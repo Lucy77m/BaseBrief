@@ -1,0 +1,61 @@
+{
+  "status": "executed",
+  "startedAt": "2026-05-30T11:30:46.641Z",
+  "finishedAt": "2026-05-30T11:30:59.221Z",
+  "providerName": "xiaomimimo",
+  "model": "mimo-v2.5",
+  "calls": [
+    {
+      "variant": "natural",
+      "phase": "warmup",
+      "endpoint": "chat/completions",
+      "totalLatencyMs": 3281,
+      "firstTokenLatencyMs": null,
+      "promptTokens": 328,
+      "completionTokens": 64,
+      "totalTokens": 392,
+      "cachedTokens": 320,
+      "cacheFieldVisible": true,
+      "fallbackReason": "responses endpoint failed: 404 Not Found"
+    },
+    {
+      "variant": "natural",
+      "phase": "repeat",
+      "endpoint": "chat/completions",
+      "totalLatencyMs": 1924,
+      "firstTokenLatencyMs": null,
+      "promptTokens": 329,
+      "completionTokens": 64,
+      "totalTokens": 393,
+      "cachedTokens": 320,
+      "cacheFieldVisible": true,
+      "fallbackReason": "responses endpoint failed: 404 Not Found"
+    },
+    {
+      "variant": "cacheReady",
+      "phase": "warmup",
+      "endpoint": "chat/completions",
+      "totalLatencyMs": 3119,
+      "firstTokenLatencyMs": null,
+      "promptTokens": 636,
+      "completionTokens": 64,
+      "totalTokens": 700,
+      "cachedTokens": 576,
+      "cacheFieldVisible": true,
+      "fallbackReason": "responses endpoint failed: 404 Not Found"
+    },
+    {
+      "variant": "cacheReady",
+      "phase": "repeat",
+      "endpoint": "chat/completions",
+      "totalLatencyMs": 4053,
+      "firstTokenLatencyMs": null,
+      "promptTokens": 636,
+      "completionTokens": 64,
+      "totalTokens": 700,
+      "cachedTokens": 576,
+      "cacheFieldVisible": true,
+      "fallbackReason": "responses endpoint failed: 404 Not Found"
+    }
+  ]
+}

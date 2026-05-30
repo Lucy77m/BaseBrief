@@ -1,0 +1,11 @@
+node_modules/
+dist/
+.cache/
+.env
+.env.local
+.env.development
+.env.production
+.env.test
+*.log
+Thumbs.db
+.DS_Store

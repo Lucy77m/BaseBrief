@@ -1,0 +1,31 @@
+{
+  "mode": "lite-cache-ready",
+  "project_name": "frontend-dashboard",
+  "project_identity": "A front-end showcase project used for bounded AI-assisted continuation.",
+  "current_goal": "Clarify the hero boundary copy without widening scope.",
+  "verified_facts": [
+    "The task belongs to the front-end layer only."
+  ],
+  "confirmed_decisions": [
+    "Do not widen scope."
+  ],
+  "assumptions": [
+    "One component is enough for this round."
+  ],
+  "open_questions": [
+    "Does the copy change need one component or two?"
+  ],
+  "risk_boundaries": [
+    "Stop if backend, provider, .env, deployment, state, memory, or gateway becomes involved."
+  ],
+  "allowed_scope": [
+    "One front-end component inside the agreed task boundary."
+  ],
+  "forbidden_scope": [
+    "backend",
+    "provider",
+    ".env"
+  ],
+  "next_action": "Adjust the hero boundary copy only.",
+  "expected_output": "A short bounded continuation baseline."
+}

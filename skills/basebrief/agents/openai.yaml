@@ -1,0 +1,4 @@
+interface:
+  display_name: "BaseBrief"
+  short_description: "Chinese project baseline with full lite and cache-ready modes"
+  default_prompt: "Use $basebrief to choose the right mode and prepare a Chinese project baseline for this task."
