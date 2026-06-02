@@ -6,7 +6,7 @@ const test = require("node:test");
 const { generateFromObject } = require("../scripts/generate_cache_ready_lite");
 const { generateCapsuleFromObject } = require("../scripts/generate_cache_ready_capsule");
 const { generateAnchorFromObject } = require("../scripts/generate_cache_ready_anchor");
-const { buildSummary, SCENARIOS } = require("../scripts/provider_cache_benchmark");
+const { buildSummary, getPromptForVariant, SCENARIOS, PROVIDER_PROFILES } = require("../scripts/provider_cache_benchmark");
 const { routeMode } = require("../scripts/mode_router");
 
 const repoRoot = path.resolve(__dirname, "..");
@@ -150,6 +150,38 @@ test("cache-ready anchor pad v4 emits stable pad before dynamic choice", () => {
 
   assert.match(output, /\nPAD=p p p p p p p p\n--\nQ=A\n$/);
   assert.doesNotMatch(output.split("\n--\n")[1], /PAD|Restate|Generate/);
+});
+
+test("cache-ready anchor pad v4 rejects missing or invalid pad values", () => {
+  const input = readJson("examples/cache-ready-anchor-pad-input.json");
+  const tooLongPad = Array.from({ length: 65 }, () => "p").join(" ");
+
+  assert.throws(() => {
+    const missing = { ...input };
+    delete missing.cache_pad;
+    generateAnchorFromObject(missing);
+  }, /Missing required key: cache_pad/);
+  assert.throws(() => generateAnchorFromObject({ ...input, cache_pad: "" }), /Empty required value: cache_pad/);
+  assert.throws(() => generateAnchorFromObject({ ...input, cache_pad: "p x p" }), /only lowercase p tokens/);
+  assert.throws(() => generateAnchorFromObject({ ...input, cache_pad: tooLongPad }), /no more than 64/);
+});
+
+test("benchmark anchor prompts stay aligned with standalone anchor generator", () => {
+  const snapshot = {
+    projectId: "projectA",
+    readmeExcerpt: "Public sample README.",
+    packages: [{ location: "package.json", name: "sample" }],
+    entryFiles: ["src/main.js"],
+    configFiles: ["vite.config.js"],
+    fileSample: ["src/main.js", "vite.config.js"],
+  };
+  const scenario = SCENARIOS[0];
+  const prompt = getPromptForVariant("anchorpad", snapshot, scenario, 0, "anchorPadV4");
+
+  assert.match(prompt, /^BB3\n/);
+  assert.match(prompt, /\nQAA=/);
+  assert.match(prompt, /\nQAB=/);
+  assert.match(prompt, /\nPAD=p p p p p p p p\n--\nQ=A\n$/);
 });
 
 test("core templates preserve BaseBrief baseline sections", () => {
@@ -433,4 +465,60 @@ test("anchorpad benchmark summary reports padded anchor v4 cost signals separate
   assert.equal(summary.anchorPadV4ConclusionLevel, "anchorpad_cost_large_sample_evidence");
   assert.equal(summary.conclusionLevel, "anchorpad_cost_large_sample_evidence");
   assert(summary.anchorPadV4OverallCostDeltaPercent < -0.05);
+});
+
+test("padSweep benchmark summary marks stronger pad length as BB5 candidate", () => {
+  const projectIds = ["projectA", "projectB", "projectC"];
+  const calls = [];
+  const variants = ["anchorPad4", "anchorPad8", "anchorPad16", "anchorPad32", "anchorPad64"];
+
+  for (const projectId of projectIds) {
+    for (const scenario of SCENARIOS) {
+      for (const variant of variants) {
+        for (let iteration = 0; iteration < 10; iteration += 1) {
+          const estimatedTotalCostCny = variant === "anchorPad16" ? 0.00009 : variant === "anchorPad8" ? 0.00012 : 0.00013;
+          calls.push({
+            projectId,
+            scenarioId: scenario.id,
+            variant,
+            phase: iteration === 0 ? "warmup" : "repeat",
+            iteration,
+            status: "success",
+            promptTokens: 1100,
+            completionTokens: 32,
+            cachedTokens: variant === "anchorPad16" ? 1090 : 1080,
+            cacheRatio: variant === "anchorPad16" ? 1090 / 1100 : 1080 / 1100,
+            cacheFieldVisible: true,
+            estimatedTotalCostCny,
+            totalLatencyMs: 1000 + iteration,
+          });
+        }
+      }
+    }
+  }
+
+  const summary = buildSummary({
+    status: "executed",
+    startedAt: "2026-06-02T00:00:00.000Z",
+    finishedAt: "2026-06-02T00:10:00.000Z",
+    providerName: "test-provider",
+    model: "test-model",
+    providerProfileId: "custom-compatible",
+    mode: "padSweep",
+    repeats: 10,
+    projectIds,
+    calls,
+  });
+
+  assert.equal(summary.requestCount, 900);
+  assert.equal(summary.padSweepBaselineVariant, "anchorPad8");
+  assert.equal(summary.padSweepCandidate.variant, "anchorPad16");
+  assert.equal(summary.padSweepCandidate.costWinsVsPad8, 18);
+  assert.equal(summary.conclusionLevel, "pad_sweep_bb5_candidate");
+});
+
+test("benchmark provider profiles include MiMo and DeepSeek pricing", () => {
+  assert.equal(PROVIDER_PROFILES["mimo-v2.5"].pricingCnyPerMillionTokens.inputCacheHit, 0.02);
+  assert.equal(PROVIDER_PROFILES["deepseek-v4-flash"].pricingCnyPerMillionTokens.inputCacheMiss, 1);
+  assert.equal(PROVIDER_PROFILES["deepseek-v4-flash"].pricingCnyPerMillionTokens.output, 2);
 });

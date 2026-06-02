@@ -96,6 +96,7 @@ Current MiMo `mimo-v2.5` benchmark evidence supports higher absolute cached toke
 - [Cache-ready experiment notes](docs/experiments/cache-ready-lite.md)
 - [BB2 cache capsule notes](docs/experiments/cache-ready-capsule.md)
 - [BB3 cache anchor notes](docs/experiments/cache-ready-anchor.md)
+- [BB4 anchor-pad notes](docs/experiments/cache-ready-anchor-pad.md)
 - [Examples](examples)
 
 ## Cache-ready v2
@@ -104,4 +105,4 @@ Current MiMo `mimo-v2.5` benchmark evidence supports higher absolute cached toke
 
 `BB3 Cache Anchor` pre-registers tail request options in the stable prefix and changes only a short selector in the dynamic tail.
 
-`BB4 Anchor Pad` adds a small stable pad before the selector. Current MiMo `mimo-v2.5` local real-project samples show estimated-cost evidence for BB4, but this is not a cross-provider claim.
+`BB4 Anchor Pad` adds a required stable pad before the selector. Current MiMo `mimo-v2.5` local real-project samples show estimated-cost evidence for BB4, but this is not a cross-provider claim.

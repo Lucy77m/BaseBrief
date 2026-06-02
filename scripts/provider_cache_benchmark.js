@@ -3,6 +3,7 @@
 const crypto = require("crypto");
 const fs = require("fs");
 const path = require("path");
+const { generateAnchorFromObject } = require("./generate_cache_ready_anchor");
 
 const repoRoot = path.resolve(__dirname, "..");
 
@@ -26,12 +27,35 @@ const EXCLUDED_FILE_PATTERNS = [
   /^CLAUDE\.md$/i,
 ];
 
-const MIMO_V25_PRICING_CNY_PER_MILLION_TOKENS = {
+const CNY_CACHE_PRICING_PER_MILLION_TOKENS = {
   inputCacheHit: 0.02,
   inputCacheMiss: 1,
   output: 2,
   effectiveDate: "2026-06-02 Asia/Shanghai",
 };
+
+const PROVIDER_PROFILES = {
+  "mimo-v2.5": {
+    providerName: "xiaomimimo",
+    model: "mimo-v2.5",
+    pricingCnyPerMillionTokens: CNY_CACHE_PRICING_PER_MILLION_TOKENS,
+    limitation: "MiMo mimo-v2.5 only; not a cross-provider conclusion.",
+  },
+  "deepseek-v4-flash": {
+    providerName: "deepseek",
+    model: "deepseek-v4-flash",
+    pricingCnyPerMillionTokens: CNY_CACHE_PRICING_PER_MILLION_TOKENS,
+    limitation: "DeepSeek deepseek-v4-flash only; not a cross-provider conclusion.",
+  },
+};
+
+const PAD_SWEEP_VARIANTS = [
+  { variant: "anchorPad4", padLength: 4 },
+  { variant: "anchorPad8", padLength: 8 },
+  { variant: "anchorPad16", padLength: 16 },
+  { variant: "anchorPad32", padLength: 32 },
+  { variant: "anchorPad64", padLength: 64 },
+];
 
 const SCENARIOS = [
   {
@@ -324,33 +348,91 @@ function buildAnchorPrompt(snapshot, scenario, iteration) {
 
 function buildAnchorPadPrompt(snapshot, scenario, iteration) {
   const choice = iteration % scenario.tailRequests.length === 0 ? "A" : "B";
-  return buildAnchorLikePrompt(snapshot, scenario, choice, "p p p p p p p p");
+  return buildAnchorLikePrompt(snapshot, scenario, choice, 8);
 }
 
-function buildAnchorLikePrompt(snapshot, scenario, choice, pad) {
-  return [
-    "BB3",
-    `P=${snapshot.projectId}/${scenario.id}: local real-project benchmark snapshot`,
-    `G=${scenario.label}`,
-    `F=readme:${sanitizeText(snapshot.readmeExcerpt || "none", 900)} ; pkg:${sanitizeText(JSON.stringify(snapshot.packages), 900)} ; files:${sanitizeText(snapshot.fileSample.join(" | "), 1200)}`,
-    "D=source project is read-only ; sensitive files and generated directories are excluded",
-    "R=do not read or output env files, tokens, secrets, or credentials",
-    "X=.env ; token ; secret ; credential ; source project writes",
-    "O=concise BaseBrief continuation answer",
-    `QAA=${sanitizeText(scenario.tailRequests[0], 300)}`,
-    `QAB=${sanitizeText(scenario.tailRequests[1], 300)}`,
-    ...(pad ? [`PAD=${pad}`] : []),
-    "--",
-    `Q=${choice}`,
-  ].join("\n");
+function buildPadString(length) {
+  return Array.from({ length }, () => "p").join(" ");
+}
+
+function buildAnchorLikePrompt(snapshot, scenario, choice, padLength) {
+  const input = {
+    mode: padLength ? "cache-ready-anchor-pad-v4" : "cache-ready-anchor-v3",
+    project_identity: `${snapshot.projectId}/${scenario.id}: local real-project benchmark snapshot`,
+    current_goal: scenario.label,
+    verified_facts: [
+      `readme:${sanitizeText(snapshot.readmeExcerpt || "none", 900)}`,
+      `pkg:${sanitizeText(JSON.stringify(snapshot.packages), 900)}`,
+      `files:${sanitizeText(snapshot.fileSample.join(" | "), 1200)}`,
+    ],
+    confirmed_decisions: [
+      "source project is read-only",
+      "sensitive files and generated directories are excluded",
+    ],
+    risk_boundaries: [
+      "do not read or output env files, tokens, secrets, or credentials",
+    ],
+    forbidden_scope: [
+      ".env",
+      "token",
+      "secret",
+      "credential",
+      "source project writes",
+    ],
+    expected_output: "concise BaseBrief continuation answer",
+    tail_options: scenario.tailRequests.map((request) => sanitizeText(request, 300)),
+    tail_choice: choice,
+  };
+  if (padLength) {
+    input.cache_pad = buildPadString(padLength);
+  }
+  return generateAnchorFromObject(input);
+}
+
+function buildPadSweepPrompt(snapshot, scenario, iteration, variant) {
+  const config = PAD_SWEEP_VARIANTS.find((item) => item.variant === variant);
+  if (!config) throw new Error(`Unknown pad sweep variant: ${variant}`);
+  const choice = iteration % scenario.tailRequests.length === 0 ? "A" : "B";
+  return buildAnchorLikePrompt(snapshot, scenario, choice, config.padLength);
+}
+
+function detectProviderProfile(providerName, model) {
+  const requested = (process.env.BASEBRIEF_PROVIDER_PROFILE || "").trim();
+  if (requested && PROVIDER_PROFILES[requested]) {
+    return { profileId: requested, ...PROVIDER_PROFILES[requested] };
+  }
+  const modelKey = String(model || "").toLowerCase();
+  if (PROVIDER_PROFILES[modelKey]) {
+    return { profileId: modelKey, ...PROVIDER_PROFILES[modelKey] };
+  }
+  const providerKey = String(providerName || "").toLowerCase();
+  if (providerKey.includes("deepseek")) {
+    return { profileId: "deepseek-v4-flash", ...PROVIDER_PROFILES["deepseek-v4-flash"] };
+  }
+  if (providerKey.includes("mimo") || providerKey.includes("xiaomi")) {
+    return { profileId: "mimo-v2.5", ...PROVIDER_PROFILES["mimo-v2.5"] };
+  }
+  return {
+    profileId: "custom-compatible",
+    providerName: providerName || "openai-compatible",
+    model: model || "unknown",
+    pricingCnyPerMillionTokens: CNY_CACHE_PRICING_PER_MILLION_TOKENS,
+    limitation: "Custom OpenAI-compatible provider; not a cross-provider conclusion.",
+  };
 }
 
 function getEnvConfig() {
+  const providerName = process.env.BASEBRIEF_PROVIDER_NAME || "openai-compatible";
+  const model = process.env.BASEBRIEF_PROVIDER_MODEL || "";
+  const providerProfile = detectProviderProfile(providerName, model);
   return {
     baseUrl: process.env.BASEBRIEF_PROVIDER_BASE_URL || "",
     apiKey: process.env.BASEBRIEF_PROVIDER_API_KEY || "",
-    model: process.env.BASEBRIEF_PROVIDER_MODEL || "",
-    providerName: process.env.BASEBRIEF_PROVIDER_NAME || "openai-compatible",
+    model,
+    providerName,
+    providerProfileId: providerProfile.profileId,
+    pricingCnyPerMillionTokens: providerProfile.pricingCnyPerMillionTokens,
+    providerLimitation: providerProfile.limitation,
     timeoutMs: Number(process.env.BASEBRIEF_PROVIDER_TIMEOUT_MS || 30000),
     repeats: Number(process.env.BASEBRIEF_BENCHMARK_REPEATS || 10),
     maxOutputTokens: Number(process.env.BASEBRIEF_BENCHMARK_MAX_OUTPUT_TOKENS || 32),
@@ -361,7 +443,7 @@ function getEnvConfig() {
   };
 }
 
-function estimateCostCny(metrics, pricing = MIMO_V25_PRICING_CNY_PER_MILLION_TOKENS) {
+function estimateCostCny(metrics, pricing = CNY_CACHE_PRICING_PER_MILLION_TOKENS) {
   const promptTokens = metrics.promptTokens ?? 0;
   const cachedTokens = metrics.cachedTokens ?? 0;
   const completionTokens = metrics.completionTokens ?? 0;
@@ -393,7 +475,7 @@ async function fetchWithTimeout(url, options, timeoutMs) {
   }
 }
 
-function extractUsageMetrics(data) {
+function extractUsageMetrics(data, pricing) {
   const usage = data.usage || {};
   const promptTokens = usage.prompt_tokens ?? usage.input_tokens ?? null;
   const completionTokens = usage.completion_tokens ?? usage.output_tokens ?? null;
@@ -410,7 +492,7 @@ function extractUsageMetrics(data) {
     cachedTokens,
     cacheRatio: promptTokens ? cachedTokens / promptTokens : null,
     cacheFieldVisible: cachedTokens !== null,
-    ...estimateCostCny({ promptTokens, completionTokens, cachedTokens }),
+    ...estimateCostCny({ promptTokens, completionTokens, cachedTokens }, pricing),
   };
 }
 
@@ -438,7 +520,7 @@ async function callChatCompletions(env, input) {
   return {
     endpoint: "chat/completions",
     totalLatencyMs,
-    ...extractUsageMetrics(JSON.parse(text)),
+    ...extractUsageMetrics(JSON.parse(text), env.pricingCnyPerMillionTokens),
   };
 }
 
@@ -474,6 +556,7 @@ function summarizeCalls(calls) {
 }
 
 function getVariantsForMode(mode) {
+  if (mode === "padSweep") return PAD_SWEEP_VARIANTS.map((item) => item.variant);
   if (mode === "anchorpad") return ["natural", "cacheReady", "capsuleV2", "anchorV3", "anchorPadV4"];
   if (mode === "anchor") return ["natural", "cacheReady", "capsuleV2", "anchorV3"];
   return mode === "capsule" ? ["natural", "cacheReady", "capsuleV2"] : ["natural", "cacheReady"];
@@ -501,6 +584,9 @@ function getPromptForVariant(mode, snapshot, scenario, iteration, variant) {
     if (variant === "anchorV3") return buildAnchorPrompt(snapshot, scenario, iteration);
     return buildAnchorPadPrompt(snapshot, scenario, iteration);
   }
+  if (mode === "padSweep") {
+    return buildPadSweepPrompt(snapshot, scenario, iteration, variant);
+  }
   return variant === "natural"
     ? buildNaturalPrompt(snapshot, scenario, iteration)
     : buildCacheReadyPrompt(snapshot, scenario, iteration);
@@ -512,6 +598,9 @@ function buildSummary(rawResult) {
   const cacheFieldVisibleCount = calls.filter((call) => call.status === "success" && call.cacheFieldVisible).length;
   const variants = {};
   const variantNames = getVariantsForMode(rawResult.mode || "absolute");
+  const scenarioList = rawResult.scenarioIds
+    ? SCENARIOS.filter((scenario) => rawResult.scenarioIds.includes(scenario.id))
+    : SCENARIOS;
   for (const variant of variantNames) {
     variants[variant] = summarizeCalls(calls.filter((call) => call.variant === variant));
   }
@@ -520,8 +609,9 @@ function buildSummary(rawResult) {
   const capsuleComparisons = [];
   const anchorComparisons = [];
   const anchorPadComparisons = [];
+  const padSweepComparisons = [];
   for (const projectId of rawResult.projectIds) {
-    for (const scenario of SCENARIOS) {
+    for (const scenario of scenarioList) {
       const naturalCalls = calls.filter((call) => call.projectId === projectId && call.scenarioId === scenario.id && call.variant === "natural");
       const cacheReadyCalls = calls.filter((call) => call.projectId === projectId && call.scenarioId === scenario.id && call.variant === "cacheReady");
       const capsuleCalls = calls.filter((call) => call.projectId === projectId && call.scenarioId === scenario.id && call.variant === "capsuleV2");
@@ -550,36 +640,38 @@ function buildSummary(rawResult) {
         typeof costDeltaCny === "number" && natural.medianEstimatedCostCny
           ? costDeltaCny / natural.medianEstimatedCostCny
           : null;
-      comparisons.push({
-        projectId,
-        scenarioId: scenario.id,
-        lengthNormalized,
-        promptTokenDeltaRatio: lengthDeltaRatio,
-        naturalMedianPromptTokens: naturalPromptMedian,
-        cacheReadyMedianPromptTokens: cacheReadyPromptMedian,
-        naturalMedianCachedTokens: natural.medianCachedTokens,
-        cacheReadyMedianCachedTokens: cacheReady.medianCachedTokens,
-        naturalMedianCacheRatio: natural.medianCacheRatio,
-        cacheReadyMedianCacheRatio: cacheReady.medianCacheRatio,
-        naturalMedianEstimatedCostCny: natural.medianEstimatedCostCny,
-        cacheReadyMedianEstimatedCostCny: cacheReady.medianEstimatedCostCny,
-        costDeltaCny,
-        costDeltaPercent,
-        cacheReadyCachedTokenWin:
-          typeof natural.medianCachedTokens === "number" &&
-          typeof cacheReady.medianCachedTokens === "number" &&
-          cacheReady.medianCachedTokens > natural.medianCachedTokens,
-        cacheReadyCacheRatioWin:
-          lengthNormalized &&
-          typeof natural.medianCacheRatio === "number" &&
-          typeof cacheReady.medianCacheRatio === "number" &&
-          cacheReady.medianCacheRatio > natural.medianCacheRatio,
-        cacheReadyEstimatedCostWin:
-          lengthNormalized &&
-          typeof natural.medianEstimatedCostCny === "number" &&
-          typeof cacheReady.medianEstimatedCostCny === "number" &&
-          cacheReady.medianEstimatedCostCny < natural.medianEstimatedCostCny,
-      });
+      if (naturalCalls.length > 0 && cacheReadyCalls.length > 0) {
+        comparisons.push({
+          projectId,
+          scenarioId: scenario.id,
+          lengthNormalized,
+          promptTokenDeltaRatio: lengthDeltaRatio,
+          naturalMedianPromptTokens: naturalPromptMedian,
+          cacheReadyMedianPromptTokens: cacheReadyPromptMedian,
+          naturalMedianCachedTokens: natural.medianCachedTokens,
+          cacheReadyMedianCachedTokens: cacheReady.medianCachedTokens,
+          naturalMedianCacheRatio: natural.medianCacheRatio,
+          cacheReadyMedianCacheRatio: cacheReady.medianCacheRatio,
+          naturalMedianEstimatedCostCny: natural.medianEstimatedCostCny,
+          cacheReadyMedianEstimatedCostCny: cacheReady.medianEstimatedCostCny,
+          costDeltaCny,
+          costDeltaPercent,
+          cacheReadyCachedTokenWin:
+            typeof natural.medianCachedTokens === "number" &&
+            typeof cacheReady.medianCachedTokens === "number" &&
+            cacheReady.medianCachedTokens > natural.medianCachedTokens,
+          cacheReadyCacheRatioWin:
+            lengthNormalized &&
+            typeof natural.medianCacheRatio === "number" &&
+            typeof cacheReady.medianCacheRatio === "number" &&
+            cacheReady.medianCacheRatio > natural.medianCacheRatio,
+          cacheReadyEstimatedCostWin:
+            lengthNormalized &&
+            typeof natural.medianEstimatedCostCny === "number" &&
+            typeof cacheReady.medianEstimatedCostCny === "number" &&
+            cacheReady.medianEstimatedCostCny < natural.medianEstimatedCostCny,
+        });
+      }
       if (capsuleCalls.length > 0) {
         const capsuleCostDeltaCny =
           typeof natural.medianEstimatedCostCny === "number" && typeof capsule.medianEstimatedCostCny === "number"
@@ -683,6 +775,42 @@ function buildSummary(rawResult) {
             anchorPad.medianEstimatedCostCny < natural.medianEstimatedCostCny,
         });
       }
+      if (rawResult.mode === "padSweep") {
+        const baselineCalls = calls.filter((call) => call.projectId === projectId && call.scenarioId === scenario.id && call.variant === "anchorPad8");
+        const baseline = summarizeCalls(baselineCalls);
+        for (const { variant, padLength } of PAD_SWEEP_VARIANTS) {
+          if (variant === "anchorPad8") continue;
+          const candidateCalls = calls.filter((call) => call.projectId === projectId && call.scenarioId === scenario.id && call.variant === variant);
+          const candidate = summarizeCalls(candidateCalls);
+          const costDeltaCny =
+            typeof baseline.medianEstimatedCostCny === "number" && typeof candidate.medianEstimatedCostCny === "number"
+              ? candidate.medianEstimatedCostCny - baseline.medianEstimatedCostCny
+              : null;
+          const costDeltaPercent =
+            typeof costDeltaCny === "number" && baseline.medianEstimatedCostCny
+              ? costDeltaCny / baseline.medianEstimatedCostCny
+              : null;
+          padSweepComparisons.push({
+            projectId,
+            scenarioId: scenario.id,
+            baselineVariant: "anchorPad8",
+            candidateVariant: variant,
+            candidatePadLength: padLength,
+            baselineMedianCachedTokens: baseline.medianCachedTokens,
+            candidateMedianCachedTokens: candidate.medianCachedTokens,
+            baselineMedianCacheRatio: baseline.medianCacheRatio,
+            candidateMedianCacheRatio: candidate.medianCacheRatio,
+            baselineMedianEstimatedCostCny: baseline.medianEstimatedCostCny,
+            candidateMedianEstimatedCostCny: candidate.medianEstimatedCostCny,
+            candidateCostDeltaCny: costDeltaCny,
+            candidateCostDeltaPercent: costDeltaPercent,
+            candidateEstimatedCostWin:
+              typeof baseline.medianEstimatedCostCny === "number" &&
+              typeof candidate.medianEstimatedCostCny === "number" &&
+              candidate.medianEstimatedCostCny < baseline.medianEstimatedCostCny,
+          });
+        }
+      }
     }
   }
 
@@ -698,8 +826,8 @@ function buildSummary(rawResult) {
   const anchorPadCostWins = anchorPadComparisons.filter((item) => item.anchorPadV4EstimatedCostWin).length;
   const cacheFieldVisibilityRate = validRequestCount ? cacheFieldVisibleCount / validRequestCount : 0;
   const validRequestRate = calls.length ? validRequestCount / calls.length : 0;
-  const naturalCost = variants.natural.medianEstimatedCostCny;
-  const cacheReadyCost = variants.cacheReady.medianEstimatedCostCny;
+  const naturalCost = variants.natural?.medianEstimatedCostCny;
+  const cacheReadyCost = variants.cacheReady?.medianEstimatedCostCny;
   const capsuleCost = variants.capsuleV2?.medianEstimatedCostCny;
   const anchorCost = variants.anchorV3?.medianEstimatedCostCny;
   const anchorPadCost = variants.anchorPadV4?.medianEstimatedCostCny;
@@ -809,6 +937,34 @@ function buildSummary(rawResult) {
   const anchorPadConclusionLevel = anchorPadStrongCostEvidence
     ? "anchorpad_cost_large_sample_evidence"
     : (anchorPadInitialCostEvidence || anchorPadRatioSignal ? "anchorpad_promising_signal" : "anchorpad_inconclusive");
+  const padSweepStats = PAD_SWEEP_VARIANTS
+    .filter((item) => item.variant !== "anchorPad8")
+    .map(({ variant, padLength }) => {
+      const candidateCost = variants[variant]?.medianEstimatedCostCny;
+      const baselineCost = variants.anchorPad8?.medianEstimatedCostCny;
+      const overallCostDeltaCny =
+        typeof candidateCost === "number" && typeof baselineCost === "number"
+          ? candidateCost - baselineCost
+          : null;
+      const overallCostDeltaPercent =
+        typeof overallCostDeltaCny === "number" && baselineCost
+          ? overallCostDeltaCny / baselineCost
+          : null;
+      const costWins = padSweepComparisons.filter((item) => item.candidateVariant === variant && item.candidateEstimatedCostWin).length;
+      return { variant, padLength, costWinsVsPad8: costWins, overallCostDeltaCny, overallCostDeltaPercent };
+    });
+  const padSweepCandidate = padSweepStats
+    .filter((item) => item.costWinsVsPad8 >= 12 && typeof item.overallCostDeltaPercent === "number" && item.overallCostDeltaPercent <= -0.05)
+    .sort((a, b) => a.overallCostDeltaPercent - b.overallCostDeltaPercent)[0] || null;
+  const padSweepConclusionLevel =
+    rawResult.mode === "padSweep" &&
+    validRequestCount >= largeSampleThreshold &&
+    cacheFieldVisibilityRate >= 0.95 &&
+    padSweepCandidate
+      ? "pad_sweep_bb5_candidate"
+      : rawResult.mode === "padSweep"
+      ? "pad_sweep_no_better_candidate"
+      : undefined;
 
   return {
     status: rawResult.status,
@@ -816,11 +972,12 @@ function buildSummary(rawResult) {
     finishedAt: rawResult.finishedAt,
     providerName: rawResult.providerName,
     model: rawResult.model,
+    providerProfileId: rawResult.providerProfileId,
     mode: rawResult.mode || "absolute",
     benchmarkKind: "local-real-projects-redacted",
-    pricingCnyPerMillionTokens: rawResult.pricingCnyPerMillionTokens || MIMO_V25_PRICING_CNY_PER_MILLION_TOKENS,
+    pricingCnyPerMillionTokens: rawResult.pricingCnyPerMillionTokens || CNY_CACHE_PRICING_PER_MILLION_TOKENS,
     projectCount: rawResult.projectIds.length,
-    scenarioCount: SCENARIOS.length,
+    scenarioCount: scenarioList.length,
     repeatsPerVariant: rawResult.repeats,
     requestCount: calls.length,
     validRequestCount,
@@ -850,10 +1007,16 @@ function buildSummary(rawResult) {
     anchorPadV4OverallCostDeltaCny,
     anchorPadV4OverallCostDeltaPercent,
     anchorPadV4ConclusionLevel: anchorPadComparisons.length ? anchorPadConclusionLevel : undefined,
+    padSweepBaselineVariant: rawResult.mode === "padSweep" ? "anchorPad8" : undefined,
+    padSweepCandidate,
+    padSweepStats: rawResult.mode === "padSweep" ? padSweepStats : undefined,
+    padSweepConclusionLevel,
     ratioConclusionLevel: ratioEvidence ? "ratio_large_sample_evidence" : "ratio_not_proven",
     costConclusionLevel: costEvidence ? "cost_large_sample_evidence" : "cost_not_proven",
     conclusionLevel:
-      rawResult.mode === "anchorpad"
+      rawResult.mode === "padSweep"
+        ? padSweepConclusionLevel
+        : rawResult.mode === "anchorpad"
         ? anchorPadConclusionLevel
         : rawResult.mode === "anchor"
         ? anchorConclusionLevel
@@ -869,8 +1032,9 @@ function buildSummary(rawResult) {
     capsuleComparisons: capsuleComparisons.length ? capsuleComparisons : undefined,
     anchorComparisons: anchorComparisons.length ? anchorComparisons : undefined,
     anchorPadComparisons: anchorPadComparisons.length ? anchorPadComparisons : undefined,
+    padSweepComparisons: padSweepComparisons.length ? padSweepComparisons : undefined,
     limitations: [
-      "MiMo mimo-v2.5 only; not a cross-provider conclusion.",
+      rawResult.providerLimitation || "Provider-specific benchmark; not a cross-provider conclusion.",
       "Latency is recorded but not used as the primary win criterion.",
       "Source project snapshots are read-only and redacted in public summary output.",
     ],
@@ -882,9 +1046,14 @@ function parseArgs(argv) {
   const outputIndex = args.indexOf("--output");
   const summaryIndex = args.indexOf("--summary-output");
   const modeIndex = args.indexOf("--mode");
+  const repeatIndex = args.indexOf("--repeat-count");
+  const projectLimitIndex = args.indexOf("--project-limit");
+  const scenarioLimitIndex = args.indexOf("--scenario-limit");
   const mode = modeIndex >= 0 ? args[modeIndex + 1] : "absolute";
   const defaultOutputPath =
-    mode === "anchorpad"
+    mode === "padSweep"
+      ? "tests/outputs/private/provider-cache-benchmark-padsweep.raw.json"
+      : mode === "anchorpad"
       ? "tests/outputs/private/provider-cache-benchmark-anchorpad.raw.json"
       : mode === "anchor"
       ? "tests/outputs/private/provider-cache-benchmark-anchor.raw.json"
@@ -894,7 +1063,9 @@ function parseArgs(argv) {
       ? "tests/outputs/private/provider-cache-benchmark-normalized.raw.json"
       : "tests/outputs/private/provider-cache-benchmark.raw.json";
   const defaultSummaryOutputPath =
-    mode === "anchorpad"
+    mode === "padSweep"
+      ? "tests/outputs/provider-cache-benchmark-padsweep.latest.json"
+      : mode === "anchorpad"
       ? "tests/outputs/provider-cache-benchmark-anchorpad.latest.json"
       : mode === "anchor"
       ? "tests/outputs/provider-cache-benchmark-anchor.latest.json"
@@ -908,6 +1079,9 @@ function parseArgs(argv) {
     mode,
     outputPath: outputIndex >= 0 ? args[outputIndex + 1] : defaultOutputPath,
     summaryOutputPath: summaryIndex >= 0 ? args[summaryIndex + 1] : defaultSummaryOutputPath,
+    repeatCount: repeatIndex >= 0 ? Number(args[repeatIndex + 1]) : undefined,
+    projectLimit: projectLimitIndex >= 0 ? Number(args[projectLimitIndex + 1]) : undefined,
+    scenarioLimit: scenarioLimitIndex >= 0 ? Number(args[scenarioLimitIndex + 1]) : undefined,
     jsonMode: args.includes("--json"),
   };
 }
@@ -926,36 +1100,48 @@ async function runBenchmark(options = {}) {
   if (!options.localProjects) {
     throw new Error("Use --local-projects for this benchmark.");
   }
-  if (!["absolute", "normalized", "capsule", "anchor", "anchorpad"].includes(options.mode)) {
-    throw new Error("Benchmark mode must be absolute, normalized, capsule, anchor, or anchorpad.");
+  if (!["absolute", "normalized", "capsule", "anchor", "anchorpad", "padSweep"].includes(options.mode)) {
+    throw new Error("Benchmark mode must be absolute, normalized, capsule, anchor, anchorpad, or padSweep.");
   }
   if (env.projectPaths.length === 0) {
     throw new Error("Missing BASEBRIEF_BENCHMARK_PROJECTS. Use semicolon-separated local project paths.");
   }
 
-  const projectIds = env.projectPaths.map((_, index) => `project${String.fromCharCode(65 + index)}`);
-  const snapshots = env.projectPaths.map((projectPath, index) => buildProjectSnapshot(projectPath, projectIds[index]));
+  const projectPaths = Number.isFinite(options.projectLimit) && options.projectLimit > 0
+    ? env.projectPaths.slice(0, options.projectLimit)
+    : env.projectPaths;
+  const scenarios = Number.isFinite(options.scenarioLimit) && options.scenarioLimit > 0
+    ? SCENARIOS.slice(0, options.scenarioLimit)
+    : SCENARIOS;
+  const repeats = Number.isFinite(options.repeatCount) && options.repeatCount > 0
+    ? options.repeatCount
+    : env.repeats;
+  const projectIds = projectPaths.map((_, index) => `project${String.fromCharCode(65 + index)}`);
+  const snapshots = projectPaths.map((projectPath, index) => buildProjectSnapshot(projectPath, projectIds[index]));
   const rawResult = {
     status: "executed",
     startedAt: nowIso(),
     finishedAt: null,
     providerName: env.providerName,
     model: env.model,
+    providerProfileId: env.providerProfileId,
+    providerLimitation: env.providerLimitation,
     mode: options.mode,
-    pricingCnyPerMillionTokens: MIMO_V25_PRICING_CNY_PER_MILLION_TOKENS,
-    repeats: env.repeats,
+    pricingCnyPerMillionTokens: env.pricingCnyPerMillionTokens,
+    repeats,
     projectIds,
+    scenarioIds: scenarios.map((scenario) => scenario.id),
     calls: [],
   };
 
   const variantsForRun = getVariantsForMode(options.mode);
-  const totalRequests = snapshots.length * SCENARIOS.length * variantsForRun.length * env.repeats;
+  const totalRequests = snapshots.length * scenarios.length * variantsForRun.length * repeats;
   let completed = 0;
 
   for (const snapshot of snapshots) {
-    for (const scenario of SCENARIOS) {
+    for (const scenario of scenarios) {
       for (const variant of variantsForRun) {
-        for (let iteration = 0; iteration < env.repeats; iteration += 1) {
+        for (let iteration = 0; iteration < repeats; iteration += 1) {
           const input = getPromptForVariant(options.mode, snapshot, scenario, iteration, variant);
           const baseCall = {
             projectId: snapshot.projectId,
@@ -1005,6 +1191,9 @@ if (require.main === module) {
 
 module.exports = {
   buildSummary,
+  getPromptForVariant,
   runBenchmark,
   SCENARIOS,
+  PAD_SWEEP_VARIANTS,
+  PROVIDER_PROFILES,
 };

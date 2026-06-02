@@ -42,6 +42,22 @@ function readTailChoice(data, optionCount) {
   return choice;
 }
 
+function readCachePad(data) {
+  const isAnchorPadV4 = sanitize(data.mode).toLowerCase() === "cache-ready-anchor-pad-v4";
+  if (!("cache_pad" in data)) {
+    if (isAnchorPadV4) throw new Error("Missing required key: cache_pad");
+    return "";
+  }
+  const value = sanitize(data.cache_pad);
+  if (!value) throw new Error("Empty required value: cache_pad");
+  const tokens = value.split(" ");
+  if (tokens.length > 64) throw new Error("cache_pad must contain no more than 64 pad tokens");
+  if (!tokens.every((token) => token === "p")) {
+    throw new Error("cache_pad must contain only lowercase p tokens separated by spaces");
+  }
+  return value;
+}
+
 function pushField(lines, key, value) {
   lines.push(`${key}=${sanitize(value)}`);
 }
@@ -53,7 +69,7 @@ function pushList(lines, key, values) {
 function generateAnchorFromObject(data) {
   const options = readTailOptions(data);
   const choice = readTailChoice(data, options.length);
-  const cachePad = "cache_pad" in data ? sanitize(data.cache_pad) : "";
+  const cachePad = readCachePad(data);
   const lines = ["BB3"];
   pushField(lines, "P", readString(data, "project_identity"));
   pushField(lines, "G", readString(data, "current_goal"));

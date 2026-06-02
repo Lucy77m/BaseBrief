@@ -98,3 +98,5 @@ BB4 result:
 Allowed wording: MiMo `mimo-v2.5` local real-project samples show estimated-cost advantage for BB4 anchor-pad.
 
 Disallowed wording: BB4 is proven cheaper across all providers or all project shapes.
+
+BB4 now has a separate experiment note: [cache-ready-anchor-pad.md](cache-ready-anchor-pad.md).

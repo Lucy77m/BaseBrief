@@ -70,6 +70,7 @@ function checkRequiredFiles() {
     "docs/experiments/cache-ready-lite.md",
     "docs/experiments/cache-ready-capsule.md",
     "docs/experiments/cache-ready-anchor.md",
+    "docs/experiments/cache-ready-anchor-pad.md",
     "README.en.md",
     "scripts/mode_router.js",
     "scripts/generate_cache_ready_lite.js",
@@ -120,8 +121,10 @@ function checkContentContracts() {
   assert(readme.includes("docs/walkthrough.md"), "README.md should link to walkthrough docs");
   assert(readme.includes("docs/experiments/cache-ready-capsule.md"), "README.md should link to cache-ready capsule docs");
   assert(readme.includes("docs/experiments/cache-ready-anchor.md"), "README.md should link to cache-ready anchor docs");
+  assert(readme.includes("docs/experiments/cache-ready-anchor-pad.md"), "README.md should link to cache-ready anchor-pad docs");
   assert(englishReadme.includes("One install, one entry"), "README.en.md must explain one install, one entry");
   assert(englishReadme.includes("Integrations"), "README.en.md should link to integrations docs");
+  assert(englishReadme.includes("docs/experiments/cache-ready-anchor-pad.md"), "README.en.md should link to anchor-pad docs");
   assert(englishReadme.includes("cache-ready"), "README.en.md must describe cache-ready mode");
   assert(!/two skills/i.test(englishReadme), "README.en.md must not imply two skills");
   ["Codex", "Claude Code", "Cursor"].forEach((toolName) => {
@@ -284,6 +287,8 @@ function checkBenchmarkSummaryIfPresent() {
     "tests/outputs/provider-cache-benchmark-capsule.latest.json",
     "tests/outputs/provider-cache-benchmark-anchor.latest.json",
     "tests/outputs/provider-cache-benchmark-anchorpad.latest.json",
+    "tests/outputs/provider-cache-benchmark-padsweep.latest.json",
+    "tests/outputs/provider-cache-benchmark-padsweep-deepseek.latest.json",
   ];
   const statuses = [];
   summaries.forEach((relativePath) => {
@@ -335,7 +340,8 @@ function checkCacheReadyProxy() {
   const anchorInputB = { ...anchorInputA, tail_choice: "B" };
   const anchorA = generateAnchorFromObject(anchorInputA);
   const anchorB = generateAnchorFromObject(anchorInputB);
-  const anchorPadA = generateAnchorFromObject(readJson("examples/cache-ready-anchor-pad-input.json"));
+  const anchorPadInput = readJson("examples/cache-ready-anchor-pad-input.json");
+  const anchorPadA = generateAnchorFromObject(anchorPadInput);
 
   const sameProjectNatural = measureContents([naturalA, naturalB]);
   const sameProjectCache = measureContents([cacheA, cacheB]);
@@ -388,6 +394,15 @@ function checkCacheReadyProxy() {
     anchorInvalidChoiceRejected = /tail_choice must be one of/i.test(error.message);
   }
   assert(anchorInvalidChoiceRejected, "Invalid tail choice must be rejected by cache-ready anchor generator");
+  let anchorPadMissingPadRejected = false;
+  try {
+    const missingPad = { ...anchorPadInput };
+    delete missingPad.cache_pad;
+    generateAnchorFromObject(missingPad);
+  } catch (error) {
+    anchorPadMissingPadRejected = /Missing required key: cache_pad/i.test(error.message);
+  }
+  assert(anchorPadMissingPadRejected, "Anchor-pad v4 input must require cache_pad");
 
   return {
     sameProjectNatural: sameProjectNatural.commonPrefixChars,
@@ -403,6 +418,7 @@ function checkCacheReadyProxy() {
     missingFieldRejected,
     capsuleMissingFieldRejected,
     anchorInvalidChoiceRejected,
+    anchorPadMissingPadRejected,
   };
 }
 
@@ -439,6 +455,7 @@ async function main() {
   console.log(`cache_ready_missing_field_rejected=${proxy.missingFieldRejected}`);
   console.log(`cache_ready_capsule_missing_field_rejected=${proxy.capsuleMissingFieldRejected}`);
   console.log(`cache_ready_anchor_invalid_choice_rejected=${proxy.anchorInvalidChoiceRejected}`);
+  console.log(`cache_ready_anchor_pad_missing_pad_rejected=${proxy.anchorPadMissingPadRejected}`);
 }
 
 main().catch((error) => {

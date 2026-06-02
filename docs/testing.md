@@ -74,7 +74,7 @@ normalized 模式的公开结果默认写入 `tests/outputs/provider-cache-bench
 - 模式路由用例：`11` 条通过
 - 安全扫描文件数：`49`
 - 相对链接检查：`18` 条有效
-- 公开示例文件：`6` 个存在
+- 公开示例文件：`12` 个存在
 - 独立测试文件：`1` 个通过
 - provider probe 状态：**已运行，provider 暴露 `cached_tokens` 指标**
 - benchmark summary 状态：`absolute:large_sample_evidence,normalized:normalized_inconclusive`
@@ -249,3 +249,35 @@ Latest anchor-pad benchmark result:
 - conclusion level: `anchorpad_cost_large_sample_evidence`
 
 This supports a MiMo `mimo-v2.5` local real-project estimated-cost advantage for BB4 anchor-pad. It does not prove cross-provider savings.
+
+BB4 PAD sweep command:
+
+```bash
+node scripts/provider_cache_benchmark.js --local-projects --mode padSweep --output tests/outputs/private/provider-cache-benchmark-padsweep.raw.json
+```
+
+Smoke command:
+
+```bash
+node scripts/provider_cache_benchmark.js --local-projects --mode padSweep --repeat-count 2 --project-limit 1 --scenario-limit 2 --output tests/outputs/private/provider-cache-benchmark-padsweep-smoke.raw.json --summary-output tests/outputs/provider-cache-benchmark-padsweep-smoke.latest.json
+```
+
+PAD sweep compares `anchorPad4`, `anchorPad8`, `anchorPad16`, `anchorPad32`, and `anchorPad64`. `anchorPad8` is the BB4 baseline. A different PAD length is only a BB5 candidate if it beats `anchorPad8` on estimated cost in at least `12/18` project-scenario pairs and lowers overall median estimated cost by at least `5%`.
+
+DeepSeek `deepseek-v4-flash` can be tested through the same script after temporarily setting provider env vars. Its price profile uses the same 2026-06-02 CNY per 1M tokens values as MiMo in this repository: input cache hit `0.02`, input cache miss `1`, output `2`. Do not write provider keys into repository files.
+
+Latest MiMo pad sweep result:
+
+- request count: `900`
+- valid request count: `900`
+- cache field visibility: `900/900`
+- best cost delta vs anchorPad8 by wins: `anchorPad4`, `18/18`, `-3.65%`
+- conclusion level: `pad_sweep_no_better_candidate`
+
+Latest DeepSeek pad sweep result:
+
+- request count: `900`
+- valid request count: `900`
+- cache field visibility: `900/900`
+- best cost delta vs anchorPad8 by wins: `anchorPad4`, `18/18`, `-2.05%`
+- conclusion level: `pad_sweep_no_better_candidate`

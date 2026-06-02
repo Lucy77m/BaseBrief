@@ -84,5 +84,6 @@
 - BB3 Cache Anchor notes: [docs/experiments/cache-ready-anchor.md](experiments/cache-ready-anchor.md)
 - BB3 example input: [examples/cache-ready-anchor-input.json](../examples/cache-ready-anchor-input.json)
 - BB3 example output: [examples/cache-ready-anchor-output.md](../examples/cache-ready-anchor-output.md)
+- BB4 Anchor Pad notes: [docs/experiments/cache-ready-anchor-pad.md](experiments/cache-ready-anchor-pad.md)
 - BB4 example input: [examples/cache-ready-anchor-pad-input.json](../examples/cache-ready-anchor-pad-input.json)
 - BB4 example output: [examples/cache-ready-anchor-pad-output.md](../examples/cache-ready-anchor-pad-output.md)

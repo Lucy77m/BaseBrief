@@ -138,18 +138,29 @@ BaseBrief/
 │     ├─ AGENT_TASK.md
 │     ├─ RISK_NOTES.md
 │     ├─ CACHE_PREFIX.md
-│     └─ CACHE_READY_LITE_INPUT.json
+│     ├─ CACHE_READY_LITE_INPUT.json
+│     ├─ CACHE_READY_CAPSULE_INPUT.json
+│     ├─ CACHE_READY_ANCHOR_INPUT.json
+│     └─ CACHE_READY_ANCHOR_PAD_INPUT.json
 ├─ docs/
 │  ├─ integrations.md
 │  ├─ walkthrough.md
 │  ├─ usage.md
 │  ├─ mode-selection.md
 │  ├─ testing.md
-│  └─ experiments/cache-ready-lite.md
+│  └─ experiments/
+│     ├─ cache-ready-lite.md
+│     ├─ cache-ready-capsule.md
+│     ├─ cache-ready-anchor.md
+│     └─ cache-ready-anchor-pad.md
 └─ scripts/
    ├─ mode_router.js
    ├─ generate_cache_ready_lite.js
+   ├─ generate_cache_ready_capsule.js
+   ├─ generate_cache_ready_anchor.js
    ├─ prompt_stability_probe.js
+   ├─ provider_cache_probe.js
+   ├─ provider_cache_benchmark.js
    └─ run_release_checks.js
 ```
 
@@ -168,5 +179,6 @@ BaseBrief/
 - BB3 experiment notes: [docs/experiments/cache-ready-anchor.md](docs/experiments/cache-ready-anchor.md)
 - BB3 example input: [examples/cache-ready-anchor-input.json](examples/cache-ready-anchor-input.json)
 - BB3 example output: [examples/cache-ready-anchor-output.md](examples/cache-ready-anchor-output.md)
+- BB4 experiment notes: [docs/experiments/cache-ready-anchor-pad.md](docs/experiments/cache-ready-anchor-pad.md)
 - BB4 example input: [examples/cache-ready-anchor-pad-input.json](examples/cache-ready-anchor-pad-input.json)
 - BB4 example output: [examples/cache-ready-anchor-pad-output.md](examples/cache-ready-anchor-pad-output.md)
