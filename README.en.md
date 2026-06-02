@@ -97,6 +97,7 @@ Current MiMo `mimo-v2.5` benchmark evidence supports higher absolute cached toke
 - [BB2 cache capsule notes](docs/experiments/cache-ready-capsule.md)
 - [BB3 cache anchor notes](docs/experiments/cache-ready-anchor.md)
 - [BB4 anchor-pad notes](docs/experiments/cache-ready-anchor-pad.md)
+- [Readable Full/Lite POC](docs/experiments/cache-ready-readable-poc.md)
 - [Examples](examples)
 
 ## Cache-ready v2

@@ -281,3 +281,39 @@ Latest DeepSeek pad sweep result:
 - cache field visibility: `900/900`
 - best cost delta vs anchorPad8 by wins: `anchorPad4`, `18/18`, `-2.05%`
 - conclusion level: `pad_sweep_no_better_candidate`
+
+## Readable Full/Lite POC benchmark
+
+Readable POC command:
+
+```bash
+node scripts/provider_cache_benchmark.js --local-projects --mode readablePoc --output tests/outputs/private/provider-cache-benchmark-readable-poc.raw.json
+```
+
+Smoke command:
+
+```bash
+node scripts/provider_cache_benchmark.js --local-projects --mode readablePoc --repeat-count 2 --project-limit 1 --scenario-limit 2 --output tests/outputs/private/provider-cache-benchmark-readable-poc-smoke.raw.json --summary-output tests/outputs/provider-cache-benchmark-readable-poc-smoke.latest.json
+```
+
+`readablePoc` compares `natural`, `readableFull`, `readableFullPad4`, `readableLite`, and `readableLitePad4`. The padded variants use the hidden Markdown comment `<!-- BASEBRIEF_CACHE_PAD: p p p p -->` before the dynamic tail request.
+
+Readable Markdown cost evidence requires `>= 15/18` estimated-cost wins against the matching non-padded readable baseline and at least `5%` lower overall median estimated cost. Anything below that stays POC-only.
+
+Latest MiMo readable POC result:
+
+- request count: `900`
+- valid request count: `900`
+- cache field visibility: `900/900`
+- `readableFullPad4`: `6/18` estimated-cost wins, `-0.04%` overall estimated-cost delta
+- `readableLitePad4`: `5/18` estimated-cost wins, `-7.04%` overall estimated-cost delta
+- conclusion level: `readable_poc_inconclusive`
+
+Latest DeepSeek readable POC result:
+
+- request count: `900`
+- valid request count: `900`
+- cache field visibility: `900/900`
+- `readableFullPad4`: `0/18` estimated-cost wins, `+10.56%` overall estimated-cost delta
+- `readableLitePad4`: `0/18` estimated-cost wins, `+15.04%` overall estimated-cost delta
+- conclusion level: `readable_poc_inconclusive`

@@ -325,6 +325,90 @@ function buildNormalizedPrompt(snapshot, scenario, iteration, variant) {
   ].join("\n");
 }
 
+function buildReadableFactLines(snapshot, compact = false) {
+  const files = compact ? snapshot.fileSample.slice(0, 30) : snapshot.fileSample;
+  return [
+    `- README excerpt: ${sanitizeText(snapshot.readmeExcerpt || "none", compact ? 700 : 1100)}`,
+    `- Package summary: ${sanitizeText(JSON.stringify(snapshot.packages), compact ? 700 : 1200)}`,
+    `- Entry and config files: ${sanitizeText([...snapshot.entryFiles, ...snapshot.configFiles].join(" | ") || "none", 600)}`,
+    `- File sample: ${sanitizeText(files.join(" | "), compact ? 800 : 1200)}`,
+  ];
+}
+
+function buildReadablePocPrompt(snapshot, scenario, iteration, variant) {
+  const tailRequest = scenario.tailRequests[iteration % scenario.tailRequests.length];
+  const isLite = variant === "readableLite" || variant === "readableLitePad4";
+  const withPad = variant === "readableFullPad4" || variant === "readableLitePad4";
+  const padLine = withPad ? ["<!-- BASEBRIEF_CACHE_PAD: p p p p -->"] : [];
+  if (isLite) {
+    return [
+      "# BaseBrief Readable Lite POC",
+      "FORMAT: readable-lite-continuation",
+      "RULE: Keep sections before the cache pad stable; put request variation only after the dynamic tail heading.",
+      "",
+      "## Project Identity",
+      `${snapshot.projectId}/${scenario.id}: local real-project benchmark snapshot`,
+      "",
+      "## Current Goal",
+      scenario.label,
+      "",
+      "## verified_facts",
+      ...buildReadableFactLines(snapshot, true),
+      "",
+      "## confirmed_decisions",
+      "- Source project is read-only.",
+      "- Sensitive files and generated directories are excluded.",
+      "",
+      "## risk_boundaries",
+      "- Do not read or output env files, tokens, secrets, or credentials.",
+      "- Do not write to the source project.",
+      "",
+      "## expected_output",
+      "A concise Lite-style BaseBrief continuation answer.",
+      "",
+      ...padLine,
+      "## Dynamic Tail Request",
+      tailRequest,
+    ].join("\n");
+  }
+
+  return [
+    "# BaseBrief Readable Full POC",
+    "FORMAT: readable-full-continuation",
+    "RULE: Keep sections before the cache pad stable; put request variation only after the dynamic tail heading.",
+    "",
+    "## 1. Project Identity",
+    `${snapshot.projectId}/${scenario.id}: local real-project benchmark snapshot`,
+    "",
+    "## 2. Current Goal",
+    scenario.label,
+    "",
+    "## 3. verified_facts",
+    ...buildReadableFactLines(snapshot, false),
+    "",
+    "## 4. confirmed_decisions",
+    "- Source project is read-only.",
+    "- Sensitive files and generated directories are excluded.",
+    "",
+    "## 5. assumptions",
+    "- No unverified project assumptions are added in this benchmark prompt.",
+    "",
+    "## 6. open_questions",
+    "- None; this prompt measures continuation format behavior only.",
+    "",
+    "## 7. risk_boundaries",
+    "- Do not read or output env files, tokens, secrets, or credentials.",
+    "- Do not write to the source project.",
+    "",
+    "## 8. expected_output",
+    "A readable Full-style BaseBrief continuation answer.",
+    "",
+    ...padLine,
+    "## 9. Dynamic Tail Request",
+    tailRequest,
+  ].join("\n");
+}
+
 function buildCapsulePrompt(snapshot, scenario, iteration) {
   const tailRequest = scenario.tailRequests[iteration % scenario.tailRequests.length];
   return [
@@ -556,6 +640,7 @@ function summarizeCalls(calls) {
 }
 
 function getVariantsForMode(mode) {
+  if (mode === "readablePoc") return ["natural", "readableFull", "readableFullPad4", "readableLite", "readableLitePad4"];
   if (mode === "padSweep") return PAD_SWEEP_VARIANTS.map((item) => item.variant);
   if (mode === "anchorpad") return ["natural", "cacheReady", "capsuleV2", "anchorV3", "anchorPadV4"];
   if (mode === "anchor") return ["natural", "cacheReady", "capsuleV2", "anchorV3"];
@@ -587,6 +672,10 @@ function getPromptForVariant(mode, snapshot, scenario, iteration, variant) {
   if (mode === "padSweep") {
     return buildPadSweepPrompt(snapshot, scenario, iteration, variant);
   }
+  if (mode === "readablePoc") {
+    if (variant === "natural") return buildNormalizedPrompt(snapshot, scenario, iteration, "natural");
+    return buildReadablePocPrompt(snapshot, scenario, iteration, variant);
+  }
   return variant === "natural"
     ? buildNaturalPrompt(snapshot, scenario, iteration)
     : buildCacheReadyPrompt(snapshot, scenario, iteration);
@@ -610,6 +699,7 @@ function buildSummary(rawResult) {
   const anchorComparisons = [];
   const anchorPadComparisons = [];
   const padSweepComparisons = [];
+  const readableComparisons = [];
   for (const projectId of rawResult.projectIds) {
     for (const scenario of scenarioList) {
       const naturalCalls = calls.filter((call) => call.projectId === projectId && call.scenarioId === scenario.id && call.variant === "natural");
@@ -811,6 +901,52 @@ function buildSummary(rawResult) {
           });
         }
       }
+      if (rawResult.mode === "readablePoc") {
+        for (const pair of [
+          { family: "full", baselineVariant: "readableFull", candidateVariant: "readableFullPad4" },
+          { family: "lite", baselineVariant: "readableLite", candidateVariant: "readableLitePad4" },
+        ]) {
+          const baselineCalls = calls.filter((call) => call.projectId === projectId && call.scenarioId === scenario.id && call.variant === pair.baselineVariant);
+          const candidateCalls = calls.filter((call) => call.projectId === projectId && call.scenarioId === scenario.id && call.variant === pair.candidateVariant);
+          const baseline = summarizeCalls(baselineCalls);
+          const candidate = summarizeCalls(candidateCalls);
+          const baselinePromptMedian = median(baselineCalls.filter((call) => call.iteration > 0 && call.status === "success").map((call) => call.promptTokens));
+          const candidatePromptMedian = median(candidateCalls.filter((call) => call.iteration > 0 && call.status === "success").map((call) => call.promptTokens));
+          const costDeltaCny =
+            typeof baseline.medianEstimatedCostCny === "number" && typeof candidate.medianEstimatedCostCny === "number"
+              ? candidate.medianEstimatedCostCny - baseline.medianEstimatedCostCny
+              : null;
+          const costDeltaPercent =
+            typeof costDeltaCny === "number" && baseline.medianEstimatedCostCny
+              ? costDeltaCny / baseline.medianEstimatedCostCny
+              : null;
+          readableComparisons.push({
+            projectId,
+            scenarioId: scenario.id,
+            family: pair.family,
+            baselineVariant: pair.baselineVariant,
+            candidateVariant: pair.candidateVariant,
+            baselineMedianPromptTokens: baselinePromptMedian,
+            candidateMedianPromptTokens: candidatePromptMedian,
+            baselineMedianCachedTokens: baseline.medianCachedTokens,
+            candidateMedianCachedTokens: candidate.medianCachedTokens,
+            baselineMedianCacheRatio: baseline.medianCacheRatio,
+            candidateMedianCacheRatio: candidate.medianCacheRatio,
+            baselineMedianEstimatedCostCny: baseline.medianEstimatedCostCny,
+            candidateMedianEstimatedCostCny: candidate.medianEstimatedCostCny,
+            candidateCostDeltaCny: costDeltaCny,
+            candidateCostDeltaPercent: costDeltaPercent,
+            candidateCacheRatioWin:
+              typeof baseline.medianCacheRatio === "number" &&
+              typeof candidate.medianCacheRatio === "number" &&
+              candidate.medianCacheRatio > baseline.medianCacheRatio,
+            candidateEstimatedCostWin:
+              typeof baseline.medianEstimatedCostCny === "number" &&
+              typeof candidate.medianEstimatedCostCny === "number" &&
+              candidate.medianEstimatedCostCny < baseline.medianEstimatedCostCny,
+          });
+        }
+      }
     }
   }
 
@@ -965,6 +1101,61 @@ function buildSummary(rawResult) {
       : rawResult.mode === "padSweep"
       ? "pad_sweep_no_better_candidate"
       : undefined;
+  const readableStats = ["full", "lite"].map((family) => {
+    const baselineVariant = family === "full" ? "readableFull" : "readableLite";
+    const candidateVariant = family === "full" ? "readableFullPad4" : "readableLitePad4";
+    const baselineCost = variants[baselineVariant]?.medianEstimatedCostCny;
+    const candidateCost = variants[candidateVariant]?.medianEstimatedCostCny;
+    const overallCostDeltaCny =
+      typeof baselineCost === "number" && typeof candidateCost === "number"
+        ? candidateCost - baselineCost
+        : null;
+    const overallCostDeltaPercent =
+      typeof overallCostDeltaCny === "number" && baselineCost
+        ? overallCostDeltaCny / baselineCost
+        : null;
+    const familyComparisons = readableComparisons.filter((item) => item.family === family);
+    const cacheRatioWins = familyComparisons.filter((item) => item.candidateCacheRatioWin).length;
+    const costWins = familyComparisons.filter((item) => item.candidateEstimatedCostWin).length;
+    const strongEvidence =
+      rawResult.mode === "readablePoc" &&
+      validRequestCount >= largeSampleThreshold &&
+      cacheFieldVisibilityRate >= 0.95 &&
+      familyComparisons.length >= 15 &&
+      costWins >= 15 &&
+      typeof overallCostDeltaPercent === "number" &&
+      overallCostDeltaPercent <= -0.05;
+    const promisingSignal =
+      rawResult.mode === "readablePoc" &&
+      validRequestCount >= largeSampleThreshold &&
+      cacheFieldVisibilityRate >= 0.95 &&
+      familyComparisons.length >= 15 &&
+      costWins >= 12 &&
+      typeof overallCostDeltaPercent === "number" &&
+      overallCostDeltaPercent <= -0.03;
+    return {
+      family,
+      baselineVariant,
+      candidateVariant,
+      cacheRatioWins,
+      estimatedCostWins: costWins,
+      overallCostDeltaCny,
+      overallCostDeltaPercent,
+      conclusionLevel: strongEvidence
+        ? `readable_${family}_cost_large_sample_evidence`
+        : promisingSignal
+        ? `readable_${family}_promising_signal`
+        : `readable_${family}_inconclusive`,
+    };
+  });
+  const readableConclusionLevel =
+    rawResult.mode === "readablePoc" && readableStats.some((item) => item.conclusionLevel.endsWith("_cost_large_sample_evidence"))
+      ? "readable_poc_large_sample_evidence"
+      : rawResult.mode === "readablePoc" && readableStats.some((item) => item.conclusionLevel.endsWith("_promising_signal"))
+      ? "readable_poc_promising_signal"
+      : rawResult.mode === "readablePoc"
+      ? "readable_poc_inconclusive"
+      : undefined;
 
   return {
     status: rawResult.status,
@@ -1011,10 +1202,14 @@ function buildSummary(rawResult) {
     padSweepCandidate,
     padSweepStats: rawResult.mode === "padSweep" ? padSweepStats : undefined,
     padSweepConclusionLevel,
+    readableStats: rawResult.mode === "readablePoc" ? readableStats : undefined,
+    readableConclusionLevel,
     ratioConclusionLevel: ratioEvidence ? "ratio_large_sample_evidence" : "ratio_not_proven",
     costConclusionLevel: costEvidence ? "cost_large_sample_evidence" : "cost_not_proven",
     conclusionLevel:
-      rawResult.mode === "padSweep"
+      rawResult.mode === "readablePoc"
+        ? readableConclusionLevel
+        : rawResult.mode === "padSweep"
         ? padSweepConclusionLevel
         : rawResult.mode === "anchorpad"
         ? anchorPadConclusionLevel
@@ -1033,6 +1228,7 @@ function buildSummary(rawResult) {
     anchorComparisons: anchorComparisons.length ? anchorComparisons : undefined,
     anchorPadComparisons: anchorPadComparisons.length ? anchorPadComparisons : undefined,
     padSweepComparisons: padSweepComparisons.length ? padSweepComparisons : undefined,
+    readableComparisons: readableComparisons.length ? readableComparisons : undefined,
     limitations: [
       rawResult.providerLimitation || "Provider-specific benchmark; not a cross-provider conclusion.",
       "Latency is recorded but not used as the primary win criterion.",
@@ -1051,7 +1247,9 @@ function parseArgs(argv) {
   const scenarioLimitIndex = args.indexOf("--scenario-limit");
   const mode = modeIndex >= 0 ? args[modeIndex + 1] : "absolute";
   const defaultOutputPath =
-    mode === "padSweep"
+    mode === "readablePoc"
+      ? "tests/outputs/private/provider-cache-benchmark-readable-poc.raw.json"
+      : mode === "padSweep"
       ? "tests/outputs/private/provider-cache-benchmark-padsweep.raw.json"
       : mode === "anchorpad"
       ? "tests/outputs/private/provider-cache-benchmark-anchorpad.raw.json"
@@ -1063,7 +1261,9 @@ function parseArgs(argv) {
       ? "tests/outputs/private/provider-cache-benchmark-normalized.raw.json"
       : "tests/outputs/private/provider-cache-benchmark.raw.json";
   const defaultSummaryOutputPath =
-    mode === "padSweep"
+    mode === "readablePoc"
+      ? "tests/outputs/provider-cache-benchmark-readable-poc.latest.json"
+      : mode === "padSweep"
       ? "tests/outputs/provider-cache-benchmark-padsweep.latest.json"
       : mode === "anchorpad"
       ? "tests/outputs/provider-cache-benchmark-anchorpad.latest.json"
@@ -1100,8 +1300,8 @@ async function runBenchmark(options = {}) {
   if (!options.localProjects) {
     throw new Error("Use --local-projects for this benchmark.");
   }
-  if (!["absolute", "normalized", "capsule", "anchor", "anchorpad", "padSweep"].includes(options.mode)) {
-    throw new Error("Benchmark mode must be absolute, normalized, capsule, anchor, anchorpad, or padSweep.");
+  if (!["absolute", "normalized", "capsule", "anchor", "anchorpad", "padSweep", "readablePoc"].includes(options.mode)) {
+    throw new Error("Benchmark mode must be absolute, normalized, capsule, anchor, anchorpad, padSweep, or readablePoc.");
   }
   if (env.projectPaths.length === 0) {
     throw new Error("Missing BASEBRIEF_BENCHMARK_PROJECTS. Use semicolon-separated local project paths.");

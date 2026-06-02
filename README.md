@@ -152,7 +152,8 @@ BaseBrief/
 │     ├─ cache-ready-lite.md
 │     ├─ cache-ready-capsule.md
 │     ├─ cache-ready-anchor.md
-│     └─ cache-ready-anchor-pad.md
+│     ├─ cache-ready-anchor-pad.md
+│     └─ cache-ready-readable-poc.md
 └─ scripts/
    ├─ mode_router.js
    ├─ generate_cache_ready_lite.js
@@ -182,3 +183,4 @@ BaseBrief/
 - BB4 experiment notes: [docs/experiments/cache-ready-anchor-pad.md](docs/experiments/cache-ready-anchor-pad.md)
 - BB4 example input: [examples/cache-ready-anchor-pad-input.json](examples/cache-ready-anchor-pad-input.json)
 - BB4 example output: [examples/cache-ready-anchor-pad-output.md](examples/cache-ready-anchor-pad-output.md)
+- Readable Full/Lite POC: [docs/experiments/cache-ready-readable-poc.md](docs/experiments/cache-ready-readable-poc.md)

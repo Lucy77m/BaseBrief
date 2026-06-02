@@ -87,3 +87,4 @@
 - BB4 Anchor Pad notes: [docs/experiments/cache-ready-anchor-pad.md](experiments/cache-ready-anchor-pad.md)
 - BB4 example input: [examples/cache-ready-anchor-pad-input.json](../examples/cache-ready-anchor-pad-input.json)
 - BB4 example output: [examples/cache-ready-anchor-pad-output.md](../examples/cache-ready-anchor-pad-output.md)
+- Readable Full/Lite POC notes: [docs/experiments/cache-ready-readable-poc.md](experiments/cache-ready-readable-poc.md)

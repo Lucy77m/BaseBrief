@@ -184,6 +184,30 @@ test("benchmark anchor prompts stay aligned with standalone anchor generator", (
   assert.match(prompt, /\nPAD=p p p p p p p p\n--\nQ=A\n$/);
 });
 
+test("readablePoc prompts keep stable markdown before hidden pad and dynamic tail", () => {
+  const snapshot = {
+    projectId: "projectA",
+    readmeExcerpt: "Public sample README.",
+    packages: [{ location: "package.json", name: "sample" }],
+    entryFiles: ["src/main.js"],
+    configFiles: ["vite.config.js"],
+    fileSample: ["src/main.js", "vite.config.js"],
+  };
+  const scenario = SCENARIOS[0];
+  const full = getPromptForVariant("readablePoc", snapshot, scenario, 0, "readableFullPad4");
+  const lite = getPromptForVariant("readablePoc", snapshot, scenario, 1, "readableLitePad4");
+
+  for (const prompt of [full, lite]) {
+    const padIndex = prompt.indexOf("<!-- BASEBRIEF_CACHE_PAD: p p p p -->");
+    const tailIndex = prompt.indexOf("Dynamic Tail Request");
+    assert(padIndex > 0, "readablePoc prompt should include hidden cache pad");
+    assert(tailIndex > padIndex, "dynamic tail must appear after hidden cache pad");
+    assert.match(prompt, /verified_facts/);
+    assert.match(prompt, /confirmed_decisions/);
+    assert.match(prompt, /risk_boundaries/);
+  }
+});
+
 test("core templates preserve BaseBrief baseline sections", () => {
   const templatePaths = [
     "templates/zh-CN/BASEBRIEF.md",
@@ -515,6 +539,57 @@ test("padSweep benchmark summary marks stronger pad length as BB5 candidate", ()
   assert.equal(summary.padSweepCandidate.variant, "anchorPad16");
   assert.equal(summary.padSweepCandidate.costWinsVsPad8, 18);
   assert.equal(summary.conclusionLevel, "pad_sweep_bb5_candidate");
+});
+
+test("readablePoc benchmark summary classifies Full and Lite padded markdown separately", () => {
+  const projectIds = ["projectA", "projectB", "projectC"];
+  const calls = [];
+  const variants = ["natural", "readableFull", "readableFullPad4", "readableLite", "readableLitePad4"];
+
+  for (const projectId of projectIds) {
+    for (const scenario of SCENARIOS) {
+      for (const variant of variants) {
+        for (let iteration = 0; iteration < 10; iteration += 1) {
+          const estimatedTotalCostCny =
+            variant === "readableFullPad4" || variant === "readableLitePad4" ? 0.00009 : 0.0002;
+          calls.push({
+            projectId,
+            scenarioId: scenario.id,
+            variant,
+            phase: iteration === 0 ? "warmup" : "repeat",
+            iteration,
+            status: "success",
+            promptTokens: 1200,
+            completionTokens: 32,
+            cachedTokens: variant.endsWith("Pad4") ? 1180 : 1000,
+            cacheRatio: variant.endsWith("Pad4") ? 1180 / 1200 : 1000 / 1200,
+            cacheFieldVisible: true,
+            estimatedTotalCostCny,
+            totalLatencyMs: 1000 + iteration,
+          });
+        }
+      }
+    }
+  }
+
+  const summary = buildSummary({
+    status: "executed",
+    startedAt: "2026-06-02T00:00:00.000Z",
+    finishedAt: "2026-06-02T00:10:00.000Z",
+    providerName: "test-provider",
+    model: "test-model",
+    providerProfileId: "custom-compatible",
+    mode: "readablePoc",
+    repeats: 10,
+    projectIds,
+    calls,
+  });
+
+  assert.equal(summary.requestCount, 900);
+  assert.equal(summary.readableStats.length, 2);
+  assert.equal(summary.readableStats.find((item) => item.family === "full").estimatedCostWins, 18);
+  assert.equal(summary.readableStats.find((item) => item.family === "lite").estimatedCostWins, 18);
+  assert.equal(summary.conclusionLevel, "readable_poc_large_sample_evidence");
 });
 
 test("benchmark provider profiles include MiMo and DeepSeek pricing", () => {
