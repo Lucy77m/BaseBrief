@@ -177,3 +177,4 @@ estimatedTotalCostCny =
 最近一次 probe 状态已脱敏保存到：
 
 - `tests/outputs/provider-cache-probe.latest.json`
+Related BB2 experiment: [cache-ready-capsule.md](cache-ready-capsule.md).

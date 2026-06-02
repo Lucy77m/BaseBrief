@@ -94,4 +94,14 @@ Current MiMo `mimo-v2.5` benchmark evidence supports higher absolute cached toke
 - [Mode selection](docs/mode-selection.md)
 - [Testing](docs/testing.md)
 - [Cache-ready experiment notes](docs/experiments/cache-ready-lite.md)
+- [BB2 cache capsule notes](docs/experiments/cache-ready-capsule.md)
+- [BB3 cache anchor notes](docs/experiments/cache-ready-anchor.md)
 - [Examples](examples)
+
+## Cache-ready v2
+
+`BB2 Cache Capsule` is the compact v2 experiment for cache-ratio and estimated-cost testing. It is not the recommended path for ordinary project continuation.
+
+`BB3 Cache Anchor` pre-registers tail request options in the stable prefix and changes only a short selector in the dynamic tail.
+
+`BB4 Anchor Pad` adds a small stable pad before the selector. Current MiMo `mimo-v2.5` local real-project samples show estimated-cost evidence for BB4, but this is not a cross-provider claim.

@@ -1,0 +1,26 @@
+{
+  "mode": "cache-ready-capsule-v2",
+  "project_name": "sample-showcase",
+  "project_identity": "A showcase project used for bounded AI-assisted continuation.",
+  "current_goal": "Clarify one hero section boundary without widening scope.",
+  "verified_facts": [
+    "The task belongs to the presentation layer only.",
+    "This round does not touch backend or deployment."
+  ],
+  "confirmed_decisions": [
+    "Do not widen scope.",
+    "Keep the work inside one or two files."
+  ],
+  "risk_boundaries": [
+    "Stop if backend, provider, .env, deployment, state, memory, or gateway becomes relevant."
+  ],
+  "forbidden_scope": [
+    "backend",
+    "provider",
+    ".env",
+    "deployment",
+    "real runtime"
+  ],
+  "expected_output": "A compact BB2 capsule for cache-economics experiments.",
+  "tail_request": "Restate the project state briefly, then give only the next safe step."
+}

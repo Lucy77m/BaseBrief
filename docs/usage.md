@@ -78,3 +78,11 @@
 ## 5. Agent 任务说明示例
 
 - 参考：[examples/agent-task-example.md](../examples/agent-task-example.md)
+- BB2 Cache Capsule notes: [docs/experiments/cache-ready-capsule.md](experiments/cache-ready-capsule.md)
+- BB2 example input: [examples/cache-ready-capsule-input.json](../examples/cache-ready-capsule-input.json)
+- BB2 example output: [examples/cache-ready-capsule-output.md](../examples/cache-ready-capsule-output.md)
+- BB3 Cache Anchor notes: [docs/experiments/cache-ready-anchor.md](experiments/cache-ready-anchor.md)
+- BB3 example input: [examples/cache-ready-anchor-input.json](../examples/cache-ready-anchor-input.json)
+- BB3 example output: [examples/cache-ready-anchor-output.md](../examples/cache-ready-anchor-output.md)
+- BB4 example input: [examples/cache-ready-anchor-pad-input.json](../examples/cache-ready-anchor-pad-input.json)
+- BB4 example output: [examples/cache-ready-anchor-pad-output.md](../examples/cache-ready-anchor-pad-output.md)

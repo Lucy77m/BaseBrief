@@ -4,6 +4,8 @@ const path = require("node:path");
 const test = require("node:test");
 
 const { generateFromObject } = require("../scripts/generate_cache_ready_lite");
+const { generateCapsuleFromObject } = require("../scripts/generate_cache_ready_capsule");
+const { generateAnchorFromObject } = require("../scripts/generate_cache_ready_anchor");
 const { buildSummary, SCENARIOS } = require("../scripts/provider_cache_benchmark");
 const { routeMode } = require("../scripts/mode_router");
 
@@ -77,6 +79,77 @@ test("cache-ready generator rejects missing required fields", () => {
   const input = readJson("tests/fixtures/cache-ready/cache-ready-missing.json");
 
   assert.throws(() => generateFromObject(input), /Missing required key: tail_request/);
+});
+
+test("cache-ready capsule v2 keeps compact deterministic field order", () => {
+  const input = readJson("tests/fixtures/cache-ready/cache-ready-a.json");
+  const first = generateCapsuleFromObject(input);
+  const second = generateCapsuleFromObject(input);
+
+  assert.equal(first, second);
+  assert.equal(first.split("\n").slice(0, 9).join("\n"), [
+    "BB2",
+    `P=${input.project_identity}`,
+    `G=${input.current_goal}`,
+    `F=${input.verified_facts.join(" ; ")}`,
+    `D=${input.confirmed_decisions.join(" ; ")}`,
+    `R=${input.risk_boundaries.join(" ; ")}`,
+    `X=${input.forbidden_scope.join(" ; ")}`,
+    `O=${input.expected_output}`,
+    "--",
+  ].join("\n"));
+  assert.match(first, /\nT=/);
+  assert.doesNotMatch(first, /NOTICE|SCHEMA_VERSION|COUNT|ASSUMPTION|OPEN_QUESTION|ALLOWED_SCOPE/);
+});
+
+test("cache-ready capsule v2 is stable across shuffled input and rejects missing fields", () => {
+  const normal = generateCapsuleFromObject(readJson("tests/fixtures/cache-ready/cache-ready-a.json"));
+  const shuffled = generateCapsuleFromObject(readJson("tests/fixtures/cache-ready/cache-ready-shuffled.json"));
+
+  assert.equal(normal, shuffled);
+  assert.throws(
+    () => generateCapsuleFromObject(readJson("tests/fixtures/cache-ready/cache-ready-missing.json")),
+    /Missing required key: tail_request/,
+  );
+});
+
+test("cache-ready capsule v2 is substantially shorter than v1 for the same input", () => {
+  const input = readJson("tests/fixtures/cache-ready/cache-ready-a.json");
+  const v1 = generateFromObject(input);
+  const v2 = generateCapsuleFromObject(input);
+  const reduction = (v1.length - v2.length) / v1.length;
+
+  assert(reduction >= 0.25, `Expected v2 to be at least 25% shorter; got ${reduction}`);
+});
+
+test("cache-ready anchor v3 pre-registers tail options and keeps only choice dynamic", () => {
+  const input = readJson("examples/cache-ready-anchor-input.json");
+  const first = generateAnchorFromObject(input);
+  const second = generateAnchorFromObject(input);
+
+  assert.equal(first, second);
+  assert.match(first, /^BB3\n/);
+  assert.match(first, /\nQAA=Restate the project state briefly/);
+  assert.match(first, /\nQAB=Generate a short next-chat opener/);
+  assert.match(first, /\n--\nQ=A\n$/);
+  assert.doesNotMatch(first.split("\n--\n")[1], /Restate|Generate|project state|next-chat/);
+});
+
+test("cache-ready anchor v3 validates tail options and choice", () => {
+  const input = readJson("examples/cache-ready-anchor-input.json");
+  const changedChoice = { ...input, tail_choice: "B" };
+
+  assert.match(generateAnchorFromObject(changedChoice), /\n--\nQ=B\n$/);
+  assert.throws(() => generateAnchorFromObject({ ...input, tail_options: ["only one"] }), /tail_options must contain at least two items/);
+  assert.throws(() => generateAnchorFromObject({ ...input, tail_choice: "Z" }), /tail_choice must be one of/);
+});
+
+test("cache-ready anchor pad v4 emits stable pad before dynamic choice", () => {
+  const input = readJson("examples/cache-ready-anchor-pad-input.json");
+  const output = generateAnchorFromObject(input);
+
+  assert.match(output, /\nPAD=p p p p p p p p\n--\nQ=A\n$/);
+  assert.doesNotMatch(output.split("\n--\n")[1], /PAD|Restate|Generate/);
 });
 
 test("core templates preserve BaseBrief baseline sections", () => {
@@ -204,4 +277,160 @@ test("normalized benchmark summary reports ratio and cost wins only for length-n
   assert.equal(summary.costConclusionLevel, "cost_large_sample_evidence");
   assert.equal(summary.conclusionLevel, "normalized_large_sample_evidence");
   assert(summary.overallCostDeltaPercent < -0.05);
+});
+
+test("capsule benchmark summary reports capsule v2 cost and ratio signals separately", () => {
+  const projectIds = ["projectA", "projectB", "projectC"];
+  const calls = [];
+
+  for (const projectId of projectIds) {
+    for (const scenario of SCENARIOS) {
+      for (const variant of ["natural", "cacheReady", "capsuleV2"]) {
+        for (let iteration = 0; iteration < 10; iteration += 1) {
+          const promptTokens = variant === "capsuleV2" ? 700 : 1000;
+          const cachedTokens = variant === "capsuleV2" ? 680 : 900;
+          const estimatedTotalCostCny = variant === "capsuleV2" ? 0.00012 : 0.0002;
+          calls.push({
+            projectId,
+            scenarioId: scenario.id,
+            variant,
+            phase: iteration === 0 ? "warmup" : "repeat",
+            iteration,
+            status: "success",
+            promptTokens,
+            completionTokens: 32,
+            cachedTokens,
+            cacheRatio: cachedTokens / promptTokens,
+            cacheFieldVisible: true,
+            estimatedTotalCostCny,
+            totalLatencyMs: 1000 + iteration,
+          });
+        }
+      }
+    }
+  }
+
+  const summary = buildSummary({
+    status: "executed",
+    startedAt: "2026-06-02T00:00:00.000Z",
+    finishedAt: "2026-06-02T00:10:00.000Z",
+    providerName: "test-provider",
+    model: "test-model",
+    mode: "capsule",
+    repeats: 10,
+    projectIds,
+    calls,
+  });
+
+  assert.equal(summary.requestCount, 540);
+  assert.equal(summary.largeSampleThreshold, 486);
+  assert.equal(summary.capsuleV2CacheRatioWins, 18);
+  assert.equal(summary.capsuleV2EstimatedCostWins, 18);
+  assert.equal(summary.capsuleV2ConclusionLevel, "capsule_cost_large_sample_evidence");
+  assert.equal(summary.conclusionLevel, "capsule_cost_large_sample_evidence");
+  assert(summary.capsuleV2OverallCostDeltaPercent < -0.05);
+});
+
+test("anchor benchmark summary reports anchor v3 cost and ratio signals separately", () => {
+  const projectIds = ["projectA", "projectB", "projectC"];
+  const calls = [];
+
+  for (const projectId of projectIds) {
+    for (const scenario of SCENARIOS) {
+      for (const variant of ["natural", "cacheReady", "capsuleV2", "anchorV3"]) {
+        for (let iteration = 0; iteration < 10; iteration += 1) {
+          const promptTokens = variant === "anchorV3" ? 1100 : 1000;
+          const cachedTokens = variant === "anchorV3" ? 1088 : 900;
+          const estimatedTotalCostCny = variant === "anchorV3" ? 0.00012 : 0.0002;
+          calls.push({
+            projectId,
+            scenarioId: scenario.id,
+            variant,
+            phase: iteration === 0 ? "warmup" : "repeat",
+            iteration,
+            status: "success",
+            promptTokens,
+            completionTokens: 32,
+            cachedTokens,
+            cacheRatio: cachedTokens / promptTokens,
+            cacheFieldVisible: true,
+            estimatedTotalCostCny,
+            totalLatencyMs: 1000 + iteration,
+          });
+        }
+      }
+    }
+  }
+
+  const summary = buildSummary({
+    status: "executed",
+    startedAt: "2026-06-02T00:00:00.000Z",
+    finishedAt: "2026-06-02T00:10:00.000Z",
+    providerName: "test-provider",
+    model: "test-model",
+    mode: "anchor",
+    repeats: 10,
+    projectIds,
+    calls,
+  });
+
+  assert.equal(summary.requestCount, 720);
+  assert.equal(summary.largeSampleThreshold, 648);
+  assert.equal(summary.anchorV3CacheRatioWins, 18);
+  assert.equal(summary.anchorV3EstimatedCostWins, 18);
+  assert.equal(summary.anchorV3ConclusionLevel, "anchor_cost_large_sample_evidence");
+  assert.equal(summary.conclusionLevel, "anchor_cost_large_sample_evidence");
+  assert(summary.anchorV3OverallCostDeltaPercent < -0.05);
+});
+
+test("anchorpad benchmark summary reports padded anchor v4 cost signals separately", () => {
+  const projectIds = ["projectA", "projectB", "projectC"];
+  const calls = [];
+
+  for (const projectId of projectIds) {
+    for (const scenario of SCENARIOS) {
+      for (const variant of ["natural", "cacheReady", "capsuleV2", "anchorV3", "anchorPadV4"]) {
+        for (let iteration = 0; iteration < 10; iteration += 1) {
+          const promptTokens = variant === "anchorPadV4" ? 1120 : 1000;
+          const cachedTokens = variant === "anchorPadV4" ? 1088 : 900;
+          const estimatedTotalCostCny = variant === "anchorPadV4" ? 0.00012 : 0.0002;
+          calls.push({
+            projectId,
+            scenarioId: scenario.id,
+            variant,
+            phase: iteration === 0 ? "warmup" : "repeat",
+            iteration,
+            status: "success",
+            promptTokens,
+            completionTokens: 32,
+            cachedTokens,
+            cacheRatio: cachedTokens / promptTokens,
+            cacheFieldVisible: true,
+            estimatedTotalCostCny,
+            totalLatencyMs: 1000 + iteration,
+          });
+        }
+      }
+    }
+  }
+
+  const summary = buildSummary({
+    status: "executed",
+    startedAt: "2026-06-02T00:00:00.000Z",
+    finishedAt: "2026-06-02T00:10:00.000Z",
+    providerName: "test-provider",
+    model: "test-model",
+    mode: "anchorpad",
+    repeats: 10,
+    projectIds,
+    calls,
+  });
+
+  assert.equal(summary.requestCount, 900);
+  assert.equal(summary.largeSampleThreshold, 810);
+  assert.equal(summary.anchorPadV4CacheRatioWins, 18);
+  assert.equal(summary.anchorPadV4EstimatedCostWins, 18);
+  assert.equal(summary.anchorPadV4ConclusionLevel, "anchorpad_cost_large_sample_evidence");
+  assert.equal(summary.conclusionLevel, "anchorpad_cost_large_sample_evidence");
+  assert(summary.anchorPadV4OverallCostDeltaPercent < -0.05);
 });

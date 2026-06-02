@@ -5,6 +5,8 @@ const path = require("path");
 const { execFileSync } = require("child_process");
 const { routeMode } = require("./mode_router");
 const { generateFromObject } = require("./generate_cache_ready_lite");
+const { generateCapsuleFromObject } = require("./generate_cache_ready_capsule");
+const { generateAnchorFromObject } = require("./generate_cache_ready_anchor");
 const { measureContents } = require("./prompt_stability_probe");
 const { runProviderProbe } = require("./provider_cache_probe");
 
@@ -57,15 +59,22 @@ function checkRequiredFiles() {
     "templates/zh-CN/RISK_NOTES.md",
     "templates/zh-CN/CACHE_PREFIX.md",
     "templates/zh-CN/CACHE_READY_LITE_INPUT.json",
+    "templates/zh-CN/CACHE_READY_CAPSULE_INPUT.json",
+    "templates/zh-CN/CACHE_READY_ANCHOR_INPUT.json",
+    "templates/zh-CN/CACHE_READY_ANCHOR_PAD_INPUT.json",
     "docs/usage.md",
     "docs/integrations.md",
     "docs/walkthrough.md",
     "docs/mode-selection.md",
     "docs/testing.md",
     "docs/experiments/cache-ready-lite.md",
+    "docs/experiments/cache-ready-capsule.md",
+    "docs/experiments/cache-ready-anchor.md",
     "README.en.md",
     "scripts/mode_router.js",
     "scripts/generate_cache_ready_lite.js",
+    "scripts/generate_cache_ready_capsule.js",
+    "scripts/generate_cache_ready_anchor.js",
     "scripts/prompt_stability_probe.js",
     "scripts/provider_cache_probe.js",
     "scripts/provider_cache_benchmark.js",
@@ -73,6 +82,12 @@ function checkRequiredFiles() {
     "examples/lite-example.md",
     "examples/cache-ready-input.json",
     "examples/cache-ready-output.md",
+    "examples/cache-ready-capsule-input.json",
+    "examples/cache-ready-capsule-output.md",
+    "examples/cache-ready-anchor-input.json",
+    "examples/cache-ready-anchor-output.md",
+    "examples/cache-ready-anchor-pad-input.json",
+    "examples/cache-ready-anchor-pad-output.md",
     "examples/next-chat-example.md",
     "examples/agent-task-example.md",
   ];
@@ -103,6 +118,8 @@ function checkContentContracts() {
   assert(readme.includes("README.en.md"), "README.md should link to README.en.md");
   assert(readme.includes("docs/integrations.md"), "README.md should link to integrations docs");
   assert(readme.includes("docs/walkthrough.md"), "README.md should link to walkthrough docs");
+  assert(readme.includes("docs/experiments/cache-ready-capsule.md"), "README.md should link to cache-ready capsule docs");
+  assert(readme.includes("docs/experiments/cache-ready-anchor.md"), "README.md should link to cache-ready anchor docs");
   assert(englishReadme.includes("One install, one entry"), "README.en.md must explain one install, one entry");
   assert(englishReadme.includes("Integrations"), "README.en.md should link to integrations docs");
   assert(englishReadme.includes("cache-ready"), "README.en.md must describe cache-ready mode");
@@ -245,6 +262,12 @@ function checkExamples() {
     "examples/lite-example.md",
     "examples/cache-ready-input.json",
     "examples/cache-ready-output.md",
+    "examples/cache-ready-capsule-input.json",
+    "examples/cache-ready-capsule-output.md",
+    "examples/cache-ready-anchor-input.json",
+    "examples/cache-ready-anchor-output.md",
+    "examples/cache-ready-anchor-pad-input.json",
+    "examples/cache-ready-anchor-pad-output.md",
     "examples/next-chat-example.md",
     "examples/agent-task-example.md",
   ];
@@ -258,6 +281,9 @@ function checkBenchmarkSummaryIfPresent() {
   const summaries = [
     "tests/outputs/provider-cache-benchmark.latest.json",
     "tests/outputs/provider-cache-benchmark-normalized.latest.json",
+    "tests/outputs/provider-cache-benchmark-capsule.latest.json",
+    "tests/outputs/provider-cache-benchmark-anchor.latest.json",
+    "tests/outputs/provider-cache-benchmark-anchorpad.latest.json",
   ];
   const statuses = [];
   summaries.forEach((relativePath) => {
@@ -301,6 +327,15 @@ function checkCacheReadyProxy() {
   const cacheFollowupA = generateFromObject(readJson("tests/fixtures/cache-ready/cache-ready-followup-a.json"));
   const cacheFollowupB = generateFromObject(readJson("tests/fixtures/cache-ready/cache-ready-followup-b.json"));
   const cacheShuffled = generateFromObject(readJson("tests/fixtures/cache-ready/cache-ready-shuffled.json"));
+  const capsuleA = generateCapsuleFromObject(readJson("tests/fixtures/cache-ready/cache-ready-a.json"));
+  const capsuleShuffled = generateCapsuleFromObject(readJson("tests/fixtures/cache-ready/cache-ready-shuffled.json"));
+  const capsuleFollowupA = generateCapsuleFromObject(readJson("tests/fixtures/cache-ready/cache-ready-followup-a.json"));
+  const capsuleFollowupB = generateCapsuleFromObject(readJson("tests/fixtures/cache-ready/cache-ready-followup-b.json"));
+  const anchorInputA = readJson("examples/cache-ready-anchor-input.json");
+  const anchorInputB = { ...anchorInputA, tail_choice: "B" };
+  const anchorA = generateAnchorFromObject(anchorInputA);
+  const anchorB = generateAnchorFromObject(anchorInputB);
+  const anchorPadA = generateAnchorFromObject(readJson("examples/cache-ready-anchor-pad-input.json"));
 
   const sameProjectNatural = measureContents([naturalA, naturalB]);
   const sameProjectCache = measureContents([cacheA, cacheB]);
@@ -309,6 +344,10 @@ function checkCacheReadyProxy() {
   const followupNatural = measureContents([followupA, followupB]);
   const followupCache = measureContents([cacheFollowupA, cacheFollowupB]);
   const shuffledConsistency = measureContents([cacheA, cacheShuffled]);
+  const capsuleShuffledConsistency = measureContents([capsuleA, capsuleShuffled]);
+  const capsuleFollowup = measureContents([capsuleFollowupA, capsuleFollowupB]);
+  const capsuleReduction = (cacheA.length - capsuleA.length) / cacheA.length;
+  const anchorFollowup = measureContents([anchorA, anchorB]);
 
   assert(sameProjectCache.commonPrefixChars > sameProjectNatural.commonPrefixChars, "Cache-ready should improve same-project shared prefix");
   assert(crossProjectCache.commonPrefixChars > crossProjectNatural.commonPrefixChars, "Cache-ready should improve cross-project shared prefix");
@@ -317,6 +356,16 @@ function checkCacheReadyProxy() {
   assert(followupCache.fieldOrderConsistent, "Cache-ready follow-up outputs should keep field order stable");
   assert(shuffledConsistency.exactMatch, "Shuffled input keys should generate the same output");
   assert(shuffledConsistency.fieldOrderConsistent, "Shuffled input keys must not change generated field order");
+  assert(capsuleShuffledConsistency.exactMatch, "Capsule shuffled input keys should generate the same output");
+  const capsuleTailIndex = capsuleFollowupA.indexOf("\nT=");
+  assert(capsuleTailIndex > 0, "Capsule output should contain a T tail field");
+  assert(capsuleFollowup.commonPrefixChars >= capsuleTailIndex + 3, "Capsule follow-up should keep all fields before T stable");
+  assert(capsuleReduction >= 0.25, "Capsule v2 should be at least 25% shorter than cache-ready v1 for the same input");
+  const anchorTailIndex = anchorA.indexOf("\nQ=");
+  assert(anchorTailIndex > 0, "Anchor output should contain a Q tail field");
+  assert(anchorA.includes("\nQAA=") && anchorA.includes("\nQAB="), "Anchor output should pre-register request options");
+  assert(anchorFollowup.commonPrefixChars >= anchorTailIndex + 3, "Anchor follow-up should keep all fields before Q stable");
+  assert(anchorPadA.includes("\nPAD=p p p p p p p p\n--\nQ=A"), "Anchor pad output should keep PAD stable before Q");
 
   let missingFieldRejected = false;
   try {
@@ -325,6 +374,20 @@ function checkCacheReadyProxy() {
     missingFieldRejected = /Missing required key: tail_request/i.test(error.message);
   }
   assert(missingFieldRejected, "Missing field input must be rejected by cache-ready generator");
+  let capsuleMissingFieldRejected = false;
+  try {
+    generateCapsuleFromObject(readJson("tests/fixtures/cache-ready/cache-ready-missing.json"));
+  } catch (error) {
+    capsuleMissingFieldRejected = /Missing required key: tail_request/i.test(error.message);
+  }
+  assert(capsuleMissingFieldRejected, "Missing field input must be rejected by cache-ready capsule generator");
+  let anchorInvalidChoiceRejected = false;
+  try {
+    generateAnchorFromObject({ ...anchorInputA, tail_choice: "Z" });
+  } catch (error) {
+    anchorInvalidChoiceRejected = /tail_choice must be one of/i.test(error.message);
+  }
+  assert(anchorInvalidChoiceRejected, "Invalid tail choice must be rejected by cache-ready anchor generator");
 
   return {
     sameProjectNatural: sameProjectNatural.commonPrefixChars,
@@ -336,7 +399,10 @@ function checkCacheReadyProxy() {
     followupChangedSections: followupCache.changedSections,
     followupDynamicSuffixChars: followupCache.dynamicSuffixChars,
     fieldOrderConsistent: followupCache.fieldOrderConsistent,
+    capsuleReduction,
     missingFieldRejected,
+    capsuleMissingFieldRejected,
+    anchorInvalidChoiceRejected,
   };
 }
 
@@ -369,7 +435,10 @@ async function main() {
   console.log(`followup_dynamic_suffix_chars=${proxy.followupDynamicSuffixChars.join(",")}`);
   console.log(`followup_changed_sections=${proxy.followupChangedSections.join("|")}`);
   console.log(`cache_ready_field_order_consistent=${proxy.fieldOrderConsistent}`);
+  console.log(`cache_ready_capsule_reduction=${proxy.capsuleReduction}`);
   console.log(`cache_ready_missing_field_rejected=${proxy.missingFieldRejected}`);
+  console.log(`cache_ready_capsule_missing_field_rejected=${proxy.capsuleMissingFieldRejected}`);
+  console.log(`cache_ready_anchor_invalid_choice_rejected=${proxy.anchorInvalidChoiceRejected}`);
 }
 
 main().catch((error) => {

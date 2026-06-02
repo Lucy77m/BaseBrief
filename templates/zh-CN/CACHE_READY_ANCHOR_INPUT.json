@@ -1,0 +1,30 @@
+{
+  "mode": "cache-ready-anchor-v3",
+  "project_name": "example-project",
+  "project_identity": "A Chinese-first project baseline workspace used for AI-assisted development handoff.",
+  "current_goal": "Clarify one bounded task without widening scope.",
+  "verified_facts": [
+    "The task is already narrow enough for Lite.",
+    "The current project positioning is already known."
+  ],
+  "confirmed_decisions": [
+    "Do not touch real API or deployment settings.",
+    "Do not widen scope past one or two files."
+  ],
+  "risk_boundaries": [
+    "Stop if backend, provider, .env, deployment, state, memory, or gateway becomes involved."
+  ],
+  "forbidden_scope": [
+    "backend",
+    "provider",
+    ".env",
+    "deployment",
+    "real agent runtime"
+  ],
+  "expected_output": "A compact BB3 anchor prompt for cache-economics experiments.",
+  "tail_options": [
+    "Restate the project state briefly, then give only the next safe step.",
+    "Generate a short next-chat opener using only the verified facts."
+  ],
+  "tail_choice": "A"
+}
