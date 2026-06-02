@@ -2,6 +2,7 @@
 
 const fs = require("fs");
 const path = require("path");
+const { execFileSync } = require("child_process");
 const { routeMode } = require("./mode_router");
 const { generateFromObject } = require("./generate_cache_ready_lite");
 const { measureContents } = require("./prompt_stability_probe");
@@ -28,7 +29,7 @@ function readText(relativePath) {
 function walkFiles(dir) {
   const result = [];
   for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
-    if (entry.name === ".git") {
+    if (entry.name === ".git" || entry.name === "private") {
       continue;
     }
     const fullPath = path.join(dir, entry.name);
@@ -65,6 +66,7 @@ function checkRequiredFiles() {
     "scripts/generate_cache_ready_lite.js",
     "scripts/prompt_stability_probe.js",
     "scripts/provider_cache_probe.js",
+    "scripts/provider_cache_benchmark.js",
     "examples/full-example.md",
     "examples/lite-example.md",
     "examples/cache-ready-input.json",
@@ -186,7 +188,11 @@ function checkSecurity() {
   const files = walkFiles(repoRoot);
   files.forEach((fullPath) => {
     const relative = path.relative(repoRoot, fullPath).replace(/\\/g, "/");
-    if (relative === "scripts/run_release_checks.js" || relative === "scripts/provider_cache_probe.js") {
+    if (
+      relative === "scripts/run_release_checks.js" ||
+      relative === "scripts/provider_cache_probe.js" ||
+      relative === "scripts/provider_cache_benchmark.js"
+    ) {
       return;
     }
     forbiddenPathParts.forEach((part) => {
@@ -234,6 +240,40 @@ function checkExamples() {
     assert(fs.existsSync(path.join(repoRoot, relativePath)), `Missing example: ${relativePath}`);
   });
   return exampleFiles.length;
+}
+
+function checkBenchmarkSummaryIfPresent() {
+  const summaries = [
+    "tests/outputs/provider-cache-benchmark.latest.json",
+    "tests/outputs/provider-cache-benchmark-normalized.latest.json",
+  ];
+  const statuses = [];
+  summaries.forEach((relativePath) => {
+    const fullPath = path.join(repoRoot, relativePath);
+    if (!fs.existsSync(fullPath)) {
+      return;
+    }
+    const summary = readJson(relativePath);
+    assert(summary.benchmarkKind === "local-real-projects-redacted", "Benchmark summary must be public-redacted");
+    assert(summary.projectCount >= 1, "Benchmark summary must include project count");
+    assert(summary.requestCount >= summary.validRequestCount, "Benchmark summary request counts are inconsistent");
+    assert(!JSON.stringify(summary).match(/[A-Z]:\\|\/home\/|sk-[A-Za-z0-9]{10,}/), "Benchmark summary contains private path or key-like content");
+    statuses.push(`${summary.mode || "absolute"}:${summary.conclusionLevel || "present"}`);
+  });
+  return statuses.length ? statuses.join(",") : "absent";
+}
+
+function checkIndependentTests() {
+  const tests = ["tests/basebrief.test.js"];
+  tests.forEach((relativePath) => {
+    assert(fs.existsSync(path.join(repoRoot, relativePath)), `Missing independent test: ${relativePath}`);
+  });
+  execFileSync(process.execPath, ["--test", ...tests], {
+    cwd: repoRoot,
+    stdio: "pipe",
+    env: process.env,
+  });
+  return tests.length;
 }
 
 function checkCacheReadyProxy() {
@@ -295,6 +335,8 @@ async function main() {
   const scannedFiles = checkSecurity();
   const checkedLinks = checkLinks();
   const exampleCount = checkExamples();
+  const benchmarkSummaryStatus = checkBenchmarkSummaryIfPresent();
+  const independentTests = checkIndependentTests();
   const proxy = checkCacheReadyProxy();
   const providerProbe = await runProviderProbe();
 
@@ -303,6 +345,8 @@ async function main() {
   console.log(`scanned_files=${scannedFiles}`);
   console.log(`checked_links=${checkedLinks}`);
   console.log(`example_files=${exampleCount}`);
+  console.log(`benchmark_summary_status=${benchmarkSummaryStatus}`);
+  console.log(`independent_test_files=${independentTests}`);
   console.log(`provider_probe_status=${providerProbe.status}`);
   console.log(`same_project_natural=${proxy.sameProjectNatural}`);
   console.log(`same_project_cache_ready=${proxy.sameProjectCache}`);

@@ -35,6 +35,7 @@ function getEnvConfig() {
     apiKey: process.env.BASEBRIEF_PROVIDER_API_KEY || "",
     model: process.env.BASEBRIEF_PROVIDER_MODEL || "",
     providerName: process.env.BASEBRIEF_PROVIDER_NAME || "openai-compatible",
+    requestTimeoutMs: Number(process.env.BASEBRIEF_PROVIDER_TIMEOUT_MS || 30000),
   };
 }
 
@@ -57,10 +58,33 @@ function extractUsageMetrics(data) {
   };
 }
 
-async function callResponses(baseUrl, apiKey, model, input) {
+function summarizeErrorBody(text) {
+  return String(text || "")
+    .replace(/<[^>]+>/g, " ")
+    .replace(/\s+/g, " ")
+    .trim()
+    .slice(0, 120);
+}
+
+async function fetchWithTimeout(url, options, timeoutMs) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    return await fetch(url, { ...options, signal: controller.signal });
+  } catch (error) {
+    if (error.name === "AbortError") {
+      throw new Error(`request timed out after ${timeoutMs}ms`);
+    }
+    throw error;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+async function callResponses(baseUrl, apiKey, model, input, timeoutMs) {
   const url = `${baseUrl.replace(/\/+$/, "")}/responses`;
   const start = Date.now();
-  const response = await fetch(url, {
+  const response = await fetchWithTimeout(url, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -72,11 +96,11 @@ async function callResponses(baseUrl, apiKey, model, input) {
       temperature: 0,
       max_output_tokens: 64,
     }),
-  });
+  }, timeoutMs);
   const totalLatencyMs = Date.now() - start;
   const text = await response.text();
   if (!response.ok) {
-    throw new Error(`responses endpoint failed: ${response.status} ${text.slice(0, 300)}`);
+    throw new Error(`responses endpoint failed: ${response.status} ${response.statusText || summarizeErrorBody(text)}`);
   }
   const data = JSON.parse(text);
   return {
@@ -87,10 +111,10 @@ async function callResponses(baseUrl, apiKey, model, input) {
   };
 }
 
-async function callChatCompletions(baseUrl, apiKey, model, input) {
+async function callChatCompletions(baseUrl, apiKey, model, input, timeoutMs) {
   const url = `${baseUrl.replace(/\/+$/, "")}/chat/completions`;
   const start = Date.now();
-  const response = await fetch(url, {
+  const response = await fetchWithTimeout(url, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -102,11 +126,11 @@ async function callChatCompletions(baseUrl, apiKey, model, input) {
       temperature: 0,
       max_tokens: 64,
     }),
-  });
+  }, timeoutMs);
   const totalLatencyMs = Date.now() - start;
   const text = await response.text();
   if (!response.ok) {
-    throw new Error(`chat/completions endpoint failed: ${response.status} ${text.slice(0, 300)}`);
+    throw new Error(`chat/completions endpoint failed: ${response.status} ${response.statusText || summarizeErrorBody(text)}`);
   }
   const data = JSON.parse(text);
   return {
@@ -117,12 +141,12 @@ async function callChatCompletions(baseUrl, apiKey, model, input) {
   };
 }
 
-async function callOpenAICompatible(baseUrl, apiKey, model, input) {
+async function callOpenAICompatible(baseUrl, apiKey, model, input, timeoutMs) {
   try {
-    return await callResponses(baseUrl, apiKey, model, input);
+    return await callResponses(baseUrl, apiKey, model, input, timeoutMs);
   } catch (error) {
     return {
-      ...(await callChatCompletions(baseUrl, apiKey, model, input)),
+      ...(await callChatCompletions(baseUrl, apiKey, model, input, timeoutMs)),
       fallbackReason: error.message,
     };
   }
@@ -146,9 +170,9 @@ async function runProviderProbe() {
   const promptPairs = buildPromptPairs();
   const calls = [];
   for (const [variant, prompts] of Object.entries(promptPairs)) {
-    const warmupMetrics = await callOpenAICompatible(env.baseUrl, env.apiKey, env.model, prompts.warmup);
+    const warmupMetrics = await callOpenAICompatible(env.baseUrl, env.apiKey, env.model, prompts.warmup, env.requestTimeoutMs);
     calls.push({ variant, phase: "warmup", ...warmupMetrics });
-    const repeatMetrics = await callOpenAICompatible(env.baseUrl, env.apiKey, env.model, prompts.repeat);
+    const repeatMetrics = await callOpenAICompatible(env.baseUrl, env.apiKey, env.model, prompts.repeat, env.requestTimeoutMs);
     calls.push({ variant, phase: "repeat", ...repeatMetrics });
   }
 

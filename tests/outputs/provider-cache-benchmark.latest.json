@@ -1,0 +1,214 @@
+{
+  "status": "executed",
+  "startedAt": "2026-06-02T13:39:18.015Z",
+  "finishedAt": "2026-06-02T13:50:06.372Z",
+  "providerName": "xiaomimimo",
+  "model": "mimo-v2.5",
+  "benchmarkKind": "local-real-projects-redacted",
+  "projectCount": 3,
+  "scenarioCount": 6,
+  "repeatsPerVariant": 10,
+  "requestCount": 360,
+  "validRequestCount": 360,
+  "validRequestRate": 1,
+  "cacheFieldVisibleCount": 360,
+  "cacheFieldVisibilityRate": 1,
+  "cacheReadyWins": 18,
+  "cacheReadyCacheRatioWins": 0,
+  "cacheReadyWinThreshold": 15,
+  "largeSampleThreshold": 324,
+  "conclusionLevel": "large_sample_evidence",
+  "variants": {
+    "natural": {
+      "requestCount": 180,
+      "validRequestCount": 180,
+      "repeatRequestCount": 162,
+      "cacheFieldVisibleCount": 180,
+      "medianCachedTokens": 1344,
+      "medianCacheRatio": 0.9850889850889851,
+      "medianLatencyMs": 1723.5,
+      "p25LatencyMs": 1395,
+      "p75LatencyMs": 2059
+    },
+    "cacheReady": {
+      "requestCount": 180,
+      "validRequestCount": 180,
+      "repeatRequestCount": 162,
+      "cacheFieldVisibleCount": 180,
+      "medianCachedTokens": 1472,
+      "medianCacheRatio": 0.9837251356238698,
+      "medianLatencyMs": 1689,
+      "p25LatencyMs": 1445,
+      "p75LatencyMs": 2053
+    }
+  },
+  "comparisons": [
+    {
+      "projectId": "projectA",
+      "scenarioId": "full-baseline",
+      "naturalMedianCachedTokens": 1216,
+      "cacheReadyMedianCachedTokens": 1344,
+      "naturalMedianCacheRatio": 0.9886178861788618,
+      "cacheReadyMedianCacheRatio": 0.9860601614086574,
+      "cacheReadyCachedTokenWin": true
+    },
+    {
+      "projectId": "projectA",
+      "scenarioId": "lite-handoff",
+      "naturalMedianCachedTokens": 1216,
+      "cacheReadyMedianCachedTokens": 1344,
+      "naturalMedianCacheRatio": 0.990228013029316,
+      "cacheReadyMedianCacheRatio": 0.9882352941176471,
+      "cacheReadyCachedTokenWin": true
+    },
+    {
+      "projectId": "projectA",
+      "scenarioId": "risk-boundary",
+      "naturalMedianCachedTokens": 1216,
+      "cacheReadyMedianCachedTokens": 1344,
+      "naturalMedianCacheRatio": 0.9910350448247759,
+      "cacheReadyMedianCacheRatio": 0.9882352941176471,
+      "cacheReadyCachedTokenWin": true
+    },
+    {
+      "projectId": "projectA",
+      "scenarioId": "next-chat-opener",
+      "naturalMedianCachedTokens": 1216,
+      "cacheReadyMedianCachedTokens": 1344,
+      "naturalMedianCacheRatio": 0.9910350448247759,
+      "cacheReadyMedianCacheRatio": 0.9882352941176471,
+      "cacheReadyCachedTokenWin": true
+    },
+    {
+      "projectId": "projectA",
+      "scenarioId": "agent-task",
+      "naturalMedianCachedTokens": 1216,
+      "cacheReadyMedianCachedTokens": 1344,
+      "naturalMedianCacheRatio": 0.9894222945484134,
+      "cacheReadyMedianCacheRatio": 0.9882352941176471,
+      "cacheReadyCachedTokenWin": true
+    },
+    {
+      "projectId": "projectA",
+      "scenarioId": "cache-ready-followup",
+      "naturalMedianCachedTokens": 1216,
+      "cacheReadyMedianCachedTokens": 1344,
+      "naturalMedianCacheRatio": 0.990228013029316,
+      "cacheReadyMedianCacheRatio": 0.9875091844232182,
+      "cacheReadyCachedTokenWin": true
+    },
+    {
+      "projectId": "projectB",
+      "scenarioId": "full-baseline",
+      "naturalMedianCachedTokens": 1344,
+      "cacheReadyMedianCachedTokens": 1472,
+      "naturalMedianCacheRatio": 0.9662113587347232,
+      "cacheReadyMedianCacheRatio": 0.9652459016393443,
+      "cacheReadyCachedTokenWin": true
+    },
+    {
+      "projectId": "projectB",
+      "scenarioId": "lite-handoff",
+      "naturalMedianCachedTokens": 1344,
+      "cacheReadyMedianCachedTokens": 1472,
+      "naturalMedianCacheRatio": 0.9689978370583994,
+      "cacheReadyMedianCacheRatio": 0.967784352399737,
+      "cacheReadyCachedTokenWin": true
+    },
+    {
+      "projectId": "projectB",
+      "scenarioId": "risk-boundary",
+      "naturalMedianCachedTokens": 1344,
+      "cacheReadyMedianCachedTokens": 1472,
+      "naturalMedianCacheRatio": 0.9725036179450073,
+      "cacheReadyMedianCacheRatio": 0.970336189848385,
+      "cacheReadyCachedTokenWin": true
+    },
+    {
+      "projectId": "projectB",
+      "scenarioId": "next-chat-opener",
+      "naturalMedianCachedTokens": 1344,
+      "cacheReadyMedianCachedTokens": 1472,
+      "naturalMedianCacheRatio": 0.9718004338394793,
+      "cacheReadyMedianCacheRatio": 0.968421052631579,
+      "cacheReadyCachedTokenWin": true
+    },
+    {
+      "projectId": "projectB",
+      "scenarioId": "agent-task",
+      "naturalMedianCachedTokens": 1344,
+      "cacheReadyMedianCachedTokens": 1472,
+      "naturalMedianCacheRatio": 0.9718004338394793,
+      "cacheReadyMedianCacheRatio": 0.9709762532981531,
+      "cacheReadyCachedTokenWin": true
+    },
+    {
+      "projectId": "projectB",
+      "scenarioId": "cache-ready-followup",
+      "naturalMedianCachedTokens": 1344,
+      "cacheReadyMedianCachedTokens": 1472,
+      "naturalMedianCacheRatio": 0.9676025917926566,
+      "cacheReadyMedianCacheRatio": 0.9658792650918635,
+      "cacheReadyCachedTokenWin": true
+    },
+    {
+      "projectId": "projectC",
+      "scenarioId": "full-baseline",
+      "naturalMedianCachedTokens": 2048,
+      "cacheReadyMedianCachedTokens": 2176,
+      "naturalMedianCacheRatio": 0.984142239308025,
+      "cacheReadyMedianCacheRatio": 0.982836495031617,
+      "cacheReadyCachedTokenWin": true
+    },
+    {
+      "projectId": "projectC",
+      "scenarioId": "lite-handoff",
+      "naturalMedianCachedTokens": 2048,
+      "cacheReadyMedianCachedTokens": 2176,
+      "naturalMedianCacheRatio": 0.9860375541646605,
+      "cacheReadyMedianCacheRatio": 0.9846153846153847,
+      "cacheReadyCachedTokenWin": true
+    },
+    {
+      "projectId": "projectC",
+      "scenarioId": "risk-boundary",
+      "naturalMedianCachedTokens": 2048,
+      "cacheReadyMedianCachedTokens": 2176,
+      "naturalMedianCacheRatio": 0.9884169884169884,
+      "cacheReadyMedianCacheRatio": 0.986400725294651,
+      "cacheReadyCachedTokenWin": true
+    },
+    {
+      "projectId": "projectC",
+      "scenarioId": "next-chat-opener",
+      "naturalMedianCachedTokens": 2048,
+      "cacheReadyMedianCachedTokens": 2176,
+      "naturalMedianCacheRatio": 0.9879401833092137,
+      "cacheReadyMedianCacheRatio": 0.9850611136260752,
+      "cacheReadyCachedTokenWin": true
+    },
+    {
+      "projectId": "projectC",
+      "scenarioId": "agent-task",
+      "naturalMedianCachedTokens": 2048,
+      "cacheReadyMedianCachedTokens": 2176,
+      "naturalMedianCacheRatio": 0.9879401833092137,
+      "cacheReadyMedianCacheRatio": 0.9868480725623583,
+      "cacheReadyCachedTokenWin": true
+    },
+    {
+      "projectId": "projectC",
+      "scenarioId": "cache-ready-followup",
+      "naturalMedianCachedTokens": 2048,
+      "cacheReadyMedianCachedTokens": 2176,
+      "naturalMedianCacheRatio": 0.9850889850889851,
+      "cacheReadyMedianCacheRatio": 0.9832806145503841,
+      "cacheReadyCachedTokenWin": true
+    }
+  ],
+  "limitations": [
+    "MiMo mimo-v2.5 only; not a cross-provider conclusion.",
+    "Latency is recorded but not used as the primary win criterion.",
+    "Source project snapshots are read-only and redacted in public summary output."
+  ]
+}
