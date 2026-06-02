@@ -7,6 +7,30 @@ Inside that single skill, it routes to `full`, `lite`, or `cache-ready`.
 
 [中文说明](README.md)
 
+## Quick Start
+
+BaseBrief is not a CLI or plugin yet. Ask your AI tool to read the skill entry:
+
+```text
+Please read BaseBrief's skills/basebrief/SKILL.md.
+Choose full, lite, or cache-ready based on my next task.
+Do not turn assumptions into facts; if the boundary is unclear, list open_questions first.
+```
+
+Then give your task:
+
+```text
+Use BaseBrief to prepare a full project baseline.
+Also prepare a short next-chat opener and an agent task handoff.
+```
+
+Start here:
+
+- [Integrations](docs/integrations.md)
+- [Walkthrough](docs/walkthrough.md)
+- [Usage](docs/usage.md)
+- [Mode selection](docs/mode-selection.md)
+
 ## What It Is
 
 BaseBrief helps you turn the current state of a project into a stable Markdown baseline that another window or agent can continue safely.
@@ -54,7 +78,7 @@ Do not use Lite when the task touches backend, provider, `.env`, deployment, sta
 Use `cache-ready` only when you explicitly want a stable-prefix experiment.
 
 It is experimental.  
-It does not claim proven real-world cache hit, cost, or latency gains unless provider data clearly shows them.
+Current MiMo `mimo-v2.5` benchmark evidence supports higher absolute cached tokens in local real-project samples, but does not prove better cache ratio, cost, or latency.
 
 ## Security Notes
 
@@ -64,6 +88,8 @@ It does not claim proven real-world cache hit, cost, or latency gains unless pro
 
 ## Docs
 
+- [Integrations](docs/integrations.md)
+- [Walkthrough](docs/walkthrough.md)
 - [Usage](docs/usage.md)
 - [Mode selection](docs/mode-selection.md)
 - [Testing](docs/testing.md)

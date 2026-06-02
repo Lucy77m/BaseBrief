@@ -58,6 +58,8 @@ function checkRequiredFiles() {
     "templates/zh-CN/CACHE_PREFIX.md",
     "templates/zh-CN/CACHE_READY_LITE_INPUT.json",
     "docs/usage.md",
+    "docs/integrations.md",
+    "docs/walkthrough.md",
     "docs/mode-selection.md",
     "docs/testing.md",
     "docs/experiments/cache-ready-lite.md",
@@ -83,6 +85,8 @@ function checkContentContracts() {
   const skill = readText("skills/basebrief/SKILL.md");
   const readme = readText("README.md");
   const englishReadme = readText("README.en.md");
+  const integrationsDoc = readText("docs/integrations.md");
+  const walkthroughDoc = readText("docs/walkthrough.md");
   const fullTemplate = readText("templates/zh-CN/BASEBRIEF.md");
   const liteTemplate = readText("templates/zh-CN/BASEBRIEF_LITE.md");
   const nextChatTemplate = readText("templates/zh-CN/NEXT_CHAT_PROMPT.md");
@@ -97,9 +101,17 @@ function checkContentContracts() {
   });
   assert(readme.includes("对外只有一个入口"), "README.md must state that BaseBrief has one public entry");
   assert(readme.includes("README.en.md"), "README.md should link to README.en.md");
+  assert(readme.includes("docs/integrations.md"), "README.md should link to integrations docs");
+  assert(readme.includes("docs/walkthrough.md"), "README.md should link to walkthrough docs");
   assert(englishReadme.includes("One install, one entry"), "README.en.md must explain one install, one entry");
+  assert(englishReadme.includes("Integrations"), "README.en.md should link to integrations docs");
   assert(englishReadme.includes("cache-ready"), "README.en.md must describe cache-ready mode");
   assert(!/two skills/i.test(englishReadme), "README.en.md must not imply two skills");
+  ["Codex", "Claude Code", "Cursor"].forEach((toolName) => {
+    assert(integrationsDoc.includes(toolName), `integrations.md must mention ${toolName}`);
+  });
+  assert(walkthroughDoc.includes("verified_facts"), "walkthrough.md must show verified_facts");
+  assert(walkthroughDoc.includes("risk_boundaries"), "walkthrough.md must show risk_boundaries");
 
   [
     "verified_facts",

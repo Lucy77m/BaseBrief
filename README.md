@@ -7,6 +7,38 @@ English README: [README.en.md](README.en.md)
 对外只有一个入口：`BaseBrief`。  
 安装一次，用一个 Skill；内部按任务自动落到 `full`、`lite`、`cache-ready` 三种模式。
 
+## 快速开始
+
+BaseBrief 当前不是 CLI，也不是插件。最简单的使用方式是让你的 AI 工具读取这个 Skill：
+
+```text
+请读取 BaseBrief 的 skills/basebrief/SKILL.md。
+根据我接下来的任务自动选择 full、lite 或 cache-ready。
+不要把推测写成事实；如果边界不清，先列 open_questions。
+```
+
+然后给出你的任务，例如：
+
+```text
+请用 BaseBrief 整理当前项目阶段基线。
+我需要完整版本，并额外准备新窗口开场白和 Agent 任务说明。
+```
+
+你应该检查输出是否明确区分：
+
+- `verified_facts`
+- `confirmed_decisions`
+- `assumptions`
+- `open_questions`
+- `risk_boundaries`
+
+更多入口：
+
+- 工具集成：[docs/integrations.md](docs/integrations.md)
+- 完整 walkthrough：[docs/walkthrough.md](docs/walkthrough.md)
+- 模式示例：[docs/usage.md](docs/usage.md)
+- 模式选择：[docs/mode-selection.md](docs/mode-selection.md)
+
 ## 它适合谁
 
 - 需要跨窗口继续项目的 AI 辅助开发者
@@ -20,17 +52,6 @@ English README: [README.en.md](README.en.md)
 - 不是密钥管理器
 - 不是 CLI、Web UI、MCP、VS Code 插件
 - 不是用来接入真实 API、provider、部署链路的工具
-
-## 最简单用法
-
-1. 让 AI 读取 `skills/basebrief/SKILL.md`
-2. 给出你当前任务
-3. 让 BaseBrief 自动选择：
-   - `full`：完整阶段基线
-   - `lite`：轻量接续
-   - `cache-ready`：缓存友好实验
-
-常见输出模板都在 `templates/zh-CN/`。
 
 ## 三种模式
 
@@ -71,7 +92,7 @@ Lite 明显短于 Full，不写长历史，不接高风险工程。
 - 稳定前缀或缓存代理实验
 
 它是实验模式。  
-它只能证明“稳定前缀更可控”或“精确共享前缀更长”，不能宣称真实 `cached_tokens`、费用或延迟收益已经被证明。
+它可以用于稳定前缀实验。当前 MiMo `mimo-v2.5` 本地真实项目样本显示 cache-ready 报告了更高的绝对 cached tokens；但 normalized benchmark 没有证明缓存比例或估算成本优势。不要宣称费用、比例或延迟收益已经稳定胜出。
 
 ## 什么时候不要用 Lite
 
@@ -119,6 +140,8 @@ BaseBrief/
 │     ├─ CACHE_PREFIX.md
 │     └─ CACHE_READY_LITE_INPUT.json
 ├─ docs/
+│  ├─ integrations.md
+│  ├─ walkthrough.md
 │  ├─ usage.md
 │  ├─ mode-selection.md
 │  ├─ testing.md
@@ -132,6 +155,8 @@ BaseBrief/
 
 ## 文档入口
 
+- 工具集成：[docs/integrations.md](docs/integrations.md)
+- 完整 walkthrough：[docs/walkthrough.md](docs/walkthrough.md)
 - 使用示例：[docs/usage.md](docs/usage.md)
 - 模式选择：[docs/mode-selection.md](docs/mode-selection.md)
 - 测试矩阵：[docs/testing.md](docs/testing.md)

@@ -1,5 +1,12 @@
 # BaseBrief 使用示例
 
+如果你是第一次使用，先看：
+
+- 工具集成：[integrations.md](integrations.md)
+- 完整 walkthrough：[walkthrough.md](walkthrough.md)
+
+本页只保留模式级示例索引。
+
 ## 1. Full 示例
 
 适合：
