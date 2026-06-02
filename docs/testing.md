@@ -355,3 +355,59 @@ Latest DeepSeek sidecar result:
 - conclusion level: `bb5_sidecar_promising_signal`
 
 Current interpretation: BB5 Sidecar is the strongest cache-economics line so far, but provider behavior differs. MiMo favors the Lite sidecar. DeepSeek favors the Full sidecar but missed the strict `15/18` evidence threshold by one scenario, so it remains promising rather than proven.
+
+## BB6 Hybrid Anchor benchmark
+
+BB6 hybrid command:
+
+```bash
+node scripts/provider_cache_benchmark.js --local-projects --mode hybrid --output tests/outputs/private/provider-cache-benchmark-hybrid.raw.json
+```
+
+Smoke command:
+
+```bash
+node scripts/provider_cache_benchmark.js --local-projects --mode hybrid --repeat-count 2 --project-limit 1 --scenario-limit 2 --output tests/outputs/private/provider-cache-benchmark-hybrid-smoke.raw.json --summary-output tests/outputs/provider-cache-benchmark-hybrid-smoke.latest.json
+```
+
+`hybrid` compares `natural`, `bb4AnchorPad`, `bb5SidecarFull`, `bb5SidecarLite`, `bb6HybridFull`, and `bb6HybridLite`. The BB6 variants keep a natural project snapshot stable, register both tail options before the dynamic boundary, and change only final `CHOICE=A/B`.
+
+BB6 evidence requires `>= 15/18` estimated-cost wins against `natural`, at least `5%` lower overall median estimated cost, and no weaker than the matching BB5 sidecar.
+
+Latest DeepSeek hybrid result:
+
+- request count: `1080`
+- valid request count: `1080`
+- cache field visibility: `1080/1080`
+- `bb6HybridLite`: `14/18` estimated-cost wins vs natural, `-18.04%` overall estimated-cost delta vs natural, conclusion `bb6_hybrid_lite_promising_signal`
+- conclusion level: `bb6_hybrid_promising_signal`
+
+## BB7 Block Pad and BB9 Adaptive Selector benchmark
+
+Blockpad command:
+
+```bash
+node scripts/provider_cache_benchmark.js --local-projects --mode blockpad --output tests/outputs/private/provider-cache-benchmark-blockpad.raw.json
+```
+
+`blockpad` compares `natural`, `bb5SidecarLite`, `bb6HybridLite`, and `bb7BlockPadLite`. It also reports `bb9AdaptiveSelector`, which selects the lowest estimated-cost candidate per project-scenario comparison.
+
+Latest MiMo blockpad / selector result:
+
+- request count: `720`
+- valid request count: `716`
+- cache field visibility: `714/716`
+- `bb7BlockPadLite`: `10/18` estimated-cost wins vs natural, conclusion `bb7_blockpad_inconclusive`
+- `bb9AdaptiveSelector`: `18/18` estimated-cost wins vs natural, `18/18` no-worse-than-natural, `-40.59%` median estimated-cost delta, conclusion `bb9_adaptive_selector_best_evidence`
+- conclusion level: `bb9_adaptive_selector_best_evidence`
+
+Latest DeepSeek blockpad / selector result:
+
+- request count: `720`
+- valid request count: `720`
+- cache field visibility: `720/720`
+- `bb7BlockPadLite`: `12/18` estimated-cost wins vs natural, conclusion `bb7_blockpad_promising_signal`
+- `bb9AdaptiveSelector`: `17/18` estimated-cost wins vs natural, `18/18` no-worse-than-natural, `-26.54%` median estimated-cost delta, conclusion `bb9_adaptive_selector_best_evidence`
+- conclusion level: `bb9_adaptive_selector_best_evidence`
+
+Current interpretation: the strongest mechanism is not one universal cache-ready prompt. It is calibrated selection among natural, BB5 Lite, BB6 Lite, and BB7 block-pad Lite variants. This is still provider- and sample-specific estimated-cost evidence.

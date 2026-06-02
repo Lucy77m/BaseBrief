@@ -73,6 +73,8 @@ function checkRequiredFiles() {
     "docs/experiments/cache-ready-anchor-pad.md",
     "docs/experiments/cache-ready-readable-poc.md",
     "docs/experiments/cache-ready-sidecar.md",
+    "docs/experiments/cache-ready-hybrid-anchor.md",
+    "docs/experiments/cache-ready-adaptive-selector.md",
     "README.en.md",
     "scripts/mode_router.js",
     "scripts/generate_cache_ready_lite.js",
@@ -126,11 +128,15 @@ function checkContentContracts() {
   assert(readme.includes("docs/experiments/cache-ready-anchor-pad.md"), "README.md should link to cache-ready anchor-pad docs");
   assert(readme.includes("docs/experiments/cache-ready-readable-poc.md"), "README.md should link to readable POC docs");
   assert(readme.includes("docs/experiments/cache-ready-sidecar.md"), "README.md should link to sidecar docs");
+  assert(readme.includes("docs/experiments/cache-ready-hybrid-anchor.md"), "README.md should link to hybrid anchor docs");
+  assert(readme.includes("docs/experiments/cache-ready-adaptive-selector.md"), "README.md should link to adaptive selector docs");
   assert(englishReadme.includes("One install, one entry"), "README.en.md must explain one install, one entry");
   assert(englishReadme.includes("Integrations"), "README.en.md should link to integrations docs");
   assert(englishReadme.includes("docs/experiments/cache-ready-anchor-pad.md"), "README.en.md should link to anchor-pad docs");
   assert(englishReadme.includes("docs/experiments/cache-ready-readable-poc.md"), "README.en.md should link to readable POC docs");
   assert(englishReadme.includes("docs/experiments/cache-ready-sidecar.md"), "README.en.md should link to sidecar docs");
+  assert(englishReadme.includes("docs/experiments/cache-ready-hybrid-anchor.md"), "README.en.md should link to hybrid anchor docs");
+  assert(englishReadme.includes("docs/experiments/cache-ready-adaptive-selector.md"), "README.en.md should link to adaptive selector docs");
   assert(englishReadme.includes("cache-ready"), "README.en.md must describe cache-ready mode");
   assert(!/two skills/i.test(englishReadme), "README.en.md must not imply two skills");
   ["Codex", "Claude Code", "Cursor"].forEach((toolName) => {
@@ -299,6 +305,12 @@ function checkBenchmarkSummaryIfPresent() {
     "tests/outputs/provider-cache-benchmark-readable-poc-deepseek.latest.json",
     "tests/outputs/provider-cache-benchmark-sidecar.latest.json",
     "tests/outputs/provider-cache-benchmark-sidecar-deepseek.latest.json",
+    "tests/outputs/provider-cache-benchmark-hybrid.latest.json",
+    "tests/outputs/provider-cache-benchmark-hybrid-deepseek.latest.json",
+    "tests/outputs/provider-cache-benchmark-blockpad.latest.json",
+    "tests/outputs/provider-cache-benchmark-blockpad-deepseek.latest.json",
+    "tests/outputs/provider-cache-benchmark-blockalign.latest.json",
+    "tests/outputs/provider-cache-benchmark-blockalign-deepseek.latest.json",
   ];
   const statuses = [];
   summaries.forEach((relativePath) => {

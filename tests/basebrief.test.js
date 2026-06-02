@@ -228,6 +228,75 @@ test("sidecar prompts keep human-readable variants separate from compact BB5 sid
   assert.doesNotMatch(sidecar, /# BaseBrief Readable Full POC|Dynamic Tail Request/);
 });
 
+test("hybrid prompts keep natural context stable and only change final choice", () => {
+  const snapshot = {
+    projectId: "projectA",
+    readmeExcerpt: "Public sample README.",
+    packages: [{ location: "package.json", name: "sample" }],
+    entryFiles: ["src/main.js"],
+    configFiles: ["vite.config.js"],
+    fileSample: ["src/main.js", "vite.config.js"],
+  };
+  const scenario = SCENARIOS[0];
+  const fullA = getPromptForVariant("hybrid", snapshot, scenario, 0, "bb6HybridFull");
+  const fullB = getPromptForVariant("hybrid", snapshot, scenario, 1, "bb6HybridFull");
+  const splitA = fullA.split("\n--\n");
+  const splitB = fullB.split("\n--\n");
+
+  assert.match(fullA, /^# BaseBrief BB6 Hybrid Anchor/);
+  assert.match(fullA, /FORMAT: bb6-hybrid-full/);
+  assert.match(fullA, /## Stable Tail Options\nA=/);
+  assert.match(fullA, /<!-- BASEBRIEF_CACHE_PAD: p p p p -->\n--\nCHOICE=A$/);
+  assert.equal(splitA[0], splitB[0]);
+  assert.equal(splitB[1], "CHOICE=B");
+});
+
+test("blockpad prompts keep long stable pad before the final choice", () => {
+  const snapshot = {
+    projectId: "projectA",
+    readmeExcerpt: "Public sample README.",
+    packages: [{ location: "package.json", name: "sample" }],
+    entryFiles: ["src/main.js"],
+    configFiles: ["vite.config.js"],
+    fileSample: ["src/main.js", "vite.config.js"],
+  };
+  const scenario = SCENARIOS[0];
+  const promptA = getPromptForVariant("blockpad", snapshot, scenario, 0, "bb7BlockPadLite");
+  const promptB = getPromptForVariant("blockpad", snapshot, scenario, 1, "bb7BlockPadLite");
+  const [stableA, tailA] = promptA.split("\n--\n");
+  const [stableB, tailB] = promptB.split("\n--\n");
+
+  assert.match(promptA, /^# BaseBrief BB7 Block Pad Lite/);
+  assert.match(promptA, /BASEBRIEF_CACHE_BLOCK_PAD/);
+  assert(stableA.split(" p").length > 300, "blockpad prompt should include a long stable pad");
+  assert.equal(stableA, stableB);
+  assert.equal(tailA, "CHOICE=A");
+  assert.equal(tailB, "CHOICE=B");
+});
+
+test("blockalign prompts keep scenario-aligned pad stable across choices", () => {
+  const snapshot = {
+    projectId: "projectA",
+    readmeExcerpt: "Public sample README.",
+    packages: [{ location: "package.json", name: "sample" }],
+    entryFiles: ["src/main.js"],
+    configFiles: ["vite.config.js"],
+    fileSample: ["src/main.js", "vite.config.js"],
+  };
+  const scenario = SCENARIOS.find((item) => item.id === "risk-boundary");
+  const promptA = getPromptForVariant("blockalign", snapshot, scenario, 0, "bb8AlignedBlockPadLite");
+  const promptB = getPromptForVariant("blockalign", snapshot, scenario, 1, "bb8AlignedBlockPadLite");
+  const [stableA, tailA] = promptA.split("\n--\n");
+  const [stableB, tailB] = promptB.split("\n--\n");
+
+  assert.match(promptA, /^# BaseBrief BB8 Aligned Block Pad Lite/);
+  assert.match(promptA, /FORMAT: bb8-aligned-blockpad-lite/);
+  assert(stableA.split(" p").length > 330, "blockalign prompt should include a scenario-aligned stable pad");
+  assert.equal(stableA, stableB);
+  assert.equal(tailA, "CHOICE=A");
+  assert.equal(tailB, "CHOICE=B");
+});
+
 test("core templates preserve BaseBrief baseline sections", () => {
   const templatePaths = [
     "templates/zh-CN/BASEBRIEF.md",
@@ -662,6 +731,163 @@ test("sidecar benchmark summary requires sidecar evidence and compares against B
   assert.equal(lite.estimatedCostWinsVsBb4, 18);
   assert.equal(lite.conclusionLevel, "bb5_sidecar_lite_best_evidence");
   assert.equal(summary.conclusionLevel, "bb5_sidecar_best_evidence");
+});
+
+test("hybrid benchmark summary requires improvement over BB5 sidecar", () => {
+  const projectIds = ["projectA", "projectB", "projectC"];
+  const calls = [];
+  const variants = ["natural", "bb4AnchorPad", "bb5SidecarFull", "bb5SidecarLite", "bb6HybridFull", "bb6HybridLite"];
+
+  for (const projectId of projectIds) {
+    for (const scenario of SCENARIOS) {
+      for (const variant of variants) {
+        for (let iteration = 0; iteration < 10; iteration += 1) {
+          const estimatedTotalCostCny =
+            variant === "bb6HybridFull" ? 0.00007 : variant === "bb5SidecarFull" ? 0.00009 : 0.0002;
+          calls.push({
+            projectId,
+            scenarioId: scenario.id,
+            variant,
+            phase: iteration === 0 ? "warmup" : "repeat",
+            iteration,
+            status: "success",
+            promptTokens: variant === "bb6HybridFull" ? 1300 : 1000,
+            completionTokens: 32,
+            cachedTokens: variant === "bb6HybridFull" ? 1260 : 900,
+            cacheRatio: variant === "bb6HybridFull" ? 1260 / 1300 : 900 / 1000,
+            cacheFieldVisible: true,
+            estimatedTotalCostCny,
+            totalLatencyMs: 1000 + iteration,
+          });
+        }
+      }
+    }
+  }
+
+  const summary = buildSummary({
+    status: "executed",
+    startedAt: "2026-06-02T00:00:00.000Z",
+    finishedAt: "2026-06-02T00:10:00.000Z",
+    providerName: "test-provider",
+    model: "test-model",
+    providerProfileId: "custom-compatible",
+    mode: "hybrid",
+    repeats: 10,
+    projectIds,
+    calls,
+  });
+
+  const full = summary.hybridStats.find((item) => item.family === "full");
+  assert.equal(summary.requestCount, 1080);
+  assert.equal(full.estimatedCostWinsVsNatural, 18);
+  assert.equal(full.estimatedCostWinsVsBb5, 18);
+  assert.equal(full.conclusionLevel, "bb6_hybrid_full_best_evidence");
+  assert.equal(summary.conclusionLevel, "bb6_hybrid_best_evidence");
+});
+
+test("blockpad benchmark summary requires improvement over BB6 hybrid", () => {
+  const projectIds = ["projectA", "projectB", "projectC"];
+  const calls = [];
+  const variants = ["natural", "bb5SidecarLite", "bb6HybridLite", "bb7BlockPadLite"];
+
+  for (const projectId of projectIds) {
+    for (const scenario of SCENARIOS) {
+      for (const variant of variants) {
+        for (let iteration = 0; iteration < 10; iteration += 1) {
+          const estimatedTotalCostCny =
+            variant === "bb7BlockPadLite" ? 0.00006 : variant === "bb6HybridLite" ? 0.00009 : 0.0002;
+          calls.push({
+            projectId,
+            scenarioId: scenario.id,
+            variant,
+            phase: iteration === 0 ? "warmup" : "repeat",
+            iteration,
+            status: "success",
+            promptTokens: variant === "bb7BlockPadLite" ? 1288 : 960,
+            completionTokens: 32,
+            cachedTokens: variant === "bb7BlockPadLite" ? 1280 : 896,
+            cacheRatio: variant === "bb7BlockPadLite" ? 1280 / 1288 : 896 / 960,
+            cacheFieldVisible: true,
+            estimatedTotalCostCny,
+            totalLatencyMs: 1000 + iteration,
+          });
+        }
+      }
+    }
+  }
+
+  const summary = buildSummary({
+    status: "executed",
+    startedAt: "2026-06-02T00:00:00.000Z",
+    finishedAt: "2026-06-02T00:10:00.000Z",
+    providerName: "test-provider",
+    model: "test-model",
+    providerProfileId: "custom-compatible",
+    mode: "blockpad",
+    repeats: 10,
+    projectIds,
+    calls,
+  });
+
+  assert.equal(summary.requestCount, 720);
+  assert.equal(summary.blockPadStats.estimatedCostWinsVsNatural, 18);
+  assert.equal(summary.blockPadStats.estimatedCostWinsVsBb6, 18);
+  assert.equal(summary.blockPadStats.conclusionLevel, "bb7_blockpad_best_evidence");
+  assert.equal(summary.adaptiveSelectorStats.estimatedCostWinsVsNatural, 18);
+  assert.equal(summary.adaptiveSelectorStats.estimatedCostNoWorseVsNatural, 18);
+  assert.equal(summary.adaptiveSelectorStats.conclusionLevel, "bb9_adaptive_selector_best_evidence");
+  assert.equal(summary.conclusionLevel, "bb9_adaptive_selector_best_evidence");
+});
+
+test("blockalign benchmark summary requires improvement over BB7 blockpad", () => {
+  const projectIds = ["projectA", "projectB", "projectC"];
+  const calls = [];
+  const variants = ["natural", "bb7BlockPadLite", "bb8AlignedBlockPadLite"];
+
+  for (const projectId of projectIds) {
+    for (const scenario of SCENARIOS) {
+      for (const variant of variants) {
+        for (let iteration = 0; iteration < 10; iteration += 1) {
+          const estimatedTotalCostCny =
+            variant === "bb8AlignedBlockPadLite" ? 0.00005 : variant === "bb7BlockPadLite" ? 0.00008 : 0.0002;
+          calls.push({
+            projectId,
+            scenarioId: scenario.id,
+            variant,
+            phase: iteration === 0 ? "warmup" : "repeat",
+            iteration,
+            status: "success",
+            promptTokens: variant === "bb8AlignedBlockPadLite" ? 1282 : 1274,
+            completionTokens: 32,
+            cachedTokens: variant === "bb8AlignedBlockPadLite" ? 1280 : 1152,
+            cacheRatio: variant === "bb8AlignedBlockPadLite" ? 1280 / 1282 : 1152 / 1274,
+            cacheFieldVisible: true,
+            estimatedTotalCostCny,
+            totalLatencyMs: 1000 + iteration,
+          });
+        }
+      }
+    }
+  }
+
+  const summary = buildSummary({
+    status: "executed",
+    startedAt: "2026-06-02T00:00:00.000Z",
+    finishedAt: "2026-06-02T00:10:00.000Z",
+    providerName: "test-provider",
+    model: "test-model",
+    providerProfileId: "custom-compatible",
+    mode: "blockalign",
+    repeats: 10,
+    projectIds,
+    calls,
+  });
+
+  assert.equal(summary.requestCount, 540);
+  assert.equal(summary.alignedBlockPadStats.estimatedCostWinsVsNatural, 18);
+  assert.equal(summary.alignedBlockPadStats.estimatedCostWinsVsBb7, 18);
+  assert.equal(summary.alignedBlockPadStats.conclusionLevel, "bb8_blockalign_best_evidence");
+  assert.equal(summary.conclusionLevel, "bb8_blockalign_best_evidence");
 });
 
 test("benchmark provider profiles include MiMo and DeepSeek pricing", () => {

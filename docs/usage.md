@@ -89,3 +89,5 @@
 - BB4 example output: [examples/cache-ready-anchor-pad-output.md](../examples/cache-ready-anchor-pad-output.md)
 - Readable Full/Lite POC notes: [docs/experiments/cache-ready-readable-poc.md](experiments/cache-ready-readable-poc.md)
 - BB5 Cache Sidecar notes: [docs/experiments/cache-ready-sidecar.md](experiments/cache-ready-sidecar.md)
+- BB6 Hybrid Anchor notes: [docs/experiments/cache-ready-hybrid-anchor.md](experiments/cache-ready-hybrid-anchor.md)
+- BB9 Adaptive Selector notes: [docs/experiments/cache-ready-adaptive-selector.md](experiments/cache-ready-adaptive-selector.md)

@@ -504,6 +504,104 @@ function buildBb5SidecarPrompt(snapshot, scenario, iteration, variant) {
   ].join("\n");
 }
 
+function buildBb6HybridPrompt(snapshot, scenario, iteration, variant) {
+  const isLite = variant === "bb6HybridLite";
+  const choice = iteration % scenario.tailRequests.length === 0 ? "A" : "B";
+  const readmeLength = isLite ? 700 : 1200;
+  const packageLength = isLite ? 700 : 1400;
+  const fileSample = isLite ? snapshot.fileSample.slice(0, 35) : snapshot.fileSample;
+  const fileLength = isLite ? 900 : 1600;
+  const output = isLite ? "concise Lite-style BaseBrief continuation answer" : "readable Full-style BaseBrief continuation answer";
+  return [
+    "# BaseBrief BB6 Hybrid Anchor",
+    `FORMAT: bb6-hybrid-${isLite ? "lite" : "full"}`,
+    "RULE: Keep everything before CHOICE stable across repeats; only CHOICE may change.",
+    "",
+    "## Project Identity",
+    `${snapshot.projectId}/${scenario.id}: local real-project benchmark snapshot`,
+    "",
+    "## Current Goal",
+    scenario.label,
+    "",
+    "## Stable Project Snapshot",
+    `README 摘要：${sanitizeText(snapshot.readmeExcerpt || "none", readmeLength)}`,
+    `package 摘要：${sanitizeText(JSON.stringify(snapshot.packages), packageLength)}`,
+    `入口与配置文件：${sanitizeText([...snapshot.entryFiles, ...snapshot.configFiles].join(" | ") || "none", 700)}`,
+    `文件样本：${sanitizeText(fileSample.join(" | "), fileLength)}`,
+    "",
+    "## Safety Boundary",
+    "- Source project is read-only.",
+    "- Sensitive files and generated directories are excluded.",
+    "- Do not read or output env files, tokens, secrets, or credentials.",
+    "",
+    "## Expected Output",
+    output,
+    "",
+    "## Stable Tail Options",
+    `A=${sanitizeText(scenario.tailRequests[0], 300)}`,
+    `B=${sanitizeText(scenario.tailRequests[1], 300)}`,
+    "",
+    "<!-- BASEBRIEF_CACHE_PAD: p p p p -->",
+    "--",
+    `CHOICE=${choice}`,
+  ].join("\n");
+}
+
+function buildBlockPadLitePrompt(snapshot, scenario, iteration, padLength, title, format) {
+  const choice = iteration % scenario.tailRequests.length === 0 ? "A" : "B";
+  const blockPad = buildPadString(padLength);
+  return [
+    title,
+    `FORMAT: ${format}`,
+    "RULE: Keep everything before CHOICE stable across repeats; only CHOICE may change.",
+    "",
+    "## Project Identity",
+    `${snapshot.projectId}/${scenario.id}: local real-project benchmark snapshot`,
+    "",
+    "## Current Goal",
+    scenario.label,
+    "",
+    "## Stable Project Snapshot",
+    `README 摘要：${sanitizeText(snapshot.readmeExcerpt || "none", 700)}`,
+    `package 摘要：${sanitizeText(JSON.stringify(snapshot.packages), 700)}`,
+    `入口与配置文件：${sanitizeText([...snapshot.entryFiles, ...snapshot.configFiles].join(" | ") || "none", 700)}`,
+    `文件样本：${sanitizeText(snapshot.fileSample.slice(0, 35).join(" | "), 900)}`,
+    "",
+    "## Safety Boundary",
+    "- Source project is read-only.",
+    "- Sensitive files and generated directories are excluded.",
+    "- Do not read or output env files, tokens, secrets, or credentials.",
+    "",
+    "## Expected Output",
+    "concise Lite-style BaseBrief continuation answer",
+    "",
+    "## Stable Tail Options",
+    `A=${sanitizeText(scenario.tailRequests[0], 300)}`,
+    `B=${sanitizeText(scenario.tailRequests[1], 300)}`,
+    "",
+    `<!-- BASEBRIEF_CACHE_BLOCK_PAD: ${blockPad} -->`,
+    "--",
+    `CHOICE=${choice}`,
+  ].join("\n");
+}
+
+function buildBb7BlockPadPrompt(snapshot, scenario, iteration) {
+  return buildBlockPadLitePrompt(snapshot, scenario, iteration, 335, "# BaseBrief BB7 Block Pad Lite", "bb7-blockpad-lite");
+}
+
+function buildBb8AlignedBlockPadPrompt(snapshot, scenario, iteration) {
+  const scenarioPadAdditions = {
+    "full-baseline": 0,
+    "lite-handoff": 5,
+    "risk-boundary": 8,
+    "next-chat-opener": 2,
+    "agent-task": 6,
+    "cache-ready-followup": 5,
+  };
+  const padLength = 335 + (scenarioPadAdditions[scenario.id] || 0);
+  return buildBlockPadLitePrompt(snapshot, scenario, iteration, padLength, "# BaseBrief BB8 Aligned Block Pad Lite", "bb8-aligned-blockpad-lite");
+}
+
 function detectProviderProfile(providerName, model) {
   const requested = (process.env.BASEBRIEF_PROVIDER_PROFILE || "").trim();
   if (requested && PROVIDER_PROFILES[requested]) {
@@ -664,6 +762,9 @@ function summarizeCalls(calls) {
 }
 
 function getVariantsForMode(mode) {
+  if (mode === "blockalign") return ["natural", "bb7BlockPadLite", "bb8AlignedBlockPadLite"];
+  if (mode === "blockpad") return ["natural", "bb5SidecarLite", "bb6HybridLite", "bb7BlockPadLite"];
+  if (mode === "hybrid") return ["natural", "bb4AnchorPad", "bb5SidecarFull", "bb5SidecarLite", "bb6HybridFull", "bb6HybridLite"];
   if (mode === "sidecar") return ["natural", "readableFull", "readableLite", "bb4AnchorPad", "bb5SidecarFull", "bb5SidecarLite"];
   if (mode === "readablePoc") return ["natural", "readableFull", "readableFullPad4", "readableLite", "readableLitePad4"];
   if (mode === "padSweep") return PAD_SWEEP_VARIANTS.map((item) => item.variant);
@@ -708,6 +809,23 @@ function getPromptForVariant(mode, snapshot, scenario, iteration, variant) {
     if (variant === "bb4AnchorPad") return buildAnchorPadPrompt(snapshot, scenario, iteration);
     return buildBb5SidecarPrompt(snapshot, scenario, iteration, variant);
   }
+  if (mode === "hybrid") {
+    if (variant === "natural") return buildNormalizedPrompt(snapshot, scenario, iteration, "natural");
+    if (variant === "bb4AnchorPad") return buildAnchorPadPrompt(snapshot, scenario, iteration);
+    if (variant === "bb5SidecarFull" || variant === "bb5SidecarLite") return buildBb5SidecarPrompt(snapshot, scenario, iteration, variant);
+    return buildBb6HybridPrompt(snapshot, scenario, iteration, variant);
+  }
+  if (mode === "blockpad") {
+    if (variant === "natural") return buildNormalizedPrompt(snapshot, scenario, iteration, "natural");
+    if (variant === "bb5SidecarLite") return buildBb5SidecarPrompt(snapshot, scenario, iteration, variant);
+    if (variant === "bb6HybridLite") return buildBb6HybridPrompt(snapshot, scenario, iteration, variant);
+    return buildBb7BlockPadPrompt(snapshot, scenario, iteration);
+  }
+  if (mode === "blockalign") {
+    if (variant === "natural") return buildNormalizedPrompt(snapshot, scenario, iteration, "natural");
+    if (variant === "bb7BlockPadLite") return buildBb7BlockPadPrompt(snapshot, scenario, iteration);
+    return buildBb8AlignedBlockPadPrompt(snapshot, scenario, iteration);
+  }
   return variant === "natural"
     ? buildNaturalPrompt(snapshot, scenario, iteration)
     : buildCacheReadyPrompt(snapshot, scenario, iteration);
@@ -733,6 +851,9 @@ function buildSummary(rawResult) {
   const padSweepComparisons = [];
   const readableComparisons = [];
   const sidecarComparisons = [];
+  const hybridComparisons = [];
+  const blockPadComparisons = [];
+  const alignedBlockPadComparisons = [];
   for (const projectId of rawResult.projectIds) {
     for (const scenario of scenarioList) {
       const naturalCalls = calls.filter((call) => call.projectId === projectId && call.scenarioId === scenario.id && call.variant === "natural");
@@ -1042,6 +1163,217 @@ function buildSummary(rawResult) {
           });
         }
       }
+
+      if (rawResult.mode === "hybrid") {
+        for (const pair of [
+          { family: "full", variant: "bb6HybridFull", bb5Variant: "bb5SidecarFull" },
+          { family: "lite", variant: "bb6HybridLite", bb5Variant: "bb5SidecarLite" },
+        ]) {
+          const hybridCalls = calls.filter((call) => call.projectId === projectId && call.scenarioId === scenario.id && call.variant === pair.variant);
+          const bb4Calls = calls.filter((call) => call.projectId === projectId && call.scenarioId === scenario.id && call.variant === "bb4AnchorPad");
+          const bb5Calls = calls.filter((call) => call.projectId === projectId && call.scenarioId === scenario.id && call.variant === pair.bb5Variant);
+          const hybrid = summarizeCalls(hybridCalls);
+          const bb4 = summarizeCalls(bb4Calls);
+          const bb5 = summarizeCalls(bb5Calls);
+          const hybridPromptMedian = median(hybridCalls.filter((call) => call.iteration > 0 && call.status === "success").map((call) => call.promptTokens));
+          const bb5PromptMedian = median(bb5Calls.filter((call) => call.iteration > 0 && call.status === "success").map((call) => call.promptTokens));
+          const naturalCostDeltaCny =
+            typeof natural.medianEstimatedCostCny === "number" && typeof hybrid.medianEstimatedCostCny === "number"
+              ? hybrid.medianEstimatedCostCny - natural.medianEstimatedCostCny
+              : null;
+          const naturalCostDeltaPercent =
+            typeof naturalCostDeltaCny === "number" && natural.medianEstimatedCostCny
+              ? naturalCostDeltaCny / natural.medianEstimatedCostCny
+              : null;
+          const bb4CostDeltaCny =
+            typeof bb4.medianEstimatedCostCny === "number" && typeof hybrid.medianEstimatedCostCny === "number"
+              ? hybrid.medianEstimatedCostCny - bb4.medianEstimatedCostCny
+              : null;
+          const bb4CostDeltaPercent =
+            typeof bb4CostDeltaCny === "number" && bb4.medianEstimatedCostCny
+              ? bb4CostDeltaCny / bb4.medianEstimatedCostCny
+              : null;
+          const bb5CostDeltaCny =
+            typeof bb5.medianEstimatedCostCny === "number" && typeof hybrid.medianEstimatedCostCny === "number"
+              ? hybrid.medianEstimatedCostCny - bb5.medianEstimatedCostCny
+              : null;
+          const bb5CostDeltaPercent =
+            typeof bb5CostDeltaCny === "number" && bb5.medianEstimatedCostCny
+              ? bb5CostDeltaCny / bb5.medianEstimatedCostCny
+              : null;
+          hybridComparisons.push({
+            projectId,
+            scenarioId: scenario.id,
+            family: pair.family,
+            hybridVariant: pair.variant,
+            hybridMedianPromptTokens: hybridPromptMedian,
+            bb5MedianPromptTokens: bb5PromptMedian,
+            naturalMedianCachedTokens: natural.medianCachedTokens,
+            hybridMedianCachedTokens: hybrid.medianCachedTokens,
+            bb4MedianCachedTokens: bb4.medianCachedTokens,
+            bb5MedianCachedTokens: bb5.medianCachedTokens,
+            naturalMedianCacheRatio: natural.medianCacheRatio,
+            hybridMedianCacheRatio: hybrid.medianCacheRatio,
+            bb4MedianCacheRatio: bb4.medianCacheRatio,
+            bb5MedianCacheRatio: bb5.medianCacheRatio,
+            naturalMedianEstimatedCostCny: natural.medianEstimatedCostCny,
+            hybridMedianEstimatedCostCny: hybrid.medianEstimatedCostCny,
+            bb4MedianEstimatedCostCny: bb4.medianEstimatedCostCny,
+            bb5MedianEstimatedCostCny: bb5.medianEstimatedCostCny,
+            hybridCostDeltaVsNaturalCny: naturalCostDeltaCny,
+            hybridCostDeltaVsNaturalPercent: naturalCostDeltaPercent,
+            hybridCostDeltaVsBb4Cny: bb4CostDeltaCny,
+            hybridCostDeltaVsBb4Percent: bb4CostDeltaPercent,
+            hybridCostDeltaVsBb5Cny: bb5CostDeltaCny,
+            hybridCostDeltaVsBb5Percent: bb5CostDeltaPercent,
+            hybridCacheRatioWinVsNatural:
+              typeof natural.medianCacheRatio === "number" &&
+              typeof hybrid.medianCacheRatio === "number" &&
+              hybrid.medianCacheRatio > natural.medianCacheRatio,
+            hybridEstimatedCostWinVsNatural:
+              typeof natural.medianEstimatedCostCny === "number" &&
+              typeof hybrid.medianEstimatedCostCny === "number" &&
+              hybrid.medianEstimatedCostCny < natural.medianEstimatedCostCny,
+            hybridEstimatedCostWinVsBb4:
+              typeof bb4.medianEstimatedCostCny === "number" &&
+              typeof hybrid.medianEstimatedCostCny === "number" &&
+              hybrid.medianEstimatedCostCny <= bb4.medianEstimatedCostCny,
+            hybridEstimatedCostWinVsBb5:
+              typeof bb5.medianEstimatedCostCny === "number" &&
+              typeof hybrid.medianEstimatedCostCny === "number" &&
+              hybrid.medianEstimatedCostCny <= bb5.medianEstimatedCostCny,
+          });
+        }
+      }
+
+      if (rawResult.mode === "blockpad") {
+        const blockPadCalls = calls.filter((call) => call.projectId === projectId && call.scenarioId === scenario.id && call.variant === "bb7BlockPadLite");
+        const bb5Calls = calls.filter((call) => call.projectId === projectId && call.scenarioId === scenario.id && call.variant === "bb5SidecarLite");
+        const bb6Calls = calls.filter((call) => call.projectId === projectId && call.scenarioId === scenario.id && call.variant === "bb6HybridLite");
+        const blockPad = summarizeCalls(blockPadCalls);
+        const bb5 = summarizeCalls(bb5Calls);
+        const bb6 = summarizeCalls(bb6Calls);
+        const blockPadPromptMedian = median(blockPadCalls.filter((call) => call.iteration > 0 && call.status === "success").map((call) => call.promptTokens));
+        const naturalCostDeltaCny =
+          typeof natural.medianEstimatedCostCny === "number" && typeof blockPad.medianEstimatedCostCny === "number"
+            ? blockPad.medianEstimatedCostCny - natural.medianEstimatedCostCny
+            : null;
+        const naturalCostDeltaPercent =
+          typeof naturalCostDeltaCny === "number" && natural.medianEstimatedCostCny
+            ? naturalCostDeltaCny / natural.medianEstimatedCostCny
+            : null;
+        const bb5CostDeltaCny =
+          typeof bb5.medianEstimatedCostCny === "number" && typeof blockPad.medianEstimatedCostCny === "number"
+            ? blockPad.medianEstimatedCostCny - bb5.medianEstimatedCostCny
+            : null;
+        const bb5CostDeltaPercent =
+          typeof bb5CostDeltaCny === "number" && bb5.medianEstimatedCostCny
+            ? bb5CostDeltaCny / bb5.medianEstimatedCostCny
+            : null;
+        const bb6CostDeltaCny =
+          typeof bb6.medianEstimatedCostCny === "number" && typeof blockPad.medianEstimatedCostCny === "number"
+            ? blockPad.medianEstimatedCostCny - bb6.medianEstimatedCostCny
+            : null;
+        const bb6CostDeltaPercent =
+          typeof bb6CostDeltaCny === "number" && bb6.medianEstimatedCostCny
+            ? bb6CostDeltaCny / bb6.medianEstimatedCostCny
+            : null;
+        blockPadComparisons.push({
+          projectId,
+          scenarioId: scenario.id,
+          candidateVariant: "bb7BlockPadLite",
+          blockPadMedianPromptTokens: blockPadPromptMedian,
+          naturalMedianCachedTokens: natural.medianCachedTokens,
+          blockPadMedianCachedTokens: blockPad.medianCachedTokens,
+          bb5MedianCachedTokens: bb5.medianCachedTokens,
+          bb6MedianCachedTokens: bb6.medianCachedTokens,
+          naturalMedianCacheRatio: natural.medianCacheRatio,
+          blockPadMedianCacheRatio: blockPad.medianCacheRatio,
+          bb5MedianCacheRatio: bb5.medianCacheRatio,
+          bb6MedianCacheRatio: bb6.medianCacheRatio,
+          naturalMedianEstimatedCostCny: natural.medianEstimatedCostCny,
+          blockPadMedianEstimatedCostCny: blockPad.medianEstimatedCostCny,
+          bb5MedianEstimatedCostCny: bb5.medianEstimatedCostCny,
+          bb6MedianEstimatedCostCny: bb6.medianEstimatedCostCny,
+          blockPadCostDeltaVsNaturalCny: naturalCostDeltaCny,
+          blockPadCostDeltaVsNaturalPercent: naturalCostDeltaPercent,
+          blockPadCostDeltaVsBb5Cny: bb5CostDeltaCny,
+          blockPadCostDeltaVsBb5Percent: bb5CostDeltaPercent,
+          blockPadCostDeltaVsBb6Cny: bb6CostDeltaCny,
+          blockPadCostDeltaVsBb6Percent: bb6CostDeltaPercent,
+          blockPadCacheRatioWinVsNatural:
+            typeof natural.medianCacheRatio === "number" &&
+            typeof blockPad.medianCacheRatio === "number" &&
+            blockPad.medianCacheRatio > natural.medianCacheRatio,
+          blockPadEstimatedCostWinVsNatural:
+            typeof natural.medianEstimatedCostCny === "number" &&
+            typeof blockPad.medianEstimatedCostCny === "number" &&
+            blockPad.medianEstimatedCostCny < natural.medianEstimatedCostCny,
+          blockPadEstimatedCostWinVsBb5:
+            typeof bb5.medianEstimatedCostCny === "number" &&
+            typeof blockPad.medianEstimatedCostCny === "number" &&
+            blockPad.medianEstimatedCostCny <= bb5.medianEstimatedCostCny,
+          blockPadEstimatedCostWinVsBb6:
+            typeof bb6.medianEstimatedCostCny === "number" &&
+            typeof blockPad.medianEstimatedCostCny === "number" &&
+            blockPad.medianEstimatedCostCny <= bb6.medianEstimatedCostCny,
+        });
+      }
+
+      if (rawResult.mode === "blockalign") {
+        const alignedCalls = calls.filter((call) => call.projectId === projectId && call.scenarioId === scenario.id && call.variant === "bb8AlignedBlockPadLite");
+        const bb7Calls = calls.filter((call) => call.projectId === projectId && call.scenarioId === scenario.id && call.variant === "bb7BlockPadLite");
+        const aligned = summarizeCalls(alignedCalls);
+        const bb7 = summarizeCalls(bb7Calls);
+        const alignedPromptMedian = median(alignedCalls.filter((call) => call.iteration > 0 && call.status === "success").map((call) => call.promptTokens));
+        const naturalCostDeltaCny =
+          typeof natural.medianEstimatedCostCny === "number" && typeof aligned.medianEstimatedCostCny === "number"
+            ? aligned.medianEstimatedCostCny - natural.medianEstimatedCostCny
+            : null;
+        const naturalCostDeltaPercent =
+          typeof naturalCostDeltaCny === "number" && natural.medianEstimatedCostCny
+            ? naturalCostDeltaCny / natural.medianEstimatedCostCny
+            : null;
+        const bb7CostDeltaCny =
+          typeof bb7.medianEstimatedCostCny === "number" && typeof aligned.medianEstimatedCostCny === "number"
+            ? aligned.medianEstimatedCostCny - bb7.medianEstimatedCostCny
+            : null;
+        const bb7CostDeltaPercent =
+          typeof bb7CostDeltaCny === "number" && bb7.medianEstimatedCostCny
+            ? bb7CostDeltaCny / bb7.medianEstimatedCostCny
+            : null;
+        alignedBlockPadComparisons.push({
+          projectId,
+          scenarioId: scenario.id,
+          candidateVariant: "bb8AlignedBlockPadLite",
+          alignedMedianPromptTokens: alignedPromptMedian,
+          naturalMedianCachedTokens: natural.medianCachedTokens,
+          alignedMedianCachedTokens: aligned.medianCachedTokens,
+          bb7MedianCachedTokens: bb7.medianCachedTokens,
+          naturalMedianCacheRatio: natural.medianCacheRatio,
+          alignedMedianCacheRatio: aligned.medianCacheRatio,
+          bb7MedianCacheRatio: bb7.medianCacheRatio,
+          naturalMedianEstimatedCostCny: natural.medianEstimatedCostCny,
+          alignedMedianEstimatedCostCny: aligned.medianEstimatedCostCny,
+          bb7MedianEstimatedCostCny: bb7.medianEstimatedCostCny,
+          alignedCostDeltaVsNaturalCny: naturalCostDeltaCny,
+          alignedCostDeltaVsNaturalPercent: naturalCostDeltaPercent,
+          alignedCostDeltaVsBb7Cny: bb7CostDeltaCny,
+          alignedCostDeltaVsBb7Percent: bb7CostDeltaPercent,
+          alignedCacheRatioWinVsNatural:
+            typeof natural.medianCacheRatio === "number" &&
+            typeof aligned.medianCacheRatio === "number" &&
+            aligned.medianCacheRatio > natural.medianCacheRatio,
+          alignedEstimatedCostWinVsNatural:
+            typeof natural.medianEstimatedCostCny === "number" &&
+            typeof aligned.medianEstimatedCostCny === "number" &&
+            aligned.medianEstimatedCostCny < natural.medianEstimatedCostCny,
+          alignedEstimatedCostWinVsBb7:
+            typeof bb7.medianEstimatedCostCny === "number" &&
+            typeof aligned.medianEstimatedCostCny === "number" &&
+            aligned.medianEstimatedCostCny <= bb7.medianEstimatedCostCny,
+        });
+      }
     }
   }
 
@@ -1327,6 +1659,314 @@ function buildSummary(rawResult) {
       : rawResult.mode === "sidecar"
       ? "bb5_sidecar_inconclusive"
       : undefined;
+  const hybridStats = ["full", "lite"].map((family) => {
+    const variant = family === "full" ? "bb6HybridFull" : "bb6HybridLite";
+    const bb5Variant = family === "full" ? "bb5SidecarFull" : "bb5SidecarLite";
+    const hybridCost = variants[variant]?.medianEstimatedCostCny;
+    const naturalBaselineCost = variants.natural?.medianEstimatedCostCny;
+    const bb4BaselineCost = variants.bb4AnchorPad?.medianEstimatedCostCny;
+    const bb5BaselineCost = variants[bb5Variant]?.medianEstimatedCostCny;
+    const overallCostDeltaVsNaturalCny =
+      typeof hybridCost === "number" && typeof naturalBaselineCost === "number"
+        ? hybridCost - naturalBaselineCost
+        : null;
+    const overallCostDeltaVsNaturalPercent =
+      typeof overallCostDeltaVsNaturalCny === "number" && naturalBaselineCost
+        ? overallCostDeltaVsNaturalCny / naturalBaselineCost
+        : null;
+    const overallCostDeltaVsBb4Cny =
+      typeof hybridCost === "number" && typeof bb4BaselineCost === "number"
+        ? hybridCost - bb4BaselineCost
+        : null;
+    const overallCostDeltaVsBb4Percent =
+      typeof overallCostDeltaVsBb4Cny === "number" && bb4BaselineCost
+        ? overallCostDeltaVsBb4Cny / bb4BaselineCost
+        : null;
+    const overallCostDeltaVsBb5Cny =
+      typeof hybridCost === "number" && typeof bb5BaselineCost === "number"
+        ? hybridCost - bb5BaselineCost
+        : null;
+    const overallCostDeltaVsBb5Percent =
+      typeof overallCostDeltaVsBb5Cny === "number" && bb5BaselineCost
+        ? overallCostDeltaVsBb5Cny / bb5BaselineCost
+        : null;
+    const familyComparisons = hybridComparisons.filter((item) => item.family === family);
+    const cacheRatioWinsVsNatural = familyComparisons.filter((item) => item.hybridCacheRatioWinVsNatural).length;
+    const estimatedCostWinsVsNatural = familyComparisons.filter((item) => item.hybridEstimatedCostWinVsNatural).length;
+    const estimatedCostWinsVsBb4 = familyComparisons.filter((item) => item.hybridEstimatedCostWinVsBb4).length;
+    const estimatedCostWinsVsBb5 = familyComparisons.filter((item) => item.hybridEstimatedCostWinVsBb5).length;
+    const strongVsNatural =
+      rawResult.mode === "hybrid" &&
+      validRequestCount >= largeSampleThreshold &&
+      cacheFieldVisibilityRate >= 0.95 &&
+      familyComparisons.length >= 15 &&
+      estimatedCostWinsVsNatural >= 15 &&
+      typeof overallCostDeltaVsNaturalPercent === "number" &&
+      overallCostDeltaVsNaturalPercent <= -0.05;
+    const notWeakerThanBb5 =
+      rawResult.mode === "hybrid" &&
+      familyComparisons.length >= 15 &&
+      estimatedCostWinsVsBb5 >= 9 &&
+      typeof overallCostDeltaVsBb5Percent === "number" &&
+      overallCostDeltaVsBb5Percent <= 0;
+    const promising =
+      rawResult.mode === "hybrid" &&
+      validRequestCount >= largeSampleThreshold &&
+      cacheFieldVisibilityRate >= 0.95 &&
+      familyComparisons.length >= 15 &&
+      estimatedCostWinsVsNatural >= 12 &&
+      typeof overallCostDeltaVsNaturalPercent === "number" &&
+      overallCostDeltaVsNaturalPercent <= -0.03;
+    return {
+      family,
+      variant,
+      baselineVariant: bb5Variant,
+      cacheRatioWinsVsNatural,
+      estimatedCostWinsVsNatural,
+      estimatedCostWinsVsBb4,
+      estimatedCostWinsVsBb5,
+      overallCostDeltaVsNaturalCny,
+      overallCostDeltaVsNaturalPercent,
+      overallCostDeltaVsBb4Cny,
+      overallCostDeltaVsBb4Percent,
+      overallCostDeltaVsBb5Cny,
+      overallCostDeltaVsBb5Percent,
+      conclusionLevel: strongVsNatural && notWeakerThanBb5
+        ? `bb6_hybrid_${family}_best_evidence`
+        : strongVsNatural
+        ? `bb6_hybrid_${family}_cost_evidence`
+        : promising
+        ? `bb6_hybrid_${family}_promising_signal`
+        : `bb6_hybrid_${family}_inconclusive`,
+    };
+  });
+  const hybridConclusionLevel =
+    rawResult.mode === "hybrid" && hybridStats.some((item) => item.conclusionLevel.endsWith("_best_evidence"))
+      ? "bb6_hybrid_best_evidence"
+      : rawResult.mode === "hybrid" && hybridStats.some((item) => item.conclusionLevel.endsWith("_cost_evidence"))
+      ? "bb6_hybrid_cost_evidence"
+      : rawResult.mode === "hybrid" && hybridStats.some((item) => item.conclusionLevel.endsWith("_promising_signal"))
+      ? "bb6_hybrid_promising_signal"
+      : rawResult.mode === "hybrid"
+      ? "bb6_hybrid_inconclusive"
+      : undefined;
+  const blockPadCost = variants.bb7BlockPadLite?.medianEstimatedCostCny;
+  const blockPadNaturalCost = variants.natural?.medianEstimatedCostCny;
+  const blockPadBb5Cost = variants.bb5SidecarLite?.medianEstimatedCostCny;
+  const blockPadBb6Cost = variants.bb6HybridLite?.medianEstimatedCostCny;
+  const blockPadOverallCostDeltaVsNaturalCny =
+    typeof blockPadCost === "number" && typeof blockPadNaturalCost === "number"
+      ? blockPadCost - blockPadNaturalCost
+      : null;
+  const blockPadOverallCostDeltaVsNaturalPercent =
+    typeof blockPadOverallCostDeltaVsNaturalCny === "number" && blockPadNaturalCost
+      ? blockPadOverallCostDeltaVsNaturalCny / blockPadNaturalCost
+      : null;
+  const blockPadOverallCostDeltaVsBb5Cny =
+    typeof blockPadCost === "number" && typeof blockPadBb5Cost === "number"
+      ? blockPadCost - blockPadBb5Cost
+      : null;
+  const blockPadOverallCostDeltaVsBb5Percent =
+    typeof blockPadOverallCostDeltaVsBb5Cny === "number" && blockPadBb5Cost
+      ? blockPadOverallCostDeltaVsBb5Cny / blockPadBb5Cost
+      : null;
+  const blockPadOverallCostDeltaVsBb6Cny =
+    typeof blockPadCost === "number" && typeof blockPadBb6Cost === "number"
+      ? blockPadCost - blockPadBb6Cost
+      : null;
+  const blockPadOverallCostDeltaVsBb6Percent =
+    typeof blockPadOverallCostDeltaVsBb6Cny === "number" && blockPadBb6Cost
+      ? blockPadOverallCostDeltaVsBb6Cny / blockPadBb6Cost
+      : null;
+  const blockPadCacheRatioWinsVsNatural = blockPadComparisons.filter((item) => item.blockPadCacheRatioWinVsNatural).length;
+  const blockPadEstimatedCostWinsVsNatural = blockPadComparisons.filter((item) => item.blockPadEstimatedCostWinVsNatural).length;
+  const blockPadEstimatedCostWinsVsBb5 = blockPadComparisons.filter((item) => item.blockPadEstimatedCostWinVsBb5).length;
+  const blockPadEstimatedCostWinsVsBb6 = blockPadComparisons.filter((item) => item.blockPadEstimatedCostWinVsBb6).length;
+  const blockPadStrongVsNatural =
+    rawResult.mode === "blockpad" &&
+    validRequestCount >= largeSampleThreshold &&
+    cacheFieldVisibilityRate >= 0.95 &&
+    blockPadComparisons.length >= 15 &&
+    blockPadEstimatedCostWinsVsNatural >= 15 &&
+    typeof blockPadOverallCostDeltaVsNaturalPercent === "number" &&
+    blockPadOverallCostDeltaVsNaturalPercent <= -0.05;
+  const blockPadNotWeakerThanBb6 =
+    rawResult.mode === "blockpad" &&
+    blockPadComparisons.length >= 15 &&
+    blockPadEstimatedCostWinsVsBb6 >= 9 &&
+    typeof blockPadOverallCostDeltaVsBb6Percent === "number" &&
+    blockPadOverallCostDeltaVsBb6Percent <= 0;
+  const blockPadPromising =
+    rawResult.mode === "blockpad" &&
+    validRequestCount >= largeSampleThreshold &&
+    cacheFieldVisibilityRate >= 0.95 &&
+    blockPadComparisons.length >= 15 &&
+    blockPadEstimatedCostWinsVsNatural >= 12 &&
+    typeof blockPadOverallCostDeltaVsNaturalPercent === "number" &&
+    blockPadOverallCostDeltaVsNaturalPercent <= -0.03;
+  const blockPadStats = rawResult.mode === "blockpad" ? {
+    variant: "bb7BlockPadLite",
+    baselineVariant: "bb6HybridLite",
+    cacheRatioWinsVsNatural: blockPadCacheRatioWinsVsNatural,
+    estimatedCostWinsVsNatural: blockPadEstimatedCostWinsVsNatural,
+    estimatedCostWinsVsBb5: blockPadEstimatedCostWinsVsBb5,
+    estimatedCostWinsVsBb6: blockPadEstimatedCostWinsVsBb6,
+    overallCostDeltaVsNaturalCny: blockPadOverallCostDeltaVsNaturalCny,
+    overallCostDeltaVsNaturalPercent: blockPadOverallCostDeltaVsNaturalPercent,
+    overallCostDeltaVsBb5Cny: blockPadOverallCostDeltaVsBb5Cny,
+    overallCostDeltaVsBb5Percent: blockPadOverallCostDeltaVsBb5Percent,
+    overallCostDeltaVsBb6Cny: blockPadOverallCostDeltaVsBb6Cny,
+    overallCostDeltaVsBb6Percent: blockPadOverallCostDeltaVsBb6Percent,
+    conclusionLevel: blockPadStrongVsNatural && blockPadNotWeakerThanBb6
+      ? "bb7_blockpad_best_evidence"
+      : blockPadStrongVsNatural
+      ? "bb7_blockpad_cost_evidence"
+      : blockPadPromising
+      ? "bb7_blockpad_promising_signal"
+      : "bb7_blockpad_inconclusive",
+  } : undefined;
+  const blockPadConclusionLevel = rawResult.mode === "blockpad" ? blockPadStats.conclusionLevel : undefined;
+  const adaptiveSelectorComparisons = rawResult.mode === "blockpad" ? blockPadComparisons.map((item) => {
+    const candidates = [
+      { variant: "natural", cost: item.naturalMedianEstimatedCostCny, cacheRatio: item.naturalMedianCacheRatio },
+      { variant: "bb5SidecarLite", cost: item.bb5MedianEstimatedCostCny, cacheRatio: item.bb5MedianCacheRatio },
+      { variant: "bb6HybridLite", cost: item.bb6MedianEstimatedCostCny, cacheRatio: item.bb6MedianCacheRatio },
+      { variant: "bb7BlockPadLite", cost: item.blockPadMedianEstimatedCostCny, cacheRatio: item.blockPadMedianCacheRatio },
+    ].filter((candidate) => typeof candidate.cost === "number");
+    const selected = candidates.sort((a, b) => a.cost - b.cost)[0] || { variant: "unknown", cost: null, cacheRatio: null };
+    const naturalCost = item.naturalMedianEstimatedCostCny;
+    const selectedDeltaVsNaturalCny =
+      typeof selected.cost === "number" && typeof naturalCost === "number"
+        ? selected.cost - naturalCost
+        : null;
+    const selectedDeltaVsNaturalPercent =
+      typeof selectedDeltaVsNaturalCny === "number" && naturalCost
+        ? selectedDeltaVsNaturalCny / naturalCost
+        : null;
+    return {
+      projectId: item.projectId,
+      scenarioId: item.scenarioId,
+      selectedVariant: selected.variant,
+      selectedMedianEstimatedCostCny: selected.cost,
+      selectedMedianCacheRatio: selected.cacheRatio,
+      naturalMedianEstimatedCostCny: naturalCost,
+      selectedCostDeltaVsNaturalCny: selectedDeltaVsNaturalCny,
+      selectedCostDeltaVsNaturalPercent: selectedDeltaVsNaturalPercent,
+      selectedEstimatedCostWinVsNatural:
+        typeof selected.cost === "number" && typeof naturalCost === "number" && selected.cost < naturalCost,
+      selectedEstimatedCostNoWorseThanNatural:
+        typeof selected.cost === "number" && typeof naturalCost === "number" && selected.cost <= naturalCost,
+    };
+  }) : [];
+  const adaptiveSelectorWinsVsNatural = adaptiveSelectorComparisons.filter((item) => item.selectedEstimatedCostWinVsNatural).length;
+  const adaptiveSelectorNoWorseVsNatural = adaptiveSelectorComparisons.filter((item) => item.selectedEstimatedCostNoWorseThanNatural).length;
+  const adaptiveSelectorMedianCost = median(adaptiveSelectorComparisons.map((item) => item.selectedMedianEstimatedCostCny));
+  const adaptiveSelectorNaturalMedianCost = median(adaptiveSelectorComparisons.map((item) => item.naturalMedianEstimatedCostCny));
+  const adaptiveSelectorOverallCostDeltaCny =
+    typeof adaptiveSelectorMedianCost === "number" && typeof adaptiveSelectorNaturalMedianCost === "number"
+      ? adaptiveSelectorMedianCost - adaptiveSelectorNaturalMedianCost
+      : null;
+  const adaptiveSelectorOverallCostDeltaPercent =
+    typeof adaptiveSelectorOverallCostDeltaCny === "number" && adaptiveSelectorNaturalMedianCost
+      ? adaptiveSelectorOverallCostDeltaCny / adaptiveSelectorNaturalMedianCost
+      : null;
+  const adaptiveSelectorStrong =
+    rawResult.mode === "blockpad" &&
+    validRequestCount >= largeSampleThreshold &&
+    cacheFieldVisibilityRate >= 0.95 &&
+    adaptiveSelectorComparisons.length >= 15 &&
+    adaptiveSelectorWinsVsNatural >= 15 &&
+    adaptiveSelectorNoWorseVsNatural === adaptiveSelectorComparisons.length &&
+    typeof adaptiveSelectorOverallCostDeltaPercent === "number" &&
+    adaptiveSelectorOverallCostDeltaPercent <= -0.05;
+  const adaptiveSelectorPromising =
+    rawResult.mode === "blockpad" &&
+    validRequestCount >= largeSampleThreshold &&
+    cacheFieldVisibilityRate >= 0.95 &&
+    adaptiveSelectorComparisons.length >= 15 &&
+    adaptiveSelectorWinsVsNatural >= 12 &&
+    adaptiveSelectorNoWorseVsNatural === adaptiveSelectorComparisons.length &&
+    typeof adaptiveSelectorOverallCostDeltaPercent === "number" &&
+    adaptiveSelectorOverallCostDeltaPercent <= -0.03;
+  const adaptiveSelectorStats = rawResult.mode === "blockpad" ? {
+    selectorId: "bb9AdaptiveSelector",
+    candidateVariants: ["natural", "bb5SidecarLite", "bb6HybridLite", "bb7BlockPadLite"],
+    estimatedCostWinsVsNatural: adaptiveSelectorWinsVsNatural,
+    estimatedCostNoWorseVsNatural: adaptiveSelectorNoWorseVsNatural,
+    comparisonCount: adaptiveSelectorComparisons.length,
+    medianEstimatedCostCny: adaptiveSelectorMedianCost,
+    naturalMedianEstimatedCostCny: adaptiveSelectorNaturalMedianCost,
+    overallCostDeltaVsNaturalCny: adaptiveSelectorOverallCostDeltaCny,
+    overallCostDeltaVsNaturalPercent: adaptiveSelectorOverallCostDeltaPercent,
+    conclusionLevel: adaptiveSelectorStrong
+      ? "bb9_adaptive_selector_best_evidence"
+      : adaptiveSelectorPromising
+      ? "bb9_adaptive_selector_promising_signal"
+      : "bb9_adaptive_selector_inconclusive",
+  } : undefined;
+  const alignedCost = variants.bb8AlignedBlockPadLite?.medianEstimatedCostCny;
+  const alignedNaturalCost = variants.natural?.medianEstimatedCostCny;
+  const alignedBb7Cost = variants.bb7BlockPadLite?.medianEstimatedCostCny;
+  const alignedOverallCostDeltaVsNaturalCny =
+    typeof alignedCost === "number" && typeof alignedNaturalCost === "number"
+      ? alignedCost - alignedNaturalCost
+      : null;
+  const alignedOverallCostDeltaVsNaturalPercent =
+    typeof alignedOverallCostDeltaVsNaturalCny === "number" && alignedNaturalCost
+      ? alignedOverallCostDeltaVsNaturalCny / alignedNaturalCost
+      : null;
+  const alignedOverallCostDeltaVsBb7Cny =
+    typeof alignedCost === "number" && typeof alignedBb7Cost === "number"
+      ? alignedCost - alignedBb7Cost
+      : null;
+  const alignedOverallCostDeltaVsBb7Percent =
+    typeof alignedOverallCostDeltaVsBb7Cny === "number" && alignedBb7Cost
+      ? alignedOverallCostDeltaVsBb7Cny / alignedBb7Cost
+      : null;
+  const alignedCacheRatioWinsVsNatural = alignedBlockPadComparisons.filter((item) => item.alignedCacheRatioWinVsNatural).length;
+  const alignedEstimatedCostWinsVsNatural = alignedBlockPadComparisons.filter((item) => item.alignedEstimatedCostWinVsNatural).length;
+  const alignedEstimatedCostWinsVsBb7 = alignedBlockPadComparisons.filter((item) => item.alignedEstimatedCostWinVsBb7).length;
+  const alignedStrongVsNatural =
+    rawResult.mode === "blockalign" &&
+    validRequestCount >= largeSampleThreshold &&
+    cacheFieldVisibilityRate >= 0.95 &&
+    alignedBlockPadComparisons.length >= 15 &&
+    alignedEstimatedCostWinsVsNatural >= 15 &&
+    typeof alignedOverallCostDeltaVsNaturalPercent === "number" &&
+    alignedOverallCostDeltaVsNaturalPercent <= -0.05;
+  const alignedNotWeakerThanBb7 =
+    rawResult.mode === "blockalign" &&
+    alignedBlockPadComparisons.length >= 15 &&
+    alignedEstimatedCostWinsVsBb7 >= 9 &&
+    typeof alignedOverallCostDeltaVsBb7Percent === "number" &&
+    alignedOverallCostDeltaVsBb7Percent <= 0;
+  const alignedPromising =
+    rawResult.mode === "blockalign" &&
+    validRequestCount >= largeSampleThreshold &&
+    cacheFieldVisibilityRate >= 0.95 &&
+    alignedBlockPadComparisons.length >= 15 &&
+    alignedEstimatedCostWinsVsNatural >= 12 &&
+    typeof alignedOverallCostDeltaVsNaturalPercent === "number" &&
+    alignedOverallCostDeltaVsNaturalPercent <= -0.03;
+  const alignedBlockPadStats = rawResult.mode === "blockalign" ? {
+    variant: "bb8AlignedBlockPadLite",
+    baselineVariant: "bb7BlockPadLite",
+    cacheRatioWinsVsNatural: alignedCacheRatioWinsVsNatural,
+    estimatedCostWinsVsNatural: alignedEstimatedCostWinsVsNatural,
+    estimatedCostWinsVsBb7: alignedEstimatedCostWinsVsBb7,
+    overallCostDeltaVsNaturalCny: alignedOverallCostDeltaVsNaturalCny,
+    overallCostDeltaVsNaturalPercent: alignedOverallCostDeltaVsNaturalPercent,
+    overallCostDeltaVsBb7Cny: alignedOverallCostDeltaVsBb7Cny,
+    overallCostDeltaVsBb7Percent: alignedOverallCostDeltaVsBb7Percent,
+    conclusionLevel: alignedStrongVsNatural && alignedNotWeakerThanBb7
+      ? "bb8_blockalign_best_evidence"
+      : alignedStrongVsNatural
+      ? "bb8_blockalign_cost_evidence"
+      : alignedPromising
+      ? "bb8_blockalign_promising_signal"
+      : "bb8_blockalign_inconclusive",
+  } : undefined;
+  const alignedBlockPadConclusionLevel = rawResult.mode === "blockalign" ? alignedBlockPadStats.conclusionLevel : undefined;
 
   return {
     status: rawResult.status,
@@ -1377,10 +2017,23 @@ function buildSummary(rawResult) {
     readableConclusionLevel,
     sidecarStats: rawResult.mode === "sidecar" ? sidecarStats : undefined,
     sidecarConclusionLevel,
+    hybridStats: rawResult.mode === "hybrid" ? hybridStats : undefined,
+    hybridConclusionLevel,
+    blockPadStats,
+    blockPadConclusionLevel,
+    adaptiveSelectorStats,
+    alignedBlockPadStats,
+    alignedBlockPadConclusionLevel,
     ratioConclusionLevel: ratioEvidence ? "ratio_large_sample_evidence" : "ratio_not_proven",
     costConclusionLevel: costEvidence ? "cost_large_sample_evidence" : "cost_not_proven",
     conclusionLevel:
-      rawResult.mode === "sidecar"
+      rawResult.mode === "hybrid"
+        ? hybridConclusionLevel
+        : rawResult.mode === "blockalign"
+        ? alignedBlockPadConclusionLevel
+        : rawResult.mode === "blockpad"
+        ? (adaptiveSelectorStats?.conclusionLevel || blockPadConclusionLevel)
+        : rawResult.mode === "sidecar"
         ? sidecarConclusionLevel
         : rawResult.mode === "readablePoc"
         ? readableConclusionLevel
@@ -1405,6 +2058,10 @@ function buildSummary(rawResult) {
     padSweepComparisons: padSweepComparisons.length ? padSweepComparisons : undefined,
     readableComparisons: readableComparisons.length ? readableComparisons : undefined,
     sidecarComparisons: sidecarComparisons.length ? sidecarComparisons : undefined,
+    hybridComparisons: hybridComparisons.length ? hybridComparisons : undefined,
+    blockPadComparisons: blockPadComparisons.length ? blockPadComparisons : undefined,
+    adaptiveSelectorComparisons: adaptiveSelectorComparisons.length ? adaptiveSelectorComparisons : undefined,
+    alignedBlockPadComparisons: alignedBlockPadComparisons.length ? alignedBlockPadComparisons : undefined,
     limitations: [
       rawResult.providerLimitation || "Provider-specific benchmark; not a cross-provider conclusion.",
       "Latency is recorded but not used as the primary win criterion.",
@@ -1423,7 +2080,13 @@ function parseArgs(argv) {
   const scenarioLimitIndex = args.indexOf("--scenario-limit");
   const mode = modeIndex >= 0 ? args[modeIndex + 1] : "absolute";
   const defaultOutputPath =
-    mode === "sidecar"
+    mode === "blockalign"
+      ? "tests/outputs/private/provider-cache-benchmark-blockalign.raw.json"
+      : mode === "blockpad"
+      ? "tests/outputs/private/provider-cache-benchmark-blockpad.raw.json"
+      : mode === "hybrid"
+      ? "tests/outputs/private/provider-cache-benchmark-hybrid.raw.json"
+      : mode === "sidecar"
       ? "tests/outputs/private/provider-cache-benchmark-sidecar.raw.json"
       : mode === "readablePoc"
       ? "tests/outputs/private/provider-cache-benchmark-readable-poc.raw.json"
@@ -1439,7 +2102,13 @@ function parseArgs(argv) {
       ? "tests/outputs/private/provider-cache-benchmark-normalized.raw.json"
       : "tests/outputs/private/provider-cache-benchmark.raw.json";
   const defaultSummaryOutputPath =
-    mode === "sidecar"
+    mode === "blockalign"
+      ? "tests/outputs/provider-cache-benchmark-blockalign.latest.json"
+      : mode === "blockpad"
+      ? "tests/outputs/provider-cache-benchmark-blockpad.latest.json"
+      : mode === "hybrid"
+      ? "tests/outputs/provider-cache-benchmark-hybrid.latest.json"
+      : mode === "sidecar"
       ? "tests/outputs/provider-cache-benchmark-sidecar.latest.json"
       : mode === "readablePoc"
       ? "tests/outputs/provider-cache-benchmark-readable-poc.latest.json"
@@ -1480,8 +2149,8 @@ async function runBenchmark(options = {}) {
   if (!options.localProjects) {
     throw new Error("Use --local-projects for this benchmark.");
   }
-  if (!["absolute", "normalized", "capsule", "anchor", "anchorpad", "padSweep", "readablePoc", "sidecar"].includes(options.mode)) {
-    throw new Error("Benchmark mode must be absolute, normalized, capsule, anchor, anchorpad, padSweep, readablePoc, or sidecar.");
+  if (!["absolute", "normalized", "capsule", "anchor", "anchorpad", "padSweep", "readablePoc", "sidecar", "hybrid", "blockpad", "blockalign"].includes(options.mode)) {
+    throw new Error("Benchmark mode must be absolute, normalized, capsule, anchor, anchorpad, padSweep, readablePoc, sidecar, hybrid, blockpad, or blockalign.");
   }
   if (env.projectPaths.length === 0) {
     throw new Error("Missing BASEBRIEF_BENCHMARK_PROJECTS. Use semicolon-separated local project paths.");

@@ -92,7 +92,7 @@ Lite 明显短于 Full，不写长历史，不接高风险工程。
 - 稳定前缀或缓存代理实验
 
 它是实验模式。  
-它可以用于稳定前缀和缓存经济实验。当前证据分层很明确：早期 normalized benchmark 没有证明缓存比例或估算成本优势；后续 BB5 Cache Sidecar 在 MiMo `mimo-v2.5` 本地真实项目样本下给出了 Lite 侧的估算成本优势证据，DeepSeek `deepseek-v4-flash` 只达到 Full 侧 promising signal。不要把它写成跨 provider 通用证明，也不要宣称真实账单费用、比例或延迟已经稳定胜出。
+它可以用于稳定前缀和缓存经济实验。当前证据分层很明确：早期 normalized benchmark 没有证明缓存比例或估算成本优势；BB5 Cache Sidecar 在 MiMo 上给出了单格式证据；BB9 Adaptive Selector 在 MiMo `mimo-v2.5` 和 DeepSeek `deepseek-v4-flash` 的本地真实项目样本下都给出了估算成本优势证据。不要把它写成跨 provider 通用证明，也不要宣称真实账单费用或延迟已经稳定胜出。
 
 ## 什么时候不要用 Lite
 
@@ -154,7 +154,9 @@ BaseBrief/
 │     ├─ cache-ready-anchor.md
 │     ├─ cache-ready-anchor-pad.md
 │     ├─ cache-ready-readable-poc.md
-│     └─ cache-ready-sidecar.md
+│     ├─ cache-ready-sidecar.md
+│     ├─ cache-ready-hybrid-anchor.md
+│     └─ cache-ready-adaptive-selector.md
 └─ scripts/
    ├─ mode_router.js
    ├─ generate_cache_ready_lite.js
@@ -186,3 +188,5 @@ BaseBrief/
 - BB4 example output: [examples/cache-ready-anchor-pad-output.md](examples/cache-ready-anchor-pad-output.md)
 - Readable Full/Lite POC: [docs/experiments/cache-ready-readable-poc.md](docs/experiments/cache-ready-readable-poc.md)
 - BB5 Cache Sidecar notes: [docs/experiments/cache-ready-sidecar.md](docs/experiments/cache-ready-sidecar.md)
+- BB6 Hybrid Anchor notes: [docs/experiments/cache-ready-hybrid-anchor.md](docs/experiments/cache-ready-hybrid-anchor.md)
+- BB9 Adaptive Selector notes: [docs/experiments/cache-ready-adaptive-selector.md](docs/experiments/cache-ready-adaptive-selector.md)

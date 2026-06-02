@@ -78,7 +78,7 @@ Do not use Lite when the task touches backend, provider, `.env`, deployment, sta
 Use `cache-ready` only when you explicitly want a stable-prefix experiment.
 
 It is experimental.  
-The evidence is tiered: early normalized benchmarks did not prove better cache ratio or estimated cost; later BB5 Cache Sidecar results show Lite-side estimated-cost evidence on MiMo `mimo-v2.5`, while DeepSeek `deepseek-v4-flash` only reached a Full-side promising signal. Do not market this as provider-general proof, real billing proof, or stable latency evidence.
+The evidence is tiered: early normalized benchmarks did not prove better cache ratio or estimated cost; BB5 Cache Sidecar produced single-format evidence on MiMo; BB9 Adaptive Selector now shows estimated-cost evidence on both MiMo `mimo-v2.5` and DeepSeek `deepseek-v4-flash` local real-project samples. Do not market this as provider-general proof, real billing proof, or stable latency evidence.
 
 ## Security Notes
 
@@ -99,6 +99,8 @@ The evidence is tiered: early normalized benchmarks did not prove better cache r
 - [BB4 anchor-pad notes](docs/experiments/cache-ready-anchor-pad.md)
 - [Readable Full/Lite POC](docs/experiments/cache-ready-readable-poc.md)
 - [BB5 cache sidecar notes](docs/experiments/cache-ready-sidecar.md)
+- [BB6 hybrid anchor notes](docs/experiments/cache-ready-hybrid-anchor.md)
+- [BB9 adaptive selector notes](docs/experiments/cache-ready-adaptive-selector.md)
 - [Examples](examples)
 
 ## Cache-ready v2
