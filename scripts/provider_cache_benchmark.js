@@ -480,6 +480,30 @@ function buildPadSweepPrompt(snapshot, scenario, iteration, variant) {
   return buildAnchorLikePrompt(snapshot, scenario, choice, config.padLength);
 }
 
+function buildBb5SidecarPrompt(snapshot, scenario, iteration, variant) {
+  const isLite = variant === "bb5SidecarLite";
+  const choice = iteration % scenario.tailRequests.length === 0 ? "A" : "B";
+  const readmeLength = isLite ? 500 : 900;
+  const packageLength = isLite ? 500 : 900;
+  const fileLength = isLite ? 700 : 1200;
+  return [
+    "BB5S",
+    `S=${isLite ? "lite" : "full"}`,
+    `P=${snapshot.projectId}/${scenario.id}: local real-project benchmark snapshot`,
+    `G=${scenario.label}`,
+    `F=readme:${sanitizeText(snapshot.readmeExcerpt || "none", readmeLength)} ; pkg:${sanitizeText(JSON.stringify(snapshot.packages), packageLength)} ; files:${sanitizeText(snapshot.fileSample.join(" | "), fileLength)}`,
+    "D=source project is read-only ; sensitive files and generated directories are excluded",
+    "R=do not read or output env files, tokens, secrets, or credentials",
+    "X=.env ; token ; secret ; credential ; source project writes",
+    `O=${isLite ? "concise Lite-style continuation answer" : "readable Full-style continuation answer"}`,
+    `QAA=${sanitizeText(scenario.tailRequests[0], 300)}`,
+    `QAB=${sanitizeText(scenario.tailRequests[1], 300)}`,
+    "PAD=p p p p",
+    "--",
+    `Q=${choice}`,
+  ].join("\n");
+}
+
 function detectProviderProfile(providerName, model) {
   const requested = (process.env.BASEBRIEF_PROVIDER_PROFILE || "").trim();
   if (requested && PROVIDER_PROFILES[requested]) {
@@ -640,6 +664,7 @@ function summarizeCalls(calls) {
 }
 
 function getVariantsForMode(mode) {
+  if (mode === "sidecar") return ["natural", "readableFull", "readableLite", "bb4AnchorPad", "bb5SidecarFull", "bb5SidecarLite"];
   if (mode === "readablePoc") return ["natural", "readableFull", "readableFullPad4", "readableLite", "readableLitePad4"];
   if (mode === "padSweep") return PAD_SWEEP_VARIANTS.map((item) => item.variant);
   if (mode === "anchorpad") return ["natural", "cacheReady", "capsuleV2", "anchorV3", "anchorPadV4"];
@@ -676,6 +701,13 @@ function getPromptForVariant(mode, snapshot, scenario, iteration, variant) {
     if (variant === "natural") return buildNormalizedPrompt(snapshot, scenario, iteration, "natural");
     return buildReadablePocPrompt(snapshot, scenario, iteration, variant);
   }
+  if (mode === "sidecar") {
+    if (variant === "natural") return buildNormalizedPrompt(snapshot, scenario, iteration, "natural");
+    if (variant === "readableFull") return buildReadablePocPrompt(snapshot, scenario, iteration, "readableFull");
+    if (variant === "readableLite") return buildReadablePocPrompt(snapshot, scenario, iteration, "readableLite");
+    if (variant === "bb4AnchorPad") return buildAnchorPadPrompt(snapshot, scenario, iteration);
+    return buildBb5SidecarPrompt(snapshot, scenario, iteration, variant);
+  }
   return variant === "natural"
     ? buildNaturalPrompt(snapshot, scenario, iteration)
     : buildCacheReadyPrompt(snapshot, scenario, iteration);
@@ -700,6 +732,7 @@ function buildSummary(rawResult) {
   const anchorPadComparisons = [];
   const padSweepComparisons = [];
   const readableComparisons = [];
+  const sidecarComparisons = [];
   for (const projectId of rawResult.projectIds) {
     for (const scenario of scenarioList) {
       const naturalCalls = calls.filter((call) => call.projectId === projectId && call.scenarioId === scenario.id && call.variant === "natural");
@@ -947,6 +980,68 @@ function buildSummary(rawResult) {
           });
         }
       }
+      if (rawResult.mode === "sidecar") {
+        const bb4Calls = calls.filter((call) => call.projectId === projectId && call.scenarioId === scenario.id && call.variant === "bb4AnchorPad");
+        const bb4 = summarizeCalls(bb4Calls);
+        for (const pair of [
+          { family: "full", variant: "bb5SidecarFull" },
+          { family: "lite", variant: "bb5SidecarLite" },
+        ]) {
+          const sidecarCalls = calls.filter((call) => call.projectId === projectId && call.scenarioId === scenario.id && call.variant === pair.variant);
+          const sidecar = summarizeCalls(sidecarCalls);
+          const sidecarPromptMedian = median(sidecarCalls.filter((call) => call.iteration > 0 && call.status === "success").map((call) => call.promptTokens));
+          const bb4PromptMedian = median(bb4Calls.filter((call) => call.iteration > 0 && call.status === "success").map((call) => call.promptTokens));
+          const naturalCostDeltaCny =
+            typeof natural.medianEstimatedCostCny === "number" && typeof sidecar.medianEstimatedCostCny === "number"
+              ? sidecar.medianEstimatedCostCny - natural.medianEstimatedCostCny
+              : null;
+          const naturalCostDeltaPercent =
+            typeof naturalCostDeltaCny === "number" && natural.medianEstimatedCostCny
+              ? naturalCostDeltaCny / natural.medianEstimatedCostCny
+              : null;
+          const bb4CostDeltaCny =
+            typeof bb4.medianEstimatedCostCny === "number" && typeof sidecar.medianEstimatedCostCny === "number"
+              ? sidecar.medianEstimatedCostCny - bb4.medianEstimatedCostCny
+              : null;
+          const bb4CostDeltaPercent =
+            typeof bb4CostDeltaCny === "number" && bb4.medianEstimatedCostCny
+              ? bb4CostDeltaCny / bb4.medianEstimatedCostCny
+              : null;
+          sidecarComparisons.push({
+            projectId,
+            scenarioId: scenario.id,
+            family: pair.family,
+            sidecarVariant: pair.variant,
+            sidecarMedianPromptTokens: sidecarPromptMedian,
+            bb4MedianPromptTokens: bb4PromptMedian,
+            naturalMedianCachedTokens: natural.medianCachedTokens,
+            sidecarMedianCachedTokens: sidecar.medianCachedTokens,
+            bb4MedianCachedTokens: bb4.medianCachedTokens,
+            naturalMedianCacheRatio: natural.medianCacheRatio,
+            sidecarMedianCacheRatio: sidecar.medianCacheRatio,
+            bb4MedianCacheRatio: bb4.medianCacheRatio,
+            naturalMedianEstimatedCostCny: natural.medianEstimatedCostCny,
+            sidecarMedianEstimatedCostCny: sidecar.medianEstimatedCostCny,
+            bb4MedianEstimatedCostCny: bb4.medianEstimatedCostCny,
+            sidecarCostDeltaVsNaturalCny: naturalCostDeltaCny,
+            sidecarCostDeltaVsNaturalPercent: naturalCostDeltaPercent,
+            sidecarCostDeltaVsBb4Cny: bb4CostDeltaCny,
+            sidecarCostDeltaVsBb4Percent: bb4CostDeltaPercent,
+            sidecarCacheRatioWinVsNatural:
+              typeof natural.medianCacheRatio === "number" &&
+              typeof sidecar.medianCacheRatio === "number" &&
+              sidecar.medianCacheRatio > natural.medianCacheRatio,
+            sidecarEstimatedCostWinVsNatural:
+              typeof natural.medianEstimatedCostCny === "number" &&
+              typeof sidecar.medianEstimatedCostCny === "number" &&
+              sidecar.medianEstimatedCostCny < natural.medianEstimatedCostCny,
+            sidecarEstimatedCostWinVsBb4:
+              typeof bb4.medianEstimatedCostCny === "number" &&
+              typeof sidecar.medianEstimatedCostCny === "number" &&
+              sidecar.medianEstimatedCostCny <= bb4.medianEstimatedCostCny,
+          });
+        }
+      }
     }
   }
 
@@ -1156,6 +1251,82 @@ function buildSummary(rawResult) {
       : rawResult.mode === "readablePoc"
       ? "readable_poc_inconclusive"
       : undefined;
+  const sidecarStats = ["full", "lite"].map((family) => {
+    const variant = family === "full" ? "bb5SidecarFull" : "bb5SidecarLite";
+    const sidecarCost = variants[variant]?.medianEstimatedCostCny;
+    const naturalBaselineCost = variants.natural?.medianEstimatedCostCny;
+    const bb4BaselineCost = variants.bb4AnchorPad?.medianEstimatedCostCny;
+    const overallCostDeltaVsNaturalCny =
+      typeof sidecarCost === "number" && typeof naturalBaselineCost === "number"
+        ? sidecarCost - naturalBaselineCost
+        : null;
+    const overallCostDeltaVsNaturalPercent =
+      typeof overallCostDeltaVsNaturalCny === "number" && naturalBaselineCost
+        ? overallCostDeltaVsNaturalCny / naturalBaselineCost
+        : null;
+    const overallCostDeltaVsBb4Cny =
+      typeof sidecarCost === "number" && typeof bb4BaselineCost === "number"
+        ? sidecarCost - bb4BaselineCost
+        : null;
+    const overallCostDeltaVsBb4Percent =
+      typeof overallCostDeltaVsBb4Cny === "number" && bb4BaselineCost
+        ? overallCostDeltaVsBb4Cny / bb4BaselineCost
+        : null;
+    const familyComparisons = sidecarComparisons.filter((item) => item.family === family);
+    const cacheRatioWinsVsNatural = familyComparisons.filter((item) => item.sidecarCacheRatioWinVsNatural).length;
+    const estimatedCostWinsVsNatural = familyComparisons.filter((item) => item.sidecarEstimatedCostWinVsNatural).length;
+    const estimatedCostWinsVsBb4 = familyComparisons.filter((item) => item.sidecarEstimatedCostWinVsBb4).length;
+    const strongVsNatural =
+      rawResult.mode === "sidecar" &&
+      validRequestCount >= largeSampleThreshold &&
+      cacheFieldVisibilityRate >= 0.95 &&
+      familyComparisons.length >= 15 &&
+      estimatedCostWinsVsNatural >= 15 &&
+      typeof overallCostDeltaVsNaturalPercent === "number" &&
+      overallCostDeltaVsNaturalPercent <= -0.05;
+    const notWeakerThanBb4 =
+      rawResult.mode === "sidecar" &&
+      familyComparisons.length >= 15 &&
+      estimatedCostWinsVsBb4 >= 9 &&
+      typeof overallCostDeltaVsBb4Percent === "number" &&
+      overallCostDeltaVsBb4Percent <= 0;
+    const promising =
+      rawResult.mode === "sidecar" &&
+      validRequestCount >= largeSampleThreshold &&
+      cacheFieldVisibilityRate >= 0.95 &&
+      familyComparisons.length >= 15 &&
+      estimatedCostWinsVsNatural >= 12 &&
+      typeof overallCostDeltaVsNaturalPercent === "number" &&
+      overallCostDeltaVsNaturalPercent <= -0.03;
+    return {
+      family,
+      variant,
+      cacheRatioWinsVsNatural,
+      estimatedCostWinsVsNatural,
+      estimatedCostWinsVsBb4,
+      overallCostDeltaVsNaturalCny,
+      overallCostDeltaVsNaturalPercent,
+      overallCostDeltaVsBb4Cny,
+      overallCostDeltaVsBb4Percent,
+      conclusionLevel: strongVsNatural && notWeakerThanBb4
+        ? `bb5_sidecar_${family}_best_evidence`
+        : strongVsNatural
+        ? `bb5_sidecar_${family}_cost_evidence`
+        : promising
+        ? `bb5_sidecar_${family}_promising_signal`
+        : `bb5_sidecar_${family}_inconclusive`,
+    };
+  });
+  const sidecarConclusionLevel =
+    rawResult.mode === "sidecar" && sidecarStats.some((item) => item.conclusionLevel.endsWith("_best_evidence"))
+      ? "bb5_sidecar_best_evidence"
+      : rawResult.mode === "sidecar" && sidecarStats.some((item) => item.conclusionLevel.endsWith("_cost_evidence"))
+      ? "bb5_sidecar_cost_evidence"
+      : rawResult.mode === "sidecar" && sidecarStats.some((item) => item.conclusionLevel.endsWith("_promising_signal"))
+      ? "bb5_sidecar_promising_signal"
+      : rawResult.mode === "sidecar"
+      ? "bb5_sidecar_inconclusive"
+      : undefined;
 
   return {
     status: rawResult.status,
@@ -1204,10 +1375,14 @@ function buildSummary(rawResult) {
     padSweepConclusionLevel,
     readableStats: rawResult.mode === "readablePoc" ? readableStats : undefined,
     readableConclusionLevel,
+    sidecarStats: rawResult.mode === "sidecar" ? sidecarStats : undefined,
+    sidecarConclusionLevel,
     ratioConclusionLevel: ratioEvidence ? "ratio_large_sample_evidence" : "ratio_not_proven",
     costConclusionLevel: costEvidence ? "cost_large_sample_evidence" : "cost_not_proven",
     conclusionLevel:
-      rawResult.mode === "readablePoc"
+      rawResult.mode === "sidecar"
+        ? sidecarConclusionLevel
+        : rawResult.mode === "readablePoc"
         ? readableConclusionLevel
         : rawResult.mode === "padSweep"
         ? padSweepConclusionLevel
@@ -1229,6 +1404,7 @@ function buildSummary(rawResult) {
     anchorPadComparisons: anchorPadComparisons.length ? anchorPadComparisons : undefined,
     padSweepComparisons: padSweepComparisons.length ? padSweepComparisons : undefined,
     readableComparisons: readableComparisons.length ? readableComparisons : undefined,
+    sidecarComparisons: sidecarComparisons.length ? sidecarComparisons : undefined,
     limitations: [
       rawResult.providerLimitation || "Provider-specific benchmark; not a cross-provider conclusion.",
       "Latency is recorded but not used as the primary win criterion.",
@@ -1247,7 +1423,9 @@ function parseArgs(argv) {
   const scenarioLimitIndex = args.indexOf("--scenario-limit");
   const mode = modeIndex >= 0 ? args[modeIndex + 1] : "absolute";
   const defaultOutputPath =
-    mode === "readablePoc"
+    mode === "sidecar"
+      ? "tests/outputs/private/provider-cache-benchmark-sidecar.raw.json"
+      : mode === "readablePoc"
       ? "tests/outputs/private/provider-cache-benchmark-readable-poc.raw.json"
       : mode === "padSweep"
       ? "tests/outputs/private/provider-cache-benchmark-padsweep.raw.json"
@@ -1261,7 +1439,9 @@ function parseArgs(argv) {
       ? "tests/outputs/private/provider-cache-benchmark-normalized.raw.json"
       : "tests/outputs/private/provider-cache-benchmark.raw.json";
   const defaultSummaryOutputPath =
-    mode === "readablePoc"
+    mode === "sidecar"
+      ? "tests/outputs/provider-cache-benchmark-sidecar.latest.json"
+      : mode === "readablePoc"
       ? "tests/outputs/provider-cache-benchmark-readable-poc.latest.json"
       : mode === "padSweep"
       ? "tests/outputs/provider-cache-benchmark-padsweep.latest.json"
@@ -1300,8 +1480,8 @@ async function runBenchmark(options = {}) {
   if (!options.localProjects) {
     throw new Error("Use --local-projects for this benchmark.");
   }
-  if (!["absolute", "normalized", "capsule", "anchor", "anchorpad", "padSweep", "readablePoc"].includes(options.mode)) {
-    throw new Error("Benchmark mode must be absolute, normalized, capsule, anchor, anchorpad, padSweep, or readablePoc.");
+  if (!["absolute", "normalized", "capsule", "anchor", "anchorpad", "padSweep", "readablePoc", "sidecar"].includes(options.mode)) {
+    throw new Error("Benchmark mode must be absolute, normalized, capsule, anchor, anchorpad, padSweep, readablePoc, or sidecar.");
   }
   if (env.projectPaths.length === 0) {
     throw new Error("Missing BASEBRIEF_BENCHMARK_PROJECTS. Use semicolon-separated local project paths.");

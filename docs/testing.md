@@ -317,3 +317,41 @@ Latest DeepSeek readable POC result:
 - `readableFullPad4`: `0/18` estimated-cost wins, `+10.56%` overall estimated-cost delta
 - `readableLitePad4`: `0/18` estimated-cost wins, `+15.04%` overall estimated-cost delta
 - conclusion level: `readable_poc_inconclusive`
+
+## BB5 Cache Sidecar benchmark
+
+BB5 sidecar command:
+
+```bash
+node scripts/provider_cache_benchmark.js --local-projects --mode sidecar --output tests/outputs/private/provider-cache-benchmark-sidecar.raw.json
+```
+
+Smoke command:
+
+```bash
+node scripts/provider_cache_benchmark.js --local-projects --mode sidecar --repeat-count 2 --project-limit 1 --scenario-limit 2 --output tests/outputs/private/provider-cache-benchmark-sidecar-smoke.raw.json --summary-output tests/outputs/provider-cache-benchmark-sidecar-smoke.latest.json
+```
+
+`sidecar` compares `natural`, `readableFull`, `readableLite`, `bb4AnchorPad`, `bb5SidecarFull`, and `bb5SidecarLite`. The readable variants are the human track. The sidecar variants are compact cache-economics prompts derived from the same facts.
+
+BB5 evidence requires `>= 15/18` estimated-cost wins against `natural` and at least `5%` lower overall median estimated cost. To be considered better than BB4, it also needs to be no worse than `bb4AnchorPad` on overall median estimated cost.
+
+Latest MiMo sidecar result:
+
+- request count: `1080`
+- valid request count: `1080`
+- cache field visibility: `1080/1080`
+- `bb5SidecarFull`: `16/18` estimated-cost wins vs natural, `-11.59%` overall estimated-cost delta vs natural, `+1.42%` vs BB4, conclusion `bb5_sidecar_full_cost_evidence`
+- `bb5SidecarLite`: `15/18` estimated-cost wins vs natural, `-27.39%` overall estimated-cost delta vs natural, `-16.70%` vs BB4, conclusion `bb5_sidecar_lite_best_evidence`
+- conclusion level: `bb5_sidecar_best_evidence`
+
+Latest DeepSeek sidecar result:
+
+- request count: `1080`
+- valid request count: `1080`
+- cache field visibility: `1080/1080`
+- `bb5SidecarFull`: `14/18` estimated-cost wins vs natural, `-17.16%` overall estimated-cost delta vs natural, `-8.14%` vs BB4, conclusion `bb5_sidecar_full_promising_signal`
+- `bb5SidecarLite`: `2/18` estimated-cost wins vs natural, `+6.36%` overall estimated-cost delta vs natural, `+17.94%` vs BB4, conclusion `bb5_sidecar_lite_inconclusive`
+- conclusion level: `bb5_sidecar_promising_signal`
+
+Current interpretation: BB5 Sidecar is the strongest cache-economics line so far, but provider behavior differs. MiMo favors the Lite sidecar. DeepSeek favors the Full sidecar but missed the strict `15/18` evidence threshold by one scenario, so it remains promising rather than proven.

@@ -208,6 +208,26 @@ test("readablePoc prompts keep stable markdown before hidden pad and dynamic tai
   }
 });
 
+test("sidecar prompts keep human-readable variants separate from compact BB5 sidecar", () => {
+  const snapshot = {
+    projectId: "projectA",
+    readmeExcerpt: "Public sample README.",
+    packages: [{ location: "package.json", name: "sample" }],
+    entryFiles: ["src/main.js"],
+    configFiles: ["vite.config.js"],
+    fileSample: ["src/main.js", "vite.config.js"],
+  };
+  const scenario = SCENARIOS[0];
+  const sidecar = getPromptForVariant("sidecar", snapshot, scenario, 0, "bb5SidecarFull");
+  const readable = getPromptForVariant("sidecar", snapshot, scenario, 0, "readableFull");
+
+  assert.match(readable, /^# BaseBrief Readable Full POC/);
+  assert.match(sidecar, /^BB5S\n/);
+  assert.match(sidecar, /\nS=full\n/);
+  assert.match(sidecar, /\nPAD=p p p p\n--\nQ=A$/);
+  assert.doesNotMatch(sidecar, /# BaseBrief Readable Full POC|Dynamic Tail Request/);
+});
+
 test("core templates preserve BaseBrief baseline sections", () => {
   const templatePaths = [
     "templates/zh-CN/BASEBRIEF.md",
@@ -590,6 +610,58 @@ test("readablePoc benchmark summary classifies Full and Lite padded markdown sep
   assert.equal(summary.readableStats.find((item) => item.family === "full").estimatedCostWins, 18);
   assert.equal(summary.readableStats.find((item) => item.family === "lite").estimatedCostWins, 18);
   assert.equal(summary.conclusionLevel, "readable_poc_large_sample_evidence");
+});
+
+test("sidecar benchmark summary requires sidecar evidence and compares against BB4", () => {
+  const projectIds = ["projectA", "projectB", "projectC"];
+  const calls = [];
+  const variants = ["natural", "readableFull", "readableLite", "bb4AnchorPad", "bb5SidecarFull", "bb5SidecarLite"];
+
+  for (const projectId of projectIds) {
+    for (const scenario of SCENARIOS) {
+      for (const variant of variants) {
+        for (let iteration = 0; iteration < 10; iteration += 1) {
+          const estimatedTotalCostCny =
+            variant === "bb5SidecarLite" ? 0.00008 : variant === "bb4AnchorPad" ? 0.00009 : 0.0002;
+          calls.push({
+            projectId,
+            scenarioId: scenario.id,
+            variant,
+            phase: iteration === 0 ? "warmup" : "repeat",
+            iteration,
+            status: "success",
+            promptTokens: variant === "bb5SidecarLite" ? 900 : 1200,
+            completionTokens: 32,
+            cachedTokens: variant === "bb5SidecarLite" ? 880 : 1000,
+            cacheRatio: variant === "bb5SidecarLite" ? 880 / 900 : 1000 / 1200,
+            cacheFieldVisible: true,
+            estimatedTotalCostCny,
+            totalLatencyMs: 1000 + iteration,
+          });
+        }
+      }
+    }
+  }
+
+  const summary = buildSummary({
+    status: "executed",
+    startedAt: "2026-06-02T00:00:00.000Z",
+    finishedAt: "2026-06-02T00:10:00.000Z",
+    providerName: "test-provider",
+    model: "test-model",
+    providerProfileId: "custom-compatible",
+    mode: "sidecar",
+    repeats: 10,
+    projectIds,
+    calls,
+  });
+
+  const lite = summary.sidecarStats.find((item) => item.family === "lite");
+  assert.equal(summary.requestCount, 1080);
+  assert.equal(lite.estimatedCostWinsVsNatural, 18);
+  assert.equal(lite.estimatedCostWinsVsBb4, 18);
+  assert.equal(lite.conclusionLevel, "bb5_sidecar_lite_best_evidence");
+  assert.equal(summary.conclusionLevel, "bb5_sidecar_best_evidence");
 });
 
 test("benchmark provider profiles include MiMo and DeepSeek pricing", () => {

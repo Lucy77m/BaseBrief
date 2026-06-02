@@ -88,3 +88,4 @@
 - BB4 example input: [examples/cache-ready-anchor-pad-input.json](../examples/cache-ready-anchor-pad-input.json)
 - BB4 example output: [examples/cache-ready-anchor-pad-output.md](../examples/cache-ready-anchor-pad-output.md)
 - Readable Full/Lite POC notes: [docs/experiments/cache-ready-readable-poc.md](experiments/cache-ready-readable-poc.md)
+- BB5 Cache Sidecar notes: [docs/experiments/cache-ready-sidecar.md](experiments/cache-ready-sidecar.md)

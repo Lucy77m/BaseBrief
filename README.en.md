@@ -78,7 +78,7 @@ Do not use Lite when the task touches backend, provider, `.env`, deployment, sta
 Use `cache-ready` only when you explicitly want a stable-prefix experiment.
 
 It is experimental.  
-Current MiMo `mimo-v2.5` benchmark evidence supports higher absolute cached tokens in local real-project samples, but does not prove better cache ratio, cost, or latency.
+The evidence is tiered: early normalized benchmarks did not prove better cache ratio or estimated cost; later BB5 Cache Sidecar results show Lite-side estimated-cost evidence on MiMo `mimo-v2.5`, while DeepSeek `deepseek-v4-flash` only reached a Full-side promising signal. Do not market this as provider-general proof, real billing proof, or stable latency evidence.
 
 ## Security Notes
 
@@ -98,6 +98,7 @@ Current MiMo `mimo-v2.5` benchmark evidence supports higher absolute cached toke
 - [BB3 cache anchor notes](docs/experiments/cache-ready-anchor.md)
 - [BB4 anchor-pad notes](docs/experiments/cache-ready-anchor-pad.md)
 - [Readable Full/Lite POC](docs/experiments/cache-ready-readable-poc.md)
+- [BB5 cache sidecar notes](docs/experiments/cache-ready-sidecar.md)
 - [Examples](examples)
 
 ## Cache-ready v2
