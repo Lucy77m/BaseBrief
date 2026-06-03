@@ -199,6 +199,8 @@ BB9 现在有一个可用的 handoff POC：普通接续仍然输出可读的 `fu
 
 关键规则：`readableBrief` 给人和接续边界看；`cacheSidecar` 给支持缓存证据的 provider 作为 active prompt。不要把两者直接拼进同一个 provider 请求，否则会把 prompt 变长，可能抵消缓存收益。
 
+BB10 active prompt workflow 在这个规则上再推进一步：生成结果会直接给出 `activeProviderPrompt`。普通用户看 `readableBrief`，省钱实验或重复 provider 调用只发送 `activeProviderPrompt`。
+
 普通接续触发语：
 
 ```text
@@ -217,6 +219,7 @@ BB9 现在有一个可用的 handoff POC：普通接续仍然输出可读的 `fu
 ```text
 node scripts/generate_bb9_handoff.js --input examples/bb9-handoff-full-input.json --mode full --provider-profile mimo
 node scripts/generate_bb9_handoff.js --input examples/bb9-handoff-lite-input.json --mode lite --provider-profile deepseek
+node scripts/generate_bb9_handoff.js --input examples/bb9-handoff-full-input.json --mode full --provider-profile mimo --print activeProviderPrompt
 ```
 
 公开示例：

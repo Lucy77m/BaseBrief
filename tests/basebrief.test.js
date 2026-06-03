@@ -1,4 +1,5 @@
 const assert = require("node:assert/strict");
+const { execFileSync } = require("node:child_process");
 const fs = require("node:fs");
 const path = require("node:path");
 const test = require("node:test");
@@ -338,6 +339,7 @@ test("BB9 handoff generator emits readable full brief plus supported cache sidec
   assert.match(output.cacheSidecar, /BASEBRIEF_CACHE_BLOCK_PAD/);
   assert.equal(output.selectedVariant, "bb7BlockPadLite");
   assert.equal(output.recommendedPromptType, "cacheSidecar");
+  assert.equal(output.activeProviderPrompt, output.cacheSidecar);
   assert.equal(output.promptUsePolicy.activeProviderPrompt, "cacheSidecar");
   assert.match(output.promptUsePolicy.cacheSidecar, /Do not concatenate/);
   assert.equal(output.providerProfile.profileId, "mimo");
@@ -398,6 +400,7 @@ test("BB9 handoff generator falls back when cache cost is not observable", () =>
   assert.equal(output.cacheSidecar, null);
   assert.equal(output.selectedVariant, "natural");
   assert.equal(output.recommendedPromptType, "readableBrief");
+  assert.equal(output.activeProviderPrompt, output.readableBrief);
   assert.equal(output.promptUsePolicy.activeProviderPrompt, "readableBrief");
   assert.equal(output.fallbackReason, "cache_cost_not_observable");
   assert.equal(output.providerProfile.cacheUsageObservable, false);
@@ -416,6 +419,46 @@ test("BB9 provider profiles separate direct provider evidence from relay observa
   assert.equal(relay.recommendedVariant, "natural");
   assert.equal(unknown.cacheUsageObservable, false);
   assert.equal(unknown.fallbackReason, "provider_profile_not_supported");
+});
+
+test("BB10 active provider prompt preserves core handoff fields", () => {
+  const output = generateBb9HandoffFromObject(bb9Fixture(), { mode: "full", providerProfile: "mimo" });
+
+  for (const token of ["P=", "G=", "F=", "D=", "R=", "X=", "O=", "TAIL_REQUEST="]) {
+    assert.match(output.activeProviderPrompt, new RegExp(token.replace("=", "=")));
+  }
+  assert.match(output.activeProviderPrompt, /BASEBRIEF_CACHE_BLOCK_PAD/);
+});
+
+test("BB9 handoff CLI can print individual prompt artifacts", () => {
+  const inputPath = path.join(repoRoot, "examples/bb9-handoff-full-input.json");
+  const readable = execFileSync(process.execPath, [
+    "scripts/generate_bb9_handoff.js",
+    "--input",
+    inputPath,
+    "--mode",
+    "full",
+    "--provider-profile",
+    "mimo",
+    "--print",
+    "readableBrief",
+  ], { cwd: repoRoot, encoding: "utf8" });
+  const active = execFileSync(process.execPath, [
+    "scripts/generate_bb9_handoff.js",
+    "--input",
+    inputPath,
+    "--mode",
+    "full",
+    "--provider-profile",
+    "mimo",
+    "--print",
+    "activeProviderPrompt",
+  ], { cwd: repoRoot, encoding: "utf8" });
+
+  assert.match(readable, /^# BaseBrief Full Handoff/);
+  assert.doesNotMatch(readable, /BASEBRIEF_CACHE_BLOCK_PAD/);
+  assert.match(active, /^# BaseBrief BB9 Cache Sidecar/);
+  assert.match(active, /BASEBRIEF_CACHE_BLOCK_PAD/);
 });
 
 test("handoffPoc benchmark prompts compare readable brief with attached BB9 sidecar", () => {
@@ -439,6 +482,27 @@ test("handoffPoc benchmark prompts compare readable brief with attached BB9 side
   assert.match(sidecar, /# BaseBrief BB9 Cache Sidecar/);
   assert(sidecar.indexOf("TAIL_REQUEST=") > sidecar.indexOf("BASEBRIEF_CACHE_BLOCK_PAD"));
   assert.match(fallbackSidecar, /BB9 sidecar unavailable for this provider profile/);
+});
+
+test("activePromptPoc benchmark prompts use one active prompt without concatenation", () => {
+  const snapshot = {
+    projectId: "projectA",
+    readmeExcerpt: "Public sample README.",
+    packages: [{ location: "package.json", name: "sample" }],
+    entryFiles: ["src/main.js"],
+    configFiles: ["vite.config.js"],
+    fileSample: ["src/main.js", "vite.config.js"],
+  };
+  const scenario = SCENARIOS[0];
+  const readable = getPromptForVariant("activePromptPoc", snapshot, scenario, 0, "readableFull", "mimo");
+  const sidecarOnly = getPromptForVariant("activePromptPoc", snapshot, scenario, 0, "cacheSidecarFullOnly", "mimo");
+
+  assert.match(readable, /^# BaseBrief Full Handoff/);
+  assert.doesNotMatch(readable, /# BaseBrief BB9 Cache Sidecar/);
+  assert.match(sidecarOnly, /^# BaseBrief BB9 Cache Sidecar/);
+  assert.doesNotMatch(sidecarOnly, /^# BaseBrief Full Handoff/);
+  assert.match(sidecarOnly, /TAIL_REQUEST=/);
+  assert(sidecarOnly.indexOf("TAIL_REQUEST=") > sidecarOnly.indexOf("BASEBRIEF_CACHE_BLOCK_PAD"));
 });
 
 test("handoffPoc benchmark summary classifies sidecar wins against readable baselines", () => {
@@ -490,6 +554,57 @@ test("handoffPoc benchmark summary classifies sidecar wins against readable base
   assert.equal(summary.handoffStats.find((item) => item.family === "full").estimatedCostWinsVsReadable, 18);
   assert.equal(summary.handoffStats.find((item) => item.family === "lite").estimatedCostWinsVsReadable, 18);
   assert.equal(summary.conclusionLevel, "bb9_handoff_poc_cost_evidence");
+});
+
+test("activePromptPoc benchmark summary classifies sidecar-only merge candidates", () => {
+  const projectIds = ["projectA", "projectB", "projectC"];
+  const calls = [];
+  const variants = ["readableFull", "readableLite", "cacheSidecarFullOnly", "cacheSidecarLiteOnly", "bb9Best"];
+
+  for (const projectId of projectIds) {
+    for (const scenario of SCENARIOS) {
+      for (const variant of variants) {
+        for (let iteration = 0; iteration < 10; iteration += 1) {
+          const sidecar = variant === "cacheSidecarFullOnly" || variant === "cacheSidecarLiteOnly";
+          const estimatedTotalCostCny = sidecar ? 0.00007 : variant === "bb9Best" ? 0.00008 : 0.0002;
+          calls.push({
+            projectId,
+            scenarioId: scenario.id,
+            variant,
+            phase: iteration === 0 ? "warmup" : "repeat",
+            iteration,
+            status: "success",
+            promptTokens: sidecar ? 1200 : 1000,
+            completionTokens: 32,
+            cachedTokens: sidecar ? 1180 : 900,
+            cacheRatio: sidecar ? 1180 / 1200 : 900 / 1000,
+            cacheFieldVisible: true,
+            estimatedTotalCostCny,
+            totalLatencyMs: 1000 + iteration,
+          });
+        }
+      }
+    }
+  }
+
+  const summary = buildSummary({
+    status: "executed",
+    startedAt: "2026-06-02T00:00:00.000Z",
+    finishedAt: "2026-06-02T00:10:00.000Z",
+    providerName: "test-provider",
+    model: "test-model",
+    providerProfileId: "mimo",
+    mode: "activePromptPoc",
+    repeats: 10,
+    projectIds,
+    calls,
+  });
+
+  assert.equal(summary.requestCount, 900);
+  assert.equal(summary.activePromptStats.length, 2);
+  assert.equal(summary.activePromptStats.find((item) => item.family === "full").estimatedCostWinsVsReadable, 18);
+  assert.equal(summary.activePromptStats.find((item) => item.family === "lite").estimatedCostNoWorseThanBb9Best, 18);
+  assert.equal(summary.conclusionLevel, "bb10_active_prompt_merge_candidate");
 });
 
 test("core templates preserve BaseBrief baseline sections", () => {

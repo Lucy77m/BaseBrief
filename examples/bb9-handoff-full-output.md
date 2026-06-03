@@ -73,6 +73,7 @@ TAIL_REQUEST=Generate the next-chat opener and keep the cache sidecar attached.
 
 - selectedVariant: `bb7BlockPadLite`
 - recommendedPromptType: `cacheSidecar`
+- activeProviderPrompt: same as `cacheSidecar`
 - providerProfile: `mimo`
 - fallbackReason: `null`
 - boundary: estimated-cost evidence only, not a billing audit.

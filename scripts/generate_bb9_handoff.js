@@ -236,6 +236,9 @@ function generateBb9HandoffFromObject(data, options = {}) {
       : null,
     selectedVariant,
     recommendedPromptType,
+    activeProviderPrompt: providerProfile.cacheUsageObservable
+      ? renderCacheSidecar(input, mode, providerProfile)
+      : renderReadableBrief(input, mode),
     promptUsePolicy: {
       readableBrief: "Use for human review, project continuation, and safety boundaries.",
       cacheSidecar: providerProfile.cacheUsageObservable
@@ -255,11 +258,13 @@ function parseArgs(argv) {
   const outputIndex = args.indexOf("--output");
   const modeIndex = args.indexOf("--mode");
   const profileIndex = args.indexOf("--provider-profile");
+  const printIndex = args.indexOf("--print");
   return {
     inputPath: inputIndex >= 0 ? args[inputIndex + 1] : "",
     outputPath: outputIndex >= 0 ? args[outputIndex + 1] : "",
     mode: modeIndex >= 0 ? args[modeIndex + 1] : "",
     providerProfile: profileIndex >= 0 ? args[profileIndex + 1] : "",
+    printTarget: printIndex >= 0 ? args[printIndex + 1] : "",
     jsonMode: args.includes("--json"),
   };
 }
@@ -272,7 +277,13 @@ function cli() {
   }
   const data = JSON.parse(fs.readFileSync(path.resolve(options.inputPath), "utf8"));
   const output = generateBb9HandoffFromObject(data, options);
-  const text = `${JSON.stringify(output, null, 2)}\n`;
+  const printableFields = new Set(["readableBrief", "cacheSidecar", "activeProviderPrompt"]);
+  if (options.printTarget && !printableFields.has(options.printTarget)) {
+    throw new Error("--print must be readableBrief, cacheSidecar, or activeProviderPrompt");
+  }
+  const text = options.printTarget
+    ? `${output[options.printTarget] || ""}${output[options.printTarget]?.endsWith("\n") ? "" : "\n"}`
+    : `${JSON.stringify(output, null, 2)}\n`;
   if (options.outputPath) {
     fs.writeFileSync(path.resolve(options.outputPath), text, "utf8");
   } else {

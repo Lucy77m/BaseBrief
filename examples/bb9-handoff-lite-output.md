@@ -64,6 +64,7 @@ TAIL_REQUEST=Give the next agent a compact task statement.
 
 - selectedVariant: `bb7BlockPadLite`
 - recommendedPromptType: `cacheSidecar`
+- activeProviderPrompt: same as `cacheSidecar`
 - providerProfile: `deepseek`
 - fallbackReason: `null`
 - boundary: DeepSeek-specific estimated-cost evidence only.

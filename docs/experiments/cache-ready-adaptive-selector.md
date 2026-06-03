@@ -39,12 +39,21 @@ The output is JSON:
 - `cacheSidecar`: a stable BB9 sidecar when the provider profile exposes cache usage evidence.
 - `selectedVariant`: the selected cache-economics variant, or `natural` for fallback.
 - `recommendedPromptType`: which artifact should be used as the active provider prompt.
+- `activeProviderPrompt`: the single prompt that should be sent to the provider for repeated cache-aware calls.
 - `promptUsePolicy`: warns that readable and sidecar artifacts must not be concatenated into the same provider request.
 - `providerProfile`: public provider/model/evidence/pricing metadata with no API key.
 - `fallbackReason`: why no sidecar is emitted.
 - `warnings`: wording boundaries for estimated-cost evidence.
 
 The sidecar is a separate artifact, not a text block to append blindly. Ordinary project continuation still reads `readableBrief` first. Cache-aware repeated provider calls should use `cacheSidecar` as the active prompt only when `recommendedPromptType=cacheSidecar`.
+
+BB10 active prompt workflow makes this operational:
+
+```text
+node scripts/generate_bb9_handoff.js --input examples/bb9-handoff-full-input.json --mode full --provider-profile mimo --print activeProviderPrompt
+```
+
+This prints only the provider-ready prompt. It does not print the human-readable brief.
 
 Public examples:
 
@@ -59,6 +68,23 @@ node scripts/provider_cache_benchmark.js --local-projects --mode handoffPoc --ou
 ```
 
 `handoffPoc` compares `readableFull`, `readableFullSidecar`, `readableLite`, `readableLiteSidecar`, and `bb9Best`. It is a safety check for the tempting but risky "concatenate readable + sidecar" design. If it is inconclusive or negative, keep the dual-artifact single-active-prompt policy.
+
+Provider benchmark for the active prompt workflow:
+
+```text
+node scripts/provider_cache_benchmark.js --local-projects --mode activePromptPoc --output tests/outputs/private/provider-cache-benchmark-active-prompt-poc.raw.json
+```
+
+`activePromptPoc` compares `readableFull`, `readableLite`, `cacheSidecarFullOnly`, `cacheSidecarLiteOnly`, and `bb9Best`.
+
+Latest MiMo `activePromptPoc` result:
+
+- `360` requests, `340` valid, cache field visibility `340/340`
+- `cacheSidecarFullOnly`: inconclusive, `1/18` estimated-cost wins vs readable Full
+- `cacheSidecarLiteOnly`: promising, `17/18` estimated-cost wins vs readable Lite, `-4.25%` overall estimated-cost delta
+- not a merge candidate: Lite sidecar missed the `>=5%` cost reduction threshold and was no-worse-than-`bb9Best` in only `11/18` comparisons
+
+Latest DeepSeek smoke result: cache fields were visible, but sidecar-only was more expensive than readable baselines and worse than `bb9Best`, so no DeepSeek large sample was run for this variant.
 
 ## Provider Profile
 

@@ -452,12 +452,14 @@ BB9 handoff generation is local-only and does not call a provider:
 node scripts/generate_bb9_handoff.js --input examples/bb9-handoff-full-input.json --mode full --provider-profile mimo
 node scripts/generate_bb9_handoff.js --input examples/bb9-handoff-lite-input.json --mode lite --provider-profile deepseek
 node scripts/generate_bb9_handoff.js --input examples/bb9-handoff-lite-input.json --mode lite --provider-profile relay-openai-gpt55-codex-oauth
+node scripts/generate_bb9_handoff.js --input examples/bb9-handoff-full-input.json --mode full --provider-profile mimo --print activeProviderPrompt
 ```
 
 Expected behavior:
 
 - MiMo and DeepSeek profiles emit both `readableBrief` and `cacheSidecar`.
 - Supported profiles set `recommendedPromptType=cacheSidecar`; unsupported profiles set `recommendedPromptType=readableBrief`.
+- `activeProviderPrompt` equals `cacheSidecar` for supported profiles and `readableBrief` for unsupported profiles.
 - The relay profile emits `readableBrief`, sets `cacheSidecar` to `null`, selects `natural`, and reports `fallbackReason=cache_cost_not_observable`.
 - No provider API key is needed for this generator.
 - The generator does not prove new provider savings; it only applies the already recorded BB9 provider-profile evidence.
@@ -485,3 +487,44 @@ Handoff POC evidence requires:
 - overall median estimated cost is at least `5%` lower than the matching readable baseline
 
 If it misses this threshold, keep BB9 as an experimental sidecar and do not merge it into ordinary `full` / `lite`.
+
+BB10 active prompt POC provider benchmark:
+
+```bash
+node scripts/provider_cache_benchmark.js --local-projects --mode activePromptPoc --output tests/outputs/private/provider-cache-benchmark-active-prompt-poc.raw.json
+```
+
+Smoke command:
+
+```bash
+node scripts/provider_cache_benchmark.js --local-projects --mode activePromptPoc --repeat-count 2 --project-limit 1 --scenario-limit 2 --output tests/outputs/private/provider-cache-benchmark-active-prompt-poc-smoke.raw.json --summary-output tests/outputs/provider-cache-benchmark-active-prompt-poc-smoke.latest.json
+```
+
+`activePromptPoc` compares `readableFull`, `readableLite`, `cacheSidecarFullOnly`, `cacheSidecarLiteOnly`, and `bb9Best`. It tests the single-active-prompt policy, not the concatenation policy.
+
+BB10 active prompt evidence requires:
+
+- valid request rate `>= 90%`
+- cache field visibility `>= 95%`
+- sidecar-only estimated cost wins against the matching readable baseline in at least `15/18` comparisons
+- overall median estimated cost is at least `5%` lower than the matching readable baseline
+- sidecar-only is no worse than `bb9Best` in all `18/18` comparisons before it can be called a merge candidate
+
+Latest MiMo active prompt POC result:
+
+- request count: `360`
+- valid request count: `340`
+- cache field visibility: `340/340`
+- `cacheSidecarFullOnly`: `1/18` estimated-cost wins vs readable Full, `+20.47%` overall estimated-cost delta, conclusion `bb10_active_prompt_full_inconclusive`
+- `cacheSidecarLiteOnly`: `17/18` estimated-cost wins vs readable Lite, `-4.25%` overall estimated-cost delta, `11/18` no-worse-than-`bb9Best`, conclusion `bb10_active_prompt_lite_promising_signal`
+- conclusion level: `bb10_active_prompt_promising_signal`
+
+Interpretation: BB10 Lite sidecar-only is promising on MiMo, but it missed the strict merge-candidate threshold because the median estimated-cost reduction was below `5%` and it was not no-worse than `bb9Best` in all comparisons. Do not merge it into ordinary `full` / `lite` yet.
+
+Latest DeepSeek active prompt smoke result:
+
+- request count: `20`
+- valid request count: `20`
+- cache field visibility: `20/20`
+- sidecar-only was more expensive than the readable baselines and worse than `bb9Best`
+- conclusion: stop before DeepSeek large sample for this variant

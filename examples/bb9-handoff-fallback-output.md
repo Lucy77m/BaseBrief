@@ -41,6 +41,7 @@ Give the next agent a compact task statement.
 - cacheSidecar: `null`
 - selectedVariant: `natural`
 - recommendedPromptType: `readableBrief`
+- activeProviderPrompt: same as `readableBrief`
 - providerProfile: `relay-openai-gpt55-codex-oauth`
 - fallbackReason: `cache_cost_not_observable`
 

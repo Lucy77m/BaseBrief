@@ -111,11 +111,14 @@ BB9 now has a usable handoff POC. It keeps the normal readable `full` / `lite` b
 
 Important: use `readableBrief` for human review and continuation boundaries. Use `cacheSidecar` as the active provider prompt only when `recommendedPromptType` says so. Do not concatenate both into one provider request.
 
+BB10 active prompt workflow makes that explicit by returning `activeProviderPrompt`. For repeated cache-aware provider calls, send only `activeProviderPrompt`.
+
 Commands:
 
 ```text
 node scripts/generate_bb9_handoff.js --input examples/bb9-handoff-full-input.json --mode full --provider-profile mimo
 node scripts/generate_bb9_handoff.js --input examples/bb9-handoff-lite-input.json --mode lite --provider-profile deepseek
+node scripts/generate_bb9_handoff.js --input examples/bb9-handoff-full-input.json --mode full --provider-profile mimo --print activeProviderPrompt
 ```
 
 Examples:

@@ -8,6 +8,7 @@
 - BB3 is for pre-registered request-option experiments where only a short selector changes in the tail.
 - `cache-ready v4` is BB3 plus a required stable `PAD` field before the selector. Current MiMo `mimo-v2.5` local real-project samples show estimated-cost evidence for this anchor-pad shape.
 - BB9 keeps readable `full` / `lite` as the primary handoff and adds `cacheSidecar` only when the provider profile has cache usage evidence.
+- BB10 uses `activeProviderPrompt` so provider calls send one selected prompt instead of concatenating readable text and sidecar text.
 
 # BaseBrief Cache-ready Mode
 

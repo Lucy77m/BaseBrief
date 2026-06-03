@@ -58,3 +58,9 @@ This log records why each cache-ready generation exists and whether it has bench
 - Current status: strongest mechanism so far, but still provider- and sample-specific estimated-cost evidence.
 - Productization POC: `scripts/generate_bb9_handoff.js` keeps readable `full` / `lite` as the primary handoff and emits `cacheSidecar` only when `scripts/bb9_provider_profiles.json` marks cache usage as observable.
 - Fallback rule: providers without visible cache-cost evidence return `selectedVariant=natural` and no sidecar.
+
+## BB10 Active Prompt Workflow
+
+- Purpose: turn BB9 dual artifacts into one provider-ready active prompt without concatenating readable and sidecar text.
+- Mechanism: `activeProviderPrompt` equals `cacheSidecar` for supported cache-observable profiles and `readableBrief` for unsupported profiles.
+- Evidence rule: only `activePromptPoc` can show whether sidecar-only is strong enough to become a Full/Lite merge candidate.
