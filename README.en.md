@@ -3,7 +3,7 @@
 BaseBrief is a Chinese-first, skill-first project baseline tool for AI-assisted development.
 
 One install, one entry: `BaseBrief`.  
-Inside that single skill, it routes to `full`, `lite`, or `cache-ready`.
+Inside that single skill, normal continuation routes to `full` or `lite`; `cache-ready` is reserved for explicit prompt-cache experiments.
 
 [中文说明](README.md)
 
@@ -13,7 +13,7 @@ BaseBrief is not a CLI or plugin yet. Ask your AI tool to read the skill entry:
 
 ```text
 Please read BaseBrief's skills/basebrief/SKILL.md.
-Choose full, lite, or cache-ready based on my next task.
+Choose full or lite based on my next task. Use cache-ready only when I explicitly ask for prompt cache, cache-ready, or stable-prefix experiments.
 Do not turn assumptions into facts; if the boundary is unclear, list open_questions first.
 ```
 
@@ -52,7 +52,7 @@ It focuses on:
 - not a real API or provider integration tool
 - not a CLI, Web UI, MCP, or plugin yet
 
-## One Entry, Three Modes
+## Normal Modes And Experimental Route
 
 ### Full
 
@@ -80,6 +80,8 @@ Use `cache-ready` only when you explicitly want a stable-prefix experiment.
 It is experimental.  
 The evidence is tiered: early normalized benchmarks did not prove better cache ratio or estimated cost; BB5 Cache Sidecar produced single-format evidence on MiMo; BB9 Adaptive Selector now shows estimated-cost evidence on both MiMo `mimo-v2.5` and DeepSeek `deepseek-v4-flash` local real-project samples. Do not market this as provider-general proof, real billing proof, or stable latency evidence.
 
+Normal `full` / `lite` briefs stay human-readable. Provider-facing `cacheSidecar` / `activeProviderPrompt` artifacts are BB9 handoff post-processing outputs and should not be inserted into normal Markdown briefs.
+
 ## Security Notes
 
 - do not commit `.env`, API keys, tokens, or secrets
@@ -92,7 +94,9 @@ The evidence is tiered: early normalized benchmarks did not prove better cache r
 - [Walkthrough](docs/walkthrough.md)
 - [Usage](docs/usage.md)
 - [Mode selection](docs/mode-selection.md)
+- [Handoff contract](docs/handoff.md)
 - [Testing](docs/testing.md)
+- [Long-term baseline](docs/roadmap/basebrief-long-term-baseline.md)
 - [Cache-ready experiment notes](docs/experiments/cache-ready-lite.md)
 - [BB2 cache capsule notes](docs/experiments/cache-ready-capsule.md)
 - [BB3 cache anchor notes](docs/experiments/cache-ready-anchor.md)
@@ -107,13 +111,15 @@ The evidence is tiered: early normalized benchmarks did not prove better cache r
 - [GPT-5.5 relay usage audit](docs/experiments/cache-ready-relay-gpt55.md)
 - [Examples](examples)
 
-## BB9 Handoff POC
+## BB9 Handoff Contract
 
-BB9 now has a usable handoff POC. It keeps the normal readable `full` / `lite` brief as the primary continuation surface. When the selected provider profile exposes cache usage evidence, it adds a separate `cacheSidecar` for estimated-cost experiments.
+BB9 is now the standard handoff-contract direction for BaseBrief. It keeps the normal readable `full` / `lite` brief as the primary continuation surface. When the selected provider profile exposes cache usage evidence, it adds a separate `cacheSidecar` for estimated-cost experiments.
 
 Important: use `readableBrief` for human review and continuation boundaries. Use `cacheSidecar` as the active provider prompt only when `recommendedPromptType` says so. Do not concatenate both into one provider request.
 
 BB10 active prompt workflow makes that explicit by returning `activeProviderPrompt`. For repeated cache-aware provider calls, send only `activeProviderPrompt`.
+
+Artifact boundaries are documented in [docs/handoff.md](docs/handoff.md). The input schema is [schemas/bb9-handoff.schema.json](schemas/bb9-handoff.schema.json).
 
 Commands:
 

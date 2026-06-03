@@ -2,6 +2,8 @@
 
 ## 快速决策树
 
+普通项目接续默认只在 `full` 和 `lite` 之间选择。`cache-ready` 是显式实验路线，不是普通第三路线。
+
 1. 用户明确提到 `prompt cache`、`cache-ready`、`稳定前缀`、`缓存代理实验`？
    - 是：走 `cache-ready`
    - 否：继续
@@ -22,7 +24,13 @@
 
 - `full` 负责完整、复杂、风险高
 - `lite` 负责短、硬、边界清楚
-- `cache-ready` 负责稳定前缀实验，不负责证明真实缓存收益
+- `cache-ready` 只负责显式稳定前缀 / prompt-cache 实验，不负责普通接续，也不负责证明真实缓存收益
+
+## Handoff 规则
+
+- `full` / `lite` 的主产物是人类可读 brief
+- provider 侧 `cacheSidecar` / `activeProviderPrompt` 由 BB9 handoff 后处理生成
+- 不要把 sidecar 或 PAD 结构塞进普通 Markdown brief
 
 ## 负向路由提醒
 

@@ -22,6 +22,38 @@ function readJson(relativePath) {
   return JSON.parse(readText(relativePath));
 }
 
+function validateBb9HandoffInputAgainstSchema(input, schema) {
+  const allowed = new Set(Object.keys(schema.properties));
+  for (const key of schema.required) {
+    assert(key in input, `missing required key: ${key}`);
+  }
+  for (const key of Object.keys(input)) {
+    assert(allowed.has(key), `unexpected key: ${key}`);
+  }
+  if ("mode" in input) {
+    assert(schema.properties.mode.enum.includes(input.mode), `invalid mode: ${input.mode}`);
+  }
+  for (const [key, rule] of Object.entries(schema.properties)) {
+    if (!(key in input)) continue;
+    if (rule.type === "string") {
+      assert.equal(typeof input[key], "string", `${key} must be string`);
+      if (rule.minLength) assert(input[key].length >= rule.minLength, `${key} must not be empty`);
+    }
+    if (rule.$ref === "#/$defs/nonEmptyStringArray") {
+      assert(Array.isArray(input[key]), `${key} must be array`);
+      assert(input[key].length > 0, `${key} must not be empty`);
+      input[key].forEach((item) => {
+        assert.equal(typeof item, "string", `${key} item must be string`);
+        assert(item.length > 0, `${key} item must not be empty`);
+      });
+    }
+    if (rule.$ref === "#/$defs/stringArray") {
+      assert(Array.isArray(input[key]), `${key} must be array`);
+      input[key].forEach((item) => assert.equal(typeof item, "string", `${key} item must be string`));
+    }
+  }
+}
+
 test("mode router selects full for complex or risky requests", () => {
   const cases = [
     "请整理完整阶段基线，并生成新窗口开场和 Agent 任务说明。",
@@ -55,6 +87,33 @@ test("mode router selects cache-ready only for stable-prefix experiments", () =>
   for (const input of cases) {
     assert.equal(routeMode(input), "cache-ready", input);
   }
+});
+
+test("public docs keep cache-ready as explicit experiment route", () => {
+  const readme = readText("README.md");
+  const englishReadme = readText("README.en.md");
+  const skill = readText("skills/basebrief/SKILL.md");
+  const modeSelection = readText("docs/mode-selection.md");
+
+  assert.match(readme, /普通项目接续默认在 `full` 和 `lite` 之间选择/);
+  assert.match(readme, /`cache-ready` 只保留为显式 prompt-cache 实验路线/);
+  assert.match(englishReadme, /normal continuation routes to `full` or `lite`/);
+  assert.match(skill, /普通项目接续默认只在 `full` 和 `lite` 之间选择/);
+  assert.match(modeSelection, /`cache-ready` 是显式实验路线/);
+});
+
+test("BB9 handoff contract and examples match schema boundaries", () => {
+  const schema = readJson("schemas/bb9-handoff.schema.json");
+  const fullInput = readJson("examples/bb9-handoff-full-input.json");
+  const liteInput = readJson("examples/bb9-handoff-lite-input.json");
+  const handoffDoc = readText("docs/handoff.md");
+
+  validateBb9HandoffInputAgainstSchema(fullInput, schema);
+  validateBb9HandoffInputAgainstSchema(liteInput, schema);
+  ["readableBrief", "cacheSidecar", "activeProviderPrompt", "handoff.meta.json"].forEach((artifact) => {
+    assert(handoffDoc.includes(artifact), `handoff doc missing artifact: ${artifact}`);
+  });
+  assert.match(handoffDoc, /BB12 is a MiMo-specific selector candidate/);
 });
 
 test("mode router asks for clarification when no mode signal is present", () => {

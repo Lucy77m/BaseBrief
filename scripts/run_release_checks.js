@@ -66,7 +66,9 @@ function checkRequiredFiles() {
     "docs/integrations.md",
     "docs/walkthrough.md",
     "docs/mode-selection.md",
+    "docs/handoff.md",
     "docs/testing.md",
+    "docs/roadmap/basebrief-long-term-baseline.md",
     "docs/evolution/bb-evolution-log.md",
     "docs/experiments/cache-ready-lite.md",
     "docs/experiments/cache-ready-capsule.md",
@@ -88,6 +90,7 @@ function checkRequiredFiles() {
     "scripts/provider_relay_usage_audit.js",
     "scripts/generate_bb9_handoff.js",
     "scripts/bb9_provider_profiles.json",
+    "schemas/bb9-handoff.schema.json",
     "examples/full-example.md",
     "examples/lite-example.md",
     "examples/cache-ready-input.json",
@@ -117,6 +120,10 @@ function checkContentContracts() {
   const englishReadme = readText("README.en.md");
   const integrationsDoc = readText("docs/integrations.md");
   const walkthroughDoc = readText("docs/walkthrough.md");
+  const modeSelectionDoc = readText("docs/mode-selection.md");
+  const handoffDoc = readText("docs/handoff.md");
+  const roadmapDoc = readText("docs/roadmap/basebrief-long-term-baseline.md");
+  const bb9Schema = readJson("schemas/bb9-handoff.schema.json");
   const fullTemplate = readText("templates/zh-CN/BASEBRIEF.md");
   const liteTemplate = readText("templates/zh-CN/BASEBRIEF_LITE.md");
   const nextChatTemplate = readText("templates/zh-CN/NEXT_CHAT_PROMPT.md");
@@ -133,6 +140,8 @@ function checkContentContracts() {
   assert(readme.includes("README.en.md"), "README.md should link to README.en.md");
   assert(readme.includes("docs/integrations.md"), "README.md should link to integrations docs");
   assert(readme.includes("docs/walkthrough.md"), "README.md should link to walkthrough docs");
+  assert(readme.includes("docs/handoff.md"), "README.md should link to handoff contract docs");
+  assert(readme.includes("docs/roadmap/basebrief-long-term-baseline.md"), "README.md should link to long-term baseline");
   assert(readme.includes("docs/experiments/cache-ready-capsule.md"), "README.md should link to cache-ready capsule docs");
   assert(readme.includes("docs/experiments/cache-ready-anchor.md"), "README.md should link to cache-ready anchor docs");
   assert(readme.includes("docs/experiments/cache-ready-anchor-pad.md"), "README.md should link to cache-ready anchor-pad docs");
@@ -143,6 +152,9 @@ function checkContentContracts() {
   assert(readme.includes("docs/evolution/bb-evolution-log.md"), "README.md should link to evolution log");
   assert(readme.includes("docs/experiments/cache-ready-relay-gpt55.md"), "README.md should link to relay audit docs");
   assert(englishReadme.includes("One install, one entry"), "README.en.md must explain one install, one entry");
+  assert(englishReadme.includes("normal continuation routes to `full` or `lite`"), "README.en.md must make full/lite the normal route");
+  assert(englishReadme.includes("docs/handoff.md"), "README.en.md should link to handoff docs");
+  assert(englishReadme.includes("docs/roadmap/basebrief-long-term-baseline.md"), "README.en.md should link to long-term baseline");
   assert(englishReadme.includes("Integrations"), "README.en.md should link to integrations docs");
   assert(englishReadme.includes("docs/experiments/cache-ready-anchor-pad.md"), "README.en.md should link to anchor-pad docs");
   assert(englishReadme.includes("docs/experiments/cache-ready-readable-poc.md"), "README.en.md should link to readable POC docs");
@@ -153,6 +165,30 @@ function checkContentContracts() {
   assert(englishReadme.includes("docs/experiments/cache-ready-relay-gpt55.md"), "README.en.md should link to relay audit docs");
   assert(englishReadme.includes("cache-ready"), "README.en.md must describe cache-ready mode");
   assert(!/two skills/i.test(englishReadme), "README.en.md must not imply two skills");
+  assert(
+    skill.includes("普通项目接续默认只在 `full` 和 `lite` 之间选择"),
+    "SKILL.md must keep cache-ready out of ordinary routing",
+  );
+  assert(
+    modeSelectionDoc.includes("`cache-ready` 是显式实验路线"),
+    "mode-selection.md must mark cache-ready as explicit experiment route",
+  );
+  assert(handoffDoc.includes("readableBrief"), "handoff.md must define readableBrief");
+  assert(handoffDoc.includes("cacheSidecar"), "handoff.md must define cacheSidecar");
+  assert(handoffDoc.includes("activeProviderPrompt"), "handoff.md must define activeProviderPrompt");
+  assert(handoffDoc.includes("handoff.meta.json"), "handoff.md must define handoff.meta.json");
+  assert(roadmapDoc.includes("Do not add BB13"), "roadmap baseline must include experiment freeze rule");
+  [
+    "project_identity",
+    "current_goal",
+    "verified_facts",
+    "confirmed_decisions",
+    "risk_boundaries",
+    "expected_output",
+    "tail_request",
+  ].forEach((field) => {
+    assert(bb9Schema.required.includes(field), `BB9 schema missing required field: ${field}`);
+  });
   ["Codex", "Claude Code", "Cursor"].forEach((toolName) => {
     assert(integrationsDoc.includes(toolName), `integrations.md must mention ${toolName}`);
   });

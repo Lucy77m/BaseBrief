@@ -43,3 +43,9 @@ Lite 不应：
 默认使用：
 
 - `templates/zh-CN/BASEBRIEF_LITE.md`
+
+## Handoff Sidecar Rule
+
+Lite 的主产物始终是短、硬、可读的接续 brief。需要 provider 侧缓存实验时，先保留 readable brief，再通过 BB9 handoff 后处理生成 `cacheSidecar` / `activeProviderPrompt`。
+
+不要为了缓存实验把 Lite 正文改成 provider-only sidecar 格式。

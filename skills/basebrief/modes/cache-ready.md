@@ -10,11 +10,13 @@
 - BB9 keeps readable `full` / `lite` as the primary handoff and adds `cacheSidecar` only when the provider profile has cache usage evidence.
 - BB10 uses `activeProviderPrompt` so provider calls send one selected prompt instead of concatenating readable text and sidecar text.
 
-# BaseBrief Cache-ready Mode
+# BaseBrief Cache-ready Experimental Route
 
 ## What It Is
 
 `cache-ready` 是 BaseBrief 的实验模式。
+
+它不是普通项目接续的第三条默认路线。普通接续优先使用 `full` 或 `lite`；`cache-ready` 只在用户明确要求 prompt cache、cache-ready、稳定前缀或缓存代理实验时使用。
 
 它只承诺：
 
@@ -78,3 +80,9 @@ BB2 / BB3 / BB4 是压缩实验协议，会保留 `verified_facts`、`confirmed_
 - `缓存命中提升已证明`
 - `cached_tokens 已提升`
 - `真实延迟已下降`
+
+## BB9 Handoff Boundary
+
+BB9 handoff 是当前标准契约方向：`readableBrief` 给人类审阅，`cacheSidecar` / `activeProviderPrompt` 给支持缓存证据的 provider 调用。
+
+MiMo / DeepSeek 的 BB9 sidecar 只能写成 provider-specific estimated-cost evidence。BB12 只记录为 MiMo-specific selector candidate，不是跨 provider 默认策略。

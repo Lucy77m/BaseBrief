@@ -43,3 +43,9 @@
 - 缺信息就列 `open_questions`
 - 不要为了“完整”而编造路径、commit、构建状态
 - 复杂项目默认优先 Full，不要硬压成 Lite
+
+## Handoff Sidecar Rule
+
+Full 的主产物始终是人类可读 brief。需要 provider 侧缓存实验时，先保留 readable brief，再通过 BB9 handoff 后处理生成 `cacheSidecar` / `activeProviderPrompt`。
+
+不要把 sidecar 字段或 PAD 结构塞进普通 `BASEBRIEF.md` 正文。

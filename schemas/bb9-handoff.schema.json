@@ -1,0 +1,81 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/basebrief/schemas/bb9-handoff.schema.json",
+  "title": "BaseBrief BB9 Handoff Input",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "project_identity",
+    "current_goal",
+    "verified_facts",
+    "confirmed_decisions",
+    "risk_boundaries",
+    "expected_output",
+    "tail_request"
+  ],
+  "properties": {
+    "mode": {
+      "type": "string",
+      "enum": ["full", "lite"],
+      "description": "Readable BaseBrief mode used before provider-side handoff post-processing."
+    },
+    "provider_profile": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Provider profile id, such as mimo, deepseek, relay-openai-gpt55-codex-oauth, or unknown."
+    },
+    "project_identity": {
+      "type": "string",
+      "minLength": 1
+    },
+    "current_goal": {
+      "type": "string",
+      "minLength": 1
+    },
+    "verified_facts": {
+      "$ref": "#/$defs/nonEmptyStringArray"
+    },
+    "confirmed_decisions": {
+      "$ref": "#/$defs/nonEmptyStringArray"
+    },
+    "assumptions": {
+      "$ref": "#/$defs/stringArray"
+    },
+    "open_questions": {
+      "$ref": "#/$defs/stringArray"
+    },
+    "risk_boundaries": {
+      "$ref": "#/$defs/nonEmptyStringArray"
+    },
+    "forbidden_scope": {
+      "$ref": "#/$defs/stringArray"
+    },
+    "expected_output": {
+      "type": "string",
+      "minLength": 1
+    },
+    "tail_request": {
+      "type": "string",
+      "minLength": 1
+    },
+    "audience": {
+      "type": "string"
+    }
+  },
+  "$defs": {
+    "stringArray": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "nonEmptyStringArray": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    }
+  }
+}
