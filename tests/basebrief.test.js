@@ -15,6 +15,7 @@ const {
   validateHandoffInput,
 } = require("../scripts/basebrief_build_handoff");
 const { buildAdapterArtifacts, normalizeTargets } = require("../scripts/basebrief_build_adapters");
+const { checkArtifacts } = require("../scripts/basebrief_check_artifacts");
 const { buildSummary, getPromptForVariant, SCENARIOS, PROVIDER_PROFILES } = require("../scripts/provider_cache_benchmark");
 const { classifyRelayUsage } = require("../scripts/provider_relay_usage_audit");
 const { routeMode } = require("../scripts/mode_router");
@@ -325,6 +326,161 @@ test("adapter builder CLI writes selected target metadata", () => withTempDir((t
   assert.deepEqual(result.targets, ["codex"]);
   assert(fs.existsSync(path.join(outputDir, "codex-task.md")));
   assert(!fs.existsSync(path.join(outputDir, "claude-project-context.md")));
+}));
+
+test("artifact checker passes clean structured and adapter examples", () => withTempDir((tempDir) => {
+  const outputDir = path.join(tempDir, "clean");
+  fs.mkdirSync(outputDir, { recursive: true });
+  for (const relativePath of [
+    "examples/structured-handoff-full.md",
+    "examples/adapter-codex-task.md",
+    "examples/adapter-claude-project-context.md",
+  ]) {
+    fs.copyFileSync(path.join(repoRoot, relativePath), path.join(outputDir, path.basename(relativePath)));
+  }
+
+  const result = checkArtifacts({ inputPath: outputDir });
+  assert.equal(result.status, "passed");
+  assert.equal(result.errorCount, 0);
+  assert.equal(result.warningCount, 0);
+  assert.deepEqual(result.findings, []);
+}));
+
+test("artifact checker CLI emits stable json for clean input", () => {
+  const stdout = execFileSync(process.execPath, [
+    "scripts/basebrief_check_artifacts.js",
+    "--input",
+    "examples/adapter-codex-task.md",
+    "--json",
+  ], { cwd: repoRoot, encoding: "utf8" });
+
+  const result = JSON.parse(stdout);
+  assert.equal(result.status, "passed");
+  assert.equal(result.errorCount, 0);
+  assert.equal(result.warningCount, 0);
+  assert(Array.isArray(result.findings));
+});
+
+test("artifact checker reports errors for secrets, bearer tokens, and private paths", () => withTempDir((tempDir) => {
+  const filePath = path.join(tempDir, "codex-task.md");
+  fs.writeFileSync(filePath, [
+    "# BaseBrief Codex Task",
+    "",
+    "## Risk Boundaries",
+    "- keep safe",
+    "",
+    "## Open Questions",
+    "- none",
+    "",
+    `api_key=${"sk-" + "1234567890abcdef"}`,
+    `Authorization: ${"Bearer " + "abcdef1234567890"}`,
+    `Path: ${"D:" + "\\BaseBrief-private\\secret.md"}`,
+    "",
+  ].join("\n"), "utf8");
+
+  const result = checkArtifacts({ inputPath: filePath });
+  assert.equal(result.status, "failed");
+  assert(result.errorCount >= 3);
+  assert(result.findings.some((finding) => finding.ruleId === "secret.sk"));
+  assert(result.findings.some((finding) => finding.ruleId === "secret.bearer"));
+  assert(result.findings.some((finding) => finding.ruleId === "private.absolute-path"));
+}));
+
+test("artifact checker rejects provider sidecar content in adapter outputs", () => withTempDir((tempDir) => {
+  const filePath = path.join(tempDir, "codex-task.md");
+  fs.writeFileSync(filePath, [
+    "# BaseBrief Codex Task",
+    "",
+    "## Risk Boundaries",
+    "- keep provider-only prompt text out",
+    "",
+    "## Open Questions",
+    "- none",
+    "",
+    "BASEBRIEF_CACHE_BLOCK_PAD",
+    "",
+  ].join("\n"), "utf8");
+
+  const result = checkArtifacts({ inputPath: filePath });
+  assert.equal(result.status, "failed");
+  assert(result.findings.some((finding) => finding.ruleId === "adapter.provider-sidecar"));
+}));
+
+test("artifact checker distinguishes missing risk errors from missing open-question warnings", () => withTempDir((tempDir) => {
+  const missingRisk = path.join(tempDir, "missing-risk.md");
+  const missingOpen = path.join(tempDir, "missing-open.md");
+  fs.writeFileSync(missingRisk, [
+    "# BaseBrief Codex Task",
+    "",
+    "## Open Questions",
+    "- none",
+    "",
+  ].join("\n"), "utf8");
+  fs.writeFileSync(missingOpen, [
+    "# BaseBrief Codex Task",
+    "",
+    "## Risk Boundaries",
+    "- keep safe",
+    "",
+  ].join("\n"), "utf8");
+
+  const riskResult = checkArtifacts({ inputPath: missingRisk });
+  const openResult = checkArtifacts({ inputPath: missingOpen });
+  assert.equal(riskResult.status, "failed");
+  assert(riskResult.findings.some((finding) => finding.ruleId === `artifact.missing-${"risk"}-boundaries`));
+  assert.equal(openResult.status, "passed");
+  assert.equal(openResult.errorCount, 0);
+  assert.equal(openResult.warningCount, 1);
+  assert(openResult.findings.some((finding) => finding.ruleId === "artifact.missing-open-questions"));
+}));
+
+test("artifact checker warns on provider-general savings claims", () => withTempDir((tempDir) => {
+  const filePath = path.join(tempDir, "claim.md");
+  fs.writeFileSync(filePath, [
+    "# BaseBrief Codex Task",
+    "",
+    "## Risk Boundaries",
+    "- keep provider claims scoped",
+    "",
+    "## Open Questions",
+    "- none",
+    "",
+    "This is cross-provider proof of savings.",
+    "",
+  ].join("\n"), "utf8");
+
+  const result = checkArtifacts({ inputPath: filePath });
+  assert.equal(result.status, "passed");
+  assert.equal(result.errorCount, 0);
+  assert.equal(result.warningCount, 1);
+  assert(result.findings.some((finding) => finding.ruleId === "provider.overgeneralized-claim"));
+}));
+
+test("artifact checker CLI exits nonzero on errors", () => withTempDir((tempDir) => {
+  const filePath = path.join(tempDir, "codex-task.md");
+  fs.writeFileSync(filePath, [
+    "# BaseBrief Codex Task",
+    "",
+    "## Open Questions",
+    "- none",
+    "",
+  ].join("\n"), "utf8");
+
+  let error;
+  try {
+    execFileSync(process.execPath, [
+      "scripts/basebrief_check_artifacts.js",
+      "--input",
+      filePath,
+      "--json",
+    ], { cwd: repoRoot, encoding: "utf8" });
+  } catch (caught) {
+    error = caught;
+  }
+  assert(error, "checker CLI should fail on missing risk boundaries");
+  assert.notEqual(error.status, 0);
+  const result = JSON.parse(error.stdout);
+  assert(result.findings.some((finding) => finding.ruleId === `artifact.missing-${"risk"}-boundaries`));
 }));
 
 test("mode router asks for clarification when no mode signal is present", () => {

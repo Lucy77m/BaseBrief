@@ -205,6 +205,8 @@ Exit criteria:
 - Findings are deterministic and explainable.
 - The rule set stays small enough that users do not ignore it.
 
+Current v1 target: a local artifact checker runs against explicit files or directories only. It checks generated handoff and adapter artifacts for common publication hazards without becoming a full secret scanner or compliance audit.
+
 ### Phase 7: CLI Lite
 
 Goal: provide a thin command wrapper only after the contract, builder, adapters, and lint mini have shaped the real workflow.

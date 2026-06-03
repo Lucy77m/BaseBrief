@@ -186,6 +186,7 @@ BaseBrief/
 - 模式选择：[docs/mode-selection.md](docs/mode-selection.md)
 - Handoff 契约：[docs/handoff.md](docs/handoff.md)
 - 测试矩阵：[docs/testing.md](docs/testing.md)
+- Artifact checks: [docs/checks.md](docs/checks.md)
 - 长期规划基线：[docs/roadmap/basebrief-long-term-baseline.md](docs/roadmap/basebrief-long-term-baseline.md)
 - Cache-ready 实验说明：[docs/experiments/cache-ready-lite.md](docs/experiments/cache-ready-lite.md)
 - 公开示例：[examples](examples)
@@ -255,4 +256,5 @@ node scripts/generate_bb9_handoff.js --input examples/bb9-handoff-full-input.jso
 ```text
 node scripts/basebrief_build_handoff.js --input examples/structured-handoff-full.md --output-dir tests/outputs/private/structured-full --provider-profile mimo
 node scripts/basebrief_build_adapters.js --input examples/structured-handoff-full.md --output-dir tests/outputs/private/adapters --target all
+node scripts/basebrief_check_artifacts.js --input examples/adapter-codex-task.md --json
 ```

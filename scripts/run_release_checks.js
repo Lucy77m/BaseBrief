@@ -68,6 +68,7 @@ function checkRequiredFiles() {
     "docs/walkthrough.md",
     "docs/mode-selection.md",
     "docs/handoff.md",
+    "docs/checks.md",
     "docs/testing.md",
     "docs/roadmap/basebrief-long-term-baseline.md",
     "docs/evolution/bb-evolution-log.md",
@@ -92,6 +93,7 @@ function checkRequiredFiles() {
     "scripts/generate_bb9_handoff.js",
     "scripts/basebrief_build_handoff.js",
     "scripts/basebrief_build_adapters.js",
+    "scripts/basebrief_check_artifacts.js",
     "scripts/bb9_provider_profiles.json",
     "schemas/bb9-handoff.schema.json",
     "examples/full-example.md",
@@ -130,6 +132,7 @@ function checkContentContracts() {
   const walkthroughDoc = readText("docs/walkthrough.md");
   const modeSelectionDoc = readText("docs/mode-selection.md");
   const handoffDoc = readText("docs/handoff.md");
+  const checksDoc = readText("docs/checks.md");
   const roadmapDoc = readText("docs/roadmap/basebrief-long-term-baseline.md");
   const bb9Schema = readJson("schemas/bb9-handoff.schema.json");
   const providerProfiles = readJson("scripts/bb9_provider_profiles.json");
@@ -153,6 +156,7 @@ function checkContentContracts() {
   assert(readme.includes("docs/adapters.md"), "README.md should link to adapters docs");
   assert(readme.includes("docs/walkthrough.md"), "README.md should link to walkthrough docs");
   assert(readme.includes("docs/handoff.md"), "README.md should link to handoff contract docs");
+  assert(readme.includes("docs/checks.md"), "README.md should link to artifact checks docs");
   assert(readme.includes("docs/roadmap/basebrief-long-term-baseline.md"), "README.md should link to long-term baseline");
   assert(readme.includes("docs/experiments/cache-ready-capsule.md"), "README.md should link to cache-ready capsule docs");
   assert(readme.includes("docs/experiments/cache-ready-anchor.md"), "README.md should link to cache-ready anchor docs");
@@ -167,6 +171,7 @@ function checkContentContracts() {
   assert(englishReadme.includes("normal continuation routes to `full` or `lite`"), "README.en.md must make full/lite the normal route");
   assert(englishReadme.includes("docs/handoff.md"), "README.en.md should link to handoff docs");
   assert(englishReadme.includes("docs/adapters.md"), "README.en.md should link to adapters docs");
+  assert(englishReadme.includes("docs/checks.md"), "README.en.md should link to artifact checks docs");
   assert(englishReadme.includes("docs/roadmap/basebrief-long-term-baseline.md"), "README.en.md should link to long-term baseline");
   assert(englishReadme.includes("Integrations"), "README.en.md should link to integrations docs");
   assert(englishReadme.includes("docs/experiments/cache-ready-anchor-pad.md"), "README.en.md should link to anchor-pad docs");
@@ -201,6 +206,9 @@ function checkContentContracts() {
   assert(adaptersDoc.includes("scripts/basebrief_build_adapters.js"), "adapters.md must document adapter builder script");
   assert(adaptersDoc.includes("codex-task.md"), "adapters.md must document Codex output");
   assert(adaptersDoc.includes("claude-project-context.md"), "adapters.md must document Claude output");
+  assert(checksDoc.includes("scripts/basebrief_check_artifacts.js"), "checks.md must document artifact checker script");
+  assert(checksDoc.includes("--input"), "checks.md must document explicit input behavior");
+  assert(checksDoc.includes("not a full security audit"), "checks.md must explain checker boundary");
   assert(structuredFullExample.includes("BASEBRIEF_HANDOFF_JSON_BEGIN"), "structured full example must include handoff JSON begin marker");
   assert(structuredFullExample.includes("BASEBRIEF_HANDOFF_JSON_END"), "structured full example must include handoff JSON end marker");
   assert(structuredLiteExample.includes("BASEBRIEF_HANDOFF_JSON_BEGIN"), "structured lite example must include handoff JSON begin marker");
@@ -343,7 +351,8 @@ function checkSecurity() {
       relative === "scripts/provider_cache_benchmark.js" ||
       relative === "scripts/generate_bb9_handoff.js" ||
       relative === "scripts/basebrief_build_handoff.js" ||
-      relative === "scripts/basebrief_build_adapters.js"
+      relative === "scripts/basebrief_build_adapters.js" ||
+      relative === "scripts/basebrief_check_artifacts.js"
     ) {
       return;
     }
@@ -407,6 +416,33 @@ function checkExamples() {
     assert(fs.existsSync(path.join(repoRoot, relativePath)), `Missing example: ${relativePath}`);
   });
   return exampleFiles.length;
+}
+
+function checkArtifactChecker() {
+  const inputs = [
+    "examples/structured-handoff-full.md",
+    "examples/structured-handoff-lite.md",
+    "examples/adapter-codex-task.md",
+    "examples/adapter-claude-project-context.md",
+  ];
+  inputs.forEach((relativePath) => {
+    const stdout = execFileSync(process.execPath, [
+      "scripts/basebrief_check_artifacts.js",
+      "--input",
+      relativePath,
+      "--json",
+    ], {
+      cwd: repoRoot,
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "pipe"],
+      env: process.env,
+    });
+    const result = JSON.parse(stdout);
+    assert(result.status === "passed", `Artifact checker must pass for ${relativePath}`);
+    assert(result.errorCount === 0, `Artifact checker must report zero errors for ${relativePath}`);
+    assert(Array.isArray(result.findings), `Artifact checker must return findings array for ${relativePath}`);
+  });
+  return inputs.length;
 }
 
 function checkBenchmarkSummaryIfPresent() {
@@ -583,6 +619,7 @@ async function main() {
   const scannedFiles = checkSecurity();
   const checkedLinks = checkLinks();
   const exampleCount = checkExamples();
+  const artifactCheckInputs = checkArtifactChecker();
   const benchmarkSummaryStatus = checkBenchmarkSummaryIfPresent();
   const independentTests = checkIndependentTests();
   const proxy = checkCacheReadyProxy();
@@ -593,6 +630,7 @@ async function main() {
   console.log(`scanned_files=${scannedFiles}`);
   console.log(`checked_links=${checkedLinks}`);
   console.log(`example_files=${exampleCount}`);
+  console.log(`artifact_check_inputs=${artifactCheckInputs}`);
   console.log(`benchmark_summary_status=${benchmarkSummaryStatus}`);
   console.log(`independent_test_files=${independentTests}`);
   console.log(`provider_probe_status=${providerProbe.status}`);
