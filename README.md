@@ -35,6 +35,7 @@ BaseBrief 当前不是 CLI，也不是插件。最简单的使用方式是让你
 更多入口：
 
 - 工具集成：[docs/integrations.md](docs/integrations.md)
+- Adapter 输出：[docs/adapters.md](docs/adapters.md)
 - 完整 walkthrough：[docs/walkthrough.md](docs/walkthrough.md)
 - 模式示例：[docs/usage.md](docs/usage.md)
 - 模式选择：[docs/mode-selection.md](docs/mode-selection.md)
@@ -146,6 +147,7 @@ BaseBrief/
 │     └─ CACHE_READY_ANCHOR_PAD_INPUT.json
 ├─ docs/
 │  ├─ integrations.md
+│  ├─ adapters.md
 │  ├─ walkthrough.md
 │  ├─ usage.md
 │  ├─ mode-selection.md
@@ -170,12 +172,15 @@ BaseBrief/
    ├─ prompt_stability_probe.js
    ├─ provider_cache_probe.js
    ├─ provider_cache_benchmark.js
+   ├─ basebrief_build_handoff.js
+   ├─ basebrief_build_adapters.js
    └─ run_release_checks.js
 ```
 
 ## 文档入口
 
 - 工具集成：[docs/integrations.md](docs/integrations.md)
+- Adapter 输出：[docs/adapters.md](docs/adapters.md)
 - 完整 walkthrough：[docs/walkthrough.md](docs/walkthrough.md)
 - 使用示例：[docs/usage.md](docs/usage.md)
 - 模式选择：[docs/mode-selection.md](docs/mode-selection.md)
@@ -242,9 +247,12 @@ node scripts/generate_bb9_handoff.js --input examples/bb9-handoff-full-input.jso
 - [BB9 unsupported provider fallback](examples/bb9-handoff-fallback-output.md)
 - [Structured full handoff example](examples/structured-handoff-full.md)
 - [Structured lite handoff example](examples/structured-handoff-lite.md)
+- [Adapter Codex task example](examples/adapter-codex-task.md)
+- [Adapter Claude context example](examples/adapter-claude-project-context.md)
 
 最小 builder：
 
 ```text
 node scripts/basebrief_build_handoff.js --input examples/structured-handoff-full.md --output-dir tests/outputs/private/structured-full --provider-profile mimo
+node scripts/basebrief_build_adapters.js --input examples/structured-handoff-full.md --output-dir tests/outputs/private/adapters --target all
 ```

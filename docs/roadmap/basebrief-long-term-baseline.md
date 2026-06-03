@@ -184,6 +184,8 @@ Exit criteria:
 - Adapter outputs are tested.
 - No adapter output weakens safety boundaries.
 
+Current v1 status: Codex and Claude file-based adapters are the first targets. They export context files only and do not write official tool configuration.
+
 ### Phase 6: Lint Mini
 
 Goal: create a small quality gate for handoff artifacts.
@@ -305,4 +307,3 @@ BaseBrief is off track if:
 The next development cycle should not chase a new benchmark variant.
 
 The next development cycle should formalize the BB9 dual-track handoff, keep BB12 as a MiMo-specific optimization candidate, and make BaseBrief's public surface easier to understand.
-

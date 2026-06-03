@@ -64,6 +64,7 @@ function checkRequiredFiles() {
     "templates/zh-CN/CACHE_READY_ANCHOR_PAD_INPUT.json",
     "docs/usage.md",
     "docs/integrations.md",
+    "docs/adapters.md",
     "docs/walkthrough.md",
     "docs/mode-selection.md",
     "docs/handoff.md",
@@ -90,6 +91,7 @@ function checkRequiredFiles() {
     "scripts/provider_relay_usage_audit.js",
     "scripts/generate_bb9_handoff.js",
     "scripts/basebrief_build_handoff.js",
+    "scripts/basebrief_build_adapters.js",
     "scripts/bb9_provider_profiles.json",
     "schemas/bb9-handoff.schema.json",
     "examples/full-example.md",
@@ -109,6 +111,8 @@ function checkRequiredFiles() {
     "examples/bb9-handoff-fallback-output.md",
     "examples/structured-handoff-full.md",
     "examples/structured-handoff-lite.md",
+    "examples/adapter-codex-task.md",
+    "examples/adapter-claude-project-context.md",
     "examples/next-chat-example.md",
     "examples/agent-task-example.md",
   ];
@@ -122,6 +126,7 @@ function checkContentContracts() {
   const readme = readText("README.md");
   const englishReadme = readText("README.en.md");
   const integrationsDoc = readText("docs/integrations.md");
+  const adaptersDoc = readText("docs/adapters.md");
   const walkthroughDoc = readText("docs/walkthrough.md");
   const modeSelectionDoc = readText("docs/mode-selection.md");
   const handoffDoc = readText("docs/handoff.md");
@@ -145,6 +150,7 @@ function checkContentContracts() {
   assert(readme.includes("对外只有一个入口"), "README.md must state that BaseBrief has one public entry");
   assert(readme.includes("README.en.md"), "README.md should link to README.en.md");
   assert(readme.includes("docs/integrations.md"), "README.md should link to integrations docs");
+  assert(readme.includes("docs/adapters.md"), "README.md should link to adapters docs");
   assert(readme.includes("docs/walkthrough.md"), "README.md should link to walkthrough docs");
   assert(readme.includes("docs/handoff.md"), "README.md should link to handoff contract docs");
   assert(readme.includes("docs/roadmap/basebrief-long-term-baseline.md"), "README.md should link to long-term baseline");
@@ -160,6 +166,7 @@ function checkContentContracts() {
   assert(englishReadme.includes("One install, one entry"), "README.en.md must explain one install, one entry");
   assert(englishReadme.includes("normal continuation routes to `full` or `lite`"), "README.en.md must make full/lite the normal route");
   assert(englishReadme.includes("docs/handoff.md"), "README.en.md should link to handoff docs");
+  assert(englishReadme.includes("docs/adapters.md"), "README.en.md should link to adapters docs");
   assert(englishReadme.includes("docs/roadmap/basebrief-long-term-baseline.md"), "README.en.md should link to long-term baseline");
   assert(englishReadme.includes("Integrations"), "README.en.md should link to integrations docs");
   assert(englishReadme.includes("docs/experiments/cache-ready-anchor-pad.md"), "README.en.md should link to anchor-pad docs");
@@ -189,6 +196,11 @@ function checkContentContracts() {
   assert(handoffDoc.includes("experimentalCandidates"), "handoff.md must document experimental candidates");
   assert(readme.includes("examples/structured-handoff-full.md"), "README.md should link to structured full handoff example");
   assert(englishReadme.includes("examples/structured-handoff-full.md"), "README.en.md should link to structured full handoff example");
+  assert(readme.includes("examples/adapter-codex-task.md"), "README.md should link to adapter Codex example");
+  assert(englishReadme.includes("examples/adapter-codex-task.md"), "README.en.md should link to adapter Codex example");
+  assert(adaptersDoc.includes("scripts/basebrief_build_adapters.js"), "adapters.md must document adapter builder script");
+  assert(adaptersDoc.includes("codex-task.md"), "adapters.md must document Codex output");
+  assert(adaptersDoc.includes("claude-project-context.md"), "adapters.md must document Claude output");
   assert(structuredFullExample.includes("BASEBRIEF_HANDOFF_JSON_BEGIN"), "structured full example must include handoff JSON begin marker");
   assert(structuredFullExample.includes("BASEBRIEF_HANDOFF_JSON_END"), "structured full example must include handoff JSON end marker");
   assert(structuredLiteExample.includes("BASEBRIEF_HANDOFF_JSON_BEGIN"), "structured lite example must include handoff JSON begin marker");
@@ -330,7 +342,8 @@ function checkSecurity() {
       relative === "scripts/provider_cache_probe.js" ||
       relative === "scripts/provider_cache_benchmark.js" ||
       relative === "scripts/generate_bb9_handoff.js" ||
-      relative === "scripts/basebrief_build_handoff.js"
+      relative === "scripts/basebrief_build_handoff.js" ||
+      relative === "scripts/basebrief_build_adapters.js"
     ) {
       return;
     }
@@ -385,6 +398,8 @@ function checkExamples() {
     "examples/bb9-handoff-fallback-output.md",
     "examples/structured-handoff-full.md",
     "examples/structured-handoff-lite.md",
+    "examples/adapter-codex-task.md",
+    "examples/adapter-claude-project-context.md",
     "examples/next-chat-example.md",
     "examples/agent-task-example.md",
   ];

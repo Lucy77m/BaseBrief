@@ -14,6 +14,7 @@ const {
   extractHandoffJsonBlock,
   validateHandoffInput,
 } = require("../scripts/basebrief_build_handoff");
+const { buildAdapterArtifacts, normalizeTargets } = require("../scripts/basebrief_build_adapters");
 const { buildSummary, getPromptForVariant, SCENARIOS, PROVIDER_PROFILES } = require("../scripts/provider_cache_benchmark");
 const { classifyRelayUsage } = require("../scripts/provider_relay_usage_audit");
 const { routeMode } = require("../scripts/mode_router");
@@ -232,6 +233,98 @@ test("handoff builder CLI accepts markdown input and writes metadata", () => wit
   assert.equal(result.wroteCacheSidecar, true);
   const meta = JSON.parse(fs.readFileSync(path.join(outputDir, "handoff.meta.json"), "utf8"));
   assert.equal(meta.providerProfile.profileId, "deepseek");
+}));
+
+test("adapter builder writes Codex and Claude outputs from structured markdown", () => withTempDir((tempDir) => {
+  const outputDir = path.join(tempDir, "adapters");
+  const result = buildAdapterArtifacts({
+    inputPath: path.join(repoRoot, "examples/structured-handoff-full.md"),
+    outputDir,
+    target: "all",
+  });
+
+  assert.deepEqual(result.targets, ["codex", "claude"]);
+  assert(fs.existsSync(path.join(outputDir, "codex-task.md")));
+  assert(fs.existsSync(path.join(outputDir, "claude-project-context.md")));
+  assert(fs.existsSync(path.join(outputDir, "adapter.meta.json")));
+
+  const codex = fs.readFileSync(path.join(outputDir, "codex-task.md"), "utf8");
+  const claude = fs.readFileSync(path.join(outputDir, "claude-project-context.md"), "utf8");
+  const meta = JSON.parse(fs.readFileSync(path.join(outputDir, "adapter.meta.json"), "utf8"));
+
+  for (const content of [codex, claude]) {
+    assert.match(content, /Verified Facts/);
+    assert.match(content, /Confirmed Decisions/);
+    assert.match(content, /Risk Boundaries/);
+    assert.match(content, /Open Questions/);
+    assert.doesNotMatch(content, /BASEBRIEF_CACHE_BLOCK_PAD|cacheSidecar|Bearer\s+|sk-[A-Za-z0-9]{10,}|[A-Z]:\\/);
+  }
+  assert.equal(meta.inputMode, "full");
+  assert.equal(meta.outputFiles.codex, "codex-task.md");
+  assert.equal(meta.outputFiles.claude, "claude-project-context.md");
+  assert(!JSON.stringify(meta).includes("Prepare a complete handoff"));
+}));
+
+test("adapter builder respects individual targets", () => withTempDir((tempDir) => {
+  const codexDir = path.join(tempDir, "codex");
+  const claudeDir = path.join(tempDir, "claude");
+
+  buildAdapterArtifacts({
+    inputPath: path.join(repoRoot, "examples/structured-handoff-full.md"),
+    outputDir: codexDir,
+    target: "codex",
+  });
+  buildAdapterArtifacts({
+    inputPath: path.join(repoRoot, "examples/structured-handoff-full.md"),
+    outputDir: claudeDir,
+    target: "claude",
+  });
+
+  assert(fs.existsSync(path.join(codexDir, "codex-task.md")));
+  assert(!fs.existsSync(path.join(codexDir, "claude-project-context.md")));
+  assert(!fs.existsSync(path.join(claudeDir, "codex-task.md")));
+  assert(fs.existsSync(path.join(claudeDir, "claude-project-context.md")));
+}));
+
+test("adapter builder rejects missing arguments, invalid targets, and schema failures", () => withTempDir((tempDir) => {
+  const missingField = path.join(tempDir, "missing-field.json");
+  fs.writeFileSync(missingField, JSON.stringify({ mode: "full" }), "utf8");
+
+  assert.throws(
+    () => buildAdapterArtifacts({ outputDir: tempDir, target: "all" }),
+    /Missing --input/,
+  );
+  assert.throws(
+    () => buildAdapterArtifacts({ inputPath: path.join(repoRoot, "examples/structured-handoff-full.md"), target: "all" }),
+    /Missing --output-dir/,
+  );
+  assert.throws(
+    () => normalizeTargets("cursor"),
+    /--target must be codex, claude, or all/,
+  );
+  assert.throws(
+    () => buildAdapterArtifacts({ inputPath: missingField, outputDir: path.join(tempDir, "bad"), target: "all" }),
+    /Missing required key: project_identity/,
+  );
+}));
+
+test("adapter builder CLI writes selected target metadata", () => withTempDir((tempDir) => {
+  const outputDir = path.join(tempDir, "cli");
+  const stdout = execFileSync(process.execPath, [
+    "scripts/basebrief_build_adapters.js",
+    "--input",
+    "examples/structured-handoff-full.md",
+    "--output-dir",
+    outputDir,
+    "--target",
+    "codex",
+    "--json",
+  ], { cwd: repoRoot, encoding: "utf8" });
+
+  const result = JSON.parse(stdout);
+  assert.deepEqual(result.targets, ["codex"]);
+  assert(fs.existsSync(path.join(outputDir, "codex-task.md")));
+  assert(!fs.existsSync(path.join(outputDir, "claude-project-context.md")));
 }));
 
 test("mode router asks for clarification when no mode signal is present", () => {

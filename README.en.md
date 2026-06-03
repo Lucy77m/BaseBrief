@@ -27,6 +27,7 @@ Also prepare a short next-chat opener and an agent task handoff.
 Start here:
 
 - [Integrations](docs/integrations.md)
+- [Adapters](docs/adapters.md)
 - [Walkthrough](docs/walkthrough.md)
 - [Usage](docs/usage.md)
 - [Mode selection](docs/mode-selection.md)
@@ -91,6 +92,7 @@ Normal `full` / `lite` briefs stay human-readable. Provider-facing `cacheSidecar
 ## Docs
 
 - [Integrations](docs/integrations.md)
+- [Adapters](docs/adapters.md)
 - [Walkthrough](docs/walkthrough.md)
 - [Usage](docs/usage.md)
 - [Mode selection](docs/mode-selection.md)
@@ -138,11 +140,14 @@ Examples:
 - [BB9 unsupported provider fallback](examples/bb9-handoff-fallback-output.md)
 - [Structured full handoff example](examples/structured-handoff-full.md)
 - [Structured lite handoff example](examples/structured-handoff-lite.md)
+- [Adapter Codex task example](examples/adapter-codex-task.md)
+- [Adapter Claude context example](examples/adapter-claude-project-context.md)
 
 Minimal builder:
 
 ```text
 node scripts/basebrief_build_handoff.js --input examples/structured-handoff-full.md --output-dir tests/outputs/private/structured-full --provider-profile mimo
+node scripts/basebrief_build_adapters.js --input examples/structured-handoff-full.md --output-dir tests/outputs/private/adapters --target all
 ```
 
 Boundary: this is provider-specific estimated-cost evidence, not a billing audit and not a provider-general cache claim.
