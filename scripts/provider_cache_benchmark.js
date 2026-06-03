@@ -704,6 +704,55 @@ function buildBb10ActivePrompt(snapshot, scenario, iteration, variant, providerP
   return output.activeProviderPrompt;
 }
 
+function getBb11TrimPadLength(scenario) {
+  const scenarioPadAdditions = {
+    "full-baseline": 0,
+    "lite-handoff": 3,
+    "risk-boundary": 6,
+    "next-chat-opener": 1,
+    "agent-task": 5,
+    "cache-ready-followup": 3,
+  };
+  return 312 + (scenarioPadAdditions[scenario.id] || 0);
+}
+
+function buildBb11LiteTrimPrompt(snapshot, scenario, iteration, providerProfileId = "mimo") {
+  const tailRequest = scenario.tailRequests[iteration % scenario.tailRequests.length];
+  const padLength = getBb11TrimPadLength(scenario);
+  return [
+    "BB11L",
+    "FORMAT=bb11-lite-trim-sidecar",
+    "RULE=stable_before_tail;active_prompt_only;do_not_concat_readable",
+    `PROFILE=${providerProfileId}`,
+    `P=${snapshot.projectId}/${scenario.id}: local real-project benchmark snapshot`,
+    `G=${scenario.label}`,
+    `F=readme:${sanitizeText(snapshot.readmeExcerpt || "none", 760)} ; pkg:${sanitizeText(JSON.stringify(snapshot.packages), 760)} ; files:${sanitizeText(snapshot.fileSample.slice(0, 40).join(" | "), 960)} ; redacted_inputs:true`,
+    "D=source_project_read_only ; readable_handoff_primary ; provider_profile_gated",
+    "R=no_env_tokens_secrets_credentials ; no_source_project_writes",
+    "X=.env ; token ; secret ; credential ; source_project_writes",
+    "O=concise Lite-style BaseBrief continuation answer",
+    `PAD=${buildPadString(padLength)}`,
+    "--",
+    `TAIL_REQUEST=${sanitizeText(tailRequest, 300)}`,
+  ].join("\n");
+}
+
+function buildBb11SelectorGuardPrompt(snapshot, scenario, iteration, providerProfileId = "mimo") {
+  const trimmed = buildBb11LiteTrimPrompt(snapshot, scenario, iteration, providerProfileId);
+  const bb9Best = buildBb7BlockPadPrompt(snapshot, scenario, iteration);
+  return trimmed.length <= bb9Best.length ? trimmed : bb9Best;
+}
+
+function buildBb11ActivePromptTrimPrompt(snapshot, scenario, iteration, variant, providerProfileId = "mimo") {
+  if (variant === "readableLite" || variant === "cacheSidecarLiteOnly") {
+    return buildBb10ActivePrompt(snapshot, scenario, iteration, variant, providerProfileId);
+  }
+  if (variant === "cacheSidecarLiteTrimOnly") {
+    return buildBb11LiteTrimPrompt(snapshot, scenario, iteration, providerProfileId);
+  }
+  return buildBb11SelectorGuardPrompt(snapshot, scenario, iteration, providerProfileId);
+}
+
 function detectProviderProfile(providerName, model) {
   const requested = (process.env.BASEBRIEF_PROVIDER_PROFILE || "").trim();
   if (requested && PROVIDER_PROFILES[requested]) {
@@ -882,6 +931,7 @@ function summarizeCalls(calls) {
 }
 
 function getVariantsForMode(mode) {
+  if (mode === "activePromptTrimPoc") return ["readableLite", "cacheSidecarLiteOnly", "cacheSidecarLiteTrimOnly", "bb9Best", "bb11SelectorGuard"];
   if (mode === "activePromptPoc") return ["readableFull", "readableLite", "cacheSidecarFullOnly", "cacheSidecarLiteOnly", "bb9Best"];
   if (mode === "handoffPoc") return ["readableFull", "readableFullSidecar", "readableLite", "readableLiteSidecar", "bb9Best"];
   if (mode === "blockalign") return ["natural", "bb7BlockPadLite", "bb8AlignedBlockPadLite"];
@@ -896,6 +946,10 @@ function getVariantsForMode(mode) {
 }
 
 function getPromptForVariant(mode, snapshot, scenario, iteration, variant, providerProfileId = "mimo") {
+  if (mode === "activePromptTrimPoc") {
+    if (variant === "bb9Best") return buildBb7BlockPadPrompt(snapshot, scenario, iteration);
+    return buildBb11ActivePromptTrimPrompt(snapshot, scenario, iteration, variant, providerProfileId);
+  }
   if (mode === "activePromptPoc") {
     if (variant === "bb9Best") return buildBb7BlockPadPrompt(snapshot, scenario, iteration);
     return buildBb10ActivePrompt(snapshot, scenario, iteration, variant, providerProfileId);
@@ -982,6 +1036,7 @@ function buildSummary(rawResult) {
   const readableComparisons = [];
   const handoffComparisons = [];
   const activePromptComparisons = [];
+  const activePromptTrimComparisons = [];
   const sidecarComparisons = [];
   const hybridComparisons = [];
   const blockPadComparisons = [];
@@ -1365,6 +1420,92 @@ function buildSummary(rawResult) {
               candidate.medianEstimatedCostCny <= bb9Best.medianEstimatedCostCny,
           });
         }
+      }
+      if (rawResult.mode === "activePromptTrimPoc") {
+        const baselineCalls = calls.filter((call) => call.projectId === projectId && call.scenarioId === scenario.id && call.variant === "readableLite");
+        const bb10Calls = calls.filter((call) => call.projectId === projectId && call.scenarioId === scenario.id && call.variant === "cacheSidecarLiteOnly");
+        const trimCalls = calls.filter((call) => call.projectId === projectId && call.scenarioId === scenario.id && call.variant === "cacheSidecarLiteTrimOnly");
+        const bb9BestCalls = calls.filter((call) => call.projectId === projectId && call.scenarioId === scenario.id && call.variant === "bb9Best");
+        const guardCalls = calls.filter((call) => call.projectId === projectId && call.scenarioId === scenario.id && call.variant === "bb11SelectorGuard");
+        const baseline = summarizeCalls(baselineCalls);
+        const bb10 = summarizeCalls(bb10Calls);
+        const trim = summarizeCalls(trimCalls);
+        const bb9Best = summarizeCalls(bb9BestCalls);
+        const guard = summarizeCalls(guardCalls);
+        const promptMedian = (variantCalls) => median(variantCalls.filter((call) => call.iteration > 0 && call.status === "success").map((call) => call.promptTokens));
+        const costDelta = (candidate, reference) =>
+          typeof candidate.medianEstimatedCostCny === "number" && typeof reference.medianEstimatedCostCny === "number"
+            ? candidate.medianEstimatedCostCny - reference.medianEstimatedCostCny
+            : null;
+        const costDeltaPercent = (delta, reference) =>
+          typeof delta === "number" && reference.medianEstimatedCostCny
+            ? delta / reference.medianEstimatedCostCny
+            : null;
+        const trimVsReadable = costDelta(trim, baseline);
+        const trimVsBb10 = costDelta(trim, bb10);
+        const trimVsBb9Best = costDelta(trim, bb9Best);
+        const guardVsReadable = costDelta(guard, baseline);
+        const guardVsBb9Best = costDelta(guard, bb9Best);
+        activePromptTrimComparisons.push({
+          projectId,
+          scenarioId: scenario.id,
+          family: "lite",
+          baselineVariant: "readableLite",
+          previousVariant: "cacheSidecarLiteOnly",
+          candidateVariant: "cacheSidecarLiteTrimOnly",
+          selectorGuardVariant: "bb11SelectorGuard",
+          referenceVariant: "bb9Best",
+          baselineMedianPromptTokens: promptMedian(baselineCalls),
+          bb10MedianPromptTokens: promptMedian(bb10Calls),
+          candidateMedianPromptTokens: promptMedian(trimCalls),
+          bb9BestMedianPromptTokens: promptMedian(bb9BestCalls),
+          selectorGuardMedianPromptTokens: promptMedian(guardCalls),
+          baselineMedianCachedTokens: baseline.medianCachedTokens,
+          bb10MedianCachedTokens: bb10.medianCachedTokens,
+          candidateMedianCachedTokens: trim.medianCachedTokens,
+          bb9BestMedianCachedTokens: bb9Best.medianCachedTokens,
+          selectorGuardMedianCachedTokens: guard.medianCachedTokens,
+          baselineMedianCacheRatio: baseline.medianCacheRatio,
+          bb10MedianCacheRatio: bb10.medianCacheRatio,
+          candidateMedianCacheRatio: trim.medianCacheRatio,
+          bb9BestMedianCacheRatio: bb9Best.medianCacheRatio,
+          selectorGuardMedianCacheRatio: guard.medianCacheRatio,
+          baselineMedianEstimatedCostCny: baseline.medianEstimatedCostCny,
+          bb10MedianEstimatedCostCny: bb10.medianEstimatedCostCny,
+          candidateMedianEstimatedCostCny: trim.medianEstimatedCostCny,
+          bb9BestMedianEstimatedCostCny: bb9Best.medianEstimatedCostCny,
+          selectorGuardMedianEstimatedCostCny: guard.medianEstimatedCostCny,
+          candidateCostDeltaVsReadableCny: trimVsReadable,
+          candidateCostDeltaVsReadablePercent: costDeltaPercent(trimVsReadable, baseline),
+          candidateCostDeltaVsBb10Cny: trimVsBb10,
+          candidateCostDeltaVsBb10Percent: costDeltaPercent(trimVsBb10, bb10),
+          candidateCostDeltaVsBb9BestCny: trimVsBb9Best,
+          candidateCostDeltaVsBb9BestPercent: costDeltaPercent(trimVsBb9Best, bb9Best),
+          selectorGuardCostDeltaVsReadableCny: guardVsReadable,
+          selectorGuardCostDeltaVsReadablePercent: costDeltaPercent(guardVsReadable, baseline),
+          selectorGuardCostDeltaVsBb9BestCny: guardVsBb9Best,
+          selectorGuardCostDeltaVsBb9BestPercent: costDeltaPercent(guardVsBb9Best, bb9Best),
+          candidateEstimatedCostWinVsReadable:
+            typeof baseline.medianEstimatedCostCny === "number" &&
+            typeof trim.medianEstimatedCostCny === "number" &&
+            trim.medianEstimatedCostCny < baseline.medianEstimatedCostCny,
+          candidateEstimatedCostWinVsBb10:
+            typeof bb10.medianEstimatedCostCny === "number" &&
+            typeof trim.medianEstimatedCostCny === "number" &&
+            trim.medianEstimatedCostCny < bb10.medianEstimatedCostCny,
+          candidateEstimatedCostNoWorseThanBb9Best:
+            typeof bb9Best.medianEstimatedCostCny === "number" &&
+            typeof trim.medianEstimatedCostCny === "number" &&
+            trim.medianEstimatedCostCny <= bb9Best.medianEstimatedCostCny,
+          selectorGuardEstimatedCostWinVsReadable:
+            typeof baseline.medianEstimatedCostCny === "number" &&
+            typeof guard.medianEstimatedCostCny === "number" &&
+            guard.medianEstimatedCostCny < baseline.medianEstimatedCostCny,
+          selectorGuardEstimatedCostNoWorseThanBb9Best:
+            typeof bb9Best.medianEstimatedCostCny === "number" &&
+            typeof guard.medianEstimatedCostCny === "number" &&
+            guard.medianEstimatedCostCny <= bb9Best.medianEstimatedCostCny,
+        });
       }
       if (rawResult.mode === "sidecar") {
         const bb4Calls = calls.filter((call) => call.projectId === projectId && call.scenarioId === scenario.id && call.variant === "bb4AnchorPad");
@@ -1993,6 +2134,112 @@ function buildSummary(rawResult) {
       : rawResult.mode === "activePromptPoc"
       ? "bb10_active_prompt_inconclusive"
       : undefined;
+  const trimBaselineCost = variants.readableLite?.medianEstimatedCostCny;
+  const trimBb10Cost = variants.cacheSidecarLiteOnly?.medianEstimatedCostCny;
+  const trimCandidateCost = variants.cacheSidecarLiteTrimOnly?.medianEstimatedCostCny;
+  const trimBb9BestCost = variants.bb9Best?.medianEstimatedCostCny;
+  const trimGuardCost = variants.bb11SelectorGuard?.medianEstimatedCostCny;
+  const trimOverallCostDeltaVsReadableCny =
+    typeof trimBaselineCost === "number" && typeof trimCandidateCost === "number"
+      ? trimCandidateCost - trimBaselineCost
+      : null;
+  const trimOverallCostDeltaVsReadablePercent =
+    typeof trimOverallCostDeltaVsReadableCny === "number" && trimBaselineCost
+      ? trimOverallCostDeltaVsReadableCny / trimBaselineCost
+      : null;
+  const trimOverallCostDeltaVsBb10Cny =
+    typeof trimBb10Cost === "number" && typeof trimCandidateCost === "number"
+      ? trimCandidateCost - trimBb10Cost
+      : null;
+  const trimOverallCostDeltaVsBb10Percent =
+    typeof trimOverallCostDeltaVsBb10Cny === "number" && trimBb10Cost
+      ? trimOverallCostDeltaVsBb10Cny / trimBb10Cost
+      : null;
+  const trimOverallCostDeltaVsBb9BestCny =
+    typeof trimBb9BestCost === "number" && typeof trimCandidateCost === "number"
+      ? trimCandidateCost - trimBb9BestCost
+      : null;
+  const trimOverallCostDeltaVsBb9BestPercent =
+    typeof trimOverallCostDeltaVsBb9BestCny === "number" && trimBb9BestCost
+      ? trimOverallCostDeltaVsBb9BestCny / trimBb9BestCost
+      : null;
+  const guardOverallCostDeltaVsReadableCny =
+    typeof trimBaselineCost === "number" && typeof trimGuardCost === "number"
+      ? trimGuardCost - trimBaselineCost
+      : null;
+  const guardOverallCostDeltaVsReadablePercent =
+    typeof guardOverallCostDeltaVsReadableCny === "number" && trimBaselineCost
+      ? guardOverallCostDeltaVsReadableCny / trimBaselineCost
+      : null;
+  const guardOverallCostDeltaVsBb9BestCny =
+    typeof trimBb9BestCost === "number" && typeof trimGuardCost === "number"
+      ? trimGuardCost - trimBb9BestCost
+      : null;
+  const guardOverallCostDeltaVsBb9BestPercent =
+    typeof guardOverallCostDeltaVsBb9BestCny === "number" && trimBb9BestCost
+      ? guardOverallCostDeltaVsBb9BestCny / trimBb9BestCost
+      : null;
+  const trimCostWinsVsReadable = activePromptTrimComparisons.filter((item) => item.candidateEstimatedCostWinVsReadable).length;
+  const trimCostWinsVsBb10 = activePromptTrimComparisons.filter((item) => item.candidateEstimatedCostWinVsBb10).length;
+  const trimNoWorseThanBb9Best = activePromptTrimComparisons.filter((item) => item.candidateEstimatedCostNoWorseThanBb9Best).length;
+  const guardCostWinsVsReadable = activePromptTrimComparisons.filter((item) => item.selectorGuardEstimatedCostWinVsReadable).length;
+  const guardNoWorseThanBb9Best = activePromptTrimComparisons.filter((item) => item.selectorGuardEstimatedCostNoWorseThanBb9Best).length;
+  const trimStrongEvidence =
+    rawResult.mode === "activePromptTrimPoc" &&
+    validRequestCount >= largeSampleThreshold &&
+    cacheFieldVisibilityRate >= 0.95 &&
+    activePromptTrimComparisons.length >= 15 &&
+    trimCostWinsVsReadable >= 15 &&
+    typeof trimOverallCostDeltaVsReadablePercent === "number" &&
+    trimOverallCostDeltaVsReadablePercent <= -0.05;
+  const trimPromisingSignal =
+    rawResult.mode === "activePromptTrimPoc" &&
+    validRequestCount >= largeSampleThreshold &&
+    cacheFieldVisibilityRate >= 0.95 &&
+    activePromptTrimComparisons.length >= 15 &&
+    trimCostWinsVsReadable >= 12 &&
+    typeof trimOverallCostDeltaVsReadablePercent === "number" &&
+    trimOverallCostDeltaVsReadablePercent <= -0.03;
+  const guardCandidate =
+    trimStrongEvidence &&
+    guardCostWinsVsReadable >= 15 &&
+    guardNoWorseThanBb9Best === activePromptTrimComparisons.length &&
+    typeof guardOverallCostDeltaVsReadablePercent === "number" &&
+    guardOverallCostDeltaVsReadablePercent <= -0.05;
+  const activePromptTrimStats = rawResult.mode === "activePromptTrimPoc" ? {
+    family: "lite",
+    baselineVariant: "readableLite",
+    previousVariant: "cacheSidecarLiteOnly",
+    candidateVariant: "cacheSidecarLiteTrimOnly",
+    selectorGuardVariant: "bb11SelectorGuard",
+    referenceVariant: "bb9Best",
+    estimatedCostWinsVsReadable: trimCostWinsVsReadable,
+    estimatedCostWinsVsBb10: trimCostWinsVsBb10,
+    estimatedCostNoWorseThanBb9Best: trimNoWorseThanBb9Best,
+    selectorGuardEstimatedCostWinsVsReadable: guardCostWinsVsReadable,
+    selectorGuardEstimatedCostNoWorseThanBb9Best: guardNoWorseThanBb9Best,
+    comparisonCount: activePromptTrimComparisons.length,
+    overallCostDeltaVsReadableCny: trimOverallCostDeltaVsReadableCny,
+    overallCostDeltaVsReadablePercent: trimOverallCostDeltaVsReadablePercent,
+    overallCostDeltaVsBb10Cny: trimOverallCostDeltaVsBb10Cny,
+    overallCostDeltaVsBb10Percent: trimOverallCostDeltaVsBb10Percent,
+    overallCostDeltaVsBb9BestCny: trimOverallCostDeltaVsBb9BestCny,
+    overallCostDeltaVsBb9BestPercent: trimOverallCostDeltaVsBb9BestPercent,
+    selectorGuardOverallCostDeltaVsReadableCny: guardOverallCostDeltaVsReadableCny,
+    selectorGuardOverallCostDeltaVsReadablePercent: guardOverallCostDeltaVsReadablePercent,
+    selectorGuardOverallCostDeltaVsBb9BestCny: guardOverallCostDeltaVsBb9BestCny,
+    selectorGuardOverallCostDeltaVsBb9BestPercent: guardOverallCostDeltaVsBb9BestPercent,
+    conclusionLevel: guardCandidate
+      ? "bb11_active_prompt_trim_selector_guard_candidate"
+      : trimStrongEvidence
+      ? "bb11_active_prompt_trim_cost_evidence"
+      : trimPromisingSignal
+      ? "bb11_active_prompt_trim_promising_signal"
+      : "bb11_active_prompt_trim_inconclusive",
+  } : undefined;
+  const activePromptTrimConclusionLevel = rawResult.mode === "activePromptTrimPoc"
+    ? activePromptTrimStats.conclusionLevel
+    : undefined;
   const sidecarStats = ["full", "lite"].map((family) => {
     const variant = family === "full" ? "bb5SidecarFull" : "bb5SidecarLite";
     const sidecarCost = variants[variant]?.medianEstimatedCostCny;
@@ -2437,6 +2684,8 @@ function buildSummary(rawResult) {
     handoffConclusionLevel,
     activePromptStats: rawResult.mode === "activePromptPoc" ? activePromptStats : undefined,
     activePromptConclusionLevel,
+    activePromptTrimStats,
+    activePromptTrimConclusionLevel,
     sidecarStats: rawResult.mode === "sidecar" ? sidecarStats : undefined,
     sidecarConclusionLevel,
     hybridStats: rawResult.mode === "hybrid" ? hybridStats : undefined,
@@ -2457,6 +2706,8 @@ function buildSummary(rawResult) {
         ? (adaptiveSelectorStats?.conclusionLevel || blockPadConclusionLevel)
         : rawResult.mode === "sidecar"
         ? sidecarConclusionLevel
+        : rawResult.mode === "activePromptTrimPoc"
+        ? activePromptTrimConclusionLevel
         : rawResult.mode === "activePromptPoc"
         ? activePromptConclusionLevel
         : rawResult.mode === "handoffPoc"
@@ -2485,6 +2736,7 @@ function buildSummary(rawResult) {
     readableComparisons: readableComparisons.length ? readableComparisons : undefined,
     handoffComparisons: handoffComparisons.length ? handoffComparisons : undefined,
     activePromptComparisons: activePromptComparisons.length ? activePromptComparisons : undefined,
+    activePromptTrimComparisons: activePromptTrimComparisons.length ? activePromptTrimComparisons : undefined,
     sidecarComparisons: sidecarComparisons.length ? sidecarComparisons : undefined,
     hybridComparisons: hybridComparisons.length ? hybridComparisons : undefined,
     blockPadComparisons: blockPadComparisons.length ? blockPadComparisons : undefined,
@@ -2510,6 +2762,8 @@ function parseArgs(argv) {
   const defaultOutputPath =
     mode === "blockalign"
       ? "tests/outputs/private/provider-cache-benchmark-blockalign.raw.json"
+      : mode === "activePromptTrimPoc"
+      ? "tests/outputs/private/provider-cache-benchmark-active-prompt-trim-poc.raw.json"
       : mode === "activePromptPoc"
       ? "tests/outputs/private/provider-cache-benchmark-active-prompt-poc.raw.json"
       : mode === "handoffPoc"
@@ -2536,6 +2790,8 @@ function parseArgs(argv) {
   const defaultSummaryOutputPath =
     mode === "blockalign"
       ? "tests/outputs/provider-cache-benchmark-blockalign.latest.json"
+      : mode === "activePromptTrimPoc"
+      ? "tests/outputs/provider-cache-benchmark-active-prompt-trim-poc.latest.json"
       : mode === "activePromptPoc"
       ? "tests/outputs/provider-cache-benchmark-active-prompt-poc.latest.json"
       : mode === "handoffPoc"
@@ -2585,8 +2841,8 @@ async function runBenchmark(options = {}) {
   if (!options.localProjects) {
     throw new Error("Use --local-projects for this benchmark.");
   }
-  if (!["absolute", "normalized", "capsule", "anchor", "anchorpad", "padSweep", "readablePoc", "sidecar", "hybrid", "blockpad", "blockalign", "handoffPoc", "activePromptPoc"].includes(options.mode)) {
-    throw new Error("Benchmark mode must be absolute, normalized, capsule, anchor, anchorpad, padSweep, readablePoc, sidecar, hybrid, blockpad, blockalign, handoffPoc, or activePromptPoc.");
+  if (!["absolute", "normalized", "capsule", "anchor", "anchorpad", "padSweep", "readablePoc", "sidecar", "hybrid", "blockpad", "blockalign", "handoffPoc", "activePromptPoc", "activePromptTrimPoc"].includes(options.mode)) {
+    throw new Error("Benchmark mode must be absolute, normalized, capsule, anchor, anchorpad, padSweep, readablePoc, sidecar, hybrid, blockpad, blockalign, handoffPoc, activePromptPoc, or activePromptTrimPoc.");
   }
   if (env.projectPaths.length === 0) {
     throw new Error("Missing BASEBRIEF_BENCHMARK_PROJECTS. Use semicolon-separated local project paths.");

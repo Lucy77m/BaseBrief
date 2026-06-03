@@ -64,3 +64,11 @@ This log records why each cache-ready generation exists and whether it has bench
 - Purpose: turn BB9 dual artifacts into one provider-ready active prompt without concatenating readable and sidecar text.
 - Mechanism: `activeProviderPrompt` equals `cacheSidecar` for supported cache-observable profiles and `readableBrief` for unsupported profiles.
 - Evidence rule: only `activePromptPoc` can show whether sidecar-only is strong enough to become a Full/Lite merge candidate.
+
+## BB11 Active Prompt Trim
+
+- Purpose: shorten the BB10 Lite sidecar-only active prompt while preserving the core `P/G/F/D/R/X/O/TAIL_REQUEST` handoff fields.
+- Mechanism: `activePromptTrimPoc` compares readable Lite, BB10 sidecar-only, BB11 trimmed Lite, `bb9Best`, and a static-length `bb11SelectorGuard`.
+- Evidence: MiMo `mimo-v2.5` 360-request sample reached `16/18` wins vs readable Lite and `-15.91%` overall estimated-cost delta vs readable Lite.
+- Limitation: BB11 trim was no-worse-than-`bb9Best` in only `10/18` comparisons, and the guard reached only `12/18`; it is cost evidence, not a BB9 selector replacement.
+- DeepSeek status: 20-request smoke was inconclusive and more expensive than readable Lite, so no large sample should be run for this variant yet.

@@ -325,6 +325,8 @@ function checkBenchmarkSummaryIfPresent() {
     "tests/outputs/provider-cache-benchmark-readable-poc-deepseek.latest.json",
     "tests/outputs/provider-cache-benchmark-active-prompt-poc.latest.json",
     "tests/outputs/provider-cache-benchmark-active-prompt-poc-deepseek.latest.json",
+    "tests/outputs/provider-cache-benchmark-active-prompt-trim-poc.latest.json",
+    "tests/outputs/provider-cache-benchmark-active-prompt-trim-poc-deepseek.latest.json",
     "tests/outputs/provider-cache-benchmark-handoff-poc.latest.json",
     "tests/outputs/provider-cache-benchmark-handoff-poc-deepseek.latest.json",
     "tests/outputs/provider-cache-benchmark-sidecar.latest.json",

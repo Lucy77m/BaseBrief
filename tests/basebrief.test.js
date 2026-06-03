@@ -505,6 +505,33 @@ test("activePromptPoc benchmark prompts use one active prompt without concatenat
   assert(sidecarOnly.indexOf("TAIL_REQUEST=") > sidecarOnly.indexOf("BASEBRIEF_CACHE_BLOCK_PAD"));
 });
 
+test("activePromptTrimPoc benchmark prompts emit compact BB11 lite sidecar and selector guard", () => {
+  const snapshot = {
+    projectId: "projectA",
+    readmeExcerpt: "Public sample README.",
+    packages: [{ location: "package.json", name: "sample" }],
+    entryFiles: ["src/main.js"],
+    configFiles: ["vite.config.js"],
+    fileSample: ["src/main.js", "vite.config.js"],
+  };
+  const scenario = SCENARIOS[0];
+  const readable = getPromptForVariant("activePromptTrimPoc", snapshot, scenario, 0, "readableLite", "mimo");
+  const bb10 = getPromptForVariant("activePromptTrimPoc", snapshot, scenario, 0, "cacheSidecarLiteOnly", "mimo");
+  const trim = getPromptForVariant("activePromptTrimPoc", snapshot, scenario, 0, "cacheSidecarLiteTrimOnly", "mimo");
+  const bb9 = getPromptForVariant("activePromptTrimPoc", snapshot, scenario, 0, "bb9Best", "mimo");
+  const guard = getPromptForVariant("activePromptTrimPoc", snapshot, scenario, 0, "bb11SelectorGuard", "mimo");
+
+  assert.match(readable, /^# BaseBrief Lite Handoff/);
+  assert.match(bb10, /^# BaseBrief BB9 Cache Sidecar/);
+  assert.match(trim, /^BB11L\n/);
+  for (const token of ["P=", "G=", "F=", "D=", "R=", "X=", "O=", "PAD=", "TAIL_REQUEST="]) {
+    assert.match(trim, new RegExp(token.replace("=", "=")));
+  }
+  assert.doesNotMatch(trim, /^# BaseBrief Lite Handoff/);
+  assert(trim.length < bb10.length, "BB11 trim sidecar should be shorter than BB10 lite sidecar");
+  assert(guard === trim || guard === bb9, "Selector guard should choose either trimmed sidecar or BB9 best fallback");
+});
+
 test("handoffPoc benchmark summary classifies sidecar wins against readable baselines", () => {
   const projectIds = ["projectA", "projectB", "projectC"];
   const calls = [];
@@ -605,6 +632,63 @@ test("activePromptPoc benchmark summary classifies sidecar-only merge candidates
   assert.equal(summary.activePromptStats.find((item) => item.family === "full").estimatedCostWinsVsReadable, 18);
   assert.equal(summary.activePromptStats.find((item) => item.family === "lite").estimatedCostNoWorseThanBb9Best, 18);
   assert.equal(summary.conclusionLevel, "bb10_active_prompt_merge_candidate");
+});
+
+test("activePromptTrimPoc benchmark summary classifies BB11 trim and selector guard", () => {
+  const projectIds = ["projectA", "projectB", "projectC"];
+  const calls = [];
+  const variants = ["readableLite", "cacheSidecarLiteOnly", "cacheSidecarLiteTrimOnly", "bb9Best", "bb11SelectorGuard"];
+
+  for (const projectId of projectIds) {
+    for (const scenario of SCENARIOS) {
+      for (const variant of variants) {
+        for (let iteration = 0; iteration < 10; iteration += 1) {
+          const estimatedTotalCostCny =
+            variant === "cacheSidecarLiteTrimOnly" || variant === "bb11SelectorGuard"
+              ? 0.00007
+              : variant === "cacheSidecarLiteOnly"
+              ? 0.00008
+              : variant === "bb9Best"
+              ? 0.000075
+              : 0.0002;
+          calls.push({
+            projectId,
+            scenarioId: scenario.id,
+            variant,
+            phase: iteration === 0 ? "warmup" : "repeat",
+            iteration,
+            status: "success",
+            promptTokens: variant === "readableLite" ? 1000 : 1180,
+            completionTokens: 32,
+            cachedTokens: variant === "readableLite" ? 900 : 1152,
+            cacheRatio: variant === "readableLite" ? 900 / 1000 : 1152 / 1180,
+            cacheFieldVisible: true,
+            estimatedTotalCostCny,
+            totalLatencyMs: 1000 + iteration,
+          });
+        }
+      }
+    }
+  }
+
+  const summary = buildSummary({
+    status: "executed",
+    startedAt: "2026-06-02T00:00:00.000Z",
+    finishedAt: "2026-06-02T00:10:00.000Z",
+    providerName: "test-provider",
+    model: "test-model",
+    providerProfileId: "mimo",
+    mode: "activePromptTrimPoc",
+    repeats: 10,
+    projectIds,
+    calls,
+  });
+
+  assert.equal(summary.requestCount, 900);
+  assert.equal(summary.activePromptTrimStats.estimatedCostWinsVsReadable, 18);
+  assert.equal(summary.activePromptTrimStats.estimatedCostWinsVsBb10, 18);
+  assert.equal(summary.activePromptTrimStats.selectorGuardEstimatedCostNoWorseThanBb9Best, 18);
+  assert.equal(summary.conclusionLevel, "bb11_active_prompt_trim_selector_guard_candidate");
 });
 
 test("core templates preserve BaseBrief baseline sections", () => {
