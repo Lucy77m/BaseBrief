@@ -172,6 +172,7 @@ BaseBrief/
    ├─ prompt_stability_probe.js
    ├─ provider_cache_probe.js
    ├─ provider_cache_benchmark.js
+   ├─ basebrief.js
    ├─ basebrief_build_handoff.js
    ├─ basebrief_build_adapters.js
    └─ run_release_checks.js
@@ -187,6 +188,7 @@ BaseBrief/
 - Handoff 契约：[docs/handoff.md](docs/handoff.md)
 - 测试矩阵：[docs/testing.md](docs/testing.md)
 - Artifact checks: [docs/checks.md](docs/checks.md)
+- CLI Lite: [docs/cli-lite.md](docs/cli-lite.md)
 - 长期规划基线：[docs/roadmap/basebrief-long-term-baseline.md](docs/roadmap/basebrief-long-term-baseline.md)
 - Cache-ready 实验说明：[docs/experiments/cache-ready-lite.md](docs/experiments/cache-ready-lite.md)
 - 公开示例：[examples](examples)
@@ -257,4 +259,5 @@ node scripts/generate_bb9_handoff.js --input examples/bb9-handoff-full-input.jso
 node scripts/basebrief_build_handoff.js --input examples/structured-handoff-full.md --output-dir tests/outputs/private/structured-full --provider-profile mimo
 node scripts/basebrief_build_adapters.js --input examples/structured-handoff-full.md --output-dir tests/outputs/private/adapters --target all
 node scripts/basebrief_check_artifacts.js --input examples/adapter-codex-task.md --json
+node scripts/basebrief.js build --input examples/structured-handoff-full.md --output-dir tests/outputs/private/cli-build --adapters all --check
 ```

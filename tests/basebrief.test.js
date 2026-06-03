@@ -16,6 +16,7 @@ const {
 } = require("../scripts/basebrief_build_handoff");
 const { buildAdapterArtifacts, normalizeTargets } = require("../scripts/basebrief_build_adapters");
 const { checkArtifacts } = require("../scripts/basebrief_check_artifacts");
+const { commandBuild, commandCheck, commandInit, run, starterInput } = require("../scripts/basebrief");
 const { buildSummary, getPromptForVariant, SCENARIOS, PROVIDER_PROFILES } = require("../scripts/provider_cache_benchmark");
 const { classifyRelayUsage } = require("../scripts/provider_relay_usage_audit");
 const { routeMode } = require("../scripts/mode_router");
@@ -481,6 +482,111 @@ test("artifact checker CLI exits nonzero on errors", () => withTempDir((tempDir)
   assert.notEqual(error.status, 0);
   const result = JSON.parse(error.stdout);
   assert(result.findings.some((finding) => finding.ruleId === `artifact.missing-${"risk"}-boundaries`));
+}));
+
+test("CLI Lite init writes a schema-compatible starter input", () => withTempDir((tempDir) => {
+  const outputDir = path.join(tempDir, "starter");
+  const result = commandInit({ "output-dir": outputDir });
+  const starterPath = path.join(outputDir, "basebrief-handoff-input.json");
+  const starter = JSON.parse(fs.readFileSync(starterPath, "utf8"));
+  const schema = readJson("schemas/bb9-handoff.schema.json");
+
+  assert.equal(result.command, "init");
+  assert.equal(result.outputFiles.starter, starterPath);
+  validateBb9HandoffInputAgainstSchema(starter, schema);
+  validateBb9HandoffInputAgainstSchema(starterInput(), schema);
+  assert.equal(starter.provider_profile, "unknown");
+}));
+
+test("CLI Lite build writes handoff and adapter outputs with check summary", () => withTempDir((tempDir) => {
+  const outputDir = path.join(tempDir, "build");
+  const result = commandBuild({
+    input: path.join(repoRoot, "examples/structured-handoff-full.md"),
+    "output-dir": outputDir,
+    "provider-profile": "relay-openai-gpt55-codex-oauth",
+    adapters: "all",
+    check: true,
+  });
+
+  assert.equal(result.command, "build");
+  assert.equal(result.check.status, "passed");
+  assert.equal(result.handoff.wroteCacheSidecar, false);
+  assert.equal(result.adapters.targets.length, 2);
+  assert(fs.existsSync(path.join(outputDir, "readableBrief.md")));
+  assert(fs.existsSync(path.join(outputDir, "activeProviderPrompt.md")));
+  assert(fs.existsSync(path.join(outputDir, "handoff.meta.json")));
+  assert(fs.existsSync(path.join(outputDir, "adapters", "codex-task.md")));
+  assert(fs.existsSync(path.join(outputDir, "adapters", "claude-project-context.md")));
+  assert(!JSON.stringify(result).includes("Prepare a complete handoff"));
+}));
+
+test("CLI Lite build can skip adapters explicitly", () => withTempDir((tempDir) => {
+  const outputDir = path.join(tempDir, "build-no-adapters");
+  const result = commandBuild({
+    input: path.join(repoRoot, "examples/structured-handoff-full.md"),
+    "output-dir": outputDir,
+    adapters: "none",
+  });
+
+  assert.equal(result.command, "build");
+  assert.equal(result.adapters, null);
+  assert(fs.existsSync(path.join(outputDir, "readableBrief.md")));
+  assert(!fs.existsSync(path.join(outputDir, "adapters")));
+}));
+
+test("CLI Lite check delegates to artifact checker", () => {
+  const result = commandCheck({ input: path.join(repoRoot, "examples/adapter-codex-task.md") });
+
+  assert.equal(result.command, "check");
+  assert.equal(result.check.status, "passed");
+  assert.equal(result.check.errorCount, 0);
+  assert(Array.isArray(result.check.findings));
+});
+
+test("CLI Lite rejects missing command, missing args, and invalid adapter targets", () => {
+  assert.throws(() => run(["node", "scripts/basebrief.js"]), /Missing command/);
+  assert.throws(() => run(["node", "scripts/basebrief.js", "deploy"]), /Unknown command: deploy/);
+  assert.throws(() => commandInit({}), /Missing --output-dir/);
+  assert.throws(() => commandBuild({ "output-dir": "out" }), /Missing --input/);
+  assert.throws(() => commandBuild({ input: "examples/structured-handoff-full.md" }), /Missing --output-dir/);
+  assert.throws(
+    () => commandBuild({ input: "examples/structured-handoff-full.md", "output-dir": "out", adapters: "cursor" }),
+    /--target must be codex, claude, or all/,
+  );
+  assert.throws(() => commandCheck({}), /Missing --input/);
+});
+
+test("CLI Lite build --check exits nonzero when generated artifacts contain errors", () => withTempDir((tempDir) => {
+  const outputDir = path.join(tempDir, "dirty-out");
+  fs.mkdirSync(outputDir, { recursive: true });
+  fs.writeFileSync(path.join(outputDir, "codex-task.md"), [
+    "# BaseBrief Codex Task",
+    "",
+    "## Open Questions",
+    "- none",
+    "",
+  ].join("\n"), "utf8");
+
+  let error;
+  try {
+    execFileSync(process.execPath, [
+      "scripts/basebrief.js",
+      "build",
+      "--input",
+      "examples/structured-handoff-full.md",
+      "--output-dir",
+      outputDir,
+      "--check",
+      "--json",
+    ], { cwd: repoRoot, encoding: "utf8" });
+  } catch (caught) {
+    error = caught;
+  }
+  assert(error, "CLI build --check should fail when checker reports errors");
+  assert.notEqual(error.status, 0);
+  const result = JSON.parse(error.stdout);
+  assert.equal(result.check.status, "failed");
+  assert(result.check.findings.some((finding) => finding.ruleId === `artifact.missing-${"risk"}-boundaries`));
 }));
 
 test("mode router asks for clarification when no mode signal is present", () => {

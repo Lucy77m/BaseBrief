@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 const fs = require("fs");
+const os = require("os");
 const path = require("path");
 const { execFileSync } = require("child_process");
 const { routeMode } = require("./mode_router");
@@ -69,6 +70,7 @@ function checkRequiredFiles() {
     "docs/mode-selection.md",
     "docs/handoff.md",
     "docs/checks.md",
+    "docs/cli-lite.md",
     "docs/testing.md",
     "docs/roadmap/basebrief-long-term-baseline.md",
     "docs/evolution/bb-evolution-log.md",
@@ -91,6 +93,7 @@ function checkRequiredFiles() {
     "scripts/provider_cache_benchmark.js",
     "scripts/provider_relay_usage_audit.js",
     "scripts/generate_bb9_handoff.js",
+    "scripts/basebrief.js",
     "scripts/basebrief_build_handoff.js",
     "scripts/basebrief_build_adapters.js",
     "scripts/basebrief_check_artifacts.js",
@@ -133,6 +136,7 @@ function checkContentContracts() {
   const modeSelectionDoc = readText("docs/mode-selection.md");
   const handoffDoc = readText("docs/handoff.md");
   const checksDoc = readText("docs/checks.md");
+  const cliLiteDoc = readText("docs/cli-lite.md");
   const roadmapDoc = readText("docs/roadmap/basebrief-long-term-baseline.md");
   const bb9Schema = readJson("schemas/bb9-handoff.schema.json");
   const providerProfiles = readJson("scripts/bb9_provider_profiles.json");
@@ -157,6 +161,7 @@ function checkContentContracts() {
   assert(readme.includes("docs/walkthrough.md"), "README.md should link to walkthrough docs");
   assert(readme.includes("docs/handoff.md"), "README.md should link to handoff contract docs");
   assert(readme.includes("docs/checks.md"), "README.md should link to artifact checks docs");
+  assert(readme.includes("docs/cli-lite.md"), "README.md should link to CLI Lite docs");
   assert(readme.includes("docs/roadmap/basebrief-long-term-baseline.md"), "README.md should link to long-term baseline");
   assert(readme.includes("docs/experiments/cache-ready-capsule.md"), "README.md should link to cache-ready capsule docs");
   assert(readme.includes("docs/experiments/cache-ready-anchor.md"), "README.md should link to cache-ready anchor docs");
@@ -172,6 +177,7 @@ function checkContentContracts() {
   assert(englishReadme.includes("docs/handoff.md"), "README.en.md should link to handoff docs");
   assert(englishReadme.includes("docs/adapters.md"), "README.en.md should link to adapters docs");
   assert(englishReadme.includes("docs/checks.md"), "README.en.md should link to artifact checks docs");
+  assert(englishReadme.includes("docs/cli-lite.md"), "README.en.md should link to CLI Lite docs");
   assert(englishReadme.includes("docs/roadmap/basebrief-long-term-baseline.md"), "README.en.md should link to long-term baseline");
   assert(englishReadme.includes("Integrations"), "README.en.md should link to integrations docs");
   assert(englishReadme.includes("docs/experiments/cache-ready-anchor-pad.md"), "README.en.md should link to anchor-pad docs");
@@ -209,6 +215,9 @@ function checkContentContracts() {
   assert(checksDoc.includes("scripts/basebrief_check_artifacts.js"), "checks.md must document artifact checker script");
   assert(checksDoc.includes("--input"), "checks.md must document explicit input behavior");
   assert(checksDoc.includes("not a full security audit"), "checks.md must explain checker boundary");
+  assert(cliLiteDoc.includes("scripts/basebrief.js"), "cli-lite.md must document CLI Lite script");
+  assert(cliLiteDoc.includes("not an npm package"), "cli-lite.md must state CLI Lite is not an npm package");
+  assert(cliLiteDoc.includes("node scripts/basebrief.js build"), "cli-lite.md must document build command");
   assert(structuredFullExample.includes("BASEBRIEF_HANDOFF_JSON_BEGIN"), "structured full example must include handoff JSON begin marker");
   assert(structuredFullExample.includes("BASEBRIEF_HANDOFF_JSON_END"), "structured full example must include handoff JSON end marker");
   assert(structuredLiteExample.includes("BASEBRIEF_HANDOFF_JSON_BEGIN"), "structured lite example must include handoff JSON begin marker");
@@ -445,6 +454,93 @@ function checkArtifactChecker() {
   return inputs.length;
 }
 
+function validateCliStarter(input) {
+  const schema = readJson("schemas/bb9-handoff.schema.json");
+  schema.required.forEach((key) => {
+    assert(key in input, `CLI starter missing required key: ${key}`);
+  });
+  Object.keys(input).forEach((key) => {
+    assert(key in schema.properties, `CLI starter has unexpected key: ${key}`);
+  });
+  assert(input.mode === "full", "CLI starter should default to full mode");
+  assert(input.provider_profile === "unknown", "CLI starter should default to unknown provider profile");
+}
+
+function checkCliLite() {
+  const tempRoot = fs.mkdtempSync(path.join(repoRoot, "tests", "outputs", "private", "release-cli-"));
+  try {
+    const initDir = path.join(tempRoot, "init");
+    const initStdout = execFileSync(process.execPath, [
+      "scripts/basebrief.js",
+      "init",
+      "--output-dir",
+      initDir,
+      "--json",
+    ], {
+      cwd: repoRoot,
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "pipe"],
+      env: process.env,
+    });
+    const initResult = JSON.parse(initStdout);
+    assert(initResult.command === "init", "CLI init must return command metadata");
+    const starterPath = path.join(initDir, "basebrief-handoff-input.json");
+    assert(fs.existsSync(starterPath), "CLI init must write starter handoff input");
+    validateCliStarter(JSON.parse(fs.readFileSync(starterPath, "utf8")));
+
+    const buildDir = path.join(tempRoot, "build");
+    const buildStdout = execFileSync(process.execPath, [
+      "scripts/basebrief.js",
+      "build",
+      "--input",
+      "examples/structured-handoff-full.md",
+      "--output-dir",
+      buildDir,
+      "--provider-profile",
+      "relay-openai-gpt55-codex-oauth",
+      "--adapters",
+      "all",
+      "--check",
+      "--json",
+    ], {
+      cwd: repoRoot,
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "pipe"],
+      env: process.env,
+    });
+    const buildResult = JSON.parse(buildStdout);
+    assert(buildResult.command === "build", "CLI build must return command metadata");
+    assert(buildResult.handoff.outputFiles.readableBrief, "CLI build must report readableBrief");
+    assert(buildResult.handoff.outputFiles.activeProviderPrompt, "CLI build must report activeProviderPrompt");
+    assert(buildResult.handoff.outputFiles.meta, "CLI build must report handoff metadata");
+    assert(buildResult.adapters.targets.length === 2, "CLI build --adapters all must report two targets");
+    assert(buildResult.check.status === "passed", "CLI build --check must pass for public-safe structured example");
+    assert(fs.existsSync(path.join(buildDir, "readableBrief.md")), "CLI build must write readableBrief");
+    assert(fs.existsSync(path.join(buildDir, "adapters", "codex-task.md")), "CLI build must write Codex adapter");
+    assert(fs.existsSync(path.join(buildDir, "adapters", "claude-project-context.md")), "CLI build must write Claude adapter");
+
+    const checkStdout = execFileSync(process.execPath, [
+      "scripts/basebrief.js",
+      "check",
+      "--input",
+      "examples/adapter-codex-task.md",
+      "--json",
+    ], {
+      cwd: repoRoot,
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "pipe"],
+      env: process.env,
+    });
+    const checkResult = JSON.parse(checkStdout);
+    assert(checkResult.command === "check", "CLI check must return command metadata");
+    assert(checkResult.check.status === "passed", "CLI check must delegate to artifact checker");
+    assert(Array.isArray(checkResult.check.findings), "CLI check must return checker findings array");
+  } finally {
+    fs.rmSync(tempRoot, { recursive: true, force: true });
+  }
+  return 3;
+}
+
 function checkBenchmarkSummaryIfPresent() {
   const summaries = [
     "tests/outputs/provider-cache-benchmark.latest.json",
@@ -620,6 +716,7 @@ async function main() {
   const checkedLinks = checkLinks();
   const exampleCount = checkExamples();
   const artifactCheckInputs = checkArtifactChecker();
+  const cliLiteCommands = checkCliLite();
   const benchmarkSummaryStatus = checkBenchmarkSummaryIfPresent();
   const independentTests = checkIndependentTests();
   const proxy = checkCacheReadyProxy();
@@ -631,6 +728,7 @@ async function main() {
   console.log(`checked_links=${checkedLinks}`);
   console.log(`example_files=${exampleCount}`);
   console.log(`artifact_check_inputs=${artifactCheckInputs}`);
+  console.log(`cli_lite_commands=${cliLiteCommands}`);
   console.log(`benchmark_summary_status=${benchmarkSummaryStatus}`);
   console.log(`independent_test_files=${independentTests}`);
   console.log(`provider_probe_status=${providerProbe.status}`);

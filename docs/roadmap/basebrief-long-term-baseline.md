@@ -233,6 +233,8 @@ Exit criteria:
 - Zero-install skill usage remains documented.
 - The CLI is optional, not required for normal template use.
 
+Current v1 target: `scripts/basebrief.js` is a zero-dependency Node wrapper for init, build, and check. It stays optional and does not create an npm package, global command, plugin, or provider integration.
+
 ### Phase 8: Seal and Diff
 
 Goal: support longer projects where phase changes need traceability.

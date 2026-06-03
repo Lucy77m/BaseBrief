@@ -15,8 +15,8 @@ const SECRET_PATTERNS = [
 ];
 
 const PRIVATE_PATH_PATTERNS = [
-  /[A-Za-z]:\\(?:Users|BaseBrief|[^\\\s]+)[^\s"'`)]*/i,
-  /[A-Za-z]:\/(?:Users|BaseBrief|[^/\s]+)[^\s"'`)]*/i,
+  /[A-Za-z]:\\[^\s"'`)]*/i,
+  /[A-Za-z]:\/[^\s"'`)]*/i,
   /\/home\/[^\s"'`)]+/i,
   /\/Users\/[^\s"'`)]+/i,
 ];
@@ -91,7 +91,7 @@ function lineNumberForIndex(content, index) {
 }
 
 function hasRiskBoundaries(content) {
-  return /\brisk_boundaries\b/i.test(content) || /^##\s+Risk Boundaries\s*$/im.test(content);
+  return /\brisk_boundaries\b/i.test(content) || /^##\s+Risk Boundaries\s*$/im.test(content) || /^R=.+/m.test(content);
 }
 
 function hasOpenQuestions(content) {
@@ -103,7 +103,6 @@ function isAdapterArtifact(filePath, content) {
   return (
     name === "codex-task.md" ||
     name === "claude-project-context.md" ||
-    name === "adapter.meta.json" ||
     /^# BaseBrief (?:Codex Task|Claude Project Context)/m.test(content)
   );
 }
@@ -114,7 +113,6 @@ function isHandoffOrAdapterArtifact(filePath, content) {
     isAdapterArtifact(filePath, content) ||
     name === "readablebrief.md" ||
     name === "activeproviderprompt.md" ||
-    name === "handoff.meta.json" ||
     content.includes("BASEBRIEF_HANDOFF_JSON_BEGIN") ||
     content.includes("# BaseBrief BB9")
   );
