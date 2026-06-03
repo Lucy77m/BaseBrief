@@ -86,6 +86,8 @@ function checkRequiredFiles() {
     "scripts/provider_cache_probe.js",
     "scripts/provider_cache_benchmark.js",
     "scripts/provider_relay_usage_audit.js",
+    "scripts/generate_bb9_handoff.js",
+    "scripts/bb9_provider_profiles.json",
     "examples/full-example.md",
     "examples/lite-example.md",
     "examples/cache-ready-input.json",
@@ -96,6 +98,11 @@ function checkRequiredFiles() {
     "examples/cache-ready-anchor-output.md",
     "examples/cache-ready-anchor-pad-input.json",
     "examples/cache-ready-anchor-pad-output.md",
+    "examples/bb9-handoff-full-input.json",
+    "examples/bb9-handoff-full-output.md",
+    "examples/bb9-handoff-lite-input.json",
+    "examples/bb9-handoff-lite-output.md",
+    "examples/bb9-handoff-fallback-output.md",
     "examples/next-chat-example.md",
     "examples/agent-task-example.md",
   ];
@@ -242,7 +249,8 @@ function checkSecurity() {
     if (
       relative === "scripts/run_release_checks.js" ||
       relative === "scripts/provider_cache_probe.js" ||
-      relative === "scripts/provider_cache_benchmark.js"
+      relative === "scripts/provider_cache_benchmark.js" ||
+      relative === "scripts/generate_bb9_handoff.js"
     ) {
       return;
     }
@@ -290,6 +298,11 @@ function checkExamples() {
     "examples/cache-ready-anchor-output.md",
     "examples/cache-ready-anchor-pad-input.json",
     "examples/cache-ready-anchor-pad-output.md",
+    "examples/bb9-handoff-full-input.json",
+    "examples/bb9-handoff-full-output.md",
+    "examples/bb9-handoff-lite-input.json",
+    "examples/bb9-handoff-lite-output.md",
+    "examples/bb9-handoff-fallback-output.md",
     "examples/next-chat-example.md",
     "examples/agent-task-example.md",
   ];
@@ -310,6 +323,8 @@ function checkBenchmarkSummaryIfPresent() {
     "tests/outputs/provider-cache-benchmark-padsweep-deepseek.latest.json",
     "tests/outputs/provider-cache-benchmark-readable-poc.latest.json",
     "tests/outputs/provider-cache-benchmark-readable-poc-deepseek.latest.json",
+    "tests/outputs/provider-cache-benchmark-handoff-poc.latest.json",
+    "tests/outputs/provider-cache-benchmark-handoff-poc-deepseek.latest.json",
     "tests/outputs/provider-cache-benchmark-sidecar.latest.json",
     "tests/outputs/provider-cache-benchmark-sidecar-deepseek.latest.json",
     "tests/outputs/provider-cache-benchmark-hybrid.latest.json",

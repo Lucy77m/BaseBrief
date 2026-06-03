@@ -1,0 +1,83 @@
+{
+  "mimo": {
+    "profileId": "mimo",
+    "providerName": "xiaomimimo",
+    "baseUrl": "https://api.xiaomimimo.com/v1",
+    "model": "mimo-v2.5",
+    "routeType": "direct_provider",
+    "evidenceLevel": "provider_specific_estimated_cost_evidence",
+    "pricingBasis": "provider_official_price_2026_06_02",
+    "billingAudited": false,
+    "cacheUsageObservable": true,
+    "pricingCnyPerMillionTokens": {
+      "inputCacheHit": 0.02,
+      "inputCacheMiss": 1,
+      "output": 2,
+      "effectiveDate": "2026-06-02 Asia/Shanghai"
+    },
+    "candidateVariants": ["natural", "bb5SidecarLite", "bb6HybridLite", "bb7BlockPadLite"],
+    "recommendedVariant": "bb7BlockPadLite",
+    "benchmarkSummaryPath": "tests/outputs/provider-cache-benchmark-blockpad.latest.json",
+    "latestEvidence": {
+      "validRequests": "716/720",
+      "cacheFieldVisibility": "714/716",
+      "winsVsNatural": "18/18",
+      "medianEstimatedCostDeltaPercent": -0.4059,
+      "conclusionLevel": "bb9_adaptive_selector_best_evidence"
+    },
+    "limitation": "MiMo mimo-v2.5 local real-project benchmark evidence only; not a cross-provider proof or billing audit."
+  },
+  "deepseek": {
+    "profileId": "deepseek",
+    "providerName": "deepseek",
+    "baseUrl": "https://api.deepseek.com/v1",
+    "model": "deepseek-v4-flash",
+    "routeType": "direct_provider",
+    "evidenceLevel": "provider_specific_estimated_cost_evidence",
+    "pricingBasis": "provider_official_price_2026_06_02",
+    "billingAudited": false,
+    "cacheUsageObservable": true,
+    "pricingCnyPerMillionTokens": {
+      "inputCacheHit": 0.02,
+      "inputCacheMiss": 1,
+      "output": 2,
+      "effectiveDate": "2026-06-02 Asia/Shanghai"
+    },
+    "candidateVariants": ["natural", "bb5SidecarLite", "bb6HybridLite", "bb7BlockPadLite"],
+    "recommendedVariant": "bb7BlockPadLite",
+    "benchmarkSummaryPath": "tests/outputs/provider-cache-benchmark-blockpad-deepseek.latest.json",
+    "latestEvidence": {
+      "validRequests": "720/720",
+      "cacheFieldVisibility": "720/720",
+      "winsVsNatural": "17/18",
+      "noWorseVsNatural": "18/18",
+      "medianEstimatedCostDeltaPercent": -0.2654,
+      "conclusionLevel": "bb9_adaptive_selector_best_evidence"
+    },
+    "limitation": "DeepSeek deepseek-v4-flash local real-project benchmark evidence only; not a cross-provider proof or billing audit."
+  },
+  "relay-openai-gpt55-codex-oauth": {
+    "profileId": "relay-openai-gpt55-codex-oauth",
+    "providerName": "sanye-relay",
+    "baseUrl": "https://sanye.mom/v1",
+    "model": "gpt-5.5",
+    "routeType": "third_party_relay",
+    "evidenceLevel": "token_length_observation_only",
+    "pricingBasis": "openai_official_reference_price",
+    "billingAudited": false,
+    "cacheUsageObservable": false,
+    "pricingCnyPerMillionTokens": null,
+    "candidateVariants": ["natural"],
+    "recommendedVariant": "natural",
+    "benchmarkSummaryPath": "tests/outputs/provider-relay-usage-audit.latest.json",
+    "latestEvidence": {
+      "validRequests": "6/6",
+      "usageVisible": "6/6",
+      "cacheFieldVisible": "0/6",
+      "usageInterpretation": "token_length_observation_only",
+      "benchmarkRecommended": false
+    },
+    "fallbackReason": "cache_cost_not_observable",
+    "limitation": "Third-party relay usage did not expose cached_tokens, so BB9 cost benchmarking is not recommended."
+  }
+}

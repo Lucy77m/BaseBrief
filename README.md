@@ -192,3 +192,37 @@ BaseBrief/
 - BB9 Adaptive Selector notes: [docs/experiments/cache-ready-adaptive-selector.md](docs/experiments/cache-ready-adaptive-selector.md)
 - BB evolution log: [docs/evolution/bb-evolution-log.md](docs/evolution/bb-evolution-log.md)
 - GPT-5.5 relay usage audit: [docs/experiments/cache-ready-relay-gpt55.md](docs/experiments/cache-ready-relay-gpt55.md)
+
+## BB9 双轨省钱 POC
+
+BB9 现在有一个可用的 handoff POC：普通接续仍然输出可读的 `full` / `lite` brief；如果 provider profile 有可见的缓存 usage 证据，再额外附加 `cacheSidecar`。
+
+关键规则：`readableBrief` 给人和接续边界看；`cacheSidecar` 给支持缓存证据的 provider 作为 active prompt。不要把两者直接拼进同一个 provider 请求，否则会把 prompt 变长，可能抵消缓存收益。
+
+普通接续触发语：
+
+```text
+请用 BaseBrief 生成 full 或 lite 项目接续，优先保证 readable brief 的事实、决策和风险边界清楚。
+```
+
+省钱实验触发语：
+
+```text
+请用 BaseBrief BB9 handoff 生成 readable brief，并在 MiMo 或 DeepSeek profile 支持时附加 cache sidecar。不要把 estimated cost 写成真实账单审计。
+发给 provider 的 active prompt 按 recommendedPromptType 选择，不要把 readableBrief 和 cacheSidecar 拼接。
+```
+
+脚本入口：
+
+```text
+node scripts/generate_bb9_handoff.js --input examples/bb9-handoff-full-input.json --mode full --provider-profile mimo
+node scripts/generate_bb9_handoff.js --input examples/bb9-handoff-lite-input.json --mode lite --provider-profile deepseek
+```
+
+公开示例：
+
+- [BB9 full input](examples/bb9-handoff-full-input.json)
+- [BB9 full output](examples/bb9-handoff-full-output.md)
+- [BB9 lite input](examples/bb9-handoff-lite-input.json)
+- [BB9 lite output](examples/bb9-handoff-lite-output.md)
+- [BB9 unsupported provider fallback](examples/bb9-handoff-fallback-output.md)

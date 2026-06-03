@@ -1,0 +1,25 @@
+{
+  "mode": "lite",
+  "provider_profile": "deepseek",
+  "project_identity": "BaseBrief public sample project",
+  "current_goal": "Create a short continuation brief for one small documentation edit.",
+  "verified_facts": [
+    "The task is bounded to docs wording.",
+    "The repository keeps cache-ready evidence separate from normal usage claims."
+  ],
+  "confirmed_decisions": [
+    "Use lite for this small continuation.",
+    "Attach BB9 sidecar only when the provider profile supports cache usage visibility."
+  ],
+  "risk_boundaries": [
+    "Do not modify release tags.",
+    "Do not expose secrets or private paths."
+  ],
+  "forbidden_scope": [
+    "release",
+    "tag",
+    "API key"
+  ],
+  "expected_output": "Short lite handoff plus BB9 cache sidecar.",
+  "tail_request": "Give the next agent a compact task statement."
+}

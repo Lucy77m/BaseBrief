@@ -24,6 +24,42 @@ BB9 has four steps:
 
 The selector always keeps `natural` in the candidate pool. If every cache-aware candidate is more expensive than `natural`, the selector should fall back to `natural` and must not claim a savings win.
 
+## Handoff POC
+
+BB9 now has a productization POC:
+
+```text
+node scripts/generate_bb9_handoff.js --input examples/bb9-handoff-full-input.json --mode full --provider-profile mimo
+node scripts/generate_bb9_handoff.js --input examples/bb9-handoff-lite-input.json --mode lite --provider-profile deepseek
+```
+
+The output is JSON:
+
+- `readableBrief`: the normal human-readable Full/Lite handoff.
+- `cacheSidecar`: a stable BB9 sidecar when the provider profile exposes cache usage evidence.
+- `selectedVariant`: the selected cache-economics variant, or `natural` for fallback.
+- `recommendedPromptType`: which artifact should be used as the active provider prompt.
+- `promptUsePolicy`: warns that readable and sidecar artifacts must not be concatenated into the same provider request.
+- `providerProfile`: public provider/model/evidence/pricing metadata with no API key.
+- `fallbackReason`: why no sidecar is emitted.
+- `warnings`: wording boundaries for estimated-cost evidence.
+
+The sidecar is a separate artifact, not a text block to append blindly. Ordinary project continuation still reads `readableBrief` first. Cache-aware repeated provider calls should use `cacheSidecar` as the active prompt only when `recommendedPromptType=cacheSidecar`.
+
+Public examples:
+
+- [full + cache sidecar](../../examples/bb9-handoff-full-output.md)
+- [lite + cache sidecar](../../examples/bb9-handoff-lite-output.md)
+- [unsupported provider fallback](../../examples/bb9-handoff-fallback-output.md)
+
+Provider benchmark for the merged handoff prompt:
+
+```text
+node scripts/provider_cache_benchmark.js --local-projects --mode handoffPoc --output tests/outputs/private/provider-cache-benchmark-handoff-poc.raw.json
+```
+
+`handoffPoc` compares `readableFull`, `readableFullSidecar`, `readableLite`, `readableLiteSidecar`, and `bb9Best`. It is a safety check for the tempting but risky "concatenate readable + sidecar" design. If it is inconclusive or negative, keep the dual-artifact single-active-prompt policy.
+
 ## Provider Profile
 
 A provider profile defines:
@@ -36,6 +72,8 @@ A provider profile defines:
 - whether billing is audited
 
 MiMo and DeepSeek results are direct provider evidence. Third-party relay routes must be recorded separately as relay-specific observations.
+
+The current POC profile config lives in `scripts/bb9_provider_profiles.json`. It contains public provider route metadata, pricing basis, evidence level, and latest redacted benchmark summary references. It does not contain API keys.
 
 ## When Not To Use BB9
 

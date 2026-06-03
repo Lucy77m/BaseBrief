@@ -4,6 +4,7 @@ const crypto = require("crypto");
 const fs = require("fs");
 const path = require("path");
 const { generateAnchorFromObject } = require("./generate_cache_ready_anchor");
+const { generateBb9HandoffFromObject } = require("./generate_bb9_handoff");
 
 const repoRoot = path.resolve(__dirname, "..");
 
@@ -629,6 +630,65 @@ function buildBb8AlignedBlockPadPrompt(snapshot, scenario, iteration) {
   return buildBlockPadLitePrompt(snapshot, scenario, iteration, padLength, "# BaseBrief BB8 Aligned Block Pad Lite", "bb8-aligned-blockpad-lite");
 }
 
+function buildBb9HandoffInput(snapshot, scenario, iteration) {
+  const tailRequest = scenario.tailRequests[iteration % scenario.tailRequests.length];
+  return {
+    project_identity: `${snapshot.projectId}/${scenario.id}: local real-project benchmark snapshot`,
+    current_goal: scenario.label,
+    verified_facts: [
+      `readme:${sanitizeText(snapshot.readmeExcerpt || "none", 900)}`,
+      `pkg:${sanitizeText(JSON.stringify(snapshot.packages), 900)}`,
+      `files:${sanitizeText(snapshot.fileSample.join(" | "), 1200)}`,
+      "sensitive files and generated directories are excluded",
+    ],
+    confirmed_decisions: [
+      "source project is read-only",
+      "readable handoff remains primary",
+      "cache sidecar is provider-profile gated",
+    ],
+    assumptions: [
+      "benchmark prompt only; no source project write is requested",
+    ],
+    open_questions: [
+      "whether merged handoff plus sidecar beats readable baseline",
+    ],
+    risk_boundaries: [
+      "do not read or output env files, tokens, secrets, or credentials",
+      "do not write to the source project",
+    ],
+    forbidden_scope: [
+      ".env",
+      "token",
+      "secret",
+      "credential",
+      "source project writes",
+    ],
+    expected_output: "concise BaseBrief continuation answer",
+    tail_request: sanitizeText(tailRequest, 300),
+  };
+}
+
+function buildBb9HandoffPrompt(snapshot, scenario, iteration, variant, providerProfileId = "mimo") {
+  const isLite = variant === "readableLite" || variant === "readableLiteSidecar";
+  const withSidecar = variant === "readableFullSidecar" || variant === "readableLiteSidecar";
+  const output = generateBb9HandoffFromObject(
+    buildBb9HandoffInput(snapshot, scenario, iteration),
+    {
+      mode: isLite ? "lite" : "full",
+      providerProfile: withSidecar ? providerProfileId : "relay-openai-gpt55-codex-oauth",
+    },
+  );
+  if (!withSidecar) {
+    return output.readableBrief;
+  }
+  return [
+    output.readableBrief.trimEnd(),
+    "",
+    "## cache_sidecar",
+    output.cacheSidecar || "BB9 sidecar unavailable for this provider profile.",
+  ].join("\n");
+}
+
 function detectProviderProfile(providerName, model) {
   const requested = (process.env.BASEBRIEF_PROVIDER_PROFILE || "").trim();
   if (requested && PROVIDER_PROFILES[requested]) {
@@ -807,6 +867,7 @@ function summarizeCalls(calls) {
 }
 
 function getVariantsForMode(mode) {
+  if (mode === "handoffPoc") return ["readableFull", "readableFullSidecar", "readableLite", "readableLiteSidecar", "bb9Best"];
   if (mode === "blockalign") return ["natural", "bb7BlockPadLite", "bb8AlignedBlockPadLite"];
   if (mode === "blockpad") return ["natural", "bb5SidecarLite", "bb6HybridLite", "bb7BlockPadLite"];
   if (mode === "hybrid") return ["natural", "bb4AnchorPad", "bb5SidecarFull", "bb5SidecarLite", "bb6HybridFull", "bb6HybridLite"];
@@ -818,7 +879,11 @@ function getVariantsForMode(mode) {
   return mode === "capsule" ? ["natural", "cacheReady", "capsuleV2"] : ["natural", "cacheReady"];
 }
 
-function getPromptForVariant(mode, snapshot, scenario, iteration, variant) {
+function getPromptForVariant(mode, snapshot, scenario, iteration, variant, providerProfileId = "mimo") {
+  if (mode === "handoffPoc") {
+    if (variant === "bb9Best") return buildBb7BlockPadPrompt(snapshot, scenario, iteration);
+    return buildBb9HandoffPrompt(snapshot, scenario, iteration, variant, providerProfileId);
+  }
   if (mode === "normalized") {
     return buildNormalizedPrompt(snapshot, scenario, iteration, variant);
   }
@@ -895,6 +960,7 @@ function buildSummary(rawResult) {
   const anchorPadComparisons = [];
   const padSweepComparisons = [];
   const readableComparisons = [];
+  const handoffComparisons = [];
   const sidecarComparisons = [];
   const hybridComparisons = [];
   const blockPadComparisons = [];
@@ -1143,6 +1209,71 @@ function buildSummary(rawResult) {
               typeof baseline.medianEstimatedCostCny === "number" &&
               typeof candidate.medianEstimatedCostCny === "number" &&
               candidate.medianEstimatedCostCny < baseline.medianEstimatedCostCny,
+          });
+        }
+      }
+      if (rawResult.mode === "handoffPoc") {
+        const bb9BestCalls = calls.filter((call) => call.projectId === projectId && call.scenarioId === scenario.id && call.variant === "bb9Best");
+        const bb9Best = summarizeCalls(bb9BestCalls);
+        for (const pair of [
+          { family: "full", baselineVariant: "readableFull", candidateVariant: "readableFullSidecar" },
+          { family: "lite", baselineVariant: "readableLite", candidateVariant: "readableLiteSidecar" },
+        ]) {
+          const baselineCalls = calls.filter((call) => call.projectId === projectId && call.scenarioId === scenario.id && call.variant === pair.baselineVariant);
+          const candidateCalls = calls.filter((call) => call.projectId === projectId && call.scenarioId === scenario.id && call.variant === pair.candidateVariant);
+          const baseline = summarizeCalls(baselineCalls);
+          const candidate = summarizeCalls(candidateCalls);
+          const baselinePromptMedian = median(baselineCalls.filter((call) => call.iteration > 0 && call.status === "success").map((call) => call.promptTokens));
+          const candidatePromptMedian = median(candidateCalls.filter((call) => call.iteration > 0 && call.status === "success").map((call) => call.promptTokens));
+          const bb9BestPromptMedian = median(bb9BestCalls.filter((call) => call.iteration > 0 && call.status === "success").map((call) => call.promptTokens));
+          const baselineCostDeltaCny =
+            typeof baseline.medianEstimatedCostCny === "number" && typeof candidate.medianEstimatedCostCny === "number"
+              ? candidate.medianEstimatedCostCny - baseline.medianEstimatedCostCny
+              : null;
+          const baselineCostDeltaPercent =
+            typeof baselineCostDeltaCny === "number" && baseline.medianEstimatedCostCny
+              ? baselineCostDeltaCny / baseline.medianEstimatedCostCny
+              : null;
+          const bb9BestCostDeltaCny =
+            typeof bb9Best.medianEstimatedCostCny === "number" && typeof candidate.medianEstimatedCostCny === "number"
+              ? candidate.medianEstimatedCostCny - bb9Best.medianEstimatedCostCny
+              : null;
+          const bb9BestCostDeltaPercent =
+            typeof bb9BestCostDeltaCny === "number" && bb9Best.medianEstimatedCostCny
+              ? bb9BestCostDeltaCny / bb9Best.medianEstimatedCostCny
+              : null;
+          handoffComparisons.push({
+            projectId,
+            scenarioId: scenario.id,
+            family: pair.family,
+            baselineVariant: pair.baselineVariant,
+            candidateVariant: pair.candidateVariant,
+            referenceVariant: "bb9Best",
+            baselineMedianPromptTokens: baselinePromptMedian,
+            candidateMedianPromptTokens: candidatePromptMedian,
+            bb9BestMedianPromptTokens: bb9BestPromptMedian,
+            baselineMedianCacheRatio: baseline.medianCacheRatio,
+            candidateMedianCacheRatio: candidate.medianCacheRatio,
+            bb9BestMedianCacheRatio: bb9Best.medianCacheRatio,
+            baselineMedianEstimatedCostCny: baseline.medianEstimatedCostCny,
+            candidateMedianEstimatedCostCny: candidate.medianEstimatedCostCny,
+            bb9BestMedianEstimatedCostCny: bb9Best.medianEstimatedCostCny,
+            candidateCostDeltaVsBaselineCny: baselineCostDeltaCny,
+            candidateCostDeltaVsBaselinePercent: baselineCostDeltaPercent,
+            candidateCostDeltaVsBb9BestCny: bb9BestCostDeltaCny,
+            candidateCostDeltaVsBb9BestPercent: bb9BestCostDeltaPercent,
+            candidateCacheRatioWinVsBaseline:
+              typeof baseline.medianCacheRatio === "number" &&
+              typeof candidate.medianCacheRatio === "number" &&
+              candidate.medianCacheRatio > baseline.medianCacheRatio,
+            candidateEstimatedCostWinVsBaseline:
+              typeof baseline.medianEstimatedCostCny === "number" &&
+              typeof candidate.medianEstimatedCostCny === "number" &&
+              candidate.medianEstimatedCostCny < baseline.medianEstimatedCostCny,
+            candidateEstimatedCostNoWorseThanBb9Best:
+              typeof bb9Best.medianEstimatedCostCny === "number" &&
+              typeof candidate.medianEstimatedCostCny === "number" &&
+              candidate.medianEstimatedCostCny <= bb9Best.medianEstimatedCostCny,
           });
         }
       }
@@ -1628,6 +1759,75 @@ function buildSummary(rawResult) {
       : rawResult.mode === "readablePoc"
       ? "readable_poc_inconclusive"
       : undefined;
+  const handoffStats = ["full", "lite"].map((family) => {
+    const baselineVariant = family === "full" ? "readableFull" : "readableLite";
+    const candidateVariant = family === "full" ? "readableFullSidecar" : "readableLiteSidecar";
+    const baselineCost = variants[baselineVariant]?.medianEstimatedCostCny;
+    const candidateCost = variants[candidateVariant]?.medianEstimatedCostCny;
+    const bb9BestCost = variants.bb9Best?.medianEstimatedCostCny;
+    const overallCostDeltaVsBaselineCny =
+      typeof baselineCost === "number" && typeof candidateCost === "number"
+        ? candidateCost - baselineCost
+        : null;
+    const overallCostDeltaVsBaselinePercent =
+      typeof overallCostDeltaVsBaselineCny === "number" && baselineCost
+        ? overallCostDeltaVsBaselineCny / baselineCost
+        : null;
+    const overallCostDeltaVsBb9BestCny =
+      typeof bb9BestCost === "number" && typeof candidateCost === "number"
+        ? candidateCost - bb9BestCost
+        : null;
+    const overallCostDeltaVsBb9BestPercent =
+      typeof overallCostDeltaVsBb9BestCny === "number" && bb9BestCost
+        ? overallCostDeltaVsBb9BestCny / bb9BestCost
+        : null;
+    const familyComparisons = handoffComparisons.filter((item) => item.family === family);
+    const cacheRatioWins = familyComparisons.filter((item) => item.candidateCacheRatioWinVsBaseline).length;
+    const costWins = familyComparisons.filter((item) => item.candidateEstimatedCostWinVsBaseline).length;
+    const noWorseThanBb9Best = familyComparisons.filter((item) => item.candidateEstimatedCostNoWorseThanBb9Best).length;
+    const strongEvidence =
+      rawResult.mode === "handoffPoc" &&
+      validRequestCount >= largeSampleThreshold &&
+      cacheFieldVisibilityRate >= 0.95 &&
+      familyComparisons.length >= 15 &&
+      costWins >= 15 &&
+      typeof overallCostDeltaVsBaselinePercent === "number" &&
+      overallCostDeltaVsBaselinePercent <= -0.05;
+    const promisingSignal =
+      rawResult.mode === "handoffPoc" &&
+      validRequestCount >= largeSampleThreshold &&
+      cacheFieldVisibilityRate >= 0.95 &&
+      familyComparisons.length >= 15 &&
+      costWins >= 12 &&
+      typeof overallCostDeltaVsBaselinePercent === "number" &&
+      overallCostDeltaVsBaselinePercent <= -0.03;
+    return {
+      family,
+      baselineVariant,
+      candidateVariant,
+      referenceVariant: "bb9Best",
+      cacheRatioWinsVsReadable: cacheRatioWins,
+      estimatedCostWinsVsReadable: costWins,
+      estimatedCostNoWorseThanBb9Best: noWorseThanBb9Best,
+      overallCostDeltaVsReadableCny: overallCostDeltaVsBaselineCny,
+      overallCostDeltaVsReadablePercent: overallCostDeltaVsBaselinePercent,
+      overallCostDeltaVsBb9BestCny,
+      overallCostDeltaVsBb9BestPercent,
+      conclusionLevel: strongEvidence
+        ? `bb9_handoff_${family}_cost_evidence`
+        : promisingSignal
+        ? `bb9_handoff_${family}_promising_signal`
+        : `bb9_handoff_${family}_inconclusive`,
+    };
+  });
+  const handoffConclusionLevel =
+    rawResult.mode === "handoffPoc" && handoffStats.some((item) => item.conclusionLevel.endsWith("_cost_evidence"))
+      ? "bb9_handoff_poc_cost_evidence"
+      : rawResult.mode === "handoffPoc" && handoffStats.some((item) => item.conclusionLevel.endsWith("_promising_signal"))
+      ? "bb9_handoff_poc_promising_signal"
+      : rawResult.mode === "handoffPoc"
+      ? "bb9_handoff_poc_inconclusive"
+      : undefined;
   const sidecarStats = ["full", "lite"].map((family) => {
     const variant = family === "full" ? "bb5SidecarFull" : "bb5SidecarLite";
     const sidecarCost = variants[variant]?.medianEstimatedCostCny;
@@ -2068,6 +2268,8 @@ function buildSummary(rawResult) {
     padSweepConclusionLevel,
     readableStats: rawResult.mode === "readablePoc" ? readableStats : undefined,
     readableConclusionLevel,
+    handoffStats: rawResult.mode === "handoffPoc" ? handoffStats : undefined,
+    handoffConclusionLevel,
     sidecarStats: rawResult.mode === "sidecar" ? sidecarStats : undefined,
     sidecarConclusionLevel,
     hybridStats: rawResult.mode === "hybrid" ? hybridStats : undefined,
@@ -2088,6 +2290,8 @@ function buildSummary(rawResult) {
         ? (adaptiveSelectorStats?.conclusionLevel || blockPadConclusionLevel)
         : rawResult.mode === "sidecar"
         ? sidecarConclusionLevel
+        : rawResult.mode === "handoffPoc"
+        ? handoffConclusionLevel
         : rawResult.mode === "readablePoc"
         ? readableConclusionLevel
         : rawResult.mode === "padSweep"
@@ -2110,6 +2314,7 @@ function buildSummary(rawResult) {
     anchorPadComparisons: anchorPadComparisons.length ? anchorPadComparisons : undefined,
     padSweepComparisons: padSweepComparisons.length ? padSweepComparisons : undefined,
     readableComparisons: readableComparisons.length ? readableComparisons : undefined,
+    handoffComparisons: handoffComparisons.length ? handoffComparisons : undefined,
     sidecarComparisons: sidecarComparisons.length ? sidecarComparisons : undefined,
     hybridComparisons: hybridComparisons.length ? hybridComparisons : undefined,
     blockPadComparisons: blockPadComparisons.length ? blockPadComparisons : undefined,
@@ -2135,6 +2340,8 @@ function parseArgs(argv) {
   const defaultOutputPath =
     mode === "blockalign"
       ? "tests/outputs/private/provider-cache-benchmark-blockalign.raw.json"
+      : mode === "handoffPoc"
+      ? "tests/outputs/private/provider-cache-benchmark-handoff-poc.raw.json"
       : mode === "blockpad"
       ? "tests/outputs/private/provider-cache-benchmark-blockpad.raw.json"
       : mode === "hybrid"
@@ -2157,6 +2364,8 @@ function parseArgs(argv) {
   const defaultSummaryOutputPath =
     mode === "blockalign"
       ? "tests/outputs/provider-cache-benchmark-blockalign.latest.json"
+      : mode === "handoffPoc"
+      ? "tests/outputs/provider-cache-benchmark-handoff-poc.latest.json"
       : mode === "blockpad"
       ? "tests/outputs/provider-cache-benchmark-blockpad.latest.json"
       : mode === "hybrid"
@@ -2202,8 +2411,8 @@ async function runBenchmark(options = {}) {
   if (!options.localProjects) {
     throw new Error("Use --local-projects for this benchmark.");
   }
-  if (!["absolute", "normalized", "capsule", "anchor", "anchorpad", "padSweep", "readablePoc", "sidecar", "hybrid", "blockpad", "blockalign"].includes(options.mode)) {
-    throw new Error("Benchmark mode must be absolute, normalized, capsule, anchor, anchorpad, padSweep, readablePoc, sidecar, hybrid, blockpad, or blockalign.");
+  if (!["absolute", "normalized", "capsule", "anchor", "anchorpad", "padSweep", "readablePoc", "sidecar", "hybrid", "blockpad", "blockalign", "handoffPoc"].includes(options.mode)) {
+    throw new Error("Benchmark mode must be absolute, normalized, capsule, anchor, anchorpad, padSweep, readablePoc, sidecar, hybrid, blockpad, blockalign, or handoffPoc.");
   }
   if (env.projectPaths.length === 0) {
     throw new Error("Missing BASEBRIEF_BENCHMARK_PROJECTS. Use semicolon-separated local project paths.");
@@ -2249,7 +2458,7 @@ async function runBenchmark(options = {}) {
     for (const scenario of scenarios) {
       for (const variant of variantsForRun) {
         for (let iteration = 0; iteration < repeats; iteration += 1) {
-          const input = getPromptForVariant(options.mode, snapshot, scenario, iteration, variant);
+          const input = getPromptForVariant(options.mode, snapshot, scenario, iteration, variant, env.providerProfileId);
           const baseCall = {
             projectId: snapshot.projectId,
             scenarioId: scenario.id,

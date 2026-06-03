@@ -93,3 +93,32 @@
 - BB9 Adaptive Selector notes: [docs/experiments/cache-ready-adaptive-selector.md](experiments/cache-ready-adaptive-selector.md)
 - BB evolution log: [docs/evolution/bb-evolution-log.md](evolution/bb-evolution-log.md)
 - GPT-5.5 relay usage audit: [docs/experiments/cache-ready-relay-gpt55.md](experiments/cache-ready-relay-gpt55.md)
+
+## 6. BB9 Handoff POC 示例
+
+普通接续仍然优先使用 `full` 或 `lite`：
+
+```text
+请用 BaseBrief 生成 lite 项目接续。只保留事实、决策、风险边界和下一步，不要展开长历史。
+```
+
+如果明确要做省钱实验，可以使用 BB9 handoff：
+
+```text
+请用 BaseBrief BB9 handoff 生成 readable brief，并在 provider profile 支持时附加 cache sidecar。保留 natural/readable fallback，不要声明真实账单已经下降。
+发给 provider 的 active prompt 按 recommendedPromptType 选择；不要把 readableBrief 和 cacheSidecar 拼接到同一个请求里。
+```
+
+脚本示例：
+
+```text
+node scripts/generate_bb9_handoff.js --input examples/bb9-handoff-full-input.json --mode full --provider-profile mimo
+node scripts/generate_bb9_handoff.js --input examples/bb9-handoff-lite-input.json --mode lite --provider-profile deepseek
+node scripts/generate_bb9_handoff.js --input examples/bb9-handoff-lite-input.json --mode lite --provider-profile relay-openai-gpt55-codex-oauth
+```
+
+参考：
+
+- [BB9 full output](../examples/bb9-handoff-full-output.md)
+- [BB9 lite output](../examples/bb9-handoff-lite-output.md)
+- [BB9 fallback output](../examples/bb9-handoff-fallback-output.md)

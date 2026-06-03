@@ -443,3 +443,45 @@ Latest `sanye.mom` GPT-5.5 relay audit result:
 - stop reason: `cache_cost_not_observable`
 
 Because cache-aware cost is not observable from this relay response, no relay smoke benchmark or larger benchmark was run.
+
+## BB9 handoff POC checks
+
+BB9 handoff generation is local-only and does not call a provider:
+
+```bash
+node scripts/generate_bb9_handoff.js --input examples/bb9-handoff-full-input.json --mode full --provider-profile mimo
+node scripts/generate_bb9_handoff.js --input examples/bb9-handoff-lite-input.json --mode lite --provider-profile deepseek
+node scripts/generate_bb9_handoff.js --input examples/bb9-handoff-lite-input.json --mode lite --provider-profile relay-openai-gpt55-codex-oauth
+```
+
+Expected behavior:
+
+- MiMo and DeepSeek profiles emit both `readableBrief` and `cacheSidecar`.
+- Supported profiles set `recommendedPromptType=cacheSidecar`; unsupported profiles set `recommendedPromptType=readableBrief`.
+- The relay profile emits `readableBrief`, sets `cacheSidecar` to `null`, selects `natural`, and reports `fallbackReason=cache_cost_not_observable`.
+- No provider API key is needed for this generator.
+- The generator does not prove new provider savings; it only applies the already recorded BB9 provider-profile evidence.
+- Do not concatenate `readableBrief` and `cacheSidecar` into one provider request; use the artifact named by `recommendedPromptType`.
+
+BB9 handoff POC provider benchmark:
+
+```bash
+node scripts/provider_cache_benchmark.js --local-projects --mode handoffPoc --output tests/outputs/private/provider-cache-benchmark-handoff-poc.raw.json
+```
+
+Smoke command:
+
+```bash
+node scripts/provider_cache_benchmark.js --local-projects --mode handoffPoc --repeat-count 2 --project-limit 1 --scenario-limit 2 --output tests/outputs/private/provider-cache-benchmark-handoff-poc-smoke.raw.json --summary-output tests/outputs/provider-cache-benchmark-handoff-poc-smoke.latest.json
+```
+
+`handoffPoc` compares `readableFull`, `readableFullSidecar`, `readableLite`, `readableLiteSidecar`, and `bb9Best`. It answers a negative-control question: whether directly concatenating readable handoff plus sidecar still improves estimated cost.
+
+Handoff POC evidence requires:
+
+- valid request rate `>= 90%`
+- cache field visibility `>= 95%`
+- `readableFullSidecar` or `readableLiteSidecar` wins estimated cost against the matching readable baseline in at least `15/18` comparisons
+- overall median estimated cost is at least `5%` lower than the matching readable baseline
+
+If it misses this threshold, keep BB9 as an experimental sidecar and do not merge it into ordinary `full` / `lite`.

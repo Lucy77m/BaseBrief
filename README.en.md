@@ -105,6 +105,29 @@ The evidence is tiered: early normalized benchmarks did not prove better cache r
 - [GPT-5.5 relay usage audit](docs/experiments/cache-ready-relay-gpt55.md)
 - [Examples](examples)
 
+## BB9 Handoff POC
+
+BB9 now has a usable handoff POC. It keeps the normal readable `full` / `lite` brief as the primary continuation surface. When the selected provider profile exposes cache usage evidence, it adds a separate `cacheSidecar` for estimated-cost experiments.
+
+Important: use `readableBrief` for human review and continuation boundaries. Use `cacheSidecar` as the active provider prompt only when `recommendedPromptType` says so. Do not concatenate both into one provider request.
+
+Commands:
+
+```text
+node scripts/generate_bb9_handoff.js --input examples/bb9-handoff-full-input.json --mode full --provider-profile mimo
+node scripts/generate_bb9_handoff.js --input examples/bb9-handoff-lite-input.json --mode lite --provider-profile deepseek
+```
+
+Examples:
+
+- [BB9 full input](examples/bb9-handoff-full-input.json)
+- [BB9 full output](examples/bb9-handoff-full-output.md)
+- [BB9 lite input](examples/bb9-handoff-lite-input.json)
+- [BB9 lite output](examples/bb9-handoff-lite-output.md)
+- [BB9 unsupported provider fallback](examples/bb9-handoff-fallback-output.md)
+
+Boundary: this is provider-specific estimated-cost evidence, not a billing audit and not a provider-general cache claim.
+
 ## Cache-ready v2
 
 `BB2 Cache Capsule` is the compact v2 experiment for cache-ratio and estimated-cost testing. It is not the recommended path for ordinary project continuation.

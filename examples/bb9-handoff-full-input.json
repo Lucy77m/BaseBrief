@@ -1,0 +1,34 @@
+{
+  "mode": "full",
+  "provider_profile": "mimo",
+  "project_identity": "BaseBrief public sample project",
+  "current_goal": "Prepare a complete phase handoff for improving onboarding docs.",
+  "verified_facts": [
+    "The repository has one public skill entry under skills/basebrief/SKILL.md.",
+    "The public modes are full, lite, and cache-ready.",
+    "README and docs explain that cache-ready is experimental."
+  ],
+  "confirmed_decisions": [
+    "Keep full and lite readable for normal project continuation.",
+    "Use BB9 sidecar only as an estimated-cost experiment."
+  ],
+  "assumptions": [
+    "The next agent can read repository files before editing.",
+    "No release or tag is planned in this phase."
+  ],
+  "open_questions": [
+    "Whether the sidecar will be merged into normal full/lite depends on later evidence."
+  ],
+  "risk_boundaries": [
+    "Do not write API keys or private local paths.",
+    "Do not claim cross-provider savings.",
+    "Do not treat estimated cost as a billing audit."
+  ],
+  "forbidden_scope": [
+    ".env files",
+    "API keys",
+    "private local project paths"
+  ],
+  "expected_output": "Readable full handoff plus BB9 cache sidecar.",
+  "tail_request": "Generate the next-chat opener and keep the cache sidecar attached."
+}

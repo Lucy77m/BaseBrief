@@ -6,6 +6,7 @@ const test = require("node:test");
 const { generateFromObject } = require("../scripts/generate_cache_ready_lite");
 const { generateCapsuleFromObject } = require("../scripts/generate_cache_ready_capsule");
 const { generateAnchorFromObject } = require("../scripts/generate_cache_ready_anchor");
+const { generateBb9HandoffFromObject, getProviderProfile } = require("../scripts/generate_bb9_handoff");
 const { buildSummary, getPromptForVariant, SCENARIOS, PROVIDER_PROFILES } = require("../scripts/provider_cache_benchmark");
 const { classifyRelayUsage } = require("../scripts/provider_relay_usage_audit");
 const { routeMode } = require("../scripts/mode_router");
@@ -296,6 +297,199 @@ test("blockalign prompts keep scenario-aligned pad stable across choices", () =>
   assert.equal(stableA, stableB);
   assert.equal(tailA, "CHOICE=A");
   assert.equal(tailB, "CHOICE=B");
+});
+
+function bb9Fixture(overrides = {}) {
+  return {
+    mode: "full",
+    provider_profile: "mimo",
+    project_identity: "BaseBrief public sample project",
+    current_goal: "Prepare a complete handoff.",
+    verified_facts: [
+      "One public skill entry exists.",
+      "Full and Lite remain readable.",
+      "Cache-ready evidence is provider-specific.",
+    ],
+    confirmed_decisions: [
+      "Keep readable handoff first.",
+      "Attach sidecar only for supported provider profiles.",
+    ],
+    assumptions: ["The next agent can inspect files."],
+    open_questions: ["Whether sidecar should be merged later."],
+    risk_boundaries: [
+      "Do not expose secrets.",
+      "Do not claim cross-provider savings.",
+    ],
+    forbidden_scope: [".env", "API keys", "private paths"],
+    expected_output: "Readable handoff plus optional BB9 sidecar.",
+    tail_request: "Write the next-chat opener.",
+    ...overrides,
+  };
+}
+
+test("BB9 handoff generator emits readable full brief plus supported cache sidecar", () => {
+  const output = generateBb9HandoffFromObject(bb9Fixture(), { mode: "full", providerProfile: "mimo" });
+
+  assert.match(output.readableBrief, /^# BaseBrief Full Handoff/);
+  assert.match(output.readableBrief, /## verified_facts/);
+  assert.match(output.readableBrief, /## assumptions/);
+  assert.match(output.cacheSidecar, /^# BaseBrief BB9 Cache Sidecar/);
+  assert.match(output.cacheSidecar, /SELECTED_VARIANT: bb7BlockPadLite/);
+  assert.match(output.cacheSidecar, /BASEBRIEF_CACHE_BLOCK_PAD/);
+  assert.equal(output.selectedVariant, "bb7BlockPadLite");
+  assert.equal(output.recommendedPromptType, "cacheSidecar");
+  assert.equal(output.promptUsePolicy.activeProviderPrompt, "cacheSidecar");
+  assert.match(output.promptUsePolicy.cacheSidecar, /Do not concatenate/);
+  assert.equal(output.providerProfile.profileId, "mimo");
+  assert.equal(output.fallbackReason, null);
+  assert(output.cacheSidecar.indexOf("TAIL_REQUEST=") > output.cacheSidecar.indexOf("BASEBRIEF_CACHE_BLOCK_PAD"));
+});
+
+test("BB9 handoff generator keeps lite readable brief separate from sidecar", () => {
+  const output = generateBb9HandoffFromObject(bb9Fixture({ mode: "lite" }), { mode: "lite", providerProfile: "deepseek" });
+
+  assert.match(output.readableBrief, /^# BaseBrief Lite Handoff/);
+  assert.doesNotMatch(output.readableBrief, /## assumptions/);
+  assert.match(output.cacheSidecar, /MODE: lite/);
+  assert.match(output.cacheSidecar, /TAIL_REQUEST=Write the next-chat opener/);
+  assert.notEqual(output.readableBrief, output.cacheSidecar);
+  assert.equal(output.providerProfile.pricingCnyPerMillionTokens.inputCacheHit, 0.02);
+});
+
+test("BB9 handoff generator is deterministic and independent of JSON key order", () => {
+  const normal = bb9Fixture();
+  const shuffled = {
+    tail_request: normal.tail_request,
+    expected_output: normal.expected_output,
+    forbidden_scope: normal.forbidden_scope,
+    risk_boundaries: normal.risk_boundaries,
+    open_questions: normal.open_questions,
+    assumptions: normal.assumptions,
+    confirmed_decisions: normal.confirmed_decisions,
+    verified_facts: normal.verified_facts,
+    current_goal: normal.current_goal,
+    project_identity: normal.project_identity,
+    provider_profile: normal.provider_profile,
+    mode: normal.mode,
+  };
+
+  assert.deepEqual(
+    generateBb9HandoffFromObject(normal, { mode: "full", providerProfile: "mimo" }),
+    generateBb9HandoffFromObject(shuffled, { mode: "full", providerProfile: "mimo" }),
+  );
+});
+
+test("BB9 handoff generator rejects missing core fields", () => {
+  const input = bb9Fixture();
+  delete input.tail_request;
+
+  assert.throws(
+    () => generateBb9HandoffFromObject(input, { mode: "full", providerProfile: "mimo" }),
+    /Missing required key: tail_request/,
+  );
+});
+
+test("BB9 handoff generator falls back when cache cost is not observable", () => {
+  const output = generateBb9HandoffFromObject(bb9Fixture(), {
+    mode: "lite",
+    providerProfile: "relay-openai-gpt55-codex-oauth",
+  });
+
+  assert.equal(output.cacheSidecar, null);
+  assert.equal(output.selectedVariant, "natural");
+  assert.equal(output.recommendedPromptType, "readableBrief");
+  assert.equal(output.promptUsePolicy.activeProviderPrompt, "readableBrief");
+  assert.equal(output.fallbackReason, "cache_cost_not_observable");
+  assert.equal(output.providerProfile.cacheUsageObservable, false);
+  assert.match(output.readableBrief, /^# BaseBrief Lite Handoff/);
+});
+
+test("BB9 provider profiles separate direct provider evidence from relay observation", () => {
+  const mimo = getProviderProfile("mimo");
+  const deepseek = getProviderProfile("deepseek-v4-flash");
+  const relay = getProviderProfile("relay-openai-gpt55-codex-oauth");
+  const unknown = getProviderProfile("unknown-provider");
+
+  assert.equal(mimo.cacheUsageObservable, true);
+  assert.equal(deepseek.cacheUsageObservable, true);
+  assert.equal(relay.cacheUsageObservable, false);
+  assert.equal(relay.recommendedVariant, "natural");
+  assert.equal(unknown.cacheUsageObservable, false);
+  assert.equal(unknown.fallbackReason, "provider_profile_not_supported");
+});
+
+test("handoffPoc benchmark prompts compare readable brief with attached BB9 sidecar", () => {
+  const snapshot = {
+    projectId: "projectA",
+    readmeExcerpt: "Public sample README.",
+    packages: [{ location: "package.json", name: "sample" }],
+    entryFiles: ["src/main.js"],
+    configFiles: ["vite.config.js"],
+    fileSample: ["src/main.js", "vite.config.js"],
+  };
+  const scenario = SCENARIOS[0];
+  const readable = getPromptForVariant("handoffPoc", snapshot, scenario, 0, "readableFull", "mimo");
+  const sidecar = getPromptForVariant("handoffPoc", snapshot, scenario, 0, "readableFullSidecar", "mimo");
+  const fallbackSidecar = getPromptForVariant("handoffPoc", snapshot, scenario, 0, "readableLiteSidecar", "relay-openai-gpt55-codex-oauth");
+
+  assert.match(readable, /^# BaseBrief Full Handoff/);
+  assert.doesNotMatch(readable, /cache_sidecar/);
+  assert.match(sidecar, /^# BaseBrief Full Handoff/);
+  assert.match(sidecar, /## cache_sidecar/);
+  assert.match(sidecar, /# BaseBrief BB9 Cache Sidecar/);
+  assert(sidecar.indexOf("TAIL_REQUEST=") > sidecar.indexOf("BASEBRIEF_CACHE_BLOCK_PAD"));
+  assert.match(fallbackSidecar, /BB9 sidecar unavailable for this provider profile/);
+});
+
+test("handoffPoc benchmark summary classifies sidecar wins against readable baselines", () => {
+  const projectIds = ["projectA", "projectB", "projectC"];
+  const calls = [];
+  const variants = ["readableFull", "readableFullSidecar", "readableLite", "readableLiteSidecar", "bb9Best"];
+
+  for (const projectId of projectIds) {
+    for (const scenario of SCENARIOS) {
+      for (const variant of variants) {
+        for (let iteration = 0; iteration < 10; iteration += 1) {
+          const sidecar = variant === "readableFullSidecar" || variant === "readableLiteSidecar";
+          const estimatedTotalCostCny = sidecar ? 0.00008 : variant === "bb9Best" ? 0.00009 : 0.0002;
+          calls.push({
+            projectId,
+            scenarioId: scenario.id,
+            variant,
+            phase: iteration === 0 ? "warmup" : "repeat",
+            iteration,
+            status: "success",
+            promptTokens: sidecar ? 1500 : 1000,
+            completionTokens: 32,
+            cachedTokens: sidecar ? 1480 : 900,
+            cacheRatio: sidecar ? 1480 / 1500 : 900 / 1000,
+            cacheFieldVisible: true,
+            estimatedTotalCostCny,
+            totalLatencyMs: 1000 + iteration,
+          });
+        }
+      }
+    }
+  }
+
+  const summary = buildSummary({
+    status: "executed",
+    startedAt: "2026-06-02T00:00:00.000Z",
+    finishedAt: "2026-06-02T00:10:00.000Z",
+    providerName: "test-provider",
+    model: "test-model",
+    providerProfileId: "mimo",
+    mode: "handoffPoc",
+    repeats: 10,
+    projectIds,
+    calls,
+  });
+
+  assert.equal(summary.requestCount, 900);
+  assert.equal(summary.handoffStats.length, 2);
+  assert.equal(summary.handoffStats.find((item) => item.family === "full").estimatedCostWinsVsReadable, 18);
+  assert.equal(summary.handoffStats.find((item) => item.family === "lite").estimatedCostWinsVsReadable, 18);
+  assert.equal(summary.conclusionLevel, "bb9_handoff_poc_cost_evidence");
 });
 
 test("core templates preserve BaseBrief baseline sections", () => {

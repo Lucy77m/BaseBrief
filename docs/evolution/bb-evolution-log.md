@@ -56,3 +56,5 @@ This log records why each cache-ready generation exists and whether it has bench
 - Candidate pool: `natural`, `bb5SidecarLite`, `bb6HybridLite`, `bb7BlockPadLite`.
 - Evidence: MiMo `18/18` wins vs natural and DeepSeek `17/18` wins plus `18/18` no-worse-than-natural in local real-project samples.
 - Current status: strongest mechanism so far, but still provider- and sample-specific estimated-cost evidence.
+- Productization POC: `scripts/generate_bb9_handoff.js` keeps readable `full` / `lite` as the primary handoff and emits `cacheSidecar` only when `scripts/bb9_provider_profiles.json` marks cache usage as observable.
+- Fallback rule: providers without visible cache-cost evidence return `selectedVariant=natural` and no sidecar.
