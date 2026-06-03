@@ -101,6 +101,7 @@ Normal `full` / `lite` briefs stay human-readable. Provider-facing `cacheSidecar
 - [Artifact checks](docs/checks.md)
 - [CLI Lite](docs/cli-lite.md)
 - [Seal/Diff](docs/seal-diff.md)
+- [ContextOps boundary](docs/contextops.md)
 - [Long-term baseline](docs/roadmap/basebrief-long-term-baseline.md)
 - [Cache-ready experiment notes](docs/experiments/cache-ready-lite.md)
 - [BB2 cache capsule notes](docs/experiments/cache-ready-capsule.md)

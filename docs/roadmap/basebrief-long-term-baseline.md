@@ -266,6 +266,8 @@ ContextOps can become a broader framing only if earlier phases show real usage:
 
 Until then, ContextOps remains a vision label, not a specification project.
 
+Current v1 target: ContextOps is documented as a boundary and vocabulary anchor only. It does not introduce a platform, hosted service, plugin ecosystem, provider gateway, or new implementation surface.
+
 ## Experiment Freeze Rule
 
 Do not add BB13 or later just because another prompt variant is imaginable.

@@ -72,6 +72,7 @@ function checkRequiredFiles() {
     "docs/checks.md",
     "docs/cli-lite.md",
     "docs/seal-diff.md",
+    "docs/contextops.md",
     "docs/testing.md",
     "docs/roadmap/basebrief-long-term-baseline.md",
     "docs/evolution/bb-evolution-log.md",
@@ -143,6 +144,7 @@ function checkContentContracts() {
   const checksDoc = readText("docs/checks.md");
   const cliLiteDoc = readText("docs/cli-lite.md");
   const sealDiffDoc = readText("docs/seal-diff.md");
+  const contextOpsDoc = readText("docs/contextops.md");
   const roadmapDoc = readText("docs/roadmap/basebrief-long-term-baseline.md");
   const bb9Schema = readJson("schemas/bb9-handoff.schema.json");
   const sealSchema = readJson("schemas/basebrief-seal.schema.json");
@@ -170,6 +172,7 @@ function checkContentContracts() {
   assert(readme.includes("docs/checks.md"), "README.md should link to artifact checks docs");
   assert(readme.includes("docs/cli-lite.md"), "README.md should link to CLI Lite docs");
   assert(readme.includes("docs/seal-diff.md"), "README.md should link to Seal/Diff docs");
+  assert(readme.includes("docs/contextops.md"), "README.md should link to ContextOps boundary docs");
   assert(readme.includes("docs/roadmap/basebrief-long-term-baseline.md"), "README.md should link to long-term baseline");
   assert(readme.includes("docs/experiments/cache-ready-capsule.md"), "README.md should link to cache-ready capsule docs");
   assert(readme.includes("docs/experiments/cache-ready-anchor.md"), "README.md should link to cache-ready anchor docs");
@@ -187,6 +190,7 @@ function checkContentContracts() {
   assert(englishReadme.includes("docs/checks.md"), "README.en.md should link to artifact checks docs");
   assert(englishReadme.includes("docs/cli-lite.md"), "README.en.md should link to CLI Lite docs");
   assert(englishReadme.includes("docs/seal-diff.md"), "README.en.md should link to Seal/Diff docs");
+  assert(englishReadme.includes("docs/contextops.md"), "README.en.md should link to ContextOps boundary docs");
   assert(englishReadme.includes("docs/roadmap/basebrief-long-term-baseline.md"), "README.en.md should link to long-term baseline");
   assert(englishReadme.includes("Integrations"), "README.en.md should link to integrations docs");
   assert(englishReadme.includes("docs/experiments/cache-ready-anchor-pad.md"), "README.en.md should link to anchor-pad docs");
@@ -232,6 +236,10 @@ function checkContentContracts() {
   assert(sealDiffDoc.includes("scripts/basebrief_seal.js"), "seal-diff.md must document seal script");
   assert(sealDiffDoc.includes("basebrief-seal-v1"), "seal-diff.md must document seal schema version");
   assert(sealDiffDoc.includes("not a project-management system"), "seal-diff.md must state product boundary");
+  assert(contextOpsDoc.includes("not a product surface"), "contextops.md must keep ContextOps out of product surface");
+  assert(contextOpsDoc.includes("Current Non-Goals"), "contextops.md must define non-goals");
+  assert(contextOpsDoc.includes("hosted service"), "contextops.md must reject hosted-service scope");
+  assert(contextOpsDoc.includes("provider-general"), "contextops.md must reject provider-general cache claims");
   assert(sealSchema.properties.schemaVersion.const === "basebrief-seal-v1", "Seal schema must define v1 schema version");
   assert(structuredFullExample.includes("BASEBRIEF_HANDOFF_JSON_BEGIN"), "structured full example must include handoff JSON begin marker");
   assert(structuredFullExample.includes("BASEBRIEF_HANDOFF_JSON_END"), "structured full example must include handoff JSON end marker");

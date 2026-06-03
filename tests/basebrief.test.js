@@ -663,6 +663,17 @@ test("Seal/Diff v1 rejects missing command arguments", () => {
   );
 });
 
+test("ContextOps docs stay a boundary document, not a platform promise", () => {
+  const contextOps = readText("docs/contextops.md");
+  const roadmap = readText("docs/roadmap/basebrief-long-term-baseline.md");
+
+  assert.match(contextOps, /not a product surface/);
+  assert.match(contextOps, /Current Non-Goals/);
+  assert.match(contextOps, /hosted service/);
+  assert.match(contextOps, /provider-general/);
+  assert.match(roadmap, /ContextOps is documented as a boundary/);
+});
+
 test("mode router asks for clarification when no mode signal is present", () => {
   assert.equal(routeMode("请继续。"), "needs-clarification");
 });

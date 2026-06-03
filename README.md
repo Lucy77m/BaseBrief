@@ -190,6 +190,7 @@ BaseBrief/
 - Artifact checks: [docs/checks.md](docs/checks.md)
 - CLI Lite: [docs/cli-lite.md](docs/cli-lite.md)
 - Seal/Diff: [docs/seal-diff.md](docs/seal-diff.md)
+- ContextOps boundary: [docs/contextops.md](docs/contextops.md)
 - 长期规划基线：[docs/roadmap/basebrief-long-term-baseline.md](docs/roadmap/basebrief-long-term-baseline.md)
 - Cache-ready 实验说明：[docs/experiments/cache-ready-lite.md](docs/experiments/cache-ready-lite.md)
 - 公开示例：[examples](examples)
