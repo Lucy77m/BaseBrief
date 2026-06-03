@@ -158,7 +158,11 @@ test("handoff builder writes prompt artifacts from structured markdown", () => w
   const meta = JSON.parse(fs.readFileSync(path.join(outputDir, "handoff.meta.json"), "utf8"));
   assert.equal(meta.recommendedPromptType, "cacheSidecar");
   assert.equal(meta.artifacts.cacheSidecar, "cacheSidecar.md");
+  assert.equal(meta.providerProfile.defaultPromptStrategy, "bb9_sidecar");
+  assert.equal(meta.providerProfile.activePromptStrategy, "cacheSidecar");
+  assert(meta.providerProfile.experimentalCandidates.some((candidate) => candidate.candidateId === "bb12SizeBandGuard"));
   assert(!JSON.stringify(meta).includes("# BaseBrief BB9 Cache Sidecar"));
+  assert(!JSON.stringify(meta).includes("BASEBRIEF_CACHE_BLOCK_PAD"));
 }));
 
 test("handoff builder falls back to readable prompt for relay profile", () => withTempDir((tempDir) => {
@@ -178,6 +182,8 @@ test("handoff builder falls back to readable prompt for relay profile", () => wi
   const meta = JSON.parse(fs.readFileSync(path.join(outputDir, "handoff.meta.json"), "utf8"));
   assert.equal(active, readable);
   assert.equal(meta.recommendedPromptType, "readableBrief");
+  assert.equal(meta.providerProfile.defaultPromptStrategy, "readable_fallback");
+  assert.equal(meta.providerProfile.activePromptStrategy, "readableBrief");
   assert.equal(meta.artifacts.cacheSidecar, null);
 }));
 
@@ -585,10 +591,27 @@ test("BB9 provider profiles separate direct provider evidence from relay observa
   const unknown = getProviderProfile("unknown-provider");
 
   assert.equal(mimo.cacheUsageObservable, true);
+  assert.equal(mimo.defaultPromptStrategy, "bb9_sidecar");
+  assert.equal(mimo.activePromptStrategy, "cacheSidecar");
+  assert(mimo.experimentalCandidates.some((candidate) => (
+    candidate.candidateId === "bb12SizeBandGuard" &&
+    candidate.status === "mimo_specific_selector_candidate" &&
+    candidate.defaultEnabled === false
+  )));
   assert.equal(deepseek.cacheUsageObservable, true);
+  assert.equal(deepseek.defaultPromptStrategy, "bb9_sidecar");
+  assert(deepseek.experimentalCandidates.every((candidate) => candidate.defaultEnabled === false));
+  assert(deepseek.experimentalCandidates.some((candidate) => (
+    candidate.candidateId === "bb12SizeBandGuard" &&
+    candidate.status === "deepseek_smoke_inconclusive"
+  )));
   assert.equal(relay.cacheUsageObservable, false);
   assert.equal(relay.recommendedVariant, "natural");
+  assert.equal(relay.defaultPromptStrategy, "readable_fallback");
+  assert.equal(relay.activePromptStrategy, "readableBrief");
   assert.equal(unknown.cacheUsageObservable, false);
+  assert.equal(unknown.defaultPromptStrategy, "readable_fallback");
+  assert.equal(unknown.activePromptStrategy, "readableBrief");
   assert.equal(unknown.fallbackReason, "provider_profile_not_supported");
 });
 

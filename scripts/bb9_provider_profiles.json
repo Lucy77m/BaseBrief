@@ -9,6 +9,10 @@
     "pricingBasis": "provider_official_price_2026_06_02",
     "billingAudited": false,
     "cacheUsageObservable": true,
+    "defaultPromptStrategy": "bb9_sidecar",
+    "activePromptStrategy": "cacheSidecar",
+    "fallbackStrategy": "readable_fallback_when_cache_usage_not_observable",
+    "evidenceScope": "MiMo mimo-v2.5 local real-project estimated-cost evidence only.",
     "pricingCnyPerMillionTokens": {
       "inputCacheHit": 0.02,
       "inputCacheMiss": 1,
@@ -18,6 +22,15 @@
     "candidateVariants": ["natural", "bb5SidecarLite", "bb6HybridLite", "bb7BlockPadLite"],
     "recommendedVariant": "bb7BlockPadLite",
     "benchmarkSummaryPath": "tests/outputs/provider-cache-benchmark-blockpad.latest.json",
+    "experimentalCandidates": [
+      {
+        "candidateId": "bb12SizeBandGuard",
+        "status": "mimo_specific_selector_candidate",
+        "defaultEnabled": false,
+        "benchmarkSummaryPath": "tests/outputs/provider-cache-benchmark-bb12-guard-poc.latest.json",
+        "limitation": "Metadata only in provider profile; builder default remains BB9 sidecar."
+      }
+    ],
     "latestEvidence": {
       "validRequests": "716/720",
       "cacheFieldVisibility": "714/716",
@@ -37,6 +50,10 @@
     "pricingBasis": "provider_official_price_2026_06_02",
     "billingAudited": false,
     "cacheUsageObservable": true,
+    "defaultPromptStrategy": "bb9_sidecar",
+    "activePromptStrategy": "cacheSidecar",
+    "fallbackStrategy": "readable_fallback_when_cache_usage_not_observable",
+    "evidenceScope": "DeepSeek deepseek-v4-flash local real-project estimated-cost evidence for BB9 only; BB11/BB12 smoke remains inconclusive.",
     "pricingCnyPerMillionTokens": {
       "inputCacheHit": 0.02,
       "inputCacheMiss": 1,
@@ -46,6 +63,22 @@
     "candidateVariants": ["natural", "bb5SidecarLite", "bb6HybridLite", "bb7BlockPadLite"],
     "recommendedVariant": "bb7BlockPadLite",
     "benchmarkSummaryPath": "tests/outputs/provider-cache-benchmark-blockpad-deepseek.latest.json",
+    "experimentalCandidates": [
+      {
+        "candidateId": "bb11ActivePromptTrim",
+        "status": "deepseek_smoke_inconclusive",
+        "defaultEnabled": false,
+        "benchmarkSummaryPath": "tests/outputs/provider-cache-benchmark-active-prompt-trim-poc-deepseek.latest.json",
+        "limitation": "Smoke only; not a default strategy."
+      },
+      {
+        "candidateId": "bb12SizeBandGuard",
+        "status": "deepseek_smoke_inconclusive",
+        "defaultEnabled": false,
+        "benchmarkSummaryPath": "tests/outputs/provider-cache-benchmark-bb12-guard-poc-deepseek.latest.json",
+        "limitation": "Smoke only; not a default strategy."
+      }
+    ],
     "latestEvidence": {
       "validRequests": "720/720",
       "cacheFieldVisibility": "720/720",
@@ -66,10 +99,15 @@
     "pricingBasis": "openai_official_reference_price",
     "billingAudited": false,
     "cacheUsageObservable": false,
+    "defaultPromptStrategy": "readable_fallback",
+    "activePromptStrategy": "readableBrief",
+    "fallbackStrategy": "cache_cost_not_observable_readable_fallback",
+    "evidenceScope": "Relay usage visibility only; cached-token and cache-cost fields are not observable.",
     "pricingCnyPerMillionTokens": null,
     "candidateVariants": ["natural"],
     "recommendedVariant": "natural",
     "benchmarkSummaryPath": "tests/outputs/provider-relay-usage-audit.latest.json",
+    "experimentalCandidates": [],
     "latestEvidence": {
       "validRequests": "6/6",
       "usageVisible": "6/6",

@@ -113,6 +113,14 @@ Output files:
 
 ## Provider Profile Rules
 
+Provider profiles expose strategy metadata:
+
+- `defaultPromptStrategy`: the default contract-level strategy, such as `bb9_sidecar` or `readable_fallback`.
+- `activePromptStrategy`: the artifact used as the active provider prompt, such as `cacheSidecar` or `readableBrief`.
+- `fallbackStrategy`: the explicit fallback behavior when cache usage or provider support is missing.
+- `evidenceScope`: the provider, model, sample, and evidence boundary for the current strategy.
+- `experimentalCandidates`: non-default candidate strategies recorded for audit and future testing.
+
 MiMo and DeepSeek:
 
 - BB9 sidecar can be selected because cache usage is observable in the current profile data.
@@ -126,7 +134,8 @@ Relay and unknown providers:
 BB12:
 
 - Record as MiMo-specific selector-candidate evidence.
-- Do not make it the default BB9 contract.
+- Keep it in MiMo `experimentalCandidates` metadata only.
+- Do not make it the default BB9 contract or builder strategy.
 - Do not generalize it to DeepSeek, relay, or unknown providers.
 
 ## Safety Rules

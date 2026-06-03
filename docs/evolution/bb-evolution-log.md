@@ -79,4 +79,5 @@ This log records why each cache-ready generation exists and whether it has bench
 - Mechanism: `bb12GuardPoc` uses BB11 selector guard below 3200 prompt characters and `bb9Best` at or above that boundary.
 - Evidence: MiMo `mimo-v2.5` 360-request sample reached `18/18` wins vs readable Lite, `18/18` no-worse-than-`bb9Best`, `-28.70%` vs readable Lite, and `-11.37%` vs `bb9Best`.
 - Current status: MiMo-specific active-prompt guard selector candidate; not a cross-provider proof or billing audit.
+- Provider profile status: recorded as MiMo metadata only; builder defaults remain BB9 sidecar.
 - DeepSeek status: 20-request smoke was inconclusive, with `0/2` wins vs readable Lite, so no large sample should be run for this variant yet.

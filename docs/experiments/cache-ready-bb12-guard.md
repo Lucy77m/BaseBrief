@@ -91,4 +91,5 @@ The default public recommendation remains conservative:
 
 - BB9 adaptive selector is still the broadly documented provider-cache mechanism.
 - BB12 is a MiMo-specific active-prompt guard candidate.
+- BB12 is recorded in the MiMo provider profile as metadata only; the handoff builder still defaults to the BB9 sidecar strategy.
 - readable `full` / `lite` remain the primary human handoff formats.

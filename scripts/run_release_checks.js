@@ -127,6 +127,7 @@ function checkContentContracts() {
   const handoffDoc = readText("docs/handoff.md");
   const roadmapDoc = readText("docs/roadmap/basebrief-long-term-baseline.md");
   const bb9Schema = readJson("schemas/bb9-handoff.schema.json");
+  const providerProfiles = readJson("scripts/bb9_provider_profiles.json");
   const structuredFullExample = readText("examples/structured-handoff-full.md");
   const structuredLiteExample = readText("examples/structured-handoff-lite.md");
   const fullTemplate = readText("templates/zh-CN/BASEBRIEF.md");
@@ -184,6 +185,8 @@ function checkContentContracts() {
   assert(handoffDoc.includes("handoff.meta.json"), "handoff.md must define handoff.meta.json");
   assert(handoffDoc.includes("BASEBRIEF_HANDOFF_JSON_BEGIN"), "handoff.md must document structured JSON block markers");
   assert(handoffDoc.includes("scripts/basebrief_build_handoff.js"), "handoff.md must document the builder script");
+  assert(handoffDoc.includes("defaultPromptStrategy"), "handoff.md must document provider strategy metadata");
+  assert(handoffDoc.includes("experimentalCandidates"), "handoff.md must document experimental candidates");
   assert(readme.includes("examples/structured-handoff-full.md"), "README.md should link to structured full handoff example");
   assert(englishReadme.includes("examples/structured-handoff-full.md"), "README.en.md should link to structured full handoff example");
   assert(structuredFullExample.includes("BASEBRIEF_HANDOFF_JSON_BEGIN"), "structured full example must include handoff JSON begin marker");
@@ -191,6 +194,33 @@ function checkContentContracts() {
   assert(structuredLiteExample.includes("BASEBRIEF_HANDOFF_JSON_BEGIN"), "structured lite example must include handoff JSON begin marker");
   assert(structuredLiteExample.includes("BASEBRIEF_HANDOFF_JSON_END"), "structured lite example must include handoff JSON end marker");
   assert(roadmapDoc.includes("Do not add BB13"), "roadmap baseline must include experiment freeze rule");
+  ["mimo", "deepseek", "relay-openai-gpt55-codex-oauth"].forEach((profileId) => {
+    const profile = providerProfiles[profileId];
+    assert(profile, `Missing provider profile: ${profileId}`);
+    ["defaultPromptStrategy", "activePromptStrategy", "fallbackStrategy", "evidenceScope", "experimentalCandidates"].forEach((field) => {
+      assert(field in profile, `Provider profile ${profileId} missing strategy field: ${field}`);
+    });
+  });
+  assert(providerProfiles.mimo.defaultPromptStrategy === "bb9_sidecar", "MiMo default strategy must remain BB9 sidecar");
+  assert(
+    providerProfiles.mimo.experimentalCandidates.some(
+      (candidate) => candidate.candidateId === "bb12SizeBandGuard" && candidate.status === "mimo_specific_selector_candidate" && candidate.defaultEnabled === false,
+    ),
+    "MiMo profile must record BB12 as metadata-only selector candidate",
+  );
+  assert(providerProfiles.deepseek.defaultPromptStrategy === "bb9_sidecar", "DeepSeek default strategy must remain BB9 sidecar");
+  assert(
+    providerProfiles.deepseek.experimentalCandidates.every((candidate) => candidate.defaultEnabled === false),
+    "DeepSeek experimental candidates must not be default enabled",
+  );
+  assert(
+    !providerProfiles.deepseek.experimentalCandidates.some(
+      (candidate) => candidate.candidateId === "bb12SizeBandGuard" && candidate.status !== "deepseek_smoke_inconclusive",
+    ),
+    "DeepSeek BB12 must remain smoke inconclusive",
+  );
+  assert(providerProfiles["relay-openai-gpt55-codex-oauth"].activePromptStrategy === "readableBrief", "Relay must use readable active prompt");
+  assert(providerProfiles["relay-openai-gpt55-codex-oauth"].cacheUsageObservable === false, "Relay cache usage must not be observable");
   [
     "project_identity",
     "current_goal",
