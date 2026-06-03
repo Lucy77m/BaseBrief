@@ -411,3 +411,35 @@ Latest DeepSeek blockpad / selector result:
 - conclusion level: `bb9_adaptive_selector_best_evidence`
 
 Current interpretation: the strongest mechanism is not one universal cache-ready prompt. It is calibrated selection among natural, BB5 Lite, BB6 Lite, and BB7 block-pad Lite variants. This is still provider- and sample-specific estimated-cost evidence.
+
+## GPT-5.5 relay usage audit
+
+Relay usage audit command:
+
+```bash
+node scripts/provider_relay_usage_audit.js --output tests/outputs/private/provider-relay-usage-audit.raw.json --summary-output tests/outputs/provider-relay-usage-audit.latest.json
+```
+
+This audit is for `GPT-5.5 via third-party Codex OAuth relay` style routes. It uses synthetic prompts and does not send local project content.
+
+The audit must run before any relay benchmark. It checks:
+
+- whether `/chat/completions` returns stable usage fields
+- whether `cached_tokens` is visible
+- whether repeated identical prompts change provider-visible input token accounting
+- whether the route should be treated as `cache_tokens_visible`, `input_tokens_may_reflect_billing_or_relay_accounting`, `token_length_observation_only`, or `usage_unusable`
+
+Stop before benchmark if the result is `token_length_observation_only` or `usage_unusable`, or if valid request rate is below `90%`. Relay results are `relay_specific_observation`; they must not be described as OpenAI official API evidence.
+
+Latest `sanye.mom` GPT-5.5 relay audit result:
+
+- request count: `6`
+- valid request count: `6`
+- usage visible: `6/6`
+- cache field visibility: `0/6`
+- repeated identical prompt token values: `[70]`
+- usage interpretation: `token_length_observation_only`
+- benchmark recommended: `false`
+- stop reason: `cache_cost_not_observable`
+
+Because cache-aware cost is not observable from this relay response, no relay smoke benchmark or larger benchmark was run.

@@ -67,6 +67,7 @@ function checkRequiredFiles() {
     "docs/walkthrough.md",
     "docs/mode-selection.md",
     "docs/testing.md",
+    "docs/evolution/bb-evolution-log.md",
     "docs/experiments/cache-ready-lite.md",
     "docs/experiments/cache-ready-capsule.md",
     "docs/experiments/cache-ready-anchor.md",
@@ -75,6 +76,7 @@ function checkRequiredFiles() {
     "docs/experiments/cache-ready-sidecar.md",
     "docs/experiments/cache-ready-hybrid-anchor.md",
     "docs/experiments/cache-ready-adaptive-selector.md",
+    "docs/experiments/cache-ready-relay-gpt55.md",
     "README.en.md",
     "scripts/mode_router.js",
     "scripts/generate_cache_ready_lite.js",
@@ -83,6 +85,7 @@ function checkRequiredFiles() {
     "scripts/prompt_stability_probe.js",
     "scripts/provider_cache_probe.js",
     "scripts/provider_cache_benchmark.js",
+    "scripts/provider_relay_usage_audit.js",
     "examples/full-example.md",
     "examples/lite-example.md",
     "examples/cache-ready-input.json",
@@ -130,6 +133,8 @@ function checkContentContracts() {
   assert(readme.includes("docs/experiments/cache-ready-sidecar.md"), "README.md should link to sidecar docs");
   assert(readme.includes("docs/experiments/cache-ready-hybrid-anchor.md"), "README.md should link to hybrid anchor docs");
   assert(readme.includes("docs/experiments/cache-ready-adaptive-selector.md"), "README.md should link to adaptive selector docs");
+  assert(readme.includes("docs/evolution/bb-evolution-log.md"), "README.md should link to evolution log");
+  assert(readme.includes("docs/experiments/cache-ready-relay-gpt55.md"), "README.md should link to relay audit docs");
   assert(englishReadme.includes("One install, one entry"), "README.en.md must explain one install, one entry");
   assert(englishReadme.includes("Integrations"), "README.en.md should link to integrations docs");
   assert(englishReadme.includes("docs/experiments/cache-ready-anchor-pad.md"), "README.en.md should link to anchor-pad docs");
@@ -137,6 +142,8 @@ function checkContentContracts() {
   assert(englishReadme.includes("docs/experiments/cache-ready-sidecar.md"), "README.en.md should link to sidecar docs");
   assert(englishReadme.includes("docs/experiments/cache-ready-hybrid-anchor.md"), "README.en.md should link to hybrid anchor docs");
   assert(englishReadme.includes("docs/experiments/cache-ready-adaptive-selector.md"), "README.en.md should link to adaptive selector docs");
+  assert(englishReadme.includes("docs/evolution/bb-evolution-log.md"), "README.en.md should link to evolution log");
+  assert(englishReadme.includes("docs/experiments/cache-ready-relay-gpt55.md"), "README.en.md should link to relay audit docs");
   assert(englishReadme.includes("cache-ready"), "README.en.md must describe cache-ready mode");
   assert(!/two skills/i.test(englishReadme), "README.en.md must not imply two skills");
   ["Codex", "Claude Code", "Cursor"].forEach((toolName) => {
@@ -311,6 +318,7 @@ function checkBenchmarkSummaryIfPresent() {
     "tests/outputs/provider-cache-benchmark-blockpad-deepseek.latest.json",
     "tests/outputs/provider-cache-benchmark-blockalign.latest.json",
     "tests/outputs/provider-cache-benchmark-blockalign-deepseek.latest.json",
+    "tests/outputs/provider-relay-usage-audit.latest.json",
   ];
   const statuses = [];
   summaries.forEach((relativePath) => {
@@ -319,11 +327,17 @@ function checkBenchmarkSummaryIfPresent() {
       return;
     }
     const summary = readJson(relativePath);
-    assert(summary.benchmarkKind === "local-real-projects-redacted", "Benchmark summary must be public-redacted");
-    assert(summary.projectCount >= 1, "Benchmark summary must include project count");
+    const isRelayAudit = relativePath.includes("provider-relay-usage-audit");
+    assert(
+      summary.benchmarkKind === (isRelayAudit ? "relay-usage-audit-redacted" : "local-real-projects-redacted"),
+      "Benchmark summary must be public-redacted",
+    );
+    if (!isRelayAudit) {
+      assert(summary.projectCount >= 1, "Benchmark summary must include project count");
+    }
     assert(summary.requestCount >= summary.validRequestCount, "Benchmark summary request counts are inconsistent");
     assert(!JSON.stringify(summary).match(/[A-Z]:\\|\/home\/|sk-[A-Za-z0-9]{10,}/), "Benchmark summary contains private path or key-like content");
-    statuses.push(`${summary.mode || "absolute"}:${summary.conclusionLevel || "present"}`);
+    statuses.push(`${summary.mode || summary.providerProfileId || "absolute"}:${summary.conclusionLevel || summary.usageInterpretation || "present"}`);
   });
   return statuses.length ? statuses.join(",") : "absent";
 }

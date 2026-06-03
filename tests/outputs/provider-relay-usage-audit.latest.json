@@ -1,0 +1,43 @@
+{
+  "status": "executed",
+  "startedAt": "2026-06-03T07:28:39.290Z",
+  "finishedAt": "2026-06-03T07:28:53.305Z",
+  "providerName": "sanye-relay",
+  "model": "gpt-5.5",
+  "providerProfileId": "relay-openai-gpt55-codex-oauth",
+  "benchmarkKind": "relay-usage-audit-redacted",
+  "routeType": "third_party_relay",
+  "evidenceLevel": "relay_specific_observation",
+  "pricingBasis": "openai_official_reference_price",
+  "billingAudited": false,
+  "officialReferencePricingUsdPerMillionTokens": {
+    "input": 5,
+    "cachedInput": 0.5,
+    "output": 30,
+    "effectiveDate": "2026-06-03",
+    "source": "OpenAI GPT-5.5 official reference pricing"
+  },
+  "requestCount": 6,
+  "validRequestCount": 6,
+  "failureCount": 0,
+  "validRequestRate": 1,
+  "usageVisibleCount": 6,
+  "cacheFieldVisibleCount": 0,
+  "cacheFieldVisibleRate": 0,
+  "identicalPromptTokenValues": [
+    70
+  ],
+  "identicalCachedTokenValues": [],
+  "promptTokensChangedAcrossIdentical": false,
+  "cachedTokensChangedAcrossIdentical": false,
+  "usageInterpretation": "token_length_observation_only",
+  "benchmarkRecommended": false,
+  "stopRecommended": true,
+  "stopReason": "cache_cost_not_observable",
+  "maxConsecutiveFailures": 0,
+  "limitations": [
+    "Third-party relay observation only; not OpenAI official API evidence.",
+    "This audit checks provider-visible usage fields, not real relay billing.",
+    "Synthetic prompts are used; no private project content is sent."
+  ]
+}

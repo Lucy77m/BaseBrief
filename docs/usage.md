@@ -91,3 +91,5 @@
 - BB5 Cache Sidecar notes: [docs/experiments/cache-ready-sidecar.md](experiments/cache-ready-sidecar.md)
 - BB6 Hybrid Anchor notes: [docs/experiments/cache-ready-hybrid-anchor.md](experiments/cache-ready-hybrid-anchor.md)
 - BB9 Adaptive Selector notes: [docs/experiments/cache-ready-adaptive-selector.md](experiments/cache-ready-adaptive-selector.md)
+- BB evolution log: [docs/evolution/bb-evolution-log.md](evolution/bb-evolution-log.md)
+- GPT-5.5 relay usage audit: [docs/experiments/cache-ready-relay-gpt55.md](experiments/cache-ready-relay-gpt55.md)

@@ -13,6 +13,40 @@ Current candidates:
 
 The selector is evaluated from provider-visible token usage and the configured CNY price profile. It is not a real billing audit.
 
+## Mechanism
+
+BB9 has four steps:
+
+1. Build candidate prompts for the same project-scenario pair.
+2. Run calibration requests through the selected provider profile.
+3. Compute estimated cost from provider-visible usage fields and the configured price profile.
+4. Select the candidate with the lowest median estimated cost.
+
+The selector always keeps `natural` in the candidate pool. If every cache-aware candidate is more expensive than `natural`, the selector should fall back to `natural` and must not claim a savings win.
+
+## Provider Profile
+
+A provider profile defines:
+
+- provider or route identity
+- model name
+- route type, such as direct provider or third-party relay
+- evidence level
+- pricing basis
+- whether billing is audited
+
+MiMo and DeepSeek results are direct provider evidence. Third-party relay routes must be recorded separately as relay-specific observations.
+
+## When Not To Use BB9
+
+Do not use BB9 as a savings claim when:
+
+- the provider does not expose enough usage data to estimate cache-aware cost
+- the task is a one-off call with no repeated stable prefix
+- the calibration sample is too small to compare candidates
+- the candidate pool would remove `natural` fallback
+- the route is a third-party relay whose usage fields cannot distinguish cache cost from prompt length
+
 ## Why Selector
 
 Single-format experiments exposed provider-specific and project-specific behavior:

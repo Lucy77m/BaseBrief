@@ -7,6 +7,7 @@ const { generateFromObject } = require("../scripts/generate_cache_ready_lite");
 const { generateCapsuleFromObject } = require("../scripts/generate_cache_ready_capsule");
 const { generateAnchorFromObject } = require("../scripts/generate_cache_ready_anchor");
 const { buildSummary, getPromptForVariant, SCENARIOS, PROVIDER_PROFILES } = require("../scripts/provider_cache_benchmark");
+const { classifyRelayUsage } = require("../scripts/provider_relay_usage_audit");
 const { routeMode } = require("../scripts/mode_router");
 
 const repoRoot = path.resolve(__dirname, "..");
@@ -894,4 +895,33 @@ test("benchmark provider profiles include MiMo and DeepSeek pricing", () => {
   assert.equal(PROVIDER_PROFILES["mimo-v2.5"].pricingCnyPerMillionTokens.inputCacheHit, 0.02);
   assert.equal(PROVIDER_PROFILES["deepseek-v4-flash"].pricingCnyPerMillionTokens.inputCacheMiss, 1);
   assert.equal(PROVIDER_PROFILES["deepseek-v4-flash"].pricingCnyPerMillionTokens.output, 2);
+});
+
+test("relay provider profile is separated from official provider evidence", () => {
+  const relay = PROVIDER_PROFILES["relay-openai-gpt55-codex-oauth"];
+
+  assert.equal(relay.routeType, "third_party_relay");
+  assert.equal(relay.evidenceLevel, "relay_specific_observation");
+  assert.equal(relay.pricingBasis, "openai_official_reference_price");
+  assert.equal(relay.billingAudited, false);
+  assert.equal(relay.pricingCnyPerMillionTokens, null);
+});
+
+test("relay usage audit recommends benchmark only when cache cost is observable", () => {
+  const visibleCache = classifyRelayUsage([
+    { label: "identical", status: "success", promptTokens: 100, completionTokens: 2, cachedTokens: 0, usageVisible: true, cacheFieldVisible: true },
+    { label: "identical", status: "success", promptTokens: 100, completionTokens: 2, cachedTokens: 80, usageVisible: true, cacheFieldVisible: true },
+    { label: "varied", status: "success", promptTokens: 110, completionTokens: 2, cachedTokens: 80, usageVisible: true, cacheFieldVisible: true },
+  ]);
+  const tokenLengthOnly = classifyRelayUsage([
+    { label: "identical", status: "success", promptTokens: 100, completionTokens: 2, cachedTokens: null, usageVisible: true, cacheFieldVisible: false },
+    { label: "identical", status: "success", promptTokens: 100, completionTokens: 2, cachedTokens: null, usageVisible: true, cacheFieldVisible: false },
+    { label: "varied", status: "success", promptTokens: 110, completionTokens: 2, cachedTokens: null, usageVisible: true, cacheFieldVisible: false },
+  ]);
+
+  assert.equal(visibleCache.usageInterpretation, "cache_tokens_visible");
+  assert.equal(visibleCache.benchmarkRecommended, true);
+  assert.equal(tokenLengthOnly.usageInterpretation, "token_length_observation_only");
+  assert.equal(tokenLengthOnly.stopRecommended, true);
+  assert.equal(tokenLengthOnly.stopReason, "cache_cost_not_observable");
 });

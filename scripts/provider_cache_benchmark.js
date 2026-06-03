@@ -34,18 +34,45 @@ const CNY_CACHE_PRICING_PER_MILLION_TOKENS = {
   effectiveDate: "2026-06-02 Asia/Shanghai",
 };
 
+const GPT55_OFFICIAL_REFERENCE_PRICING_USD_PER_MILLION_TOKENS = {
+  input: 5,
+  cachedInput: 0.5,
+  output: 30,
+  effectiveDate: "2026-06-03",
+  source: "OpenAI GPT-5.5 official reference pricing",
+};
+
 const PROVIDER_PROFILES = {
   "mimo-v2.5": {
     providerName: "xiaomimimo",
     model: "mimo-v2.5",
+    routeType: "direct_provider",
+    evidenceLevel: "provider_specific_evidence",
+    pricingBasis: "provider_official_price",
+    billingAudited: false,
     pricingCnyPerMillionTokens: CNY_CACHE_PRICING_PER_MILLION_TOKENS,
     limitation: "MiMo mimo-v2.5 only; not a cross-provider conclusion.",
   },
   "deepseek-v4-flash": {
     providerName: "deepseek",
     model: "deepseek-v4-flash",
+    routeType: "direct_provider",
+    evidenceLevel: "provider_specific_evidence",
+    pricingBasis: "provider_official_price",
+    billingAudited: false,
     pricingCnyPerMillionTokens: CNY_CACHE_PRICING_PER_MILLION_TOKENS,
     limitation: "DeepSeek deepseek-v4-flash only; not a cross-provider conclusion.",
+  },
+  "relay-openai-gpt55-codex-oauth": {
+    providerName: "sanye-relay",
+    model: "gpt-5.5",
+    routeType: "third_party_relay",
+    evidenceLevel: "relay_specific_observation",
+    pricingBasis: "openai_official_reference_price",
+    billingAudited: false,
+    officialReferencePricingUsdPerMillionTokens: GPT55_OFFICIAL_REFERENCE_PRICING_USD_PER_MILLION_TOKENS,
+    pricingCnyPerMillionTokens: null,
+    limitation: "GPT-5.5 via third-party relay only; not OpenAI official API evidence.",
   },
 };
 
@@ -623,6 +650,10 @@ function detectProviderProfile(providerName, model) {
     providerName: providerName || "openai-compatible",
     model: model || "unknown",
     pricingCnyPerMillionTokens: CNY_CACHE_PRICING_PER_MILLION_TOKENS,
+    routeType: "openai_compatible",
+    evidenceLevel: "local_observation_only",
+    pricingBasis: "custom_or_unspecified",
+    billingAudited: false,
     limitation: "Custom OpenAI-compatible provider; not a cross-provider conclusion.",
   };
 }
@@ -637,6 +668,11 @@ function getEnvConfig() {
     model,
     providerName,
     providerProfileId: providerProfile.profileId,
+    routeType: providerProfile.routeType,
+    evidenceLevel: providerProfile.evidenceLevel,
+    pricingBasis: providerProfile.pricingBasis,
+    billingAudited: providerProfile.billingAudited,
+    officialReferencePricingUsdPerMillionTokens: providerProfile.officialReferencePricingUsdPerMillionTokens,
     pricingCnyPerMillionTokens: providerProfile.pricingCnyPerMillionTokens,
     providerLimitation: providerProfile.limitation,
     timeoutMs: Number(process.env.BASEBRIEF_PROVIDER_TIMEOUT_MS || 30000),
@@ -650,6 +686,15 @@ function getEnvConfig() {
 }
 
 function estimateCostCny(metrics, pricing = CNY_CACHE_PRICING_PER_MILLION_TOKENS) {
+  if (!pricing) {
+    return {
+      uncachedInputTokens: null,
+      estimatedInputHitCostCny: null,
+      estimatedInputMissCostCny: null,
+      estimatedOutputCostCny: null,
+      estimatedTotalCostCny: null,
+    };
+  }
   const promptTokens = metrics.promptTokens ?? 0;
   const cachedTokens = metrics.cachedTokens ?? 0;
   const completionTokens = metrics.completionTokens ?? 0;
@@ -1975,9 +2020,17 @@ function buildSummary(rawResult) {
     providerName: rawResult.providerName,
     model: rawResult.model,
     providerProfileId: rawResult.providerProfileId,
+    routeType: rawResult.routeType,
+    evidenceLevel: rawResult.evidenceLevel,
+    pricingBasis: rawResult.pricingBasis,
+    billingAudited: rawResult.billingAudited,
+    officialReferencePricingUsdPerMillionTokens: rawResult.officialReferencePricingUsdPerMillionTokens,
     mode: rawResult.mode || "absolute",
     benchmarkKind: "local-real-projects-redacted",
-    pricingCnyPerMillionTokens: rawResult.pricingCnyPerMillionTokens || CNY_CACHE_PRICING_PER_MILLION_TOKENS,
+    pricingCnyPerMillionTokens:
+      rawResult.pricingCnyPerMillionTokens === undefined
+        ? CNY_CACHE_PRICING_PER_MILLION_TOKENS
+        : rawResult.pricingCnyPerMillionTokens,
     projectCount: rawResult.projectIds.length,
     scenarioCount: scenarioList.length,
     repeatsPerVariant: rawResult.repeats,
@@ -2174,6 +2227,11 @@ async function runBenchmark(options = {}) {
     providerName: env.providerName,
     model: env.model,
     providerProfileId: env.providerProfileId,
+    routeType: env.routeType,
+    evidenceLevel: env.evidenceLevel,
+    pricingBasis: env.pricingBasis,
+    billingAudited: env.billingAudited,
+    officialReferencePricingUsdPerMillionTokens: env.officialReferencePricingUsdPerMillionTokens,
     providerLimitation: env.providerLimitation,
     mode: options.mode,
     pricingCnyPerMillionTokens: env.pricingCnyPerMillionTokens,
@@ -2245,4 +2303,5 @@ module.exports = {
   SCENARIOS,
   PAD_SWEEP_VARIANTS,
   PROVIDER_PROFILES,
+  GPT55_OFFICIAL_REFERENCE_PRICING_USD_PER_MILLION_TOKENS,
 };
