@@ -49,3 +49,15 @@
 Full 的主产物始终是人类可读 brief。需要 provider 侧缓存实验时，先保留 readable brief，再通过 BB9 handoff 后处理生成 `cacheSidecar` / `activeProviderPrompt`。
 
 不要把 sidecar 字段或 PAD 结构塞进普通 `BASEBRIEF.md` 正文。
+
+如果用户明确要求 handoff builder 或 provider active prompt，可以在可读 brief 末尾追加结构化 JSON 附录块：
+
+````text
+<!-- BASEBRIEF_HANDOFF_JSON_BEGIN -->
+```json
+{ ...bb9 handoff schema input... }
+```
+<!-- BASEBRIEF_HANDOFF_JSON_END -->
+````
+
+该块必须满足 `schemas/bb9-handoff.schema.json`，并且只作为后处理输入。

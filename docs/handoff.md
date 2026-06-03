@@ -64,6 +64,53 @@ Optional input fields:
 
 `mode` must be `full` or `lite`. Normal BaseBrief usage should choose one of these first, then run handoff post-processing only when provider-side repetition is needed.
 
+## Structured Markdown Block
+
+Full and Lite can optionally carry schema-backed handoff input at the end of the readable brief.
+
+Only use this block when the user explicitly asks for a handoff builder flow or provider active prompt. It is not part of the ordinary visible brief.
+
+The exact markers are:
+
+````text
+<!-- BASEBRIEF_HANDOFF_JSON_BEGIN -->
+```json
+{ ...bb9 handoff schema input... }
+```
+<!-- BASEBRIEF_HANDOFF_JSON_END -->
+````
+
+Builder behavior:
+
+- `.json` input is read directly as BB9 handoff input.
+- Markdown input is accepted only when the marked fenced JSON block exists.
+- Free-form Markdown is not parsed.
+- Invalid JSON or missing schema-required fields must fail before artifacts are written.
+
+Examples:
+
+```text
+examples/structured-handoff-full.md
+examples/structured-handoff-lite.md
+```
+
+## Minimal Builder
+
+Builder command:
+
+```text
+node scripts/basebrief_build_handoff.js --input examples/structured-handoff-full.md --output-dir tests/outputs/private/structured-full --provider-profile mimo
+```
+
+Output files:
+
+- `readableBrief.md`
+- `activeProviderPrompt.md`
+- `handoff.meta.json`
+- `cacheSidecar.md` only when the selected provider profile supports sidecar output
+
+`handoff.meta.json` contains only metadata: selected variant, recommended prompt type, provider profile projection, fallback reason, prompt-use policy, warnings, and artifact names. It must not copy full prompt text.
+
 ## Provider Profile Rules
 
 MiMo and DeepSeek:
@@ -97,6 +144,7 @@ Current implementation source:
 
 ```text
 scripts/generate_bb9_handoff.js
+scripts/basebrief_build_handoff.js
 ```
 
 Example inputs and outputs:
@@ -107,5 +155,6 @@ examples/bb9-handoff-full-output.md
 examples/bb9-handoff-lite-input.json
 examples/bb9-handoff-lite-output.md
 examples/bb9-handoff-fallback-output.md
+examples/structured-handoff-full.md
+examples/structured-handoff-lite.md
 ```
-

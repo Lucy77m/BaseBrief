@@ -1,6 +1,7 @@
 const assert = require("node:assert/strict");
 const { execFileSync } = require("node:child_process");
 const fs = require("node:fs");
+const os = require("node:os");
 const path = require("node:path");
 const test = require("node:test");
 
@@ -8,6 +9,11 @@ const { generateFromObject } = require("../scripts/generate_cache_ready_lite");
 const { generateCapsuleFromObject } = require("../scripts/generate_cache_ready_capsule");
 const { generateAnchorFromObject } = require("../scripts/generate_cache_ready_anchor");
 const { generateBb9HandoffFromObject, getProviderProfile } = require("../scripts/generate_bb9_handoff");
+const {
+  buildHandoffArtifacts,
+  extractHandoffJsonBlock,
+  validateHandoffInput,
+} = require("../scripts/basebrief_build_handoff");
 const { buildSummary, getPromptForVariant, SCENARIOS, PROVIDER_PROFILES } = require("../scripts/provider_cache_benchmark");
 const { classifyRelayUsage } = require("../scripts/provider_relay_usage_audit");
 const { routeMode } = require("../scripts/mode_router");
@@ -20,6 +26,15 @@ function readText(relativePath) {
 
 function readJson(relativePath) {
   return JSON.parse(readText(relativePath));
+}
+
+function withTempDir(fn) {
+  const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "basebrief-handoff-"));
+  try {
+    return fn(tempDir);
+  } finally {
+    fs.rmSync(tempDir, { recursive: true, force: true });
+  }
 }
 
 function validateBb9HandoffInputAgainstSchema(input, schema) {
@@ -115,6 +130,103 @@ test("BB9 handoff contract and examples match schema boundaries", () => {
   });
   assert.match(handoffDoc, /BB12 is a MiMo-specific selector candidate/);
 });
+
+test("structured handoff markdown examples expose valid JSON blocks", () => {
+  const full = extractHandoffJsonBlock(readText("examples/structured-handoff-full.md"));
+  const lite = extractHandoffJsonBlock(readText("examples/structured-handoff-lite.md"));
+
+  validateHandoffInput(full);
+  validateHandoffInput(lite);
+  assert.equal(full.mode, "full");
+  assert.equal(lite.mode, "lite");
+});
+
+test("handoff builder writes prompt artifacts from structured markdown", () => withTempDir((tempDir) => {
+  const outputDir = path.join(tempDir, "mimo");
+  const result = buildHandoffArtifacts({
+    inputPath: path.join(repoRoot, "examples/structured-handoff-full.md"),
+    outputDir,
+    providerProfile: "mimo",
+  });
+
+  assert.equal(result.wroteCacheSidecar, true);
+  assert(fs.existsSync(path.join(outputDir, "readableBrief.md")));
+  assert(fs.existsSync(path.join(outputDir, "cacheSidecar.md")));
+  assert(fs.existsSync(path.join(outputDir, "activeProviderPrompt.md")));
+  assert(fs.existsSync(path.join(outputDir, "handoff.meta.json")));
+
+  const meta = JSON.parse(fs.readFileSync(path.join(outputDir, "handoff.meta.json"), "utf8"));
+  assert.equal(meta.recommendedPromptType, "cacheSidecar");
+  assert.equal(meta.artifacts.cacheSidecar, "cacheSidecar.md");
+  assert(!JSON.stringify(meta).includes("# BaseBrief BB9 Cache Sidecar"));
+}));
+
+test("handoff builder falls back to readable prompt for relay profile", () => withTempDir((tempDir) => {
+  const outputDir = path.join(tempDir, "relay");
+  const result = buildHandoffArtifacts({
+    inputPath: path.join(repoRoot, "examples/structured-handoff-lite.md"),
+    outputDir,
+    providerProfile: "relay-openai-gpt55-codex-oauth",
+  });
+
+  assert.equal(result.wroteCacheSidecar, false);
+  assert(fs.existsSync(path.join(outputDir, "readableBrief.md")));
+  assert(fs.existsSync(path.join(outputDir, "activeProviderPrompt.md")));
+  assert(!fs.existsSync(path.join(outputDir, "cacheSidecar.md")));
+  const readable = fs.readFileSync(path.join(outputDir, "readableBrief.md"), "utf8");
+  const active = fs.readFileSync(path.join(outputDir, "activeProviderPrompt.md"), "utf8");
+  const meta = JSON.parse(fs.readFileSync(path.join(outputDir, "handoff.meta.json"), "utf8"));
+  assert.equal(active, readable);
+  assert.equal(meta.recommendedPromptType, "readableBrief");
+  assert.equal(meta.artifacts.cacheSidecar, null);
+}));
+
+test("handoff builder rejects missing block, invalid json, and schema failures", () => withTempDir((tempDir) => {
+  const noBlock = path.join(tempDir, "no-block.md");
+  const invalidJson = path.join(tempDir, "invalid-json.md");
+  const missingField = path.join(tempDir, "missing-field.json");
+  fs.writeFileSync(noBlock, "# no block\n", "utf8");
+  fs.writeFileSync(invalidJson, [
+    "<!-- BASEBRIEF_HANDOFF_JSON_BEGIN -->",
+    "```json",
+    "{",
+    "```",
+    "<!-- BASEBRIEF_HANDOFF_JSON_END -->",
+  ].join("\n"), "utf8");
+  fs.writeFileSync(missingField, JSON.stringify({ mode: "lite" }), "utf8");
+
+  assert.throws(
+    () => buildHandoffArtifacts({ inputPath: noBlock, outputDir: path.join(tempDir, "out-a") }),
+    /Missing BASEBRIEF handoff JSON block/,
+  );
+  assert.throws(
+    () => buildHandoffArtifacts({ inputPath: invalidJson, outputDir: path.join(tempDir, "out-b") }),
+    /Invalid handoff JSON/,
+  );
+  assert.throws(
+    () => buildHandoffArtifacts({ inputPath: missingField, outputDir: path.join(tempDir, "out-c") }),
+    /Missing required key: project_identity/,
+  );
+}));
+
+test("handoff builder CLI accepts markdown input and writes metadata", () => withTempDir((tempDir) => {
+  const outputDir = path.join(tempDir, "cli");
+  const stdout = execFileSync(process.execPath, [
+    "scripts/basebrief_build_handoff.js",
+    "--input",
+    "examples/structured-handoff-full.md",
+    "--output-dir",
+    outputDir,
+    "--provider-profile",
+    "deepseek",
+    "--json",
+  ], { cwd: repoRoot, encoding: "utf8" });
+
+  const result = JSON.parse(stdout);
+  assert.equal(result.wroteCacheSidecar, true);
+  const meta = JSON.parse(fs.readFileSync(path.join(outputDir, "handoff.meta.json"), "utf8"));
+  assert.equal(meta.providerProfile.profileId, "deepseek");
+}));
 
 test("mode router asks for clarification when no mode signal is present", () => {
   assert.equal(routeMode("请继续。"), "needs-clarification");

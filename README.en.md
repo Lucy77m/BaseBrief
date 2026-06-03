@@ -136,6 +136,14 @@ Examples:
 - [BB9 lite input](examples/bb9-handoff-lite-input.json)
 - [BB9 lite output](examples/bb9-handoff-lite-output.md)
 - [BB9 unsupported provider fallback](examples/bb9-handoff-fallback-output.md)
+- [Structured full handoff example](examples/structured-handoff-full.md)
+- [Structured lite handoff example](examples/structured-handoff-lite.md)
+
+Minimal builder:
+
+```text
+node scripts/basebrief_build_handoff.js --input examples/structured-handoff-full.md --output-dir tests/outputs/private/structured-full --provider-profile mimo
+```
 
 Boundary: this is provider-specific estimated-cost evidence, not a billing audit and not a provider-general cache claim.
 

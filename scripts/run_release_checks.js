@@ -89,6 +89,7 @@ function checkRequiredFiles() {
     "scripts/provider_cache_benchmark.js",
     "scripts/provider_relay_usage_audit.js",
     "scripts/generate_bb9_handoff.js",
+    "scripts/basebrief_build_handoff.js",
     "scripts/bb9_provider_profiles.json",
     "schemas/bb9-handoff.schema.json",
     "examples/full-example.md",
@@ -106,6 +107,8 @@ function checkRequiredFiles() {
     "examples/bb9-handoff-lite-input.json",
     "examples/bb9-handoff-lite-output.md",
     "examples/bb9-handoff-fallback-output.md",
+    "examples/structured-handoff-full.md",
+    "examples/structured-handoff-lite.md",
     "examples/next-chat-example.md",
     "examples/agent-task-example.md",
   ];
@@ -124,6 +127,8 @@ function checkContentContracts() {
   const handoffDoc = readText("docs/handoff.md");
   const roadmapDoc = readText("docs/roadmap/basebrief-long-term-baseline.md");
   const bb9Schema = readJson("schemas/bb9-handoff.schema.json");
+  const structuredFullExample = readText("examples/structured-handoff-full.md");
+  const structuredLiteExample = readText("examples/structured-handoff-lite.md");
   const fullTemplate = readText("templates/zh-CN/BASEBRIEF.md");
   const liteTemplate = readText("templates/zh-CN/BASEBRIEF_LITE.md");
   const nextChatTemplate = readText("templates/zh-CN/NEXT_CHAT_PROMPT.md");
@@ -177,6 +182,14 @@ function checkContentContracts() {
   assert(handoffDoc.includes("cacheSidecar"), "handoff.md must define cacheSidecar");
   assert(handoffDoc.includes("activeProviderPrompt"), "handoff.md must define activeProviderPrompt");
   assert(handoffDoc.includes("handoff.meta.json"), "handoff.md must define handoff.meta.json");
+  assert(handoffDoc.includes("BASEBRIEF_HANDOFF_JSON_BEGIN"), "handoff.md must document structured JSON block markers");
+  assert(handoffDoc.includes("scripts/basebrief_build_handoff.js"), "handoff.md must document the builder script");
+  assert(readme.includes("examples/structured-handoff-full.md"), "README.md should link to structured full handoff example");
+  assert(englishReadme.includes("examples/structured-handoff-full.md"), "README.en.md should link to structured full handoff example");
+  assert(structuredFullExample.includes("BASEBRIEF_HANDOFF_JSON_BEGIN"), "structured full example must include handoff JSON begin marker");
+  assert(structuredFullExample.includes("BASEBRIEF_HANDOFF_JSON_END"), "structured full example must include handoff JSON end marker");
+  assert(structuredLiteExample.includes("BASEBRIEF_HANDOFF_JSON_BEGIN"), "structured lite example must include handoff JSON begin marker");
+  assert(structuredLiteExample.includes("BASEBRIEF_HANDOFF_JSON_END"), "structured lite example must include handoff JSON end marker");
   assert(roadmapDoc.includes("Do not add BB13"), "roadmap baseline must include experiment freeze rule");
   [
     "project_identity",
@@ -286,7 +299,8 @@ function checkSecurity() {
       relative === "scripts/run_release_checks.js" ||
       relative === "scripts/provider_cache_probe.js" ||
       relative === "scripts/provider_cache_benchmark.js" ||
-      relative === "scripts/generate_bb9_handoff.js"
+      relative === "scripts/generate_bb9_handoff.js" ||
+      relative === "scripts/basebrief_build_handoff.js"
     ) {
       return;
     }
@@ -339,6 +353,8 @@ function checkExamples() {
     "examples/bb9-handoff-lite-input.json",
     "examples/bb9-handoff-lite-output.md",
     "examples/bb9-handoff-fallback-output.md",
+    "examples/structured-handoff-full.md",
+    "examples/structured-handoff-lite.md",
     "examples/next-chat-example.md",
     "examples/agent-task-example.md",
   ];
