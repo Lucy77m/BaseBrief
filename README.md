@@ -189,6 +189,7 @@ BaseBrief/
 - 测试矩阵：[docs/testing.md](docs/testing.md)
 - Artifact checks: [docs/checks.md](docs/checks.md)
 - CLI Lite: [docs/cli-lite.md](docs/cli-lite.md)
+- Seal/Diff: [docs/seal-diff.md](docs/seal-diff.md)
 - 长期规划基线：[docs/roadmap/basebrief-long-term-baseline.md](docs/roadmap/basebrief-long-term-baseline.md)
 - Cache-ready 实验说明：[docs/experiments/cache-ready-lite.md](docs/experiments/cache-ready-lite.md)
 - 公开示例：[examples](examples)
@@ -260,4 +261,5 @@ node scripts/basebrief_build_handoff.js --input examples/structured-handoff-full
 node scripts/basebrief_build_adapters.js --input examples/structured-handoff-full.md --output-dir tests/outputs/private/adapters --target all
 node scripts/basebrief_check_artifacts.js --input examples/adapter-codex-task.md --json
 node scripts/basebrief.js build --input examples/structured-handoff-full.md --output-dir tests/outputs/private/cli-build --adapters all --check
+node scripts/basebrief.js diff --before examples/seal-before-input.json --after examples/seal-after-input.json --json
 ```

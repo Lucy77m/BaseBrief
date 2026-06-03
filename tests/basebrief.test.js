@@ -16,7 +16,8 @@ const {
 } = require("../scripts/basebrief_build_handoff");
 const { buildAdapterArtifacts, normalizeTargets } = require("../scripts/basebrief_build_adapters");
 const { checkArtifacts } = require("../scripts/basebrief_check_artifacts");
-const { commandBuild, commandCheck, commandInit, run, starterInput } = require("../scripts/basebrief");
+const { commandBuild, commandCheck, commandDiff, commandInit, commandSeal, run, starterInput } = require("../scripts/basebrief");
+const { createSealFromInput, diffSeals, readSealOrInput, SEAL_SCHEMA_VERSION } = require("../scripts/basebrief_seal");
 const { buildSummary, getPromptForVariant, SCENARIOS, PROVIDER_PROFILES } = require("../scripts/provider_cache_benchmark");
 const { classifyRelayUsage } = require("../scripts/provider_relay_usage_audit");
 const { routeMode } = require("../scripts/mode_router");
@@ -588,6 +589,79 @@ test("CLI Lite build --check exits nonzero when generated artifacts contain erro
   assert.equal(result.check.status, "failed");
   assert(result.check.findings.some((finding) => finding.ruleId === `artifact.missing-${"risk"}-boundaries`));
 }));
+
+test("Seal/Diff v1 creates stable seal snapshots from BB9 input", () => {
+  const input = readJson("examples/seal-before-input.json");
+  const seal = createSealFromInput(input, { sealedAt: "2026-06-03T00:00:00.000Z", label: "before" });
+
+  assert.equal(seal.schemaVersion, SEAL_SCHEMA_VERSION);
+  assert.equal(seal.sourceSchema, "schemas/bb9-handoff.schema.json");
+  assert.equal(seal.label, "before");
+  assert.equal(seal.handoff.project_identity, input.project_identity);
+  assert.match(seal.checksums.overall, /^[a-f0-9]{64}$/);
+  assert.match(seal.checksums.sections.verified_facts, /^[a-f0-9]{64}$/);
+  assert(!JSON.stringify(seal).includes("BASEBRIEF_CACHE_BLOCK_PAD"));
+});
+
+test("Seal/Diff v1 compares facts, decisions, risks, questions, and task boundaries", () => {
+  const before = createSealFromInput(readJson("examples/seal-before-input.json"), { sealedAt: "2026-06-03T00:00:00.000Z" });
+  const after = createSealFromInput(readJson("examples/seal-after-input.json"), { sealedAt: "2026-06-03T00:00:00.000Z" });
+  const diff = diffSeals(before, after);
+
+  assert.equal(diff.changed, true);
+  assert(diff.changedFields.includes("verified_facts"));
+  assert(diff.changedFields.includes("confirmed_decisions"));
+  assert(diff.changedFields.includes("risk_boundaries"));
+  assert(diff.changedFields.includes("open_questions"));
+  assert(diff.changedFields.includes("tail_request"));
+  assert.equal(diff.summary.taskBoundaryChanged, true);
+  assert.equal(diff.fields.verified_facts.added.length, 1);
+  assert.equal(diff.fields.open_questions.added.length, 1);
+});
+
+test("Seal/Diff v1 can read structured markdown and existing seal json", () => withTempDir((tempDir) => {
+  const sealPath = path.join(tempDir, "seal.json");
+  const result = commandSeal({
+    input: path.join(repoRoot, "examples/structured-handoff-full.md"),
+    output: sealPath,
+  });
+  const seal = readSealOrInput(sealPath);
+  const markdownSeal = readSealOrInput(path.join(repoRoot, "examples/structured-handoff-full.md"));
+
+  assert.equal(result.command, "seal");
+  assert.equal(seal.schemaVersion, SEAL_SCHEMA_VERSION);
+  assert.equal(markdownSeal.handoff.current_goal, seal.handoff.current_goal);
+  assert.equal(markdownSeal.checksums.overall, seal.checksums.overall);
+}));
+
+test("CLI Lite exposes seal and diff commands", () => withTempDir((tempDir) => {
+  const sealPath = path.join(tempDir, "seal-before.json");
+  const sealResult = commandSeal({
+    input: path.join(repoRoot, "examples/seal-before-input.json"),
+    output: sealPath,
+  });
+  const diffResult = commandDiff({
+    before: sealPath,
+    after: path.join(repoRoot, "examples/seal-after-input.json"),
+  });
+
+  assert.equal(sealResult.command, "seal");
+  assert(fs.existsSync(sealPath));
+  assert.equal(diffResult.command, "diff");
+  assert.equal(diffResult.diff.changed, true);
+  assert(diffResult.diff.changedFields.includes("tail_request"));
+}));
+
+test("Seal/Diff v1 rejects missing command arguments", () => {
+  assert.throws(() => commandSeal({ output: "seal.json" }), /Missing --input/);
+  assert.throws(() => commandSeal({ input: "examples/seal-before-input.json" }), /Missing --output/);
+  assert.throws(() => commandDiff({ after: "examples/seal-after-input.json" }), /Missing --before/);
+  assert.throws(() => commandDiff({ before: "examples/seal-before-input.json" }), /Missing --after/);
+  assert.throws(
+    () => diffSeals({ schemaVersion: "wrong" }, createSealFromInput(readJson("examples/seal-after-input.json"))),
+    /Before input is not a BaseBrief seal/,
+  );
+});
 
 test("mode router asks for clarification when no mode signal is present", () => {
   assert.equal(routeMode("请继续。"), "needs-clarification");

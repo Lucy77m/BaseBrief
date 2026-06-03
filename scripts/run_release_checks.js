@@ -71,6 +71,7 @@ function checkRequiredFiles() {
     "docs/handoff.md",
     "docs/checks.md",
     "docs/cli-lite.md",
+    "docs/seal-diff.md",
     "docs/testing.md",
     "docs/roadmap/basebrief-long-term-baseline.md",
     "docs/evolution/bb-evolution-log.md",
@@ -97,8 +98,10 @@ function checkRequiredFiles() {
     "scripts/basebrief_build_handoff.js",
     "scripts/basebrief_build_adapters.js",
     "scripts/basebrief_check_artifacts.js",
+    "scripts/basebrief_seal.js",
     "scripts/bb9_provider_profiles.json",
     "schemas/bb9-handoff.schema.json",
+    "schemas/basebrief-seal.schema.json",
     "examples/full-example.md",
     "examples/lite-example.md",
     "examples/cache-ready-input.json",
@@ -118,6 +121,8 @@ function checkRequiredFiles() {
     "examples/structured-handoff-lite.md",
     "examples/adapter-codex-task.md",
     "examples/adapter-claude-project-context.md",
+    "examples/seal-before-input.json",
+    "examples/seal-after-input.json",
     "examples/next-chat-example.md",
     "examples/agent-task-example.md",
   ];
@@ -137,8 +142,10 @@ function checkContentContracts() {
   const handoffDoc = readText("docs/handoff.md");
   const checksDoc = readText("docs/checks.md");
   const cliLiteDoc = readText("docs/cli-lite.md");
+  const sealDiffDoc = readText("docs/seal-diff.md");
   const roadmapDoc = readText("docs/roadmap/basebrief-long-term-baseline.md");
   const bb9Schema = readJson("schemas/bb9-handoff.schema.json");
+  const sealSchema = readJson("schemas/basebrief-seal.schema.json");
   const providerProfiles = readJson("scripts/bb9_provider_profiles.json");
   const structuredFullExample = readText("examples/structured-handoff-full.md");
   const structuredLiteExample = readText("examples/structured-handoff-lite.md");
@@ -162,6 +169,7 @@ function checkContentContracts() {
   assert(readme.includes("docs/handoff.md"), "README.md should link to handoff contract docs");
   assert(readme.includes("docs/checks.md"), "README.md should link to artifact checks docs");
   assert(readme.includes("docs/cli-lite.md"), "README.md should link to CLI Lite docs");
+  assert(readme.includes("docs/seal-diff.md"), "README.md should link to Seal/Diff docs");
   assert(readme.includes("docs/roadmap/basebrief-long-term-baseline.md"), "README.md should link to long-term baseline");
   assert(readme.includes("docs/experiments/cache-ready-capsule.md"), "README.md should link to cache-ready capsule docs");
   assert(readme.includes("docs/experiments/cache-ready-anchor.md"), "README.md should link to cache-ready anchor docs");
@@ -178,6 +186,7 @@ function checkContentContracts() {
   assert(englishReadme.includes("docs/adapters.md"), "README.en.md should link to adapters docs");
   assert(englishReadme.includes("docs/checks.md"), "README.en.md should link to artifact checks docs");
   assert(englishReadme.includes("docs/cli-lite.md"), "README.en.md should link to CLI Lite docs");
+  assert(englishReadme.includes("docs/seal-diff.md"), "README.en.md should link to Seal/Diff docs");
   assert(englishReadme.includes("docs/roadmap/basebrief-long-term-baseline.md"), "README.en.md should link to long-term baseline");
   assert(englishReadme.includes("Integrations"), "README.en.md should link to integrations docs");
   assert(englishReadme.includes("docs/experiments/cache-ready-anchor-pad.md"), "README.en.md should link to anchor-pad docs");
@@ -218,6 +227,12 @@ function checkContentContracts() {
   assert(cliLiteDoc.includes("scripts/basebrief.js"), "cli-lite.md must document CLI Lite script");
   assert(cliLiteDoc.includes("not an npm package"), "cli-lite.md must state CLI Lite is not an npm package");
   assert(cliLiteDoc.includes("node scripts/basebrief.js build"), "cli-lite.md must document build command");
+  assert(cliLiteDoc.includes("node scripts/basebrief.js seal"), "cli-lite.md must document seal command");
+  assert(cliLiteDoc.includes("node scripts/basebrief.js diff"), "cli-lite.md must document diff command");
+  assert(sealDiffDoc.includes("scripts/basebrief_seal.js"), "seal-diff.md must document seal script");
+  assert(sealDiffDoc.includes("basebrief-seal-v1"), "seal-diff.md must document seal schema version");
+  assert(sealDiffDoc.includes("not a project-management system"), "seal-diff.md must state product boundary");
+  assert(sealSchema.properties.schemaVersion.const === "basebrief-seal-v1", "Seal schema must define v1 schema version");
   assert(structuredFullExample.includes("BASEBRIEF_HANDOFF_JSON_BEGIN"), "structured full example must include handoff JSON begin marker");
   assert(structuredFullExample.includes("BASEBRIEF_HANDOFF_JSON_END"), "structured full example must include handoff JSON end marker");
   assert(structuredLiteExample.includes("BASEBRIEF_HANDOFF_JSON_BEGIN"), "structured lite example must include handoff JSON begin marker");
@@ -418,6 +433,8 @@ function checkExamples() {
     "examples/structured-handoff-lite.md",
     "examples/adapter-codex-task.md",
     "examples/adapter-claude-project-context.md",
+    "examples/seal-before-input.json",
+    "examples/seal-after-input.json",
     "examples/next-chat-example.md",
     "examples/agent-task-example.md",
   ];
@@ -535,6 +552,79 @@ function checkCliLite() {
     assert(checkResult.command === "check", "CLI check must return command metadata");
     assert(checkResult.check.status === "passed", "CLI check must delegate to artifact checker");
     assert(Array.isArray(checkResult.check.findings), "CLI check must return checker findings array");
+  } finally {
+    fs.rmSync(tempRoot, { recursive: true, force: true });
+  }
+  return 3;
+}
+
+function validateSealShape(seal) {
+  assert(seal.schemaVersion === "basebrief-seal-v1", "Seal must use v1 schema");
+  assert(seal.sourceSchema === "schemas/bb9-handoff.schema.json", "Seal must reference BB9 handoff schema");
+  assert(seal.handoff && Array.isArray(seal.handoff.verified_facts), "Seal must contain canonical handoff facts");
+  assert(seal.checksums && /^[a-f0-9]{64}$/.test(seal.checksums.overall), "Seal must contain overall checksum");
+  assert(seal.checksums.sections && /^[a-f0-9]{64}$/.test(seal.checksums.sections.risk_boundaries), "Seal must contain section checksums");
+}
+
+function checkSealDiff() {
+  const tempRoot = fs.mkdtempSync(path.join(repoRoot, "tests", "outputs", "private", "release-seal-"));
+  try {
+    const sealPath = path.join(tempRoot, "seal-before.json");
+    const sealStdout = execFileSync(process.execPath, [
+      "scripts/basebrief_seal.js",
+      "seal",
+      "--input",
+      "examples/seal-before-input.json",
+      "--output",
+      sealPath,
+      "--json",
+    ], {
+      cwd: repoRoot,
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "pipe"],
+      env: process.env,
+    });
+    const sealResult = JSON.parse(sealStdout);
+    assert(sealResult.command === "seal", "Seal script must return seal command metadata");
+    validateSealShape(JSON.parse(fs.readFileSync(sealPath, "utf8")));
+
+    const diffStdout = execFileSync(process.execPath, [
+      "scripts/basebrief_seal.js",
+      "diff",
+      "--before",
+      sealPath,
+      "--after",
+      "examples/seal-after-input.json",
+      "--json",
+    ], {
+      cwd: repoRoot,
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "pipe"],
+      env: process.env,
+    });
+    const diffResult = JSON.parse(diffStdout);
+    assert(diffResult.command === "diff", "Seal script must return diff command metadata");
+    assert(diffResult.diff.changed === true, "Seal diff must detect changes");
+    assert(diffResult.diff.summary.taskBoundaryChanged === true, "Seal diff must detect task-boundary changes");
+    assert(diffResult.diff.fields.verified_facts.added.length >= 1, "Seal diff must report added facts");
+
+    const cliDiffStdout = execFileSync(process.execPath, [
+      "scripts/basebrief.js",
+      "diff",
+      "--before",
+      "examples/seal-before-input.json",
+      "--after",
+      "examples/seal-after-input.json",
+      "--json",
+    ], {
+      cwd: repoRoot,
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "pipe"],
+      env: process.env,
+    });
+    const cliDiffResult = JSON.parse(cliDiffStdout);
+    assert(cliDiffResult.command === "diff", "CLI Lite must expose diff command");
+    assert(cliDiffResult.diff.changedFields.includes("tail_request"), "CLI diff must report changed tail request");
   } finally {
     fs.rmSync(tempRoot, { recursive: true, force: true });
   }
@@ -717,6 +807,7 @@ async function main() {
   const exampleCount = checkExamples();
   const artifactCheckInputs = checkArtifactChecker();
   const cliLiteCommands = checkCliLite();
+  const sealDiffCommands = checkSealDiff();
   const benchmarkSummaryStatus = checkBenchmarkSummaryIfPresent();
   const independentTests = checkIndependentTests();
   const proxy = checkCacheReadyProxy();
@@ -729,6 +820,7 @@ async function main() {
   console.log(`example_files=${exampleCount}`);
   console.log(`artifact_check_inputs=${artifactCheckInputs}`);
   console.log(`cli_lite_commands=${cliLiteCommands}`);
+  console.log(`seal_diff_commands=${sealDiffCommands}`);
   console.log(`benchmark_summary_status=${benchmarkSummaryStatus}`);
   console.log(`independent_test_files=${independentTests}`);
   console.log(`provider_probe_status=${providerProbe.status}`);

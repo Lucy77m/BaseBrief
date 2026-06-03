@@ -10,6 +10,8 @@ Run it through Node:
 node scripts/basebrief.js init --output-dir tests/outputs/private/starter
 node scripts/basebrief.js build --input examples/structured-handoff-full.md --output-dir tests/outputs/private/cli-build --adapters all --check
 node scripts/basebrief.js check --input examples/adapter-codex-task.md --json
+node scripts/basebrief.js seal --input examples/seal-before-input.json --output tests/outputs/private/seal-before.json
+node scripts/basebrief.js diff --before examples/seal-before-input.json --after examples/seal-after-input.json --json
 ```
 
 ## Commands
@@ -48,6 +50,22 @@ node scripts/basebrief.js check --input <file-or-dir> [--json]
 ```
 
 This command delegates to the Phase 6 artifact checker. It does not duplicate the rule set.
+
+### seal
+
+```text
+node scripts/basebrief.js seal --input <markdown-json-or-seal> --output <seal-json> [--json]
+```
+
+This command delegates to Seal/Diff v1 and writes a local `basebrief-seal-v1` JSON snapshot.
+
+### diff
+
+```text
+node scripts/basebrief.js diff --before <seal-or-input> --after <seal-or-input> [--json]
+```
+
+This command compares two BB9 inputs or seals and reports changes in facts, decisions, risks, open questions, and task boundaries.
 
 ## JSON Output
 

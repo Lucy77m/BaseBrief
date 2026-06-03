@@ -1,0 +1,34 @@
+{
+  "mode": "full",
+  "provider_profile": "unknown",
+  "project_identity": "BaseBrief public sample project",
+  "current_goal": "Prepare a stable handoff workflow with seal and diff review.",
+  "verified_facts": [
+    "BaseBrief has one public skill entry.",
+    "The handoff builder can generate readable brief artifacts.",
+    "CLI Lite can run artifact checks after building outputs."
+  ],
+  "confirmed_decisions": [
+    "Keep provider prompts separate from readable brief artifacts.",
+    "Use seal diff to review phase changes before sharing."
+  ],
+  "assumptions": [
+    "The next agent can inspect repository files before editing."
+  ],
+  "open_questions": [
+    "Whether seal diff should later feed release notes.",
+    "Whether a future seal should include adapter metadata checksums."
+  ],
+  "risk_boundaries": [
+    "Do not write secrets or private absolute paths.",
+    "Do not describe estimated cost as real billing evidence.",
+    "Do not treat seal diff as a full project-management system."
+  ],
+  "forbidden_scope": [
+    ".env files",
+    "provider credentials",
+    "automatic external publishing"
+  ],
+  "expected_output": "A readable handoff, adapter review notes, and seal diff summary.",
+  "tail_request": "Build the handoff artifacts, run checks, and compare the new seal against the previous seal."
+}

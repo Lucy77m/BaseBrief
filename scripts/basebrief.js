@@ -7,6 +7,7 @@ const path = require("path");
 const { buildAdapterArtifacts, normalizeTargets } = require("./basebrief_build_adapters");
 const { buildHandoffArtifacts, validateHandoffInput } = require("./basebrief_build_handoff");
 const { checkArtifacts } = require("./basebrief_check_artifacts");
+const { commandDiff: commandSealDiff, commandSeal: commandCreateSeal } = require("./basebrief_seal");
 
 const STARTER_FILE = "basebrief-handoff-input.json";
 
@@ -192,10 +193,26 @@ function commandCheck(options) {
   };
 }
 
+function commandSeal(options) {
+  return {
+    ...commandCreateSeal({
+      input: options.input,
+      output: options.output,
+    }),
+  };
+}
+
+function commandDiff(options) {
+  return commandSealDiff({
+    before: options.before,
+    after: options.after,
+  });
+}
+
 function run(argv) {
   const command = argv[2];
   if (!command) {
-    throw new Error("Missing command: init, build, or check");
+    throw new Error("Missing command: init, build, check, seal, or diff");
   }
   const options = parseOptions(argv.slice(3));
   if (options._.length) {
@@ -204,6 +221,8 @@ function run(argv) {
   if (command === "init") return commandInit(options);
   if (command === "build") return commandBuild(options);
   if (command === "check") return commandCheck(options);
+  if (command === "seal") return commandSeal(options);
+  if (command === "diff") return commandDiff(options);
   throw new Error(`Unknown command: ${command}`);
 }
 
@@ -238,6 +257,12 @@ function toPublicResult(result) {
       input: publicPath(result.input, cwd),
     };
   }
+  if (result.command === "seal") {
+    return {
+      ...result,
+      output: publicPath(result.output, cwd),
+    };
+  }
   return result;
 }
 
@@ -260,6 +285,17 @@ function formatHuman(result) {
   }
   if (result.command === "check") {
     return `BaseBrief check ${result.check.status}: errors=${result.check.errorCount}, warnings=${result.check.warningCount}${os.EOL}`;
+  }
+  if (result.command === "seal") {
+    return `BaseBrief seal written to ${result.output}${os.EOL}checksum=${result.checksum}${os.EOL}`;
+  }
+  if (result.command === "diff") {
+    return [
+      `BaseBrief seal diff changed=${result.diff.changed}`,
+      `changed_fields=${result.diff.changedFields.join(",") || "none"}`,
+      `task_boundary_changed=${result.diff.summary.taskBoundaryChanged}`,
+      "",
+    ].join(os.EOL);
   }
   return `${JSON.stringify(result, null, 2)}${os.EOL}`;
 }
@@ -290,7 +326,9 @@ if (require.main === module) {
 module.exports = {
   commandBuild,
   commandCheck,
+  commandDiff,
   commandInit,
+  commandSeal,
   parseOptions,
   run,
   starterInput,

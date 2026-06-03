@@ -100,6 +100,7 @@ Normal `full` / `lite` briefs stay human-readable. Provider-facing `cacheSidecar
 - [Testing](docs/testing.md)
 - [Artifact checks](docs/checks.md)
 - [CLI Lite](docs/cli-lite.md)
+- [Seal/Diff](docs/seal-diff.md)
 - [Long-term baseline](docs/roadmap/basebrief-long-term-baseline.md)
 - [Cache-ready experiment notes](docs/experiments/cache-ready-lite.md)
 - [BB2 cache capsule notes](docs/experiments/cache-ready-capsule.md)
@@ -152,6 +153,7 @@ node scripts/basebrief_build_handoff.js --input examples/structured-handoff-full
 node scripts/basebrief_build_adapters.js --input examples/structured-handoff-full.md --output-dir tests/outputs/private/adapters --target all
 node scripts/basebrief_check_artifacts.js --input examples/adapter-codex-task.md --json
 node scripts/basebrief.js build --input examples/structured-handoff-full.md --output-dir tests/outputs/private/cli-build --adapters all --check
+node scripts/basebrief.js diff --before examples/seal-before-input.json --after examples/seal-after-input.json --json
 ```
 
 Boundary: this is provider-specific estimated-cost evidence, not a billing audit and not a provider-general cache claim.

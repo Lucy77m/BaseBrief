@@ -1,0 +1,110 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/basebrief/schemas/basebrief-seal.schema.json",
+  "title": "BaseBrief Seal v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "sourceSchema", "sealedAt", "handoff", "checksums"],
+  "properties": {
+    "schemaVersion": {
+      "const": "basebrief-seal-v1"
+    },
+    "sourceSchema": {
+      "const": "schemas/bb9-handoff.schema.json"
+    },
+    "sealedAt": {
+      "type": "string",
+      "minLength": 1
+    },
+    "label": {
+      "type": "string"
+    },
+    "handoff": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "mode",
+        "provider_profile",
+        "project_identity",
+        "current_goal",
+        "verified_facts",
+        "confirmed_decisions",
+        "assumptions",
+        "open_questions",
+        "risk_boundaries",
+        "forbidden_scope",
+        "expected_output",
+        "tail_request",
+        "audience"
+      ],
+      "properties": {
+        "mode": {
+          "type": "string",
+          "enum": ["full", "lite"]
+        },
+        "provider_profile": {
+          "type": "string"
+        },
+        "project_identity": {
+          "type": "string"
+        },
+        "current_goal": {
+          "type": "string"
+        },
+        "verified_facts": {
+          "$ref": "#/$defs/stringArray"
+        },
+        "confirmed_decisions": {
+          "$ref": "#/$defs/stringArray"
+        },
+        "assumptions": {
+          "$ref": "#/$defs/stringArray"
+        },
+        "open_questions": {
+          "$ref": "#/$defs/stringArray"
+        },
+        "risk_boundaries": {
+          "$ref": "#/$defs/stringArray"
+        },
+        "forbidden_scope": {
+          "$ref": "#/$defs/stringArray"
+        },
+        "expected_output": {
+          "type": "string"
+        },
+        "tail_request": {
+          "type": "string"
+        },
+        "audience": {
+          "type": "string"
+        }
+      }
+    },
+    "checksums": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["overall", "sections"],
+      "properties": {
+        "overall": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "sections": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "stringArray": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  }
+}

@@ -251,6 +251,8 @@ Exit criteria:
 - Diff output helps continuation decisions.
 - The feature does not become a heavy project-management system.
 
+Current v1 target: local `basebrief-seal-v1` snapshots and diff summaries compare BB9 handoff state across phases. Seal/Diff remains file-based and optional.
+
 ### Phase 9: ContextOps Vision
 
 Goal: keep the long-term direction visible without prematurely turning it into implementation scope.

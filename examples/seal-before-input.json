@@ -1,0 +1,29 @@
+{
+  "mode": "full",
+  "provider_profile": "unknown",
+  "project_identity": "BaseBrief public sample project",
+  "current_goal": "Prepare a stable handoff workflow for adapter output review.",
+  "verified_facts": [
+    "BaseBrief has one public skill entry.",
+    "The handoff builder can generate readable brief artifacts."
+  ],
+  "confirmed_decisions": [
+    "Keep provider prompts separate from readable brief artifacts."
+  ],
+  "assumptions": [
+    "The next agent can inspect repository files before editing."
+  ],
+  "open_questions": [
+    "Whether seal diff should later feed release notes."
+  ],
+  "risk_boundaries": [
+    "Do not write secrets or private absolute paths.",
+    "Do not describe estimated cost as real billing evidence."
+  ],
+  "forbidden_scope": [
+    ".env files",
+    "provider credentials"
+  ],
+  "expected_output": "A readable handoff and adapter review notes.",
+  "tail_request": "Build the handoff artifacts and review adapter outputs."
+}
