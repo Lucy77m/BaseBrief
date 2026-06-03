@@ -72,3 +72,11 @@ This log records why each cache-ready generation exists and whether it has bench
 - Evidence: MiMo `mimo-v2.5` 360-request sample reached `16/18` wins vs readable Lite and `-15.91%` overall estimated-cost delta vs readable Lite.
 - Limitation: BB11 trim was no-worse-than-`bb9Best` in only `10/18` comparisons, and the guard reached only `12/18`; it is cost evidence, not a BB9 selector replacement.
 - DeepSeek status: 20-request smoke was inconclusive and more expensive than readable Lite, so no large sample should be run for this variant yet.
+
+## BB12 Size-band Guard
+
+- Purpose: fix BB11's larger-project cache-block regression by falling back to `bb9Best` when the BB11 trimmed prompt enters the failure size band.
+- Mechanism: `bb12GuardPoc` uses BB11 selector guard below 3200 prompt characters and `bb9Best` at or above that boundary.
+- Evidence: MiMo `mimo-v2.5` 360-request sample reached `18/18` wins vs readable Lite, `18/18` no-worse-than-`bb9Best`, `-28.70%` vs readable Lite, and `-11.37%` vs `bb9Best`.
+- Current status: MiMo-specific active-prompt guard selector candidate; not a cross-provider proof or billing audit.
+- DeepSeek status: 20-request smoke was inconclusive, with `0/2` wins vs readable Lite, so no large sample should be run for this variant yet.

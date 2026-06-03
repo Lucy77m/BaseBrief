@@ -191,6 +191,7 @@ BaseBrief/
 - BB6 Hybrid Anchor notes: [docs/experiments/cache-ready-hybrid-anchor.md](docs/experiments/cache-ready-hybrid-anchor.md)
 - BB9 Adaptive Selector notes: [docs/experiments/cache-ready-adaptive-selector.md](docs/experiments/cache-ready-adaptive-selector.md)
 - BB11 Active Prompt Trim notes: [docs/experiments/cache-ready-active-prompt-trim.md](docs/experiments/cache-ready-active-prompt-trim.md)
+- BB12 Size-band Guard notes: [docs/experiments/cache-ready-bb12-guard.md](docs/experiments/cache-ready-bb12-guard.md)
 - BB evolution log: [docs/evolution/bb-evolution-log.md](docs/evolution/bb-evolution-log.md)
 - GPT-5.5 relay usage audit: [docs/experiments/cache-ready-relay-gpt55.md](docs/experiments/cache-ready-relay-gpt55.md)
 

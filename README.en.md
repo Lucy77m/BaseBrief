@@ -102,6 +102,7 @@ The evidence is tiered: early normalized benchmarks did not prove better cache r
 - [BB6 hybrid anchor notes](docs/experiments/cache-ready-hybrid-anchor.md)
 - [BB9 adaptive selector notes](docs/experiments/cache-ready-adaptive-selector.md)
 - [BB11 active prompt trim notes](docs/experiments/cache-ready-active-prompt-trim.md)
+- [BB12 size-band guard notes](docs/experiments/cache-ready-bb12-guard.md)
 - [BB evolution log](docs/evolution/bb-evolution-log.md)
 - [GPT-5.5 relay usage audit](docs/experiments/cache-ready-relay-gpt55.md)
 - [Examples](examples)

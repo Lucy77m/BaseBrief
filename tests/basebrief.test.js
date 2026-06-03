@@ -532,6 +532,32 @@ test("activePromptTrimPoc benchmark prompts emit compact BB11 lite sidecar and s
   assert(guard === trim || guard === bb9, "Selector guard should choose either trimmed sidecar or BB9 best fallback");
 });
 
+test("bb12GuardPoc prompt uses size-band guard before falling back to BB9", () => {
+  const smallSnapshot = {
+    projectId: "projectA",
+    readmeExcerpt: "Public sample README.",
+    packages: [{ location: "package.json", name: "sample" }],
+    entryFiles: ["src/main.js"],
+    configFiles: ["vite.config.js"],
+    fileSample: ["src/main.js", "vite.config.js"],
+  };
+  const largeSnapshot = {
+    ...smallSnapshot,
+    projectId: "projectC",
+    readmeExcerpt: "Large public sample README. ".repeat(80),
+    packages: [{ location: "package.json", name: "sample", dependencies: Array.from({ length: 30 }, (_, index) => `dep-${index}`) }],
+    fileSample: Array.from({ length: 80 }, (_, index) => `src/very-long-directory-name/file-${index}.js`),
+  };
+  const scenario = SCENARIOS[0];
+  const smallBb11Guard = getPromptForVariant("bb12GuardPoc", smallSnapshot, scenario, 0, "bb11SelectorGuard", "mimo");
+  const smallBb12 = getPromptForVariant("bb12GuardPoc", smallSnapshot, scenario, 0, "bb12SizeBandGuard", "mimo");
+  const largeBb9 = getPromptForVariant("bb12GuardPoc", largeSnapshot, scenario, 0, "bb9Best", "mimo");
+  const largeBb12 = getPromptForVariant("bb12GuardPoc", largeSnapshot, scenario, 0, "bb12SizeBandGuard", "mimo");
+
+  assert.equal(smallBb12, smallBb11Guard);
+  assert.equal(largeBb12, largeBb9);
+});
+
 test("handoffPoc benchmark summary classifies sidecar wins against readable baselines", () => {
   const projectIds = ["projectA", "projectB", "projectC"];
   const calls = [];
@@ -689,6 +715,65 @@ test("activePromptTrimPoc benchmark summary classifies BB11 trim and selector gu
   assert.equal(summary.activePromptTrimStats.estimatedCostWinsVsBb10, 18);
   assert.equal(summary.activePromptTrimStats.selectorGuardEstimatedCostNoWorseThanBb9Best, 18);
   assert.equal(summary.conclusionLevel, "bb11_active_prompt_trim_selector_guard_candidate");
+});
+
+test("bb12GuardPoc benchmark summary classifies size-band guard selector candidates", () => {
+  const projectIds = ["projectA", "projectB", "projectC"];
+  const calls = [];
+  const variants = ["readableLite", "cacheSidecarLiteTrimOnly", "bb9Best", "bb11SelectorGuard", "bb12SizeBandGuard"];
+
+  for (const projectId of projectIds) {
+    for (const scenario of SCENARIOS) {
+      for (const variant of variants) {
+        for (let iteration = 0; iteration < 10; iteration += 1) {
+          const estimatedTotalCostCny =
+            variant === "bb12SizeBandGuard"
+              ? 0.00007
+              : variant === "bb9Best"
+              ? 0.000075
+              : variant === "bb11SelectorGuard"
+              ? 0.00008
+              : variant === "cacheSidecarLiteTrimOnly"
+              ? 0.00009
+              : 0.0002;
+          calls.push({
+            projectId,
+            scenarioId: scenario.id,
+            variant,
+            phase: iteration === 0 ? "warmup" : "repeat",
+            iteration,
+            status: "success",
+            promptTokens: variant === "readableLite" ? 1000 : 1250,
+            completionTokens: 32,
+            cachedTokens: variant === "readableLite" ? 900 : 1216,
+            cacheRatio: variant === "readableLite" ? 900 / 1000 : 1216 / 1250,
+            cacheFieldVisible: true,
+            estimatedTotalCostCny,
+            totalLatencyMs: 1000 + iteration,
+          });
+        }
+      }
+    }
+  }
+
+  const summary = buildSummary({
+    status: "executed",
+    startedAt: "2026-06-02T00:00:00.000Z",
+    finishedAt: "2026-06-02T00:10:00.000Z",
+    providerName: "test-provider",
+    model: "test-model",
+    providerProfileId: "mimo",
+    mode: "bb12GuardPoc",
+    repeats: 10,
+    projectIds,
+    calls,
+  });
+
+  assert.equal(summary.requestCount, 900);
+  assert.equal(summary.bb12GuardStats.estimatedCostWinsVsReadable, 18);
+  assert.equal(summary.bb12GuardStats.estimatedCostNoWorseThanBb9Best, 18);
+  assert.equal(summary.bb12GuardStats.estimatedCostNoWorseThanBb11Guard, 18);
+  assert.equal(summary.conclusionLevel, "bb12_size_band_guard_selector_candidate");
 });
 
 test("core templates preserve BaseBrief baseline sections", () => {
