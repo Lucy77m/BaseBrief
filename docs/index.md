@@ -19,6 +19,7 @@
 
 ## 方向与验证
 
+- [v0.3.0 release candidate](releases/v0.3.0.md)
 - [测试与验证记录](testing.md)
 - [长期规划基线](roadmap/basebrief-long-term-baseline.md)
 - [ContextOps boundary](contextops.md)

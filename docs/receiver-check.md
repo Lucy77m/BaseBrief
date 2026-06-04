@@ -6,14 +6,19 @@ Receiver Safe Check 是可选、显式启用、零依赖的本地接收核验。
 
 ## 使用
 
-推荐工作流：
+推荐工作流分为两个角色：
 
 ```text
+# 来源窗口：生成配置并审阅
 node scripts/basebrief.js receiver-init --repo <target-repo> --output <receiver-check-config.json> --json
+
+# 接收窗口：使用用户私下提供的目标仓库路径核验
 node scripts/basebrief.js receiver-check --config <receiver-check-config.json> --repo <target-repo> --json
 ```
 
 `receiver-init` 从显式目标仓库生成 state-only 配置，默认 `declared_checks: []`。来源窗口应先审阅配置，再按需手动添加允许的声明检查。它不会猜测应运行哪些行为检查。
+
+来源窗口可以在交接前立即运行一次 `receiver-check` 作为配置 smoke，但这不属于接收窗口验收，也不能写成“接收窗口本轮已验证”。
 
 输出目录会按显式路径创建，输出必须是非敏感 `.json` 路径且文件不得已经存在。若配置写在目标仓库内，它必须是非 tracked 路径；仅当该路径对 Git status 可见时，才会自动加入 `expected_changed_files`，使紧接着运行的 `receiver-check` 可以匹配。Detached HEAD 使用稳定的 `(detached)` branch 表示。
 

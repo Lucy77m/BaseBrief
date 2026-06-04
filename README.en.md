@@ -93,6 +93,7 @@ BaseBrief is not a chat client, agent runtime, hosted platform, secret manager, 
 - [Mode selection](docs/mode-selection.md)
 - [CLI Lite](docs/cli-lite.md)
 - [Receiver Safe Check](docs/receiver-check.md)
+- [v0.3.0 Release Candidate](docs/releases/v0.3.0.md)
 - [Known limitations](docs/known-limitations.md)
 - [Documentation index](docs/index.md)
 - [Public minimal example](examples/minimal/README.md)

@@ -1,6 +1,6 @@
 # BaseBrief Long-term Baseline
 
-Date: 2026-06-04
+Date: 2026-06-05
 
 This document is the planning baseline for the next stages of BaseBrief. It is not a release promise, not a provider benchmark claim, and not a replacement for the current public README. Its job is to keep future work pointed at one coherent direction.
 
@@ -8,7 +8,7 @@ This document is the planning baseline for the next stages of BaseBrief. It is n
 
 BaseBrief should continue as one public skill entry with internal modes and supporting tools.
 
-Version `v0.2.0` completed the first local toolchain: structured handoff, provider profile metadata, file-based adapters, artifact checks, CLI Lite, and Seal/Diff v1. The `v0.2.1` public-entry polish and `v0.2.2` first-run workflow validation have now completed the initial usability closure. The immediate priority is post-release observation and real-workflow evidence, not another internal capability phase.
+Version `v0.2.0` completed the first local toolchain: structured handoff, provider profile metadata, file-based adapters, artifact checks, CLI Lite, and Seal/Diff v1. The `v0.2.1` public-entry polish and `v0.2.2` first-run workflow validation completed the initial usability closure. The current `v0.3.0` release candidate adds receiver-ready semantics, Receiver Safe Check v1, and an explicit `receiver-init -> receiver-check` local workflow without changing BB9 or the normal Full/Lite entry.
 
 The useful product shape is no longer "choose a cache-ready mode for normal work." The stronger direction is:
 
@@ -235,7 +235,7 @@ Exit criteria:
 - Zero-install skill usage remains documented.
 - The CLI is optional, not required for normal template use.
 
-Current v1 target: `scripts/basebrief.js` is a zero-dependency Node wrapper for init, build, and check. It stays optional and does not create an npm package, global command, plugin, or provider integration.
+Current v0.3 target: `scripts/basebrief.js` is a zero-dependency Node wrapper for init, build, check, receiver-init, receiver-check, seal, and diff. It stays optional and does not create an npm package, global command, plugin, or provider integration.
 
 ### Phase 8: Seal and Diff
 
@@ -254,6 +254,26 @@ Exit criteria:
 - The feature does not become a heavy project-management system.
 
 Current v1 target: local `basebrief-seal-v1` snapshots and diff summaries compare BB9 handoff state across phases. Seal/Diff remains file-based and optional.
+
+### Phase 8A: Receiver Workflow
+
+Goal: make receiver acceptance explicit and locally verifiable without turning BaseBrief into an agent runtime.
+
+Current v0.3 target:
+
+- receiver-ready human-readable protocol
+- explicit source-window versus receiver-window verification
+- stable expected changed-file manifest
+- optional Receiver Safe Check v1
+- state-only `receiver-init` followed by reviewed `receiver-check`
+- no raw commands, secrets, automatic working-directory switching, or full-test claims
+
+Exit criteria:
+
+- Receiver workflow is optional and backwards compatible.
+- Config and result contracts remain independent from BB9.
+- Temporary Git repositories prove pass, difference, blocked, and no-tracked-write behavior.
+- Public docs keep limitations and evidence scope explicit.
 
 ### Phase 9: ContextOps Vision
 
@@ -284,11 +304,11 @@ A new BB experiment is allowed only when all of the following are true:
 
 ## Near-term Priority Order
 
-1. Publish and observe the `v0.2.2` first-run workflow without expanding the feature surface.
-2. Collect public-safe evidence from real Full/Lite handoff workflows.
-3. Record where CLI Lite, checks, adapters, or Seal/Diff create friction or prevent mistakes.
-4. Choose the next `v0.3` change only from repeated, measured usage evidence.
-5. Keep provider experiments, ContextOps expansion, and speculative features frozen unless measured usage creates a concrete blocker.
+1. Complete and publish the `v0.3.0` receiver workflow after explicit user approval.
+2. Observe whether `receiver-init -> review config -> receiver-check` prevents real handoff mistakes.
+3. Collect public-safe evidence from real Full/Lite receiver-ready workflows.
+4. Keep installed CLI, plugins, provider experiments, ContextOps expansion, and speculative features frozen unless measured usage creates a concrete blocker.
+5. Choose the next version only from repeated, measured usage evidence.
 
 ## Success Metrics
 
@@ -313,6 +333,6 @@ BaseBrief is off track if:
 
 ## Current Strategic Decision
 
-The next development cycle should not chase a new benchmark variant.
+The current development cycle should complete the `v0.3.0` receiver workflow and release preparation without chasing a new benchmark variant, installed CLI, or plugin.
 
-The next development cycle should gather adoption evidence and make only small, evidence-driven fixes to the `v0.2.2` workflow. BB12 remains a MiMo-specific optimization candidate, while new experiments, speculative features, and broader platform work remain frozen.
+After release, the next development cycle should gather adoption evidence and make only evidence-driven fixes. BB12 remains a MiMo-specific optimization candidate, while new experiments, speculative features, and broader platform work remain frozen.

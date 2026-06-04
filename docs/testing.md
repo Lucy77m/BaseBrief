@@ -81,17 +81,18 @@ normalized 模式的公开结果默认写入 `tests/outputs/provider-cache-bench
 
 ## 最新一次本地结果
 
-最新一次 `v0.2.2` 发布候选本地验证未注入 provider 环境变量。`node scripts/run_release_checks.js` 已通过，关键结果为：
+最新一次 `v0.3.0` 发布候选本地验证未注入 provider 环境变量。`node scripts/run_release_checks.js` 已通过，关键结果为：
 
 - 模式路由用例：`11` 条通过
-- 安全扫描文件数：`128`
-- 相对链接检查：`109` 条有效
-- 公开示例文件：`27` 个存在
-- artifact checker 输入：`8` 个通过
-- CLI Lite 命令：`6` 条通过
-- 首次使用闭环命令：`4` 条通过
+- 安全扫描文件数：`136`
+- 相对链接检查：`122` 条有效
+- 公开示例文件：`28` 个存在
+- artifact checker 输入：`12` 个通过
+- CLI Lite 命令：`8` 条通过
+- 首次使用闭环命令：`6` 条通过
 - Seal/Diff 命令：`3` 条通过
 - 独立测试文件：`1` 个通过
+- 独立逻辑测试：`99/99` 通过
 - provider probe 状态：`skipped`
 - 已保存的公开 benchmark summaries：通过脱敏结构和结论等级检查；本轮未重新运行真实 provider benchmark
 - `cache-ready` 同项目不同轮次共享前缀：`492`
@@ -105,7 +106,16 @@ normalized 模式的公开结果默认写入 `tests/outputs/provider-cache-bench
 - cache-ready 字段顺序一致：`true`
 - cache-ready 缺字段输入拒绝：`true`
 
-本轮还完成了 Quickstart 的 `build -> check -> seal -> diff` 首次使用闭环、公开产物安全检查和独立逻辑测试。公开首次使用示例没有 error 或 warning，发布候选未发现 key、Bearer、`.env` 内容或私有绝对路径。
+本轮还完成了 Quickstart 的 `build -> check -> seal -> diff` 与 `receiver-init -> receiver-check` 首次使用闭环、公开产物安全检查和独立逻辑测试。公开首次使用示例没有 error 或 warning，发布候选未发现 key、Bearer、`.env` 内容或私有绝对路径。
+
+Receiver 逻辑由临时 Git 仓库自动测试覆盖。本轮未创建 Codex 接收线程，也未运行完整模型矩阵。
+
+本轮额外执行了两个有界外部 Agent 文档 smoke case：
+
+- OpenCode 只读 smoke 完成，并发现 Quickstart 中来源窗口连续 smoke 与接收窗口正式验收的角色表述不够清楚；文档已修正。
+- Claude Code smoke 在限定时间内未返回结果，因此未重试，也没有形成可解释结论。
+
+这些结果仅是补充执行记录，不构成跨模型稳定性证明。原始输出保存在 ignored private 测试目录，不进入公开仓库。
 
 `provider_probe_status=skipped` 表示本轮未注入 provider 环境变量且没有发起真实 provider 请求；这不等同于真实 provider probe 失败。下方保存的 provider probe 和 benchmark 结果是历史 provider-specific 证据，本轮只验证其公开摘要结构，没有重新运行。
 

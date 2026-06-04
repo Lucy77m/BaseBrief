@@ -93,6 +93,7 @@ BaseBrief 不是聊天客户端、Agent runtime、托管平台、密钥管理器
 - [模式选择](docs/mode-selection.md)
 - [CLI Lite](docs/cli-lite.md)
 - [Receiver Safe Check](docs/receiver-check.md)
+- [v0.3.0 Release Candidate](docs/releases/v0.3.0.md)
 - [已知限制](docs/known-limitations.md)
 - [完整文档索引](docs/index.md)
 - [公开最小示例](examples/minimal/README.md)

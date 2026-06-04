@@ -182,6 +182,18 @@ test("public docs keep cache-ready as explicit experiment route", () => {
   assert.match(docsIndex, /experiments\/cache-ready-bb12-guard\.md/);
 });
 
+test("v0.3.0 release candidate documents receiver workflow and release boundaries", () => {
+  const release = readText("docs/releases/v0.3.0.md");
+  const roadmap = readText("docs/roadmap/basebrief-long-term-baseline.md");
+  assert.match(release, /Receiver-ready v1/);
+  assert.match(release, /Receiver Safe Check v1/);
+  assert.match(release, /receiver-init --repo <target-repo>/);
+  assert.match(release, /No Codex receiver thread/);
+  assert.match(release, /No push, tag, or formal release/);
+  assert.match(roadmap, /Phase 8A: Receiver Workflow/);
+  assert.match(roadmap, /v0\.3\.0/);
+});
+
 test("public quickstart and minimal examples provide a clean first-use path", () => {
   const quickstart = readText("docs/quickstart-5min.md");
   const minimalBrief = readText("examples/minimal/output-basebrief-lite.md");
@@ -196,6 +208,7 @@ test("public quickstart and minimal examples provide a clean first-use path", ()
   assert.match(quickstart, /expected_changed_files/);
   assert.match(quickstart, /receiver_check_config/);
   assert.match(quickstart, /receiver-init --repo \. --output tests\/outputs\/private\/quickstart\/receiver-check\.json/);
+  assert.match(quickstart, /不是接收窗口验收/);
   assert.match(quickstart, /handoff_acceptance/);
   assert.match(minimalBrief, /handoff_status/);
   assert.match(minimalBrief, /handoff_protocol_version/);
