@@ -69,15 +69,19 @@ normalized 模式的公开结果默认写入 `tests/outputs/provider-cache-bench
 
 ## 最新一次本地结果
 
-最近一次注入 MiMo provider 环境变量后运行 `node scripts/run_release_checks.js` 已通过，关键结果为：
+最新一次 `v0.2.2` 发布候选本地验证未注入 provider 环境变量。`node scripts/run_release_checks.js` 已通过，关键结果为：
 
 - 模式路由用例：`11` 条通过
-- 安全扫描文件数：`49`
-- 相对链接检查：`18` 条有效
-- 公开示例文件：`12` 个存在
+- 安全扫描文件数：`128`
+- 相对链接检查：`109` 条有效
+- 公开示例文件：`27` 个存在
+- artifact checker 输入：`8` 个通过
+- CLI Lite 命令：`6` 条通过
+- 首次使用闭环命令：`4` 条通过
+- Seal/Diff 命令：`3` 条通过
 - 独立测试文件：`1` 个通过
-- provider probe 状态：**已运行，provider 暴露 `cached_tokens` 指标**
-- benchmark summary 状态：`absolute:large_sample_evidence,normalized:normalized_inconclusive`
+- provider probe 状态：`skipped`
+- 已保存的公开 benchmark summaries：通过脱敏结构和结论等级检查；本轮未重新运行真实 provider benchmark
 - `cache-ready` 同项目不同轮次共享前缀：`492`
 - 自然 Lite 同项目不同轮次共享前缀：`70`
 - `cache-ready` 跨项目共享前缀：`357`
@@ -89,7 +93,9 @@ normalized 模式的公开结果默认写入 `tests/outputs/provider-cache-bench
 - cache-ready 字段顺序一致：`true`
 - cache-ready 缺字段输入拒绝：`true`
 
-如果未注入 provider 环境变量，`run_release_checks.js` 会明确报告 `provider_probe_status=skipped`；这不等同于真实 provider probe 失败。
+本轮还完成了 Quickstart 的 `build -> check -> seal -> diff` 首次使用闭环、公开产物安全检查和独立逻辑测试。公开首次使用示例没有 error 或 warning，发布候选未发现 key、Bearer、`.env` 内容或私有绝对路径。
+
+`provider_probe_status=skipped` 表示本轮未注入 provider 环境变量且没有发起真实 provider 请求；这不等同于真实 provider probe 失败。下方保存的 provider probe 和 benchmark 结果是历史 provider-specific 证据，本轮只验证其公开摘要结构，没有重新运行。
 
 ## 本地真实项目大样本 benchmark
 

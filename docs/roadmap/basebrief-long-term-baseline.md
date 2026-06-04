@@ -8,7 +8,7 @@ This document is the planning baseline for the next stages of BaseBrief. It is n
 
 BaseBrief should continue as one public skill entry with internal modes and supporting tools.
 
-Version `v0.2.0` completed the first local toolchain: structured handoff, provider profile metadata, file-based adapters, artifact checks, CLI Lite, and Seal/Diff v1. The immediate priority is now public-entry clarity and real usage validation, not another internal capability phase.
+Version `v0.2.0` completed the first local toolchain: structured handoff, provider profile metadata, file-based adapters, artifact checks, CLI Lite, and Seal/Diff v1. The `v0.2.1` public-entry polish and `v0.2.2` first-run workflow validation have now completed the initial usability closure. The immediate priority is post-release observation and real-workflow evidence, not another internal capability phase.
 
 The useful product shape is no longer "choose a cache-ready mode for normal work." The stronger direction is:
 
@@ -284,11 +284,11 @@ A new BB experiment is allowed only when all of the following are true:
 
 ## Near-term Priority Order
 
-1. Make the public README and first-use path match the `v0.2.0` toolchain.
-2. Validate the smallest Full/Lite handoff flow with public-safe examples.
-3. Dogfood CLI Lite, checks, adapters, and Seal/Diff before expanding them.
-4. Use observed friction to choose the next engineering-usability change.
-5. Keep provider experiments and ContextOps expansion frozen unless measured usage creates a concrete blocker.
+1. Publish and observe the `v0.2.2` first-run workflow without expanding the feature surface.
+2. Collect public-safe evidence from real Full/Lite handoff workflows.
+3. Record where CLI Lite, checks, adapters, or Seal/Diff create friction or prevent mistakes.
+4. Choose the next `v0.3` change only from repeated, measured usage evidence.
+5. Keep provider experiments, ContextOps expansion, and speculative features frozen unless measured usage creates a concrete blocker.
 
 ## Success Metrics
 
@@ -315,4 +315,4 @@ BaseBrief is off track if:
 
 The next development cycle should not chase a new benchmark variant.
 
-The next development cycle should make the existing `v0.2.0` capabilities easier to understand and use. BB12 remains a MiMo-specific optimization candidate, while new experiments and broader platform work remain frozen.
+The next development cycle should gather adoption evidence and make only small, evidence-driven fixes to the `v0.2.2` workflow. BB12 remains a MiMo-specific optimization candidate, while new experiments, speculative features, and broader platform work remain frozen.
