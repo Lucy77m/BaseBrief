@@ -10,6 +10,19 @@ const { checkArtifacts } = require("./basebrief_check_artifacts");
 const { commandDiff: commandSealDiff, commandSeal: commandCreateSeal } = require("./basebrief_seal");
 
 const STARTER_FILE = "basebrief-handoff-input.json";
+const HELP_TEXT = [
+  "BaseBrief CLI Lite",
+  "",
+  "Usage:",
+  "  node scripts/basebrief.js init --output-dir <dir>",
+  "  node scripts/basebrief.js build --input <markdown-or-json> --output-dir <dir> [--adapters codex|claude|all|none] [--check]",
+  "  node scripts/basebrief.js check --input <file-or-dir>",
+  "  node scripts/basebrief.js seal --input <markdown-or-json> --output <file>",
+  "  node scripts/basebrief.js diff --before <file> --after <file>",
+  "",
+  "Start here:",
+  "  docs/quickstart-5min.md",
+].join(os.EOL);
 
 function parseOptions(args) {
   const options = { _: [] };
@@ -211,9 +224,7 @@ function commandDiff(options) {
 
 function run(argv) {
   const command = argv[2];
-  if (!command) {
-    throw new Error("Missing command: init, build, check, seal, or diff");
-  }
+  if (!command || command === "--help" || command === "-h") return { command: "help" };
   const options = parseOptions(argv.slice(3));
   if (options._.length) {
     throw new Error(`Unexpected positional argument: ${options._[0]}`);
@@ -267,6 +278,9 @@ function toPublicResult(result) {
 }
 
 function formatHuman(result) {
+  if (result.command === "help") {
+    return `${HELP_TEXT}${os.EOL}`;
+  }
   if (result.command === "init") {
     return `BaseBrief starter written to ${result.outputFiles.starter}${os.EOL}`;
   }
@@ -324,6 +338,7 @@ if (require.main === module) {
 }
 
 module.exports = {
+  HELP_TEXT,
   commandBuild,
   commandCheck,
   commandDiff,

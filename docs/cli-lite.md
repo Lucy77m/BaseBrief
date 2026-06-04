@@ -7,6 +7,7 @@ It is not an npm package, not a globally installed `basebrief` command, not a pl
 Run it through Node:
 
 ```text
+node scripts/basebrief.js --help
 node scripts/basebrief.js init --output-dir tests/outputs/private/starter
 node scripts/basebrief.js build --input examples/structured-handoff-full.md --output-dir tests/outputs/private/cli-build --adapters all --check
 node scripts/basebrief.js check --input examples/adapter-codex-task.md --json
@@ -15,6 +16,8 @@ node scripts/basebrief.js diff --before examples/seal-before-input.json --after 
 ```
 
 ## Commands
+
+Run `node scripts/basebrief.js`, `node scripts/basebrief.js --help`, or `node scripts/basebrief.js -h` to print the current command list and Quickstart link.
 
 ### init
 

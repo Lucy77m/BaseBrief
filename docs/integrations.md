@@ -1,11 +1,11 @@
 # BaseBrief 工具集成说明
 
-BaseBrief 当前是 Skill-first Markdown 工具，不是 CLI、插件、MCP、Web UI 或 provider 接入工具。
+BaseBrief 当前提供 Skill-first 使用方式和可选的零依赖 CLI Lite。它不是安装式 CLI、插件、MCP、Web UI 或 provider 接入工具。
 
-使用方式只有一个核心动作：
+普通交接的核心动作只有一个：
 
 ```text
-让你的 AI 工具读取 skills/basebrief/SKILL.md，然后按你的任务自动选择 full / lite / cache-ready。
+让你的 AI 工具读取 skills/basebrief/SKILL.md，然后按普通任务自动选择 full / lite。
 ```
 
 ## 通用安装方式
@@ -20,7 +20,7 @@ BaseBrief 当前是 Skill-first Markdown 工具，不是 CLI、插件、MCP、We
 
 ```text
 请读取 BaseBrief 的 skills/basebrief/SKILL.md。
-根据我接下来的任务自动选择 full、lite 或 cache-ready。
+根据我接下来的任务自动选择 full 或 lite。
 不要把推测写成事实；如果边界不清，先列 open_questions。
 ```
 
@@ -54,19 +54,11 @@ Lite 示例：
 如果发现 backend、provider、.env、部署、state、memory 或 gateway 相关内容，升级 full。
 ```
 
-Cache-ready 示例：
-
-```text
-请用 BaseBrief cache-ready 模式生成稳定前缀。
-这是 prompt cache 实验，只能说明稳定前缀和绝对 cached tokens 证据。
-不要宣称缓存比例、成本或延迟已经稳定胜出。
-```
-
 常见误用：
 
 - 让 Codex 一边大改代码一边生成基线，导致事实和变更混在一起。
 - 用 lite 处理 backend、provider、部署或真实 Agent runtime。
-- 把 cache-ready 写成已证明省钱。
+- 把实验性质的 provider evidence 写成普通功能承诺。
 
 ## Claude Code
 
@@ -142,7 +134,7 @@ Do not include long history.
 
 - 能读取 `skills/basebrief/SKILL.md`
 - 能读取目标项目的必要文件
-- 能按任务边界选择 full / lite / cache-ready
+- 能按任务边界选择 full / lite
 - 能把不确定内容放进 `open_questions`
 
 如果工具不能访问本地文件，就把必要事实手动提供给它，不要让它编造仓库状态。
@@ -151,7 +143,6 @@ Do not include long history.
 
 - 用 `full`：完整阶段基线、新窗口开场、Agent 任务说明、复杂项目归档、风险红线整理。
 - 用 `lite`：只读接续、简短交接、1 到 2 个文件的小范围任务。
-- 用 `cache-ready`：明确要做稳定前缀或 prompt cache 实验。
 
 不要用 lite 的情况：
 
@@ -164,7 +155,15 @@ Do not include long history.
 - 真实 Agent runtime
 - 边界不清的大任务
 
-## Cache-ready 表述边界
+## 高级 Handoff 与 Cache-ready
+
+普通用户直接使用可读的 Full 或 Lite brief。
+
+需要本地生成 handoff artifacts 时，使用 [Handoff 契约](handoff.md) 和 [CLI Lite](cli-lite.md)。Provider-facing `cacheSidecar` / `activeProviderPrompt` 属于显式高级后处理，不应塞进普通 readable brief。
+
+只有明确进行稳定前缀或 prompt-cache 实验时，才进入 `cache-ready` 路线。完整实验文档见 [文档索引](index.md)。
+
+表述边界：
 
 可以说：
 

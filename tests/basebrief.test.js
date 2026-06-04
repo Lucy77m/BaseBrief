@@ -16,7 +16,7 @@ const {
 } = require("../scripts/basebrief_build_handoff");
 const { buildAdapterArtifacts, normalizeTargets } = require("../scripts/basebrief_build_adapters");
 const { checkArtifacts } = require("../scripts/basebrief_check_artifacts");
-const { commandBuild, commandCheck, commandDiff, commandInit, commandSeal, run, starterInput } = require("../scripts/basebrief");
+const { HELP_TEXT, commandBuild, commandCheck, commandDiff, commandInit, commandSeal, run, starterInput } = require("../scripts/basebrief");
 const { createSealFromInput, diffSeals, readSealOrInput, SEAL_SCHEMA_VERSION } = require("../scripts/basebrief_seal");
 const { buildSummary, getPromptForVariant, SCENARIOS, PROVIDER_PROFILES } = require("../scripts/provider_cache_benchmark");
 const { classifyRelayUsage } = require("../scripts/provider_relay_usage_audit");
@@ -113,12 +113,28 @@ test("public docs keep cache-ready as explicit experiment route", () => {
   const englishReadme = readText("README.en.md");
   const skill = readText("skills/basebrief/SKILL.md");
   const modeSelection = readText("docs/mode-selection.md");
+  const docsIndex = readText("docs/index.md");
 
-  assert.match(readme, /普通项目接续默认在 `full` 和 `lite` 之间选择/);
+  assert.match(readme, /普通项目接续默认只在 `full` 和 `lite` 之间选择/);
   assert.match(readme, /`cache-ready` 只保留为显式 prompt-cache 实验路线/);
+  assert.match(readme, /零依赖 CLI Lite/);
+  assert.doesNotMatch(readme, /BaseBrief 当前不是 CLI|暂无 CLI/);
   assert.match(englishReadme, /normal continuation routes to `full` or `lite`/);
+  assert.match(englishReadme, /zero-dependency CLI Lite/);
   assert.match(skill, /普通项目接续默认只在 `full` 和 `lite` 之间选择/);
   assert.match(modeSelection, /`cache-ready` 是显式实验路线/);
+  assert.match(docsIndex, /experiments\/cache-ready-bb12-guard\.md/);
+});
+
+test("public quickstart and minimal examples provide a clean first-use path", () => {
+  const quickstart = readText("docs/quickstart-5min.md");
+  assert.match(quickstart, /路径 A/);
+  assert.match(quickstart, /路径 B/);
+  assert.match(quickstart, /路径 C/);
+
+  const result = checkArtifacts({ inputPath: path.join(repoRoot, "examples/minimal") });
+  assert.equal(result.status, "passed");
+  assert.equal(result.errorCount, 0);
 });
 
 test("BB9 handoff contract and examples match schema boundaries", () => {
@@ -545,7 +561,10 @@ test("CLI Lite check delegates to artifact checker", () => {
 });
 
 test("CLI Lite rejects missing command, missing args, and invalid adapter targets", () => {
-  assert.throws(() => run(["node", "scripts/basebrief.js"]), /Missing command/);
+  assert.equal(run(["node", "scripts/basebrief.js"]).command, "help");
+  assert.equal(run(["node", "scripts/basebrief.js", "--help"]).command, "help");
+  assert.equal(run(["node", "scripts/basebrief.js", "-h"]).command, "help");
+  assert.match(HELP_TEXT, /docs\/quickstart-5min\.md/);
   assert.throws(() => run(["node", "scripts/basebrief.js", "deploy"]), /Unknown command: deploy/);
   assert.throws(() => commandInit({}), /Missing --output-dir/);
   assert.throws(() => commandBuild({ "output-dir": "out" }), /Missing --input/);

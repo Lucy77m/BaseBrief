@@ -1,12 +1,14 @@
 # BaseBrief Long-term Baseline
 
-Date: 2026-06-03
+Date: 2026-06-04
 
 This document is the planning baseline for the next stages of BaseBrief. It is not a release promise, not a provider benchmark claim, and not a replacement for the current public README. Its job is to keep future work pointed at one coherent direction.
 
 ## Current Position
 
 BaseBrief should continue as one public skill entry with internal modes and supporting tools.
+
+Version `v0.2.0` completed the first local toolchain: structured handoff, provider profile metadata, file-based adapters, artifact checks, CLI Lite, and Seal/Diff v1. The immediate priority is now public-entry clarity and real usage validation, not another internal capability phase.
 
 The useful product shape is no longer "choose a cache-ready mode for normal work." The stronger direction is:
 
@@ -282,12 +284,11 @@ A new BB experiment is allowed only when all of the following are true:
 
 ## Near-term Priority Order
 
-1. Phase 0: public wording and route alignment.
-2. Phase 1: handoff contract and artifact boundaries.
-3. Phase 2: structured output POC.
-4. Phase 3: handoff builder.
-5. Phase 4: provider profile discipline.
-6. Phase 5 and Phase 6 in parallel only after the handoff builder is stable.
+1. Make the public README and first-use path match the `v0.2.0` toolchain.
+2. Validate the smallest Full/Lite handoff flow with public-safe examples.
+3. Dogfood CLI Lite, checks, adapters, and Seal/Diff before expanding them.
+4. Use observed friction to choose the next engineering-usability change.
+5. Keep provider experiments and ContextOps expansion frozen unless measured usage creates a concrete blocker.
 
 ## Success Metrics
 
@@ -314,4 +315,4 @@ BaseBrief is off track if:
 
 The next development cycle should not chase a new benchmark variant.
 
-The next development cycle should formalize the BB9 dual-track handoff, keep BB12 as a MiMo-specific optimization candidate, and make BaseBrief's public surface easier to understand.
+The next development cycle should make the existing `v0.2.0` capabilities easier to understand and use. BB12 remains a MiMo-specific optimization candidate, while new experiments and broader platform work remain frozen.

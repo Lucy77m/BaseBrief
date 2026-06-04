@@ -11,7 +11,7 @@
 ```text
 请读取 BaseBrief 的 skills/basebrief/SKILL.md。
 我接下来要整理一个项目的阶段基线。
-请先选择 full / lite / cache-ready，再生成内容。
+请先在 full / lite 之间选择，再生成内容。
 不要把推测写成事实。
 ```
 
@@ -151,27 +151,13 @@ lite 输出应短，重点是：
 
 如果任务突然涉及 backend、provider、`.env`、部署、state、memory、gateway，就停止 lite，升级 full。
 
-## 8. 什么时候用 cache-ready
+## 8. 普通交接之后
 
-只有用户明确要做稳定前缀或 prompt cache 实验时才用：
+普通接续直接使用 Full 或 Lite readable brief。
 
-```text
-请用 BaseBrief cache-ready 模式。
-我要比较稳定前缀下的 cached token 表现。
-不要宣称缓存比例、成本或延迟已经稳定胜出。
-```
+需要生成结构化 handoff、Adapter 或执行本地检查时，再使用 [CLI Lite](cli-lite.md)。需要比较阶段前后变化时，使用 [Seal/Diff](seal-diff.md)。
 
-cache-ready 可以表达：
-
-- 稳定前缀更可控
-- 固定字段顺序更适合缓存实验
-- 在 MiMo `mimo-v2.5` 的本地真实项目样本中，绝对 cached tokens 更高
-
-cache-ready 不能表达：
-
-- 已经证明更省钱
-- 已经证明缓存比例更高
-- 已经证明延迟稳定下降
+`cache-ready` 仅保留给明确的 prompt-cache 实验。它不是普通交接步骤，也不能被描述成跨 provider 或真实账单收益证明。
 
 ## 9. 最终检查
 
@@ -183,4 +169,4 @@ cache-ready 不能表达：
 - `open_questions` 明确列出信息缺口
 - `risk_boundaries` 包含 `.env`、API key、token、secret、部署等边界
 - 没有私有路径或敏感内容
-- 没有把 cache-ready 写成成本优势已证明
+- 没有把 provider-specific estimated-cost evidence 写成通用或真实账单证明

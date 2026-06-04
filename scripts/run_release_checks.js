@@ -64,6 +64,8 @@ function checkRequiredFiles() {
     "templates/zh-CN/CACHE_READY_ANCHOR_INPUT.json",
     "templates/zh-CN/CACHE_READY_ANCHOR_PAD_INPUT.json",
     "docs/usage.md",
+    "docs/index.md",
+    "docs/quickstart-5min.md",
     "docs/integrations.md",
     "docs/adapters.md",
     "docs/walkthrough.md",
@@ -126,6 +128,10 @@ function checkRequiredFiles() {
     "examples/seal-after-input.json",
     "examples/next-chat-example.md",
     "examples/agent-task-example.md",
+    "examples/minimal/README.md",
+    "examples/minimal/input-project-notes.md",
+    "examples/minimal/output-basebrief-lite.md",
+    "examples/minimal/next-chat-prompt.md",
   ];
   required.forEach((relativePath) => {
     assert(fs.existsSync(path.join(repoRoot, relativePath)), `Missing required file: ${relativePath}`);
@@ -137,6 +143,8 @@ function checkContentContracts() {
   const readme = readText("README.md");
   const englishReadme = readText("README.en.md");
   const integrationsDoc = readText("docs/integrations.md");
+  const docsIndex = readText("docs/index.md");
+  const quickstartDoc = readText("docs/quickstart-5min.md");
   const adaptersDoc = readText("docs/adapters.md");
   const walkthroughDoc = readText("docs/walkthrough.md");
   const modeSelectionDoc = readText("docs/mode-selection.md");
@@ -163,43 +171,28 @@ function checkContentContracts() {
     assert(skill.includes(mode), `SKILL.md must mention mode: ${mode}`);
     assert(readme.includes(mode), `README.md must mention mode: ${mode}`);
   });
-  assert(readme.includes("对外只有一个入口"), "README.md must state that BaseBrief has one public entry");
+  assert(readme.includes("一个公开 Skill 入口"), "README.md must state that BaseBrief has one public skill entry");
   assert(readme.includes("README.en.md"), "README.md should link to README.en.md");
+  assert(readme.includes("docs/quickstart-5min.md"), "README.md should link to the quickstart");
+  assert(readme.includes("docs/index.md"), "README.md should link to the documentation index");
   assert(readme.includes("docs/integrations.md"), "README.md should link to integrations docs");
-  assert(readme.includes("docs/adapters.md"), "README.md should link to adapters docs");
-  assert(readme.includes("docs/walkthrough.md"), "README.md should link to walkthrough docs");
   assert(readme.includes("docs/handoff.md"), "README.md should link to handoff contract docs");
-  assert(readme.includes("docs/checks.md"), "README.md should link to artifact checks docs");
   assert(readme.includes("docs/cli-lite.md"), "README.md should link to CLI Lite docs");
   assert(readme.includes("docs/seal-diff.md"), "README.md should link to Seal/Diff docs");
-  assert(readme.includes("docs/contextops.md"), "README.md should link to ContextOps boundary docs");
-  assert(readme.includes("docs/roadmap/basebrief-long-term-baseline.md"), "README.md should link to long-term baseline");
-  assert(readme.includes("docs/experiments/cache-ready-capsule.md"), "README.md should link to cache-ready capsule docs");
-  assert(readme.includes("docs/experiments/cache-ready-anchor.md"), "README.md should link to cache-ready anchor docs");
-  assert(readme.includes("docs/experiments/cache-ready-anchor-pad.md"), "README.md should link to cache-ready anchor-pad docs");
-  assert(readme.includes("docs/experiments/cache-ready-readable-poc.md"), "README.md should link to readable POC docs");
-  assert(readme.includes("docs/experiments/cache-ready-sidecar.md"), "README.md should link to sidecar docs");
-  assert(readme.includes("docs/experiments/cache-ready-hybrid-anchor.md"), "README.md should link to hybrid anchor docs");
-  assert(readme.includes("docs/experiments/cache-ready-adaptive-selector.md"), "README.md should link to adaptive selector docs");
-  assert(readme.includes("docs/evolution/bb-evolution-log.md"), "README.md should link to evolution log");
-  assert(readme.includes("docs/experiments/cache-ready-relay-gpt55.md"), "README.md should link to relay audit docs");
-  assert(englishReadme.includes("One install, one entry"), "README.en.md must explain one install, one entry");
+  assert(readme.includes("零依赖 CLI Lite"), "README.md must describe the existing CLI Lite");
+  assert(!readme.includes("BaseBrief 当前不是 CLI"), "README.md must not describe CLI Lite as nonexistent");
+  assert(!readme.includes("暂无 CLI"), "README.md must not contain the obsolete no-CLI status");
+  assert(!readme.includes("BB2 experiment notes"), "README.md must keep experiment-history links out of the public entry");
+  assert(englishReadme.includes("one public skill entry"), "README.en.md must explain the single public skill entry");
   assert(englishReadme.includes("normal continuation routes to `full` or `lite`"), "README.en.md must make full/lite the normal route");
+  assert(englishReadme.includes("docs/quickstart-5min.md"), "README.en.md should link to the quickstart");
+  assert(englishReadme.includes("docs/index.md"), "README.en.md should link to the documentation index");
   assert(englishReadme.includes("docs/handoff.md"), "README.en.md should link to handoff docs");
-  assert(englishReadme.includes("docs/adapters.md"), "README.en.md should link to adapters docs");
-  assert(englishReadme.includes("docs/checks.md"), "README.en.md should link to artifact checks docs");
   assert(englishReadme.includes("docs/cli-lite.md"), "README.en.md should link to CLI Lite docs");
   assert(englishReadme.includes("docs/seal-diff.md"), "README.en.md should link to Seal/Diff docs");
-  assert(englishReadme.includes("docs/contextops.md"), "README.en.md should link to ContextOps boundary docs");
-  assert(englishReadme.includes("docs/roadmap/basebrief-long-term-baseline.md"), "README.en.md should link to long-term baseline");
   assert(englishReadme.includes("Integrations"), "README.en.md should link to integrations docs");
-  assert(englishReadme.includes("docs/experiments/cache-ready-anchor-pad.md"), "README.en.md should link to anchor-pad docs");
-  assert(englishReadme.includes("docs/experiments/cache-ready-readable-poc.md"), "README.en.md should link to readable POC docs");
-  assert(englishReadme.includes("docs/experiments/cache-ready-sidecar.md"), "README.en.md should link to sidecar docs");
-  assert(englishReadme.includes("docs/experiments/cache-ready-hybrid-anchor.md"), "README.en.md should link to hybrid anchor docs");
-  assert(englishReadme.includes("docs/experiments/cache-ready-adaptive-selector.md"), "README.en.md should link to adaptive selector docs");
-  assert(englishReadme.includes("docs/evolution/bb-evolution-log.md"), "README.en.md should link to evolution log");
-  assert(englishReadme.includes("docs/experiments/cache-ready-relay-gpt55.md"), "README.en.md should link to relay audit docs");
+  assert(englishReadme.includes("zero-dependency CLI Lite"), "README.en.md must describe the existing CLI Lite");
+  assert(!englishReadme.includes("not a CLI or plugin yet"), "README.en.md must not contain the obsolete no-CLI status");
   assert(englishReadme.includes("cache-ready"), "README.en.md must describe cache-ready mode");
   assert(!/two skills/i.test(englishReadme), "README.en.md must not imply two skills");
   assert(
@@ -210,6 +203,26 @@ function checkContentContracts() {
     modeSelectionDoc.includes("`cache-ready` 是显式实验路线"),
     "mode-selection.md must mark cache-ready as explicit experiment route",
   );
+  assert(modeSelectionDoc.includes("选完模式后怎么办"), "mode-selection.md must explain the next action");
+  assert(quickstartDoc.includes("路径 A"), "quickstart must document the Skill-first path");
+  assert(quickstartDoc.includes("路径 B"), "quickstart must document the local build path");
+  assert(quickstartDoc.includes("路径 C"), "quickstart must document the Seal/Diff path");
+  [
+    "docs/experiments/cache-ready-lite.md",
+    "docs/experiments/cache-ready-capsule.md",
+    "docs/experiments/cache-ready-anchor.md",
+    "docs/experiments/cache-ready-anchor-pad.md",
+    "docs/experiments/cache-ready-readable-poc.md",
+    "docs/experiments/cache-ready-sidecar.md",
+    "docs/experiments/cache-ready-hybrid-anchor.md",
+    "docs/experiments/cache-ready-adaptive-selector.md",
+    "docs/experiments/cache-ready-active-prompt-trim.md",
+    "docs/experiments/cache-ready-bb12-guard.md",
+    "docs/experiments/cache-ready-relay-gpt55.md",
+  ].forEach((relativePath) => {
+    const indexTarget = relativePath.replace(/^docs\//, "");
+    assert(docsIndex.includes(indexTarget), `Documentation index should link to ${relativePath}`);
+  });
   assert(handoffDoc.includes("readableBrief"), "handoff.md must define readableBrief");
   assert(handoffDoc.includes("cacheSidecar"), "handoff.md must define cacheSidecar");
   assert(handoffDoc.includes("activeProviderPrompt"), "handoff.md must define activeProviderPrompt");
@@ -218,10 +231,8 @@ function checkContentContracts() {
   assert(handoffDoc.includes("scripts/basebrief_build_handoff.js"), "handoff.md must document the builder script");
   assert(handoffDoc.includes("defaultPromptStrategy"), "handoff.md must document provider strategy metadata");
   assert(handoffDoc.includes("experimentalCandidates"), "handoff.md must document experimental candidates");
-  assert(readme.includes("examples/structured-handoff-full.md"), "README.md should link to structured full handoff example");
-  assert(englishReadme.includes("examples/structured-handoff-full.md"), "README.en.md should link to structured full handoff example");
-  assert(readme.includes("examples/adapter-codex-task.md"), "README.md should link to adapter Codex example");
-  assert(englishReadme.includes("examples/adapter-codex-task.md"), "README.en.md should link to adapter Codex example");
+  assert(docsIndex.includes("../examples/structured-handoff-full.md"), "Documentation index should link to structured full handoff example");
+  assert(docsIndex.includes("../examples/adapter-codex-task.md"), "Documentation index should link to adapter Codex example");
   assert(adaptersDoc.includes("scripts/basebrief_build_adapters.js"), "adapters.md must document adapter builder script");
   assert(adaptersDoc.includes("codex-task.md"), "adapters.md must document Codex output");
   assert(adaptersDoc.includes("claude-project-context.md"), "adapters.md must document Claude output");
@@ -445,6 +456,10 @@ function checkExamples() {
     "examples/seal-after-input.json",
     "examples/next-chat-example.md",
     "examples/agent-task-example.md",
+    "examples/minimal/README.md",
+    "examples/minimal/input-project-notes.md",
+    "examples/minimal/output-basebrief-lite.md",
+    "examples/minimal/next-chat-prompt.md",
   ];
   exampleFiles.forEach((relativePath) => {
     assert(fs.existsSync(path.join(repoRoot, relativePath)), `Missing example: ${relativePath}`);
@@ -458,6 +473,7 @@ function checkArtifactChecker() {
     "examples/structured-handoff-lite.md",
     "examples/adapter-codex-task.md",
     "examples/adapter-claude-project-context.md",
+    "examples/minimal",
   ];
   inputs.forEach((relativePath) => {
     const stdout = execFileSync(process.execPath, [
@@ -494,6 +510,28 @@ function validateCliStarter(input) {
 function checkCliLite() {
   const tempRoot = fs.mkdtempSync(path.join(repoRoot, "tests", "outputs", "private", "release-cli-"));
   try {
+    const helpStdout = execFileSync(process.execPath, [
+      "scripts/basebrief.js",
+      "--help",
+    ], {
+      cwd: repoRoot,
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "pipe"],
+      env: process.env,
+    });
+    assert(helpStdout.includes("BaseBrief CLI Lite"), "CLI help must identify CLI Lite");
+    assert(helpStdout.includes("docs/quickstart-5min.md"), "CLI help must link to the quickstart");
+
+    const noCommandStdout = execFileSync(process.execPath, [
+      "scripts/basebrief.js",
+    ], {
+      cwd: repoRoot,
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "pipe"],
+      env: process.env,
+    });
+    assert(noCommandStdout === helpStdout, "CLI without a command must print the same help");
+
     const initDir = path.join(tempRoot, "init");
     const initStdout = execFileSync(process.execPath, [
       "scripts/basebrief.js",
@@ -563,7 +601,7 @@ function checkCliLite() {
   } finally {
     fs.rmSync(tempRoot, { recursive: true, force: true });
   }
-  return 3;
+  return 5;
 }
 
 function validateSealShape(seal) {

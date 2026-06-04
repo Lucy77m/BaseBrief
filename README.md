@@ -1,266 +1,99 @@
 # BaseBrief
 
-BaseBrief 是一个中文优先、Skill-first、缓存友好的 AI 项目阶段基线工具。
+BaseBrief 是一个中文优先的 AI 项目阶段基线与交接工具。
+
+它解决一个具体问题：当你换窗口、换模型、换 AI 工具或隔天继续开发时，让下一个接手者知道项目做到哪里、哪些事实已经确认、哪些范围不能乱动，以及下一步该做什么。
+
+BaseBrief 保持一个公开 Skill 入口，并提供可选的零依赖 CLI Lite。普通项目接续默认只在 `full` 和 `lite` 之间选择；`cache-ready` 只保留为显式 prompt-cache 实验路线。
 
 English README: [README.en.md](README.en.md)
 
-对外只有一个入口：`BaseBrief`。  
-安装一次，用一个 Skill；普通项目接续默认在 `full` 和 `lite` 之间选择；`cache-ready` 只保留为显式 prompt-cache 实验路线。
+## Start Here
 
-## 快速开始
+1. [5 分钟上手](docs/quickstart-5min.md)
+2. [Handoff 契约与产物](docs/handoff.md)
+3. [Seal/Diff 阶段变化对比](docs/seal-diff.md)
 
-BaseBrief 当前不是 CLI，也不是插件。最简单的使用方式是让你的 AI 工具读取这个 Skill：
+完整文档与实验历史见 [文档索引](docs/index.md)。
+
+## 30 秒理解
+
+AI 接续项目时经常缺少这些信息：
+
+- 当前目标与项目状态
+- 已验证事实和已确认决策
+- 假设与待确认问题
+- 风险边界和禁止范围
+- 下一步任务与期望输出
+
+BaseBrief 将这些信息整理成可读的 Full 或 Lite brief。需要本地重复生成、检查或阶段对比时，可以使用 CLI Lite。
+
+## 最短用法
+
+让 AI 读取 BaseBrief Skill：
 
 ```text
 请读取 BaseBrief 的 skills/basebrief/SKILL.md。
-根据我接下来的任务自动选择 full 或 lite；只有我明确要求 prompt cache / cache-ready / 稳定前缀实验时，才进入 cache-ready。
+根据当前任务选择 full 或 lite，整理项目阶段基线。
 不要把推测写成事实；如果边界不清，先列 open_questions。
 ```
 
-然后给出你的任务，例如：
+小范围接续使用 Lite；完整阶段收口、复杂任务或风险边界不清时使用 Full。
+
+也可以从公开 structured example 构建本地产物：
 
 ```text
-请用 BaseBrief 整理当前项目阶段基线。
-我需要完整版本，并额外准备新窗口开场白和 Agent 任务说明。
+node scripts/basebrief.js build --input examples/structured-handoff-lite.md --output-dir basebrief-output --check
 ```
 
-你应该检查输出是否明确区分：
+CLI Lite 是可选的本地脚本，不是安装式 CLI、插件或 provider integration。
 
-- `verified_facts`
-- `confirmed_decisions`
-- `assumptions`
-- `open_questions`
-- `risk_boundaries`
+## Seal/Diff
 
-更多入口：
-
-- 工具集成：[docs/integrations.md](docs/integrations.md)
-- Adapter 输出：[docs/adapters.md](docs/adapters.md)
-- 完整 walkthrough：[docs/walkthrough.md](docs/walkthrough.md)
-- 模式示例：[docs/usage.md](docs/usage.md)
-- 模式选择：[docs/mode-selection.md](docs/mode-selection.md)
-
-## 它适合谁
-
-- 需要跨窗口继续项目的 AI 辅助开发者
-- 需要给下一个 Agent 做安全交接的人
-- 想把项目状态整理成稳定 Markdown 基线的人
-
-## 它不是什么
-
-- 不是聊天客户端
-- 不是完整平台或 Agent runtime
-- 不是密钥管理器
-- 不是 CLI、Web UI、MCP、VS Code 插件
-- 不是用来接入真实 API、provider、部署链路的工具
-
-## 普通模式与实验路线
-
-### Full
-
-适合：
-
-- 复杂项目阶段总结
-- 新窗口开场
-- Agent 任务说明
-- 风险红线集中整理
-- 复杂项目归档
-
-默认会围绕完整 `BASEBRIEF.md` 工作，必要时再派生：
-
-- `NEXT_CHAT_PROMPT.md`
-- `AGENT_TASK.md`
-- `RISK_NOTES.md`
-- `CACHE_PREFIX.md`
-
-### Lite
-
-适合：
-
-- 轻量接续
-- 简短交接
-- 只读接续
-- 1 到 2 个文件的小范围任务说明
-
-Lite 明显短于 Full，不写长历史，不接高风险工程。
-
-### Cache-ready
-
-适合：
-
-- 明确提到 `prompt cache`
-- 明确提到 `cache-ready`
-- 稳定前缀或缓存代理实验
-
-它是实验模式。  
-它可以用于稳定前缀和缓存经济实验。当前证据分层很明确：早期 normalized benchmark 没有证明缓存比例或估算成本优势；BB5 Cache Sidecar 在 MiMo 上给出了单格式证据；BB9 Adaptive Selector 在 MiMo `mimo-v2.5` 和 DeepSeek `deepseek-v4-flash` 的本地真实项目样本下都给出了估算成本优势证据。不要把它写成跨 provider 通用证明，也不要宣称真实账单费用或延迟已经稳定胜出。
-
-普通 `full` / `lite` brief 保持人类可读。provider 侧的 `cacheSidecar` / `activeProviderPrompt` 是 BB9 handoff 后处理产物，不应塞进普通 Markdown 正文。
-
-## 什么时候不要用 Lite
-
-以下情况不要硬用 Lite，直接走 Full 或先补信息：
-
-- 任务碰 backend、provider、`.env`、API key、部署
-- 任务碰 state、memory、gateway、真实 Agent runtime
-- 一开始就要跨 3 个以上业务文件
-- 边界不清，只能靠猜
-- 用户说“帮我整体优化一下”但没给清楚范围
-
-## 当前形态
-
-- Phase 1：Skill-first + Markdown templates
-- 暂无 CLI
-- 暂无 Web UI
-- 暂无 MCP / 插件
-- 暂无真实 API 接入
-
-## 安全注意
-
-- 不要把 `.env`、API key、token、secret 写进模板、README 或 Git
-- 不要把私人绝对路径写进公开文档
-- 不要把 `cache-ready` 写成已证明真实缓存收益
-
-## 仓库结构
+Seal/Diff 用来回答：阶段前后，事实、决策、风险边界和下一步任务发生了什么变化？
 
 ```text
-BaseBrief/
-├─ skills/
-│  └─ basebrief/
-│     ├─ SKILL.md
-│     ├─ agents/openai.yaml
-│     └─ modes/
-│        ├─ full.md
-│        ├─ lite.md
-│        └─ cache-ready.md
-├─ templates/
-│  └─ zh-CN/
-│     ├─ BASEBRIEF.md
-│     ├─ BASEBRIEF_LITE.md
-│     ├─ NEXT_CHAT_PROMPT.md
-│     ├─ AGENT_TASK.md
-│     ├─ RISK_NOTES.md
-│     ├─ CACHE_PREFIX.md
-│     ├─ CACHE_READY_LITE_INPUT.json
-│     ├─ CACHE_READY_CAPSULE_INPUT.json
-│     ├─ CACHE_READY_ANCHOR_INPUT.json
-│     └─ CACHE_READY_ANCHOR_PAD_INPUT.json
-├─ docs/
-│  ├─ integrations.md
-│  ├─ adapters.md
-│  ├─ walkthrough.md
-│  ├─ usage.md
-│  ├─ mode-selection.md
-│  ├─ testing.md
-│  ├─ handoff.md
-│  ├─ roadmap/
-│  │  └─ basebrief-long-term-baseline.md
-│  └─ experiments/
-│     ├─ cache-ready-lite.md
-│     ├─ cache-ready-capsule.md
-│     ├─ cache-ready-anchor.md
-│     ├─ cache-ready-anchor-pad.md
-│     ├─ cache-ready-readable-poc.md
-│     ├─ cache-ready-sidecar.md
-│     ├─ cache-ready-hybrid-anchor.md
-│     └─ cache-ready-adaptive-selector.md
-└─ scripts/
-   ├─ mode_router.js
-   ├─ generate_cache_ready_lite.js
-   ├─ generate_cache_ready_capsule.js
-   ├─ generate_cache_ready_anchor.js
-   ├─ prompt_stability_probe.js
-   ├─ provider_cache_probe.js
-   ├─ provider_cache_benchmark.js
-   ├─ basebrief.js
-   ├─ basebrief_build_handoff.js
-   ├─ basebrief_build_adapters.js
-   └─ run_release_checks.js
+node scripts/basebrief.js seal --input examples/seal-before-input.json --output basebrief-output/before.json
+node scripts/basebrief.js diff --before basebrief-output/before.json --after examples/seal-after-input.json
 ```
 
-## 文档入口
+它只处理显式输入文件，不扫描或修改其他项目。
 
-- 工具集成：[docs/integrations.md](docs/integrations.md)
-- Adapter 输出：[docs/adapters.md](docs/adapters.md)
-- 完整 walkthrough：[docs/walkthrough.md](docs/walkthrough.md)
-- 使用示例：[docs/usage.md](docs/usage.md)
-- 模式选择：[docs/mode-selection.md](docs/mode-selection.md)
-- Handoff 契约：[docs/handoff.md](docs/handoff.md)
-- 测试矩阵：[docs/testing.md](docs/testing.md)
-- Artifact checks: [docs/checks.md](docs/checks.md)
-- CLI Lite: [docs/cli-lite.md](docs/cli-lite.md)
-- Seal/Diff: [docs/seal-diff.md](docs/seal-diff.md)
-- ContextOps boundary: [docs/contextops.md](docs/contextops.md)
-- 长期规划基线：[docs/roadmap/basebrief-long-term-baseline.md](docs/roadmap/basebrief-long-term-baseline.md)
-- Cache-ready 实验说明：[docs/experiments/cache-ready-lite.md](docs/experiments/cache-ready-lite.md)
-- 公开示例：[examples](examples)
-- BB2 experiment notes: [docs/experiments/cache-ready-capsule.md](docs/experiments/cache-ready-capsule.md)
-- BB2 example input: [examples/cache-ready-capsule-input.json](examples/cache-ready-capsule-input.json)
-- BB2 example output: [examples/cache-ready-capsule-output.md](examples/cache-ready-capsule-output.md)
-- BB3 experiment notes: [docs/experiments/cache-ready-anchor.md](docs/experiments/cache-ready-anchor.md)
-- BB3 example input: [examples/cache-ready-anchor-input.json](examples/cache-ready-anchor-input.json)
-- BB3 example output: [examples/cache-ready-anchor-output.md](examples/cache-ready-anchor-output.md)
-- BB4 experiment notes: [docs/experiments/cache-ready-anchor-pad.md](docs/experiments/cache-ready-anchor-pad.md)
-- BB4 example input: [examples/cache-ready-anchor-pad-input.json](examples/cache-ready-anchor-pad-input.json)
-- BB4 example output: [examples/cache-ready-anchor-pad-output.md](examples/cache-ready-anchor-pad-output.md)
-- Readable Full/Lite POC: [docs/experiments/cache-ready-readable-poc.md](docs/experiments/cache-ready-readable-poc.md)
-- BB5 Cache Sidecar notes: [docs/experiments/cache-ready-sidecar.md](docs/experiments/cache-ready-sidecar.md)
-- BB6 Hybrid Anchor notes: [docs/experiments/cache-ready-hybrid-anchor.md](docs/experiments/cache-ready-hybrid-anchor.md)
-- BB9 Adaptive Selector notes: [docs/experiments/cache-ready-adaptive-selector.md](docs/experiments/cache-ready-adaptive-selector.md)
-- BB11 Active Prompt Trim notes: [docs/experiments/cache-ready-active-prompt-trim.md](docs/experiments/cache-ready-active-prompt-trim.md)
-- BB12 Size-band Guard notes: [docs/experiments/cache-ready-bb12-guard.md](docs/experiments/cache-ready-bb12-guard.md)
-- BB evolution log: [docs/evolution/bb-evolution-log.md](docs/evolution/bb-evolution-log.md)
-- GPT-5.5 relay usage audit: [docs/experiments/cache-ready-relay-gpt55.md](docs/experiments/cache-ready-relay-gpt55.md)
+## 核心边界
 
-## BB9 Handoff Contract
+- `full`：完整阶段基线、复杂交接、风险较高或边界不清的任务。
+- `lite`：短接续、只读交接、1 到 2 个文件的明确小范围任务。
+- `cache-ready`：仅用于明确的稳定前缀或 prompt-cache 实验，不是普通第三模式。
+- readable brief 是普通用户的主产物；provider-facing artifacts 属于显式高级后处理。
+- provider-specific estimated-cost evidence 不是跨 provider 证明，也不是真实账单审计。
 
-BB9 现在是 BaseBrief 的标准 handoff 契约方向：普通接续仍然输出可读的 `full` / `lite` brief；如果 provider profile 有可见的缓存 usage 证据，再额外附加 `cacheSidecar`。
+## 安全边界
 
-关键规则：`readableBrief` 给人和接续边界看；`cacheSidecar` 给支持缓存证据的 provider 作为 active prompt。不要把两者直接拼进同一个 provider 请求，否则会把 prompt 变长，可能抵消缓存收益。
+- 不把 `.env`、API key、token、secret 写入公开产物。
+- 不把私人绝对路径写入公开文档。
+- 不把假设写成已验证事实。
+- 不自动修改外部项目或宿主工具配置。
 
-BB10 active prompt workflow 在这个规则上再推进一步：生成结果会直接给出 `activeProviderPrompt`。普通用户看 `readableBrief`，省钱实验或重复 provider 调用只发送 `activeProviderPrompt`。
+## 当前能力
 
-标准产物和字段边界见：[docs/handoff.md](docs/handoff.md)。输入 schema 见：[schemas/bb9-handoff.schema.json](schemas/bb9-handoff.schema.json)。
+- 单一公开 Skill 入口，内部路由到 Full / Lite
+- BB9 structured handoff contract
+- Handoff Builder 与 Codex / Claude 文件型 Adapter
+- Artifact Checker
+- 零依赖 CLI Lite：`init`、`build`、`check`、`seal`、`diff`
+- 本地、文件型 Seal/Diff v1
 
-普通接续触发语：
+BaseBrief 不是聊天客户端、Agent runtime、托管平台、密钥管理器、项目管理系统或 provider gateway。
 
-```text
-请用 BaseBrief 生成 full 或 lite 项目接续，优先保证 readable brief 的事实、决策和风险边界清楚。
-```
+## 继续阅读
 
-省钱实验触发语：
+- [5 分钟上手](docs/quickstart-5min.md)
+- [工具集成](docs/integrations.md)
+- [模式选择](docs/mode-selection.md)
+- [CLI Lite](docs/cli-lite.md)
+- [完整文档索引](docs/index.md)
+- [公开最小示例](examples/minimal/README.md)
 
-```text
-请用 BaseBrief BB9 handoff 生成 readable brief，并在 MiMo 或 DeepSeek profile 支持时附加 cache sidecar。不要把 estimated cost 写成真实账单审计。
-发给 provider 的 active prompt 按 recommendedPromptType 选择，不要把 readableBrief 和 cacheSidecar 拼接。
-```
+## License
 
-脚本入口：
-
-```text
-node scripts/generate_bb9_handoff.js --input examples/bb9-handoff-full-input.json --mode full --provider-profile mimo
-node scripts/generate_bb9_handoff.js --input examples/bb9-handoff-lite-input.json --mode lite --provider-profile deepseek
-node scripts/generate_bb9_handoff.js --input examples/bb9-handoff-full-input.json --mode full --provider-profile mimo --print activeProviderPrompt
-```
-
-公开示例：
-
-- [BB9 full input](examples/bb9-handoff-full-input.json)
-- [BB9 full output](examples/bb9-handoff-full-output.md)
-- [BB9 lite input](examples/bb9-handoff-lite-input.json)
-- [BB9 lite output](examples/bb9-handoff-lite-output.md)
-- [BB9 unsupported provider fallback](examples/bb9-handoff-fallback-output.md)
-- [Structured full handoff example](examples/structured-handoff-full.md)
-- [Structured lite handoff example](examples/structured-handoff-lite.md)
-- [Adapter Codex task example](examples/adapter-codex-task.md)
-- [Adapter Claude context example](examples/adapter-claude-project-context.md)
-
-最小 builder：
-
-```text
-node scripts/basebrief_build_handoff.js --input examples/structured-handoff-full.md --output-dir tests/outputs/private/structured-full --provider-profile mimo
-node scripts/basebrief_build_adapters.js --input examples/structured-handoff-full.md --output-dir tests/outputs/private/adapters --target all
-node scripts/basebrief_check_artifacts.js --input examples/adapter-codex-task.md --json
-node scripts/basebrief.js build --input examples/structured-handoff-full.md --output-dir tests/outputs/private/cli-build --adapters all --check
-node scripts/basebrief.js diff --before examples/seal-before-input.json --after examples/seal-after-input.json --json
-```
+见 [LICENSE](LICENSE)。

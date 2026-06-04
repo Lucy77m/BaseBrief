@@ -1,168 +1,99 @@
 # BaseBrief
 
-BaseBrief is a Chinese-first, skill-first project baseline tool for AI-assisted development.
+BaseBrief is a Chinese-first project baseline and handoff tool for AI-assisted development.
 
-One install, one entry: `BaseBrief`.  
-Inside that single skill, normal continuation routes to `full` or `lite`; `cache-ready` is reserved for explicit prompt-cache experiments.
+It solves one specific problem: when you switch chats, models, AI tools, or resume work later, the next agent should know the current project state, verified facts, confirmed decisions, risk boundaries, and next task.
+
+BaseBrief keeps one public skill entry and provides an optional zero-dependency CLI Lite; normal continuation routes to `full` or `lite`, while `cache-ready` is reserved for explicit prompt-cache experiments.
 
 [中文说明](README.md)
 
-## Quick Start
+## Start Here
 
-BaseBrief is not a CLI or plugin yet. Ask your AI tool to read the skill entry:
+1. [5-minute quickstart](docs/quickstart-5min.md)
+2. [Handoff contract and artifacts](docs/handoff.md)
+3. [Seal/Diff phase comparison](docs/seal-diff.md)
+
+See the [documentation index](docs/index.md) for the complete reference and experiment history.
+
+## Understand It In 30 Seconds
+
+AI project continuation often loses:
+
+- the current goal and project state
+- verified facts and confirmed decisions
+- assumptions and open questions
+- risk boundaries and forbidden scope
+- the next task and expected output
+
+BaseBrief turns those details into a readable Full or Lite brief. For repeatable local builds, checks, and phase comparison, use the optional CLI Lite.
+
+## Shortest Path
+
+Ask your AI tool to read the BaseBrief skill:
 
 ```text
 Please read BaseBrief's skills/basebrief/SKILL.md.
-Choose full or lite based on my next task. Use cache-ready only when I explicitly ask for prompt cache, cache-ready, or stable-prefix experiments.
-Do not turn assumptions into facts; if the boundary is unclear, list open_questions first.
+Choose full or lite for the current task and prepare a project baseline.
+Do not turn assumptions into facts; list open_questions when boundaries are unclear.
 ```
 
-Then give your task:
+Use Lite for a small bounded continuation. Use Full for phase closure, complex work, or unclear risk boundaries.
+
+You can also build local artifacts from the public structured example:
 
 ```text
-Use BaseBrief to prepare a full project baseline.
-Also prepare a short next-chat opener and an agent task handoff.
+node scripts/basebrief.js build --input examples/structured-handoff-lite.md --output-dir basebrief-output --check
 ```
 
-Start here:
+CLI Lite is an optional local script, not an installed CLI, plugin, or provider integration.
 
+## Seal/Diff
+
+Seal/Diff answers: what changed in facts, decisions, risks, and task boundaries between two phases?
+
+```text
+node scripts/basebrief.js seal --input examples/seal-before-input.json --output basebrief-output/before.json
+node scripts/basebrief.js diff --before basebrief-output/before.json --after examples/seal-after-input.json
+```
+
+It only processes explicit input files and does not scan or modify other projects.
+
+## Core Boundaries
+
+- `full`: complete phase baselines, complex handoffs, or unclear and risky work.
+- `lite`: short continuation, read-only handoff, or clearly bounded work across one or two files.
+- `cache-ready`: explicit stable-prefix or prompt-cache experiments only; it is not a normal third mode.
+- The readable brief is the normal user-facing artifact. Provider-facing artifacts are explicit advanced post-processing.
+- Provider-specific estimated-cost evidence is not provider-general proof or a real billing audit.
+
+## Safety Boundaries
+
+- Do not put `.env`, API keys, tokens, or secrets in public artifacts.
+- Do not publish private absolute paths.
+- Do not turn assumptions into verified facts.
+- Do not automatically modify external projects or host-tool configuration.
+
+## Current Capabilities
+
+- one public skill entry with internal Full / Lite routing
+- BB9 structured handoff contract
+- handoff builder and file-based Codex / Claude adapters
+- artifact checker
+- zero-dependency CLI Lite: `init`, `build`, `check`, `seal`, `diff`
+- local file-based Seal/Diff v1
+
+BaseBrief is not a chat client, agent runtime, hosted platform, secret manager, project-management system, or provider gateway.
+
+## Continue Reading
+
+- [5-minute quickstart](docs/quickstart-5min.md)
 - [Integrations](docs/integrations.md)
-- [Adapters](docs/adapters.md)
-- [Walkthrough](docs/walkthrough.md)
-- [Usage](docs/usage.md)
 - [Mode selection](docs/mode-selection.md)
-
-## What It Is
-
-BaseBrief helps you turn the current state of a project into a stable Markdown baseline that another window or agent can continue safely.
-
-It focuses on:
-
-- verified facts
-- confirmed decisions
-- assumptions
-- open questions
-- risk boundaries
-
-## What It Is Not
-
-- not a chat client
-- not a full platform
-- not an agent runtime
-- not a secret manager
-- not a real API or provider integration tool
-- not a CLI, Web UI, MCP, or plugin yet
-
-## Normal Modes And Experimental Route
-
-### Full
-
-Use `full` for:
-
-- complete phase baselines
-- new chat openings
-- agent task handoff
-- risk-heavy project snapshots
-
-### Lite
-
-Use `lite` for:
-
-- short continuation
-- read-only handoff
-- 1 to 2 file scoped work
-
-Do not use Lite when the task touches backend, provider, `.env`, deployment, state, memory, gateway, or a real agent runtime.
-
-### Cache-ready
-
-Use `cache-ready` only when you explicitly want a stable-prefix experiment.
-
-It is experimental.  
-The evidence is tiered: early normalized benchmarks did not prove better cache ratio or estimated cost; BB5 Cache Sidecar produced single-format evidence on MiMo; BB9 Adaptive Selector now shows estimated-cost evidence on both MiMo `mimo-v2.5` and DeepSeek `deepseek-v4-flash` local real-project samples. Do not market this as provider-general proof, real billing proof, or stable latency evidence.
-
-Normal `full` / `lite` briefs stay human-readable. Provider-facing `cacheSidecar` / `activeProviderPrompt` artifacts are BB9 handoff post-processing outputs and should not be inserted into normal Markdown briefs.
-
-## Security Notes
-
-- do not commit `.env`, API keys, tokens, or secrets
-- do not publish private absolute paths
-- do not market `cache-ready` as proven provider-level cache improvement
-
-## Docs
-
-- [Integrations](docs/integrations.md)
-- [Adapters](docs/adapters.md)
-- [Walkthrough](docs/walkthrough.md)
-- [Usage](docs/usage.md)
-- [Mode selection](docs/mode-selection.md)
-- [Handoff contract](docs/handoff.md)
-- [Testing](docs/testing.md)
-- [Artifact checks](docs/checks.md)
 - [CLI Lite](docs/cli-lite.md)
-- [Seal/Diff](docs/seal-diff.md)
-- [ContextOps boundary](docs/contextops.md)
-- [Long-term baseline](docs/roadmap/basebrief-long-term-baseline.md)
-- [Cache-ready experiment notes](docs/experiments/cache-ready-lite.md)
-- [BB2 cache capsule notes](docs/experiments/cache-ready-capsule.md)
-- [BB3 cache anchor notes](docs/experiments/cache-ready-anchor.md)
-- [BB4 anchor-pad notes](docs/experiments/cache-ready-anchor-pad.md)
-- [Readable Full/Lite POC](docs/experiments/cache-ready-readable-poc.md)
-- [BB5 cache sidecar notes](docs/experiments/cache-ready-sidecar.md)
-- [BB6 hybrid anchor notes](docs/experiments/cache-ready-hybrid-anchor.md)
-- [BB9 adaptive selector notes](docs/experiments/cache-ready-adaptive-selector.md)
-- [BB11 active prompt trim notes](docs/experiments/cache-ready-active-prompt-trim.md)
-- [BB12 size-band guard notes](docs/experiments/cache-ready-bb12-guard.md)
-- [BB evolution log](docs/evolution/bb-evolution-log.md)
-- [GPT-5.5 relay usage audit](docs/experiments/cache-ready-relay-gpt55.md)
-- [Examples](examples)
+- [Documentation index](docs/index.md)
+- [Public minimal example](examples/minimal/README.md)
 
-## BB9 Handoff Contract
+## License
 
-BB9 is now the standard handoff-contract direction for BaseBrief. It keeps the normal readable `full` / `lite` brief as the primary continuation surface. When the selected provider profile exposes cache usage evidence, it adds a separate `cacheSidecar` for estimated-cost experiments.
-
-Important: use `readableBrief` for human review and continuation boundaries. Use `cacheSidecar` as the active provider prompt only when `recommendedPromptType` says so. Do not concatenate both into one provider request.
-
-BB10 active prompt workflow makes that explicit by returning `activeProviderPrompt`. For repeated cache-aware provider calls, send only `activeProviderPrompt`.
-
-Artifact boundaries are documented in [docs/handoff.md](docs/handoff.md). The input schema is [schemas/bb9-handoff.schema.json](schemas/bb9-handoff.schema.json).
-
-Commands:
-
-```text
-node scripts/generate_bb9_handoff.js --input examples/bb9-handoff-full-input.json --mode full --provider-profile mimo
-node scripts/generate_bb9_handoff.js --input examples/bb9-handoff-lite-input.json --mode lite --provider-profile deepseek
-node scripts/generate_bb9_handoff.js --input examples/bb9-handoff-full-input.json --mode full --provider-profile mimo --print activeProviderPrompt
-```
-
-Examples:
-
-- [BB9 full input](examples/bb9-handoff-full-input.json)
-- [BB9 full output](examples/bb9-handoff-full-output.md)
-- [BB9 lite input](examples/bb9-handoff-lite-input.json)
-- [BB9 lite output](examples/bb9-handoff-lite-output.md)
-- [BB9 unsupported provider fallback](examples/bb9-handoff-fallback-output.md)
-- [Structured full handoff example](examples/structured-handoff-full.md)
-- [Structured lite handoff example](examples/structured-handoff-lite.md)
-- [Adapter Codex task example](examples/adapter-codex-task.md)
-- [Adapter Claude context example](examples/adapter-claude-project-context.md)
-
-Minimal builder:
-
-```text
-node scripts/basebrief_build_handoff.js --input examples/structured-handoff-full.md --output-dir tests/outputs/private/structured-full --provider-profile mimo
-node scripts/basebrief_build_adapters.js --input examples/structured-handoff-full.md --output-dir tests/outputs/private/adapters --target all
-node scripts/basebrief_check_artifacts.js --input examples/adapter-codex-task.md --json
-node scripts/basebrief.js build --input examples/structured-handoff-full.md --output-dir tests/outputs/private/cli-build --adapters all --check
-node scripts/basebrief.js diff --before examples/seal-before-input.json --after examples/seal-after-input.json --json
-```
-
-Boundary: this is provider-specific estimated-cost evidence, not a billing audit and not a provider-general cache claim.
-
-## Cache-ready v2
-
-`BB2 Cache Capsule` is the compact v2 experiment for cache-ratio and estimated-cost testing. It is not the recommended path for ordinary project continuation.
-
-`BB3 Cache Anchor` pre-registers tail request options in the stable prefix and changes only a short selector in the dynamic tail.
-
-`BB4 Anchor Pad` adds a required stable pad before the selector. Current MiMo `mimo-v2.5` local real-project samples show estimated-cost evidence for BB4, but this is not a cross-provider claim.
+See [LICENSE](LICENSE).

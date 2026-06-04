@@ -32,6 +32,15 @@
 - provider 侧 `cacheSidecar` / `activeProviderPrompt` 由 BB9 handoff 后处理生成
 - 不要把 sidecar 或 PAD 结构塞进普通 Markdown brief
 
+## 选完模式后怎么办
+
+- 只需要给下一个窗口接手：直接使用 Full 或 Lite readable brief。
+- 需要生成结构化 handoff artifacts：使用 `node scripts/basebrief.js build ...`。
+- 需要检查公开或生成产物：使用 `node scripts/basebrief.js check ...`。
+- 需要对比两个阶段：使用 `node scripts/basebrief.js seal ...` 和 `node scripts/basebrief.js diff ...`。
+
+第一次使用可从 [5 分钟上手](quickstart-5min.md) 开始。
+
 ## 负向路由提醒
 
 以下表达默认不应继续硬用 Lite：

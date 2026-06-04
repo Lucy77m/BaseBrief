@@ -1,0 +1,49 @@
+# BaseBrief 文档索引
+
+这个页面保留 BaseBrief 的完整公开文档与实验历史。第一次使用请从 [5 分钟上手](quickstart-5min.md) 开始。
+
+## 核心使用文档
+
+- [5 分钟上手](quickstart-5min.md)
+- [模式选择](mode-selection.md)
+- [使用示例](usage.md)
+- [完整 walkthrough](walkthrough.md)
+- [工具集成](integrations.md)
+- [Handoff 契约](handoff.md)
+- [CLI Lite](cli-lite.md)
+- [Adapter 输出](adapters.md)
+- [Artifact checks](checks.md)
+- [Seal/Diff](seal-diff.md)
+
+## 方向与验证
+
+- [测试与验证记录](testing.md)
+- [长期规划基线](roadmap/basebrief-long-term-baseline.md)
+- [ContextOps boundary](contextops.md)
+- [BB evolution log](evolution/bb-evolution-log.md)
+
+## Cache-ready 实验历史
+
+这些文档记录高级 prompt-cache 实验，不是普通用户入口，也不构成跨 provider 或真实账单证明。
+
+- [BB1 Cache-ready Lite](experiments/cache-ready-lite.md)
+- [BB2 Cache Capsule](experiments/cache-ready-capsule.md)
+- [BB3 Cache Anchor](experiments/cache-ready-anchor.md)
+- [BB4 Anchor Pad](experiments/cache-ready-anchor-pad.md)
+- [Readable Full/Lite POC](experiments/cache-ready-readable-poc.md)
+- [BB5 Cache Sidecar](experiments/cache-ready-sidecar.md)
+- [BB6 Hybrid Anchor](experiments/cache-ready-hybrid-anchor.md)
+- [BB9 Adaptive Selector](experiments/cache-ready-adaptive-selector.md)
+- [BB11 Active Prompt Trim](experiments/cache-ready-active-prompt-trim.md)
+- [BB12 Size-band Guard](experiments/cache-ready-bb12-guard.md)
+- [GPT-5.5 relay usage audit](experiments/cache-ready-relay-gpt55.md)
+
+## 公开示例
+
+- [最小首次使用示例](../examples/minimal/README.md)
+- [Full 示例](../examples/full-example.md)
+- [Lite 示例](../examples/lite-example.md)
+- [Structured Full Handoff](../examples/structured-handoff-full.md)
+- [Structured Lite Handoff](../examples/structured-handoff-lite.md)
+- [Codex Adapter 示例](../examples/adapter-codex-task.md)
+- [Claude Adapter 示例](../examples/adapter-claude-project-context.md)
