@@ -8,6 +8,7 @@ const { buildAdapterArtifacts, normalizeTargets } = require("./basebrief_build_a
 const { buildHandoffArtifacts, validateHandoffInput } = require("./basebrief_build_handoff");
 const { checkArtifacts } = require("./basebrief_check_artifacts");
 const { runReceiverCheck } = require("./basebrief_receiver_check");
+const { runReceiverInit } = require("./basebrief_receiver_init");
 const { commandDiff: commandSealDiff, commandSeal: commandCreateSeal } = require("./basebrief_seal");
 
 const STARTER_FILE = "basebrief-handoff-input.json";
@@ -18,6 +19,7 @@ const HELP_TEXT = [
   "  node scripts/basebrief.js init --output-dir <dir>",
   "  node scripts/basebrief.js build --input <markdown-or-json> --output-dir <dir> [--adapters codex|claude|all|none] [--check]",
   "  node scripts/basebrief.js check --input <file-or-dir>",
+  "  node scripts/basebrief.js receiver-init --repo <target-repo> --output <receiver-check.json> [--json]",
   "  node scripts/basebrief.js receiver-check --config <json> --repo <target-repo> [--json]",
   "  node scripts/basebrief.js seal --input <markdown-or-json> --output <file>",
   "  node scripts/basebrief.js diff --before <file> --after <file>",
@@ -218,6 +220,13 @@ function commandReceiverCheck(options) {
   };
 }
 
+function commandReceiverInit(options) {
+  return runReceiverInit({
+    repoPath: options.repo,
+    outputPath: options.output,
+  });
+}
+
 function commandSeal(options) {
   return {
     ...commandCreateSeal({
@@ -244,6 +253,7 @@ function run(argv) {
   if (command === "init") return commandInit(options);
   if (command === "build") return commandBuild(options);
   if (command === "check") return commandCheck(options);
+  if (command === "receiver-init") return commandReceiverInit(options);
   if (command === "receiver-check") return commandReceiverCheck(options);
   if (command === "seal") return commandSeal(options);
   if (command === "diff") return commandDiff(options);
@@ -282,6 +292,12 @@ function toPublicResult(result) {
     };
   }
   if (result.command === "receiver-check") return result;
+  if (result.command === "receiver-init") {
+    return {
+      ...result,
+      output: publicPath(result.output, cwd),
+    };
+  }
   if (result.command === "seal") {
     return {
       ...result,
@@ -329,6 +345,16 @@ function formatHuman(result) {
       result.result.blocked_reason ? `blocked_reason=${result.result.blocked_reason}` : "",
       "",
     ].filter((line, index, lines) => line || index === lines.length - 1).join(os.EOL);
+  }
+  if (result.command === "receiver-init") {
+    return [
+      `BaseBrief receiver config written to ${result.output}`,
+      `expected_branch=${result.config.expected_branch}`,
+      `expected_head=${result.config.expected_head}`,
+      `expected_changed_files=${result.config.expected_changed_files.length}`,
+      `declared_checks=${result.config.declared_checks.length}`,
+      "",
+    ].join(os.EOL);
   }
   if (result.command === "seal") {
     return `BaseBrief seal written to ${result.output}${os.EOL}checksum=${result.checksum}${os.EOL}`;
@@ -382,6 +408,7 @@ module.exports = {
   commandCheck,
   commandDiff,
   commandInit,
+  commandReceiverInit,
   commandReceiverCheck,
   commandSeal,
   formatFindingLines,

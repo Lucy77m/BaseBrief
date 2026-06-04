@@ -11,6 +11,7 @@ node scripts/basebrief.js --help
 node scripts/basebrief.js init --output-dir tests/outputs/private/starter
 node scripts/basebrief.js build --input examples/structured-handoff-full.md --output-dir tests/outputs/private/cli-build --adapters all --check
 node scripts/basebrief.js check --input examples/adapter-codex-task.md --json
+node scripts/basebrief.js receiver-init --repo . --output tests/outputs/private/receiver-check.json --json
 node scripts/basebrief.js receiver-check --config examples/receiver-check-config.json --repo . --json
 node scripts/basebrief.js seal --input examples/seal-before-input.json --output tests/outputs/private/seal-before.json
 node scripts/basebrief.js diff --before examples/seal-before-input.json --after examples/seal-after-input.json --json
@@ -70,6 +71,18 @@ This optional command runs Receiver Safe Check v1. It compares branch, HEAD, and
 `pass` and `difference_found` exit zero because both mean the receiver task completed. `blocked` exits nonzero. The config must not contain a private repository path; the user supplies `--repo` in the private startup command.
 
 See [Receiver Safe Check](receiver-check.md) for the independent config/result contracts and safety boundaries.
+
+### receiver-init
+
+```text
+node scripts/basebrief.js receiver-init --repo <target-repo> --output <receiver-check.json> [--json]
+```
+
+This command generates a state-only `basebrief-receiver-check-v1` config from the explicitly selected repository. It records the current branch, exact HEAD, and stable changed-file list, with no declared behavioral checks.
+
+The explicit non-sensitive `.json` output directory is created when needed. The command never overwrites a file or writes a tracked target-repository file. When the output is inside the target repository and visible to Git status, its relative path is included in `expected_changed_files`; ignored output stays out of the manifest. Detached HEAD is represented as `(detached)`.
+
+Review the generated config before adding any optional declared checks, then run `receiver-check`.
 
 ### seal
 

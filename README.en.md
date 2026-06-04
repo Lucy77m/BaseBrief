@@ -81,7 +81,7 @@ It only processes explicit input files and does not scan or modify other project
 - handoff builder and file-based Codex / Claude adapters
 - artifact checker
 - optional read-only Receiver Safe Check v1
-- zero-dependency CLI Lite: `init`, `build`, `check`, `receiver-check`, `seal`, `diff`
+- zero-dependency CLI Lite: `init`, `build`, `check`, `receiver-init`, `receiver-check`, `seal`, `diff`
 - local file-based Seal/Diff v1
 
 BaseBrief is not a chat client, agent runtime, hosted platform, secret manager, project-management system, or provider gateway.

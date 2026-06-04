@@ -204,7 +204,7 @@ function parsePorcelainZ(buffer) {
 
 function readRepositoryState(repoRoot) {
   return {
-    branch: git(repoRoot, ["branch", "--show-current"]).trim(),
+    branch: git(repoRoot, ["branch", "--show-current"]).trim() || "(detached)",
     head: git(repoRoot, ["rev-parse", "HEAD"]).trim(),
     changedFiles: parsePorcelainZ(git(repoRoot, ["status", "--porcelain=v1", "-z", "--untracked-files=all"], "buffer")),
   };
@@ -373,6 +373,8 @@ module.exports = {
   blockedResult,
   formatHuman,
   parsePorcelainZ,
+  readRepositoryState,
+  resolveRepository,
   runReceiverCheck,
   validateReceiverCheckConfig,
   validateRepositoryRelativePath,

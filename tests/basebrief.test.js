@@ -16,7 +16,7 @@ const {
 } = require("../scripts/basebrief_build_handoff");
 const { buildAdapterArtifacts, normalizeTargets } = require("../scripts/basebrief_build_adapters");
 const { checkArtifacts } = require("../scripts/basebrief_check_artifacts");
-const { HELP_TEXT, commandBuild, commandCheck, commandDiff, commandInit, commandReceiverCheck, commandSeal, formatHuman, run, starterInput } = require("../scripts/basebrief");
+const { HELP_TEXT, commandBuild, commandCheck, commandDiff, commandInit, commandReceiverCheck, commandReceiverInit, commandSeal, formatHuman, run, starterInput } = require("../scripts/basebrief");
 const {
   CONFIG_SCHEMA_VERSION: RECEIVER_CHECK_SCHEMA_VERSION,
   RESULT_SCHEMA_VERSION: RECEIVER_CHECK_RESULT_SCHEMA_VERSION,
@@ -24,6 +24,7 @@ const {
   runReceiverCheck,
   validateReceiverCheckConfig,
 } = require("../scripts/basebrief_receiver_check");
+const { buildReceiverCheckConfig, runReceiverInit } = require("../scripts/basebrief_receiver_init");
 const { createSealFromInput, diffSeals, readSealOrInput, SEAL_SCHEMA_VERSION } = require("../scripts/basebrief_seal");
 const { buildSummary, getPromptForVariant, SCENARIOS, PROVIDER_PROFILES } = require("../scripts/provider_cache_benchmark");
 const { classifyRelayUsage } = require("../scripts/provider_relay_usage_audit");
@@ -73,6 +74,7 @@ function createReceiverCheckRepo(tempDir) {
   fs.writeFileSync(path.join(repoDir, "scripts", "valid.js"), "const value = 1;\n", "utf8");
   fs.writeFileSync(path.join(repoDir, "scripts", "invalid.js"), "const = ;\n", "utf8");
   fs.writeFileSync(path.join(repoDir, "tokens.txt"), "alpha\nbeta\n", "utf8");
+  fs.writeFileSync(path.join(repoDir, "receiver.json"), "{}\n", "utf8");
   git(repoDir, ["add", "."]);
   git(repoDir, ["commit", "-m", "fixture"]);
   return repoDir;
@@ -187,11 +189,13 @@ test("public quickstart and minimal examples provide a clean first-use path", ()
   assert.match(quickstart, /路径 A/);
   assert.match(quickstart, /路径 B/);
   assert.match(quickstart, /路径 C/);
+  assert.match(quickstart, /路径 D/);
   assert.match(quickstart, /来源窗口已验证/);
   assert.match(quickstart, /当前工作目录与目标仓库是否一致/);
   assert.match(quickstart, /match_latest_user_message/);
   assert.match(quickstart, /expected_changed_files/);
   assert.match(quickstart, /receiver_check_config/);
+  assert.match(quickstart, /receiver-init --repo \. --output tests\/outputs\/private\/quickstart\/receiver-check\.json/);
   assert.match(quickstart, /handoff_acceptance/);
   assert.match(minimalBrief, /handoff_status/);
   assert.match(minimalBrief, /handoff_protocol_version/);
@@ -791,6 +795,104 @@ test("Receiver Safe Check contracts are independent and preserve porcelain leadi
   );
 });
 
+test("Receiver init generates state-only config without changing a clean target repository", () => withTempDir((tempDir) => {
+  const repoDir = createReceiverCheckRepo(tempDir);
+  const outputPath = path.join(tempDir, "receiver-init.json");
+  const before = git(repoDir, ["status", "--porcelain=v1", "--untracked-files=all"]);
+  const result = runReceiverInit({ repoPath: repoDir, outputPath });
+  const after = git(repoDir, ["status", "--porcelain=v1", "--untracked-files=all"]);
+  const config = JSON.parse(fs.readFileSync(outputPath, "utf8"));
+
+  assert.equal(result.command, "receiver-init");
+  assert.equal(result.output_inside_repo, false);
+  assert.equal(result.output_repo_relative, "not_applicable");
+  assert.equal(result.output_git_visible, false);
+  assert.equal(config.schemaVersion, RECEIVER_CHECK_SCHEMA_VERSION);
+  assert.deepEqual(config.expected_changed_files, []);
+  assert.deepEqual(config.declared_checks, []);
+  assert.equal(config.expected_branch, git(repoDir, ["branch", "--show-current"]));
+  assert.equal(config.expected_head, git(repoDir, ["rev-parse", "HEAD"]));
+  assert.equal(before, after);
+  assert(!JSON.stringify(config).includes(repoDir));
+}));
+
+test("Receiver init captures dirty state and closes the in-repository init-check workflow", () => withTempDir((tempDir) => {
+  const repoDir = createReceiverCheckRepo(tempDir);
+  fs.writeFileSync(path.join(repoDir, "docs", "safe.md"), "# changed\n", "utf8");
+  fs.writeFileSync(path.join(repoDir, "new.txt"), "new\n", "utf8");
+  fs.mkdirSync(path.join(repoDir, "receiver"));
+  const outputPath = path.join(repoDir, "receiver", "check.json");
+  const result = runReceiverInit({ repoPath: repoDir, outputPath });
+  const config = JSON.parse(fs.readFileSync(outputPath, "utf8"));
+  const checkResult = runReceiverCheck({ configPath: outputPath, repoPath: repoDir });
+
+  assert.equal(result.output_inside_repo, true);
+  assert.equal(result.output_repo_relative, "receiver/check.json");
+  assert.equal(result.output_git_visible, true);
+  assert.deepEqual(config.expected_changed_files, ["docs/safe.md", "new.txt", "receiver/check.json"]);
+  assert.deepEqual(config.declared_checks, []);
+  assert.equal(checkResult.repository_state_status, "match");
+  assert.equal(checkResult.declared_checks_status, "skipped");
+  assert.equal(checkResult.handoff_acceptance, "pass");
+  assert.equal(git(repoDir, ["diff", "--name-only"]), "docs/safe.md");
+}));
+
+test("Receiver init keeps ignored in-repository output out of expected changed files", () => withTempDir((tempDir) => {
+  const repoDir = createReceiverCheckRepo(tempDir);
+  fs.writeFileSync(path.join(repoDir, ".gitignore"), "private/\n", "utf8");
+  git(repoDir, ["add", ".gitignore"]);
+  git(repoDir, ["commit", "-m", "ignore private"]);
+  const outputPath = path.join(repoDir, "private", "receiver.json");
+  const result = runReceiverInit({ repoPath: repoDir, outputPath });
+  const config = JSON.parse(fs.readFileSync(outputPath, "utf8"));
+  const checkResult = runReceiverCheck({ configPath: outputPath, repoPath: repoDir });
+
+  assert.equal(result.output_inside_repo, true);
+  assert.equal(result.output_git_visible, false);
+  assert.deepEqual(config.expected_changed_files, []);
+  assert.equal(checkResult.handoff_acceptance, "pass");
+}));
+
+test("Receiver init rejects overwrite, sensitive output, tracked-file writes, and non-root repos", () => withTempDir((tempDir) => {
+  const repoDir = createReceiverCheckRepo(tempDir);
+  const existingPath = path.join(tempDir, "existing.json");
+  fs.writeFileSync(existingPath, "{}\n", "utf8");
+  assert.throws(() => runReceiverInit({ repoPath: repoDir, outputPath: existingPath }), /already exists/);
+  assert.throws(() => runReceiverInit({ repoPath: repoDir, outputPath: path.join(tempDir, ".env.receiver.json") }), /must not be written inside an \.env path/);
+  assert.throws(() => runReceiverInit({ repoPath: repoDir, outputPath: path.join(tempDir, ".env.local", "receiver.json") }), /must not be written inside an \.env path/);
+  assert.throws(() => runReceiverInit({ repoPath: repoDir, outputPath: path.join(tempDir, "receiver.txt") }), /must use a \.json extension/);
+  assert.throws(() => runReceiverInit({ repoPath: repoDir, outputPath: path.join(repoDir, ".git", "receiver.json") }), /must not be written inside \.git/);
+  fs.rmSync(path.join(repoDir, "receiver.json"));
+  assert.throws(() => runReceiverInit({ repoPath: repoDir, outputPath: path.join(repoDir, "receiver.json") }), /must not write a tracked/);
+  assert.throws(() => runReceiverInit({ repoPath: path.join(repoDir, "docs"), outputPath: path.join(tempDir, "nested.json") }), /must point to the target repository root/);
+  const nestedOutput = path.join(tempDir, "missing", "nested", "receiver.json");
+  assert.equal(runReceiverInit({ repoPath: repoDir, outputPath: nestedOutput }).command, "receiver-init");
+  assert(fs.existsSync(nestedOutput));
+}));
+
+test("Receiver init config builder preserves stable state-only contract", () => {
+  const config = buildReceiverCheckConfig({
+    branch: "main",
+    head: "0123456789abcdef",
+    changedFiles: ["a.md", "z.md"],
+  }, "receiver/check.json");
+  assert.deepEqual(config.expected_changed_files, ["a.md", "receiver/check.json", "z.md"]);
+  assert.deepEqual(config.declared_checks, []);
+  assert.doesNotThrow(() => validateReceiverCheckConfig(config));
+});
+
+test("Receiver init and check use a stable detached HEAD branch sentinel", () => withTempDir((tempDir) => {
+  const repoDir = createReceiverCheckRepo(tempDir);
+  git(repoDir, ["checkout", "--detach"]);
+  const outputPath = path.join(tempDir, "detached.json");
+  const result = runReceiverInit({ repoPath: repoDir, outputPath });
+  const checkResult = runReceiverCheck({ configPath: outputPath, repoPath: repoDir });
+
+  assert.equal(result.config.expected_branch, "(detached)");
+  assert.equal(checkResult.repository.branch, "(detached)");
+  assert.equal(checkResult.handoff_acceptance, "pass");
+}));
+
 test("Receiver Safe Check returns pass for matching state and declared checks without writes", () => withTempDir((tempDir) => {
   const repoDir = createReceiverCheckRepo(tempDir);
   const configPath = writeReceiverCheckConfig(tempDir, receiverCheckConfig(repoDir, {
@@ -984,6 +1086,41 @@ test("CLI Lite exposes Receiver Safe Check and keeps difference exit zero", () =
   ], { cwd: repoRoot, encoding: "utf8" });
   assert.notEqual(blocked.status, 0);
   assert.equal(JSON.parse(blocked.stdout).result.handoff_acceptance, "blocked");
+}));
+
+test("CLI Lite and standalone script expose Receiver init", () => withTempDir((tempDir) => {
+  const repoDir = createReceiverCheckRepo(tempDir);
+  const cliOutput = path.join(tempDir, "cli-receiver.json");
+  const standaloneOutput = path.join(tempDir, "standalone-receiver.json");
+
+  assert.match(HELP_TEXT, /receiver-init --repo <target-repo> --output <receiver-check\.json>/);
+  const direct = commandReceiverInit({ repo: repoDir, output: cliOutput });
+  assert.equal(direct.command, "receiver-init");
+  assert(fs.existsSync(cliOutput));
+
+  const standalone = spawnSync(process.execPath, [
+    "scripts/basebrief_receiver_init.js",
+    "--repo",
+    repoDir,
+    "--output",
+    standaloneOutput,
+    "--json",
+  ], { cwd: repoRoot, encoding: "utf8" });
+  assert.equal(standalone.status, 0);
+  assert.equal(JSON.parse(standalone.stdout).command, "receiver-init");
+  assert(fs.existsSync(standaloneOutput));
+
+  const blocked = spawnSync(process.execPath, [
+    "scripts/basebrief.js",
+    "receiver-init",
+    "--repo",
+    repoDir,
+    "--output",
+    standaloneOutput,
+    "--json",
+  ], { cwd: repoRoot, encoding: "utf8" });
+  assert.notEqual(blocked.status, 0);
+  assert.match(blocked.stderr, /already exists/);
 }));
 
 test("Seal/Diff v1 creates stable seal snapshots from BB9 input", () => {

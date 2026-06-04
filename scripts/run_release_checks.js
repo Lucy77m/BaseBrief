@@ -109,6 +109,7 @@ function checkRequiredFiles() {
     "scripts/basebrief_build_handoff.js",
     "scripts/basebrief_build_adapters.js",
     "scripts/basebrief_check_artifacts.js",
+    "scripts/basebrief_receiver_init.js",
     "scripts/basebrief_receiver_check.js",
     "scripts/basebrief_seal.js",
     "scripts/bb9_provider_profiles.json",
@@ -231,6 +232,7 @@ function checkContentContracts() {
   assert(quickstartDoc.includes("路径 A"), "quickstart must document the Skill-first path");
   assert(quickstartDoc.includes("路径 B"), "quickstart must document the local build path");
   assert(quickstartDoc.includes("路径 C"), "quickstart must document the Seal/Diff path");
+  assert(quickstartDoc.includes("路径 D"), "quickstart must document the Receiver Safe Check path");
   assert(quickstartDoc.includes("tests/outputs/private/quickstart/build"), "quickstart build must use the ignored private output directory");
   assert(quickstartDoc.includes("tests/outputs/private/quickstart/before.json"), "quickstart seal must use the ignored private output directory");
   assert(knownLimitationsDoc.includes("Free-form Markdown"), "Known Limitations must document free-form Markdown input boundary");
@@ -397,9 +399,11 @@ function checkContentContracts() {
   assert(knownLimitationsDoc.includes("does not automatically switch"), "Known limitations must state working-directory boundary");
   assert(knownLimitationsDoc.includes("Platform-generated tool traces"), "Known limitations must state language-routing boundary");
   assert(quickstartDoc.includes("receiver_check_config"), "Quickstart must explain optional Receiver Safe Check");
+  assert(quickstartDoc.includes("receiver-init --repo . --output tests/outputs/private/quickstart/receiver-check.json"), "Quickstart must show receiver-init workflow");
   assert(receiverCheckDoc.includes("basebrief-receiver-check-v1"), "Receiver Safe Check docs must name the config contract");
   assert(receiverCheckDoc.includes("basebrief-receiver-check-result-v1"), "Receiver Safe Check docs must name the result contract");
   assert(receiverCheckDoc.includes("不等同于重跑来源窗口的完整测试"), "Receiver Safe Check docs must distinguish lightweight checks from full tests");
+  assert(receiverCheckDoc.includes("receiver-init --repo <target-repo> --output <receiver-check-config.json>"), "Receiver Safe Check docs must show receiver-init workflow");
   assert(receiverCheckSchema.properties.schemaVersion.const === "basebrief-receiver-check-v1", "Receiver Safe Check config schema version mismatch");
   assert(receiverCheckResultSchema.properties.schemaVersion.const === "basebrief-receiver-check-result-v1", "Receiver Safe Check result schema version mismatch");
   assert(receiverCheckConfigExample.schemaVersion === "basebrief-receiver-check-v1", "Receiver Safe Check example schema version mismatch");
@@ -625,6 +629,7 @@ function checkCliLite() {
     });
     assert(helpStdout.includes("BaseBrief CLI Lite"), "CLI help must identify CLI Lite");
     assert(helpStdout.includes("docs/quickstart-5min.md"), "CLI help must link to the quickstart");
+    assert(helpStdout.includes("receiver-init --repo <target-repo> --output <receiver-check.json>"), "CLI help must expose Receiver init");
     assert(helpStdout.includes("receiver-check --config <json> --repo <target-repo>"), "CLI help must expose Receiver Safe Check");
 
     const noCommandStdout = execFileSync(process.execPath, [
@@ -713,15 +718,23 @@ function checkCliLite() {
     git(receiverRepo, ["add", "."]);
     git(receiverRepo, ["commit", "-m", "fixture"]);
     const receiverConfigPath = path.join(tempRoot, "receiver-check.json");
-    fs.writeFileSync(receiverConfigPath, `${JSON.stringify({
-      schemaVersion: "basebrief-receiver-check-v1",
-      expected_branch: git(receiverRepo, ["branch", "--show-current"]),
-      expected_head: git(receiverRepo, ["rev-parse", "HEAD"]),
-      expected_changed_files: [],
-      declared_checks: [
-        { id: "syntax", kind: "node_syntax", path: "safe.js" },
-      ],
-    }, null, 2)}\n`, "utf8");
+    const receiverInitStdout = execFileSync(process.execPath, [
+      "scripts/basebrief.js",
+      "receiver-init",
+      "--repo",
+      receiverRepo,
+      "--output",
+      receiverConfigPath,
+      "--json",
+    ], {
+      cwd: repoRoot,
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "pipe"],
+      env: process.env,
+    });
+    const receiverInitResult = JSON.parse(receiverInitStdout);
+    assert(receiverInitResult.command === "receiver-init", "CLI receiver-init must return command metadata");
+    assert(receiverInitResult.config.declared_checks.length === 0, "CLI receiver-init must create state-only config");
     const receiverStdout = execFileSync(process.execPath, [
       "scripts/basebrief.js",
       "receiver-check",
@@ -763,7 +776,7 @@ function checkCliLite() {
   } finally {
     fs.rmSync(tempRoot, { recursive: true, force: true });
   }
-  return 7;
+  return 8;
 }
 
 function checkFirstRunWorkflow() {
@@ -839,10 +852,44 @@ function checkFirstRunWorkflow() {
     }));
     assert(diffResult.diff.changed === true, "Quickstart diff must detect changes");
     assert(diffResult.diff.summary.taskBoundaryChanged === true, "Quickstart diff must detect task-boundary changes");
+
+    const receiverConfigPath = path.join(quickstartRoot, "receiver-check.json");
+    const receiverInitResult = JSON.parse(execFileSync(process.execPath, [
+      "scripts/basebrief.js",
+      "receiver-init",
+      "--repo",
+      ".",
+      "--output",
+      "tests/outputs/private/quickstart/receiver-check.json",
+      "--json",
+    ], {
+      cwd: repoRoot,
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "pipe"],
+      env: process.env,
+    }));
+    assert(receiverInitResult.command === "receiver-init", "Quickstart receiver-init must complete");
+    assert(fs.existsSync(receiverConfigPath), "Quickstart receiver-init must write config");
+
+    const receiverCheckResult = JSON.parse(execFileSync(process.execPath, [
+      "scripts/basebrief.js",
+      "receiver-check",
+      "--config",
+      "tests/outputs/private/quickstart/receiver-check.json",
+      "--repo",
+      ".",
+      "--json",
+    ], {
+      cwd: repoRoot,
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "pipe"],
+      env: process.env,
+    }));
+    assert(receiverCheckResult.result.handoff_acceptance === "pass", "Quickstart receiver-check must pass immediately after receiver-init");
   } finally {
     fs.rmSync(quickstartRoot, { recursive: true, force: true });
   }
-  return 4;
+  return 6;
 }
 
 function validateSealShape(seal) {

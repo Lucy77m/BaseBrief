@@ -6,7 +6,18 @@ Receiver Safe Check 是可选、显式启用、零依赖的本地接收核验。
 
 ## 使用
 
-来源窗口准备公开安全的仓库相对配置路径，用户在私有启动命令中提供目标仓库：
+推荐工作流：
+
+```text
+node scripts/basebrief.js receiver-init --repo <target-repo> --output <receiver-check-config.json> --json
+node scripts/basebrief.js receiver-check --config <receiver-check-config.json> --repo <target-repo> --json
+```
+
+`receiver-init` 从显式目标仓库生成 state-only 配置，默认 `declared_checks: []`。来源窗口应先审阅配置，再按需手动添加允许的声明检查。它不会猜测应运行哪些行为检查。
+
+输出目录会按显式路径创建，输出必须是非敏感 `.json` 路径且文件不得已经存在。若配置写在目标仓库内，它必须是非 tracked 路径；仅当该路径对 Git status 可见时，才会自动加入 `expected_changed_files`，使紧接着运行的 `receiver-check` 可以匹配。Detached HEAD 使用稳定的 `(detached)` branch 表示。
+
+也可以直接准备公开安全的仓库相对配置路径，再由用户在私有启动命令中提供目标仓库：
 
 ```text
 node scripts/basebrief.js receiver-check --config <receiver-check-config.json> --repo <target-repo> --json
@@ -15,6 +26,7 @@ node scripts/basebrief.js receiver-check --config <receiver-check-config.json> -
 也可以直接运行独立脚本：
 
 ```text
+node scripts/basebrief_receiver_init.js --repo <target-repo> --output <receiver-check-config.json> --json
 node scripts/basebrief_receiver_check.js --config <receiver-check-config.json> --repo <target-repo> --json
 ```
 
@@ -36,6 +48,8 @@ node scripts/basebrief_receiver_check.js --config <receiver-check-config.json> -
 - `file_tokens`：只报告缺失 token 数量，不输出文件内容
 
 配置不得包含目标仓库绝对路径。`--repo` 由用户在私有启动命令中提供。
+
+`receiver-init` 不覆盖文件、不写入目标仓库 tracked files，也不自动声明行为检查。
 
 ## 结果与退出码
 

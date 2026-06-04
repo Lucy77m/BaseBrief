@@ -13,6 +13,7 @@ BaseBrief is a small local handoff toolchain. These limitations are intentional 
 - CLI Lite requires explicit input and output paths.
 - It does not scan a project automatically, maintain background state, or modify host-tool configuration.
 - It is a repository script, not an installed global command or published package.
+- `receiver-init` refuses overwrite and generates only a state snapshot; declared behavioral checks still require review and explicit editing.
 
 ## Checks
 

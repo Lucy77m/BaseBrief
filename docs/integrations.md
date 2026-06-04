@@ -161,6 +161,8 @@ Do not include long history.
 
 需要本地生成 handoff artifacts 时，使用 [Handoff 契约](handoff.md) 和 [CLI Lite](cli-lite.md)。Provider-facing `cacheSidecar` / `activeProviderPrompt` 属于显式高级后处理，不应塞进普通 readable brief。
 
+需要显式接收核验时，使用 `receiver-init -> review config -> receiver-check`。该流程只读核验目标仓库状态，并仅运行来源窗口明确声明的轻量检查；它不会自动切换工作目录或重跑完整测试。
+
 只有明确进行稳定前缀或 prompt-cache 实验时，才进入 `cache-ready` 路线。完整实验文档见 [文档索引](index.md)。
 
 表述边界：
