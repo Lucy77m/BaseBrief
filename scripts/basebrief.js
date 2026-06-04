@@ -7,6 +7,7 @@ const path = require("path");
 const { buildAdapterArtifacts, normalizeTargets } = require("./basebrief_build_adapters");
 const { buildHandoffArtifacts, validateHandoffInput } = require("./basebrief_build_handoff");
 const { checkArtifacts } = require("./basebrief_check_artifacts");
+const { runReceiverCheck } = require("./basebrief_receiver_check");
 const { commandDiff: commandSealDiff, commandSeal: commandCreateSeal } = require("./basebrief_seal");
 
 const STARTER_FILE = "basebrief-handoff-input.json";
@@ -17,6 +18,7 @@ const HELP_TEXT = [
   "  node scripts/basebrief.js init --output-dir <dir>",
   "  node scripts/basebrief.js build --input <markdown-or-json> --output-dir <dir> [--adapters codex|claude|all|none] [--check]",
   "  node scripts/basebrief.js check --input <file-or-dir>",
+  "  node scripts/basebrief.js receiver-check --config <json> --repo <target-repo> [--json]",
   "  node scripts/basebrief.js seal --input <markdown-or-json> --output <file>",
   "  node scripts/basebrief.js diff --before <file> --after <file>",
   "",
@@ -206,6 +208,16 @@ function commandCheck(options) {
   };
 }
 
+function commandReceiverCheck(options) {
+  return {
+    command: "receiver-check",
+    result: runReceiverCheck({
+      configPath: options.config,
+      repoPath: options.repo,
+    }),
+  };
+}
+
 function commandSeal(options) {
   return {
     ...commandCreateSeal({
@@ -232,6 +244,7 @@ function run(argv) {
   if (command === "init") return commandInit(options);
   if (command === "build") return commandBuild(options);
   if (command === "check") return commandCheck(options);
+  if (command === "receiver-check") return commandReceiverCheck(options);
   if (command === "seal") return commandSeal(options);
   if (command === "diff") return commandDiff(options);
   throw new Error(`Unknown command: ${command}`);
@@ -268,6 +281,7 @@ function toPublicResult(result) {
       input: publicPath(result.input, cwd),
     };
   }
+  if (result.command === "receiver-check") return result;
   if (result.command === "seal") {
     return {
       ...result,
@@ -305,6 +319,17 @@ function formatHuman(result) {
       "",
     ].join(os.EOL);
   }
+  if (result.command === "receiver-check") {
+    return [
+      `BaseBrief receiver check ${result.result.handoff_acceptance}.`,
+      `receiver_task_status=${result.result.receiver_task_status}`,
+      `repository_state_status=${result.result.repository_state_status}`,
+      `declared_checks_status=${result.result.declared_checks_status}`,
+      `handoff_acceptance=${result.result.handoff_acceptance}`,
+      result.result.blocked_reason ? `blocked_reason=${result.result.blocked_reason}` : "",
+      "",
+    ].filter((line, index, lines) => line || index === lines.length - 1).join(os.EOL);
+  }
   if (result.command === "seal") {
     return `BaseBrief seal written to ${result.output}${os.EOL}checksum=${result.checksum}${os.EOL}`;
   }
@@ -337,6 +362,9 @@ function cli() {
   if (result.check && result.check.errorCount > 0) {
     process.exitCode = 1;
   }
+  if (result.command === "receiver-check" && result.result.handoff_acceptance === "blocked") {
+    process.exitCode = 1;
+  }
 }
 
 if (require.main === module) {
@@ -354,6 +382,7 @@ module.exports = {
   commandCheck,
   commandDiff,
   commandInit,
+  commandReceiverCheck,
   commandSeal,
   formatFindingLines,
   formatHuman,

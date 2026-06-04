@@ -11,6 +11,7 @@ node scripts/basebrief.js --help
 node scripts/basebrief.js init --output-dir tests/outputs/private/starter
 node scripts/basebrief.js build --input examples/structured-handoff-full.md --output-dir tests/outputs/private/cli-build --adapters all --check
 node scripts/basebrief.js check --input examples/adapter-codex-task.md --json
+node scripts/basebrief.js receiver-check --config examples/receiver-check-config.json --repo . --json
 node scripts/basebrief.js seal --input examples/seal-before-input.json --output tests/outputs/private/seal-before.json
 node scripts/basebrief.js diff --before examples/seal-before-input.json --after examples/seal-after-input.json --json
 ```
@@ -58,6 +59,18 @@ This command delegates to the Phase 6 artifact checker. It does not duplicate th
 
 Human-readable output lists each finding with severity, rule id, file, line, and explanation. Warnings keep a zero exit code; errors exit nonzero. JSON output keeps the stable checker result shape.
 
+### receiver-check
+
+```text
+node scripts/basebrief.js receiver-check --config <json> --repo <target-repo> [--json]
+```
+
+This optional command runs Receiver Safe Check v1. It compares branch, HEAD, and changed files, then runs only explicitly declared `node_syntax`, `artifact_check`, or `file_tokens` checks.
+
+`pass` and `difference_found` exit zero because both mean the receiver task completed. `blocked` exits nonzero. The config must not contain a private repository path; the user supplies `--repo` in the private startup command.
+
+See [Receiver Safe Check](receiver-check.md) for the independent config/result contracts and safety boundaries.
+
 ### seal
 
 ```text
@@ -80,4 +93,4 @@ This command compares two BB9 inputs or seals and reports changes in facts, deci
 
 ## Boundary
 
-CLI Lite exists to make the proven local workflow easier to repeat. It should stay thin: no package publishing, no global install, no account system, no hosted service, and no automatic secret management.
+CLI Lite exists to make the proven local workflow easier to repeat. It should stay thin: no package publishing, no global install, no account system, no hosted service, no automatic secret management, and no raw-command execution.

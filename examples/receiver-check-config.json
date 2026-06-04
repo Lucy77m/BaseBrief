@@ -1,0 +1,27 @@
+{
+  "schemaVersion": "basebrief-receiver-check-v1",
+  "expected_branch": "main",
+  "expected_head": "replace-with-expected-head",
+  "expected_changed_files": [],
+  "declared_checks": [
+    {
+      "id": "example-node-syntax",
+      "kind": "node_syntax",
+      "path": "scripts/basebrief.js"
+    },
+    {
+      "id": "example-artifact-check",
+      "kind": "artifact_check",
+      "path": "examples/next-chat-example.md"
+    },
+    {
+      "id": "example-receiver-tokens",
+      "kind": "file_tokens",
+      "path": "templates/zh-CN/NEXT_CHAT_PROMPT.md",
+      "tokens": [
+        "handoff_acceptance",
+        "receiver_entry_task"
+      ]
+    }
+  ]
+}

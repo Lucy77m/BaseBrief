@@ -29,6 +29,10 @@ function readText(relativePath) {
   return fs.readFileSync(path.join(repoRoot, relativePath), "utf8");
 }
 
+function git(cwd, args) {
+  return execFileSync("git", args, { cwd, encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] }).trim();
+}
+
 function walkFiles(dir) {
   const result = [];
   for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
@@ -68,12 +72,14 @@ function checkRequiredFiles() {
     "docs/quickstart-5min.md",
     "docs/known-limitations.md",
     "docs/dogfooding/v0.2.2-first-run-workflow.md",
+    "docs/dogfooding/receiver-ready-v1-evidence.md",
     "docs/integrations.md",
     "docs/adapters.md",
     "docs/walkthrough.md",
     "docs/mode-selection.md",
     "docs/handoff.md",
     "docs/checks.md",
+    "docs/receiver-check.md",
     "docs/cli-lite.md",
     "docs/seal-diff.md",
     "docs/contextops.md",
@@ -103,9 +109,12 @@ function checkRequiredFiles() {
     "scripts/basebrief_build_handoff.js",
     "scripts/basebrief_build_adapters.js",
     "scripts/basebrief_check_artifacts.js",
+    "scripts/basebrief_receiver_check.js",
     "scripts/basebrief_seal.js",
     "scripts/bb9_provider_profiles.json",
     "schemas/bb9-handoff.schema.json",
+    "schemas/basebrief-receiver-check.schema.json",
+    "schemas/basebrief-receiver-check-result.schema.json",
     "schemas/basebrief-seal.schema.json",
     "examples/full-example.md",
     "examples/lite-example.md",
@@ -129,6 +138,7 @@ function checkRequiredFiles() {
     "examples/seal-before-input.json",
     "examples/seal-after-input.json",
     "examples/next-chat-example.md",
+    "examples/receiver-check-config.json",
     "examples/agent-task-example.md",
     "examples/minimal/README.md",
     "examples/minimal/input-project-notes.md",
@@ -150,17 +160,23 @@ function checkContentContracts() {
   const quickstartDoc = readText("docs/quickstart-5min.md");
   const knownLimitationsDoc = readText("docs/known-limitations.md");
   const dogfoodingDoc = readText("docs/dogfooding/v0.2.2-first-run-workflow.md");
+  const receiverReadyDogfoodingDoc = readText("docs/dogfooding/receiver-ready-v1-evidence.md");
+  const testingDoc = readText("docs/testing.md");
   const usabilityFeedbackTemplate = readText(".github/ISSUE_TEMPLATE/usability_feedback.md");
   const adaptersDoc = readText("docs/adapters.md");
   const walkthroughDoc = readText("docs/walkthrough.md");
   const modeSelectionDoc = readText("docs/mode-selection.md");
   const handoffDoc = readText("docs/handoff.md");
   const checksDoc = readText("docs/checks.md");
+  const receiverCheckDoc = readText("docs/receiver-check.md");
   const cliLiteDoc = readText("docs/cli-lite.md");
   const sealDiffDoc = readText("docs/seal-diff.md");
   const contextOpsDoc = readText("docs/contextops.md");
   const roadmapDoc = readText("docs/roadmap/basebrief-long-term-baseline.md");
   const bb9Schema = readJson("schemas/bb9-handoff.schema.json");
+  const receiverCheckSchema = readJson("schemas/basebrief-receiver-check.schema.json");
+  const receiverCheckResultSchema = readJson("schemas/basebrief-receiver-check-result.schema.json");
+  const receiverCheckConfigExample = readJson("examples/receiver-check-config.json");
   const sealSchema = readJson("schemas/basebrief-seal.schema.json");
   const providerProfiles = readJson("scripts/bb9_provider_profiles.json");
   const structuredFullExample = readText("examples/structured-handoff-full.md");
@@ -184,6 +200,7 @@ function checkContentContracts() {
   assert(readme.includes("docs/integrations.md"), "README.md should link to integrations docs");
   assert(readme.includes("docs/handoff.md"), "README.md should link to handoff contract docs");
   assert(readme.includes("docs/cli-lite.md"), "README.md should link to CLI Lite docs");
+  assert(readme.includes("docs/receiver-check.md"), "README.md should link to Receiver Safe Check docs");
   assert(readme.includes("docs/seal-diff.md"), "README.md should link to Seal/Diff docs");
   assert(readme.includes("零依赖 CLI Lite"), "README.md must describe the existing CLI Lite");
   assert(!readme.includes("BaseBrief 当前不是 CLI"), "README.md must not describe CLI Lite as nonexistent");
@@ -195,6 +212,7 @@ function checkContentContracts() {
   assert(englishReadme.includes("docs/index.md"), "README.en.md should link to the documentation index");
   assert(englishReadme.includes("docs/handoff.md"), "README.en.md should link to handoff docs");
   assert(englishReadme.includes("docs/cli-lite.md"), "README.en.md should link to CLI Lite docs");
+  assert(englishReadme.includes("docs/receiver-check.md"), "README.en.md should link to Receiver Safe Check docs");
   assert(englishReadme.includes("docs/seal-diff.md"), "README.en.md should link to Seal/Diff docs");
   assert(englishReadme.includes("Integrations"), "README.en.md should link to integrations docs");
   assert(englishReadme.includes("zero-dependency CLI Lite"), "README.en.md must describe the existing CLI Lite");
@@ -219,6 +237,15 @@ function checkContentContracts() {
   assert(knownLimitationsDoc.includes("not a Git diff"), "Known Limitations must document Seal/Diff boundary");
   assert(dogfoodingDoc.includes("artifact.missing-open-questions"), "Dogfooding record must document the first-run warning");
   assert(dogfoodingDoc.includes("Remaining Friction"), "Dogfooding record must document remaining friction");
+  assert(docsIndex.includes("dogfooding/receiver-ready-v1-evidence.md"), "Docs index must link receiver-ready v1 evidence");
+  assert(receiverReadyDogfoodingDoc.includes("User-provided external evidence"), "Receiver-ready evidence must distinguish external evidence");
+  assert(receiverReadyDogfoodingDoc.includes("not proof across all tools"), "Receiver-ready evidence must keep the interpretation scoped");
+  assert(receiverReadyDogfoodingDoc.includes("Low-budget Validation Rule"), "Receiver-ready evidence must record the validation budget");
+  assert(knownLimitationsDoc.includes("does not automatically decide when a handoff is stale"), "Known Limitations must document generated_at boundary");
+  assert(knownLimitationsDoc.includes("does not add file-content hashes"), "Known Limitations must document deferred receiver integrity work");
+  assert(knownLimitationsDoc.includes("not a general test runner"), "Known Limitations must scope Receiver Safe Check");
+  assert(testingDoc.includes("最多 `1` 个 low-reasoning smoke case"), "Testing docs must cap receiver smoke cases");
+  assert(testingDoc.includes("完整矩阵测试必须由用户明确批准"), "Testing docs must require approval for full receiver matrices");
   assert(usabilityFeedbackTemplate.includes("Do not include secrets"), "Usability feedback template must include a safety warning");
   assert(usabilityFeedbackTemplate.includes("Expected Result"), "Usability feedback template must collect expected results");
   [
@@ -329,6 +356,60 @@ function checkContentContracts() {
 
   ["新窗口开场白建议", "Agent 任务说明建议", "缓存前缀建议"].forEach((section) => {
     assert(fullTemplate.includes(section), `BASEBRIEF.md missing full-only section: ${section}`);
+  });
+
+  [fullTemplate, liteTemplate, nextChatTemplate].forEach((template) => {
+    [
+      "handoff_status",
+      "ready_for_receiver",
+      "handoff_protocol_version",
+      "receiver-ready-v1",
+      "generated_at",
+      "preferred_language",
+      "response_language",
+      "match_latest_user_message",
+      "receiver_entry_task",
+      "post_acceptance_next_action",
+      "expected_changed_files",
+      "receiver_check_config",
+      "receiver_task_status",
+      "repository_state_status",
+      "declared_checks_status",
+      "handoff_acceptance",
+    ].forEach((token) => {
+      assert(template.includes(token), `Receiver-ready template missing token: ${token}`);
+    });
+  });
+  assert(nextChatTemplate.includes("当前工作目录"), "NEXT_CHAT_PROMPT.md must require current working directory reporting");
+  assert(nextChatTemplate.includes("来源窗口已验证"), "NEXT_CHAT_PROMPT.md must distinguish source-window verification");
+  assert(nextChatTemplate.includes("接收窗口本轮已验证"), "NEXT_CHAT_PROMPT.md must distinguish receiver re-verification");
+  assert(nextChatTemplate.includes("实际接力摩擦"), "NEXT_CHAT_PROMPT.md must require actual handoff friction");
+  assert(nextChatTemplate.includes("第一句、进度说明和最终报告"), "NEXT_CHAT_PROMPT.md must route all agent-authored response language");
+  assert(nextChatTemplate.includes("忽略代码、路径、命令和字段名"), "NEXT_CHAT_PROMPT.md must ignore technical tokens for language routing");
+  assert(nextChatTemplate.includes("新增、缺失或意外文件"), "NEXT_CHAT_PROMPT.md must require exact changed-file comparison");
+  assert(nextChatTemplate.includes("不等于 Agent 执行失败"), "NEXT_CHAT_PROMPT.md must distinguish difference_found from execution failure");
+  assert(nextChatTemplate.includes("receiver-check --config <receiver_check_config> --repo <target-repo> --json"), "NEXT_CHAT_PROMPT.md must use the fixed receiver-check command");
+  assert(quickstartDoc.includes("receiver_entry_task"), "Quickstart must explain receiver entry task");
+  assert(quickstartDoc.includes("post_acceptance_next_action"), "Quickstart must explain post-acceptance next action");
+  assert(quickstartDoc.includes("match_latest_user_message"), "Quickstart must explain response language routing");
+  assert(quickstartDoc.includes("expected_changed_files"), "Quickstart must explain exact changed-file comparison");
+  assert(quickstartDoc.includes("handoff_acceptance"), "Quickstart must explain receiver acceptance status");
+  assert(knownLimitationsDoc.includes("does not automatically switch"), "Known limitations must state working-directory boundary");
+  assert(knownLimitationsDoc.includes("Platform-generated tool traces"), "Known limitations must state language-routing boundary");
+  assert(quickstartDoc.includes("receiver_check_config"), "Quickstart must explain optional Receiver Safe Check");
+  assert(receiverCheckDoc.includes("basebrief-receiver-check-v1"), "Receiver Safe Check docs must name the config contract");
+  assert(receiverCheckDoc.includes("basebrief-receiver-check-result-v1"), "Receiver Safe Check docs must name the result contract");
+  assert(receiverCheckDoc.includes("不等同于重跑来源窗口的完整测试"), "Receiver Safe Check docs must distinguish lightweight checks from full tests");
+  assert(receiverCheckSchema.properties.schemaVersion.const === "basebrief-receiver-check-v1", "Receiver Safe Check config schema version mismatch");
+  assert(receiverCheckResultSchema.properties.schemaVersion.const === "basebrief-receiver-check-result-v1", "Receiver Safe Check result schema version mismatch");
+  assert(receiverCheckConfigExample.schemaVersion === "basebrief-receiver-check-v1", "Receiver Safe Check example schema version mismatch");
+  assert(Array.isArray(receiverCheckConfigExample.expected_changed_files), "Receiver Safe Check example must include expected_changed_files");
+  assert(handoffDoc.includes("It is not a BB9 schema field"), "Handoff docs must keep Receiver Safe Check outside BB9");
+  assert(!("receiver_check_config" in bb9Schema.properties), "BB9 schema must not absorb receiver_check_config");
+  assert(!("declared_checks" in bb9Schema.properties), "BB9 schema must not absorb declared_checks");
+  ["node_syntax", "artifact_check", "file_tokens"].forEach((kind) => {
+    assert(receiverCheckDoc.includes(kind), `Receiver Safe Check docs missing kind: ${kind}`);
+    assert(JSON.stringify(receiverCheckSchema).includes(kind), `Receiver Safe Check schema missing kind: ${kind}`);
   });
 
   ["verified_facts", "confirmed_decisions", "assumptions", "open_questions", "risk_boundaries"].forEach((token) => {
@@ -470,6 +551,7 @@ function checkExamples() {
     "examples/seal-before-input.json",
     "examples/seal-after-input.json",
     "examples/next-chat-example.md",
+    "examples/receiver-check-config.json",
     "examples/agent-task-example.md",
     "examples/minimal/README.md",
     "examples/minimal/input-project-notes.md",
@@ -491,6 +573,9 @@ function checkArtifactChecker() {
     "examples/minimal",
     "docs/known-limitations.md",
     "docs/dogfooding/v0.2.2-first-run-workflow.md",
+    "docs/dogfooding/receiver-ready-v1-evidence.md",
+    "docs/receiver-check.md",
+    "examples/receiver-check-config.json",
     ".github/ISSUE_TEMPLATE/usability_feedback.md",
   ];
   inputs.forEach((relativePath) => {
@@ -540,6 +625,7 @@ function checkCliLite() {
     });
     assert(helpStdout.includes("BaseBrief CLI Lite"), "CLI help must identify CLI Lite");
     assert(helpStdout.includes("docs/quickstart-5min.md"), "CLI help must link to the quickstart");
+    assert(helpStdout.includes("receiver-check --config <json> --repo <target-repo>"), "CLI help must expose Receiver Safe Check");
 
     const noCommandStdout = execFileSync(process.execPath, [
       "scripts/basebrief.js",
@@ -618,6 +704,42 @@ function checkCliLite() {
     assert(checkResult.check.status === "passed", "CLI check must delegate to artifact checker");
     assert(Array.isArray(checkResult.check.findings), "CLI check must return checker findings array");
 
+    const receiverRepo = path.join(tempRoot, "receiver-repo");
+    fs.mkdirSync(receiverRepo);
+    git(receiverRepo, ["init"]);
+    git(receiverRepo, ["config", "user.email", "basebrief@example.invalid"]);
+    git(receiverRepo, ["config", "user.name", "BaseBrief Release Check"]);
+    fs.writeFileSync(path.join(receiverRepo, "safe.js"), "const safe = true;\n", "utf8");
+    git(receiverRepo, ["add", "."]);
+    git(receiverRepo, ["commit", "-m", "fixture"]);
+    const receiverConfigPath = path.join(tempRoot, "receiver-check.json");
+    fs.writeFileSync(receiverConfigPath, `${JSON.stringify({
+      schemaVersion: "basebrief-receiver-check-v1",
+      expected_branch: git(receiverRepo, ["branch", "--show-current"]),
+      expected_head: git(receiverRepo, ["rev-parse", "HEAD"]),
+      expected_changed_files: [],
+      declared_checks: [
+        { id: "syntax", kind: "node_syntax", path: "safe.js" },
+      ],
+    }, null, 2)}\n`, "utf8");
+    const receiverStdout = execFileSync(process.execPath, [
+      "scripts/basebrief.js",
+      "receiver-check",
+      "--config",
+      receiverConfigPath,
+      "--repo",
+      receiverRepo,
+      "--json",
+    ], {
+      cwd: repoRoot,
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "pipe"],
+      env: process.env,
+    });
+    const receiverResult = JSON.parse(receiverStdout);
+    assert(receiverResult.command === "receiver-check", "CLI receiver-check must return command metadata");
+    assert(receiverResult.result.handoff_acceptance === "pass", "CLI receiver-check must pass for matching fixture");
+
     const warningPath = path.join(tempRoot, "codex-task.md");
     fs.writeFileSync(warningPath, [
       "# BaseBrief Codex Task",
@@ -641,7 +763,7 @@ function checkCliLite() {
   } finally {
     fs.rmSync(tempRoot, { recursive: true, force: true });
   }
-  return 6;
+  return 7;
 }
 
 function checkFirstRunWorkflow() {

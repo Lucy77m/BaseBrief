@@ -14,6 +14,18 @@ node scripts/run_release_checks.js
 node --test tests/basebrief.test.js
 ```
 
+## Receiver 测试额度
+
+Receiver-ready 验证默认采用低额度策略：
+
+- 普通文档和静态契约改动只运行本地自动检查，不创建 Codex 接收线程。
+- 只有 Receiver 行为发生变化，且静态检查无法验证该行为时，才运行最多 `1` 个 low-reasoning smoke case。
+- Smoke case 通过后立即停止，不追加便利性或“顺便验证”用例。
+- 完整矩阵测试必须由用户明确批准。
+- 已有 private 与用户提供的外部证据应优先复用，不为重复确认重新消耗接收线程额度。
+
+这项预算规则不降低发布检查标准。单元测试、release checks、Artifact Checker、`git diff --check` 和受保护接口检查仍按改动范围执行。
+
 如需真实 provider 缓存测试框架：
 
 ```text

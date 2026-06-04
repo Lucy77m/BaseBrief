@@ -80,7 +80,8 @@ node scripts/basebrief.js diff --before tests/outputs/private/quickstart/before.
 - BB9 structured handoff contract
 - Handoff Builder 与 Codex / Claude 文件型 Adapter
 - Artifact Checker
-- 零依赖 CLI Lite：`init`、`build`、`check`、`seal`、`diff`
+- 可选、只读的 Receiver Safe Check v1
+- 零依赖 CLI Lite：`init`、`build`、`check`、`receiver-check`、`seal`、`diff`
 - 本地、文件型 Seal/Diff v1
 
 BaseBrief 不是聊天客户端、Agent runtime、托管平台、密钥管理器、项目管理系统或 provider gateway。
@@ -91,6 +92,7 @@ BaseBrief 不是聊天客户端、Agent runtime、托管平台、密钥管理器
 - [工具集成](docs/integrations.md)
 - [模式选择](docs/mode-selection.md)
 - [CLI Lite](docs/cli-lite.md)
+- [Receiver Safe Check](docs/receiver-check.md)
 - [已知限制](docs/known-limitations.md)
 - [完整文档索引](docs/index.md)
 - [公开最小示例](examples/minimal/README.md)

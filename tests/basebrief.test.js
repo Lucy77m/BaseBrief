@@ -1,5 +1,5 @@
 const assert = require("node:assert/strict");
-const { execFileSync } = require("node:child_process");
+const { execFileSync, spawnSync } = require("node:child_process");
 const fs = require("node:fs");
 const os = require("node:os");
 const path = require("node:path");
@@ -16,7 +16,14 @@ const {
 } = require("../scripts/basebrief_build_handoff");
 const { buildAdapterArtifacts, normalizeTargets } = require("../scripts/basebrief_build_adapters");
 const { checkArtifacts } = require("../scripts/basebrief_check_artifacts");
-const { HELP_TEXT, commandBuild, commandCheck, commandDiff, commandInit, commandSeal, formatHuman, run, starterInput } = require("../scripts/basebrief");
+const { HELP_TEXT, commandBuild, commandCheck, commandDiff, commandInit, commandReceiverCheck, commandSeal, formatHuman, run, starterInput } = require("../scripts/basebrief");
+const {
+  CONFIG_SCHEMA_VERSION: RECEIVER_CHECK_SCHEMA_VERSION,
+  RESULT_SCHEMA_VERSION: RECEIVER_CHECK_RESULT_SCHEMA_VERSION,
+  parsePorcelainZ,
+  runReceiverCheck,
+  validateReceiverCheckConfig,
+} = require("../scripts/basebrief_receiver_check");
 const { createSealFromInput, diffSeals, readSealOrInput, SEAL_SCHEMA_VERSION } = require("../scripts/basebrief_seal");
 const { buildSummary, getPromptForVariant, SCENARIOS, PROVIDER_PROFILES } = require("../scripts/provider_cache_benchmark");
 const { classifyRelayUsage } = require("../scripts/provider_relay_usage_audit");
@@ -39,6 +46,53 @@ function withTempDir(fn) {
   } finally {
     fs.rmSync(tempDir, { recursive: true, force: true });
   }
+}
+
+function git(cwd, args) {
+  return execFileSync("git", args, { cwd, encoding: "utf8" }).trim();
+}
+
+function createReceiverCheckRepo(tempDir) {
+  const repoDir = path.join(tempDir, "repo");
+  fs.mkdirSync(repoDir, { recursive: true });
+  git(repoDir, ["init"]);
+  git(repoDir, ["config", "user.email", "basebrief@example.invalid"]);
+  git(repoDir, ["config", "user.name", "BaseBrief Test"]);
+  fs.mkdirSync(path.join(repoDir, "docs"), { recursive: true });
+  fs.mkdirSync(path.join(repoDir, "scripts"), { recursive: true });
+  fs.writeFileSync(path.join(repoDir, "docs", "safe.md"), [
+    "# Safe",
+    "",
+    "## Risk Boundaries",
+    "- keep checks read-only",
+    "",
+    "## Open Questions",
+    "- none",
+    "",
+  ].join("\n"), "utf8");
+  fs.writeFileSync(path.join(repoDir, "scripts", "valid.js"), "const value = 1;\n", "utf8");
+  fs.writeFileSync(path.join(repoDir, "scripts", "invalid.js"), "const = ;\n", "utf8");
+  fs.writeFileSync(path.join(repoDir, "tokens.txt"), "alpha\nbeta\n", "utf8");
+  git(repoDir, ["add", "."]);
+  git(repoDir, ["commit", "-m", "fixture"]);
+  return repoDir;
+}
+
+function receiverCheckConfig(repoDir, overrides = {}) {
+  return {
+    schemaVersion: RECEIVER_CHECK_SCHEMA_VERSION,
+    expected_branch: git(repoDir, ["branch", "--show-current"]),
+    expected_head: git(repoDir, ["rev-parse", "HEAD"]),
+    expected_changed_files: [],
+    declared_checks: [],
+    ...overrides,
+  };
+}
+
+function writeReceiverCheckConfig(tempDir, config, name = "receiver-check.json") {
+  const configPath = path.join(tempDir, name);
+  fs.writeFileSync(configPath, `${JSON.stringify(config, null, 2)}\n`, "utf8");
+  return configPath;
 }
 
 function validateBb9HandoffInputAgainstSchema(input, schema) {
@@ -128,9 +182,33 @@ test("public docs keep cache-ready as explicit experiment route", () => {
 
 test("public quickstart and minimal examples provide a clean first-use path", () => {
   const quickstart = readText("docs/quickstart-5min.md");
+  const minimalBrief = readText("examples/minimal/output-basebrief-lite.md");
+  const minimalNextChat = readText("examples/minimal/next-chat-prompt.md");
   assert.match(quickstart, /路径 A/);
   assert.match(quickstart, /路径 B/);
   assert.match(quickstart, /路径 C/);
+  assert.match(quickstart, /来源窗口已验证/);
+  assert.match(quickstart, /当前工作目录与目标仓库是否一致/);
+  assert.match(quickstart, /match_latest_user_message/);
+  assert.match(quickstart, /expected_changed_files/);
+  assert.match(quickstart, /receiver_check_config/);
+  assert.match(quickstart, /handoff_acceptance/);
+  assert.match(minimalBrief, /handoff_status/);
+  assert.match(minimalBrief, /handoff_protocol_version/);
+  assert.match(minimalBrief, /generated_at/);
+  assert.match(minimalBrief, /preferred_language/);
+  assert.match(minimalBrief, /response_language/);
+  assert.match(minimalBrief, /receiver_entry_task/);
+  assert.match(minimalBrief, /post_acceptance_next_action/);
+  assert.match(minimalBrief, /expected_changed_files/);
+  assert.match(minimalBrief, /receiver_check_config/);
+  assert.match(minimalBrief, /receiver_task_status/);
+  assert.match(minimalBrief, /repository_state_status/);
+  assert.match(minimalBrief, /declared_checks_status/);
+  assert.match(minimalBrief, /handoff_acceptance/);
+  assert.match(minimalNextChat, /来源窗口已验证与接收窗口本轮已验证/);
+  assert.match(minimalNextChat, /不要再次建议开启新窗口/);
+  assert.match(minimalNextChat, /用户最新消息的自然语言主体/);
 
   const result = checkArtifacts({ inputPath: path.join(repoRoot, "examples/minimal") });
   assert.equal(result.status, "passed");
@@ -683,6 +761,229 @@ test("CLI Lite build --check exits nonzero when generated artifacts contain erro
   const result = JSON.parse(error.stdout);
   assert.equal(result.check.status, "failed");
   assert(result.check.findings.some((finding) => finding.ruleId === `artifact.missing-${"risk"}-boundaries`));
+}));
+
+test("Receiver Safe Check contracts are independent and preserve porcelain leading spaces", () => {
+  const configSchema = readJson("schemas/basebrief-receiver-check.schema.json");
+  const resultSchema = readJson("schemas/basebrief-receiver-check-result.schema.json");
+  const publicConfig = readJson("examples/receiver-check-config.json");
+  const bb9Schema = readJson("schemas/bb9-handoff.schema.json");
+
+  assert.equal(configSchema.properties.schemaVersion.const, RECEIVER_CHECK_SCHEMA_VERSION);
+  assert.equal(resultSchema.properties.schemaVersion.const, RECEIVER_CHECK_RESULT_SCHEMA_VERSION);
+  assert.doesNotThrow(() => validateReceiverCheckConfig(publicConfig));
+  assert.throws(
+    () => validateReceiverCheckConfig({ ...publicConfig, expected_changed_files: ["z.md", "a.md"] }),
+    /stable sorted order/,
+  );
+  assert.throws(
+    () => validateReceiverCheckConfig({ ...publicConfig, expected_changed_files: ["a.md", "a.md"] }),
+    /unique values/,
+  );
+  ["receiver_task_status", "repository_state_status", "declared_checks_status", "handoff_acceptance"].forEach((field) => {
+    assert(resultSchema.required.includes(field));
+  });
+  assert.equal("receiver_check_config" in bb9Schema.properties, false);
+  assert.equal("declared_checks" in bb9Schema.properties, false);
+  assert.deepEqual(
+    parsePorcelainZ(Buffer.from(" M docs/first.md\0?? second.md\0", "utf8")),
+    ["docs/first.md", "second.md"],
+  );
+});
+
+test("Receiver Safe Check returns pass for matching state and declared checks without writes", () => withTempDir((tempDir) => {
+  const repoDir = createReceiverCheckRepo(tempDir);
+  const configPath = writeReceiverCheckConfig(tempDir, receiverCheckConfig(repoDir, {
+    declared_checks: [
+      { id: "artifact", kind: "artifact_check", path: "docs/safe.md" },
+      { id: "syntax", kind: "node_syntax", path: "scripts/valid.js" },
+      { id: "tokens", kind: "file_tokens", path: "tokens.txt", tokens: ["alpha", "beta"] },
+    ],
+  }));
+  const before = git(repoDir, ["status", "--porcelain=v1", "--untracked-files=all"]);
+  const result = runReceiverCheck({ configPath, repoPath: repoDir });
+  const after = git(repoDir, ["status", "--porcelain=v1", "--untracked-files=all"]);
+
+  assert.equal(result.schemaVersion, RECEIVER_CHECK_RESULT_SCHEMA_VERSION);
+  assert.equal(result.receiver_task_status, "completed");
+  assert.equal(result.repository_state_status, "match");
+  assert.equal(result.declared_checks_status, "passed");
+  assert.equal(result.handoff_acceptance, "pass");
+  assert(result.declared_checks.every((check) => check.status === "passed"));
+  assert.equal(after, before);
+}));
+
+test("Receiver Safe Check reports repository and declared-check differences without blocking", () => withTempDir((tempDir) => {
+  const repoDir = createReceiverCheckRepo(tempDir);
+  fs.writeFileSync(path.join(repoDir, "docs", "unexpected.md"), "# unexpected\n\ncross-provider proof\n", "utf8");
+  const stateConfigPath = writeReceiverCheckConfig(tempDir, receiverCheckConfig(repoDir, {
+    expected_branch: "unexpected-branch",
+    expected_head: "0000000",
+    expected_changed_files: ["docs/missing.md"],
+  }), "state-difference.json");
+  const stateResult = runReceiverCheck({ configPath: stateConfigPath, repoPath: repoDir });
+
+  assert.equal(stateResult.receiver_task_status, "completed");
+  assert.equal(stateResult.repository_state_status, "difference_found");
+  assert.equal(stateResult.declared_checks_status, "skipped");
+  assert.equal(stateResult.handoff_acceptance, "difference_found");
+  assert.deepEqual(stateResult.changed_files.missing, ["docs/missing.md"]);
+  assert.deepEqual(stateResult.changed_files.unexpected, ["docs/unexpected.md"]);
+
+  const checksConfigPath = writeReceiverCheckConfig(tempDir, receiverCheckConfig(repoDir, {
+    expected_changed_files: ["docs/unexpected.md"],
+    declared_checks: [
+      { id: "artifact", kind: "artifact_check", path: "docs/unexpected.md" },
+      { id: "syntax", kind: "node_syntax", path: "scripts/invalid.js" },
+      { id: "tokens", kind: "file_tokens", path: "tokens.txt", tokens: ["alpha", "missing"] },
+    ],
+  }), "check-difference.json");
+  const checksResult = runReceiverCheck({ configPath: checksConfigPath, repoPath: repoDir });
+
+  assert.equal(checksResult.receiver_task_status, "completed");
+  assert.equal(checksResult.repository_state_status, "match");
+  assert.equal(checksResult.declared_checks_status, "difference_found");
+  assert.equal(checksResult.handoff_acceptance, "difference_found");
+  assert(checksResult.declared_checks.every((check) => check.status === "difference_found"));
+  assert.match(checksResult.declared_checks.find((check) => check.kind === "file_tokens").detail, /missing_token_count=1/);
+  assert(!JSON.stringify(checksResult).includes("missing\n"));
+}));
+
+test("Receiver Safe Check blocks invalid, sensitive, and escaping paths", () => withTempDir((tempDir) => {
+  const repoDir = createReceiverCheckRepo(tempDir);
+  const outsideDir = path.join(tempDir, "outside");
+  fs.mkdirSync(outsideDir);
+  fs.writeFileSync(path.join(outsideDir, "outside.md"), "# outside\n", "utf8");
+  fs.symlinkSync(outsideDir, path.join(repoDir, "outside-link"), "junction");
+
+  const cases = [
+    {
+      name: "unexpected-key",
+      config: { ...receiverCheckConfig(repoDir), raw_command: "git status" },
+      pattern: /Unexpected key/,
+    },
+    {
+      name: "traversal",
+      config: receiverCheckConfig(repoDir, {
+        declared_checks: [{ id: "escape", kind: "file_tokens", path: "../outside/outside.md", tokens: ["outside"] }],
+      }),
+      pattern: /must not escape/,
+    },
+    {
+      name: "env",
+      config: receiverCheckConfig(repoDir, {
+        declared_checks: [{ id: "env", kind: "file_tokens", path: ".env.local", tokens: ["value"] }],
+      }),
+      pattern: /must not access \.env/,
+    },
+    {
+      name: "git",
+      config: receiverCheckConfig(repoDir, {
+        declared_checks: [{ id: "git", kind: "file_tokens", path: ".GIT/config", tokens: ["core"] }],
+      }),
+      pattern: /must not access \.git/,
+    },
+    {
+      name: "symlink",
+      config: receiverCheckConfig(repoDir, {
+        expected_changed_files: ["outside-link"],
+        declared_checks: [{ id: "symlink", kind: "artifact_check", path: "outside-link/outside.md" }],
+      }),
+      pattern: /resolves outside/,
+    },
+    {
+      name: "artifact-directory",
+      config: receiverCheckConfig(repoDir, {
+        expected_changed_files: ["outside-link"],
+        declared_checks: [{ id: "directory", kind: "artifact_check", path: "docs" }],
+      }),
+      pattern: /artifact_check path must be a file/,
+    },
+    {
+      name: "node-extension",
+      config: receiverCheckConfig(repoDir, {
+        expected_changed_files: ["outside-link"],
+        declared_checks: [{ id: "extension", kind: "node_syntax", path: "tokens.txt" }],
+      }),
+      pattern: /node_syntax path must use/,
+    },
+  ];
+
+  for (const testCase of cases) {
+    const configPath = writeReceiverCheckConfig(tempDir, testCase.config, `${testCase.name}.json`);
+    const result = runReceiverCheck({ configPath, repoPath: repoDir });
+    assert.equal(result.receiver_task_status, "blocked", testCase.name);
+    assert.equal(result.handoff_acceptance, "blocked", testCase.name);
+    assert.match(result.blocked_reason, testCase.pattern, testCase.name);
+  }
+
+  const missingRepoResult = runReceiverCheck({
+    configPath: writeReceiverCheckConfig(tempDir, receiverCheckConfig(repoDir), "missing-repo.json"),
+    repoPath: path.join(tempDir, "missing"),
+  });
+  assert.equal(missingRepoResult.handoff_acceptance, "blocked");
+
+  const envConfigPath = writeReceiverCheckConfig(tempDir, receiverCheckConfig(repoDir), ".env.receiver-check.json");
+  const envConfigResult = runReceiverCheck({ configPath: envConfigPath, repoPath: repoDir });
+  assert.equal(envConfigResult.handoff_acceptance, "blocked");
+  assert.match(envConfigResult.blocked_reason, /must not be read from \.env/);
+
+  const gitConfigPath = writeReceiverCheckConfig(path.join(repoDir, ".git"), receiverCheckConfig(repoDir), "receiver-check.json");
+  const gitConfigResult = runReceiverCheck({ configPath: gitConfigPath, repoPath: repoDir });
+  assert.equal(gitConfigResult.handoff_acceptance, "blocked");
+  assert.match(gitConfigResult.blocked_reason, /must not be read from \.git/);
+}));
+
+test("CLI Lite exposes Receiver Safe Check and keeps difference exit zero", () => withTempDir((tempDir) => {
+  const repoDir = createReceiverCheckRepo(tempDir);
+  const passConfigPath = writeReceiverCheckConfig(tempDir, receiverCheckConfig(repoDir), "pass.json");
+  const differenceConfigPath = writeReceiverCheckConfig(tempDir, receiverCheckConfig(repoDir, {
+    expected_head: "0000000",
+  }), "difference.json");
+  const blockedConfigPath = writeReceiverCheckConfig(tempDir, {
+    ...receiverCheckConfig(repoDir),
+    unexpected: true,
+  }, "blocked.json");
+
+  assert.match(HELP_TEXT, /receiver-check --config <json> --repo <target-repo>/);
+  const direct = commandReceiverCheck({ config: passConfigPath, repo: repoDir });
+  assert.equal(direct.result.handoff_acceptance, "pass");
+  assert.equal(run(["node", "scripts/basebrief.js", "receiver-check", "--config", passConfigPath, "--repo", repoDir]).result.handoff_acceptance, "pass");
+
+  const difference = spawnSync(process.execPath, [
+    "scripts/basebrief.js",
+    "receiver-check",
+    "--config",
+    differenceConfigPath,
+    "--repo",
+    repoDir,
+    "--json",
+  ], { cwd: repoRoot, encoding: "utf8" });
+  assert.equal(difference.status, 0);
+  assert.equal(JSON.parse(difference.stdout).result.handoff_acceptance, "difference_found");
+
+  const standaloneDifference = spawnSync(process.execPath, [
+    "scripts/basebrief_receiver_check.js",
+    "--config",
+    differenceConfigPath,
+    "--repo",
+    repoDir,
+    "--json",
+  ], { cwd: repoRoot, encoding: "utf8" });
+  assert.equal(standaloneDifference.status, 0);
+  assert.equal(JSON.parse(standaloneDifference.stdout).handoff_acceptance, "difference_found");
+
+  const blocked = spawnSync(process.execPath, [
+    "scripts/basebrief.js",
+    "receiver-check",
+    "--config",
+    blockedConfigPath,
+    "--repo",
+    repoDir,
+    "--json",
+  ], { cwd: repoRoot, encoding: "utf8" });
+  assert.notEqual(blocked.status, 0);
+  assert.equal(JSON.parse(blocked.stdout).result.handoff_acceptance, "blocked");
 }));
 
 test("Seal/Diff v1 creates stable seal snapshots from BB9 input", () => {
@@ -1517,6 +1818,19 @@ test("core templates preserve BaseBrief baseline sections", () => {
     "assumptions",
     "open_questions",
     "risk_boundaries",
+    "handoff_status",
+    "handoff_protocol_version",
+    "generated_at",
+    "preferred_language",
+    "response_language",
+    "receiver_entry_task",
+    "post_acceptance_next_action",
+    "expected_changed_files",
+    "receiver_check_config",
+    "receiver_task_status",
+    "repository_state_status",
+    "declared_checks_status",
+    "handoff_acceptance",
   ];
 
   for (const templatePath of templatePaths) {
@@ -1525,6 +1839,43 @@ test("core templates preserve BaseBrief baseline sections", () => {
       assert.match(content, new RegExp(token), `${templatePath} missing ${token}`);
     }
   }
+});
+
+test("receiver-ready templates and examples separate entry verification from project next action", () => {
+  const paths = [
+    "templates/zh-CN/BASEBRIEF.md",
+    "templates/zh-CN/BASEBRIEF_LITE.md",
+    "templates/zh-CN/NEXT_CHAT_PROMPT.md",
+    "examples/next-chat-example.md",
+    "examples/minimal/next-chat-prompt.md",
+  ];
+
+  for (const relativePath of paths) {
+    const content = readText(relativePath);
+    assert.match(content, /ready_for_receiver/, `${relativePath} missing ready receiver status`);
+    assert.match(content, /receiver_entry_task|Receiver entry task/, `${relativePath} missing receiver entry task`);
+    assert.match(content, /post_acceptance_next_action|Post-acceptance next action/, `${relativePath} missing post-acceptance action`);
+  }
+
+  const nextChatTemplate = readText("templates/zh-CN/NEXT_CHAT_PROMPT.md");
+  assert.match(nextChatTemplate, /当前工作目录/);
+  assert.match(nextChatTemplate, /来源窗口已验证/);
+  assert.match(nextChatTemplate, /接收窗口本轮已验证/);
+  assert.match(nextChatTemplate, /实际发现的摩擦|实际接力摩擦/);
+  assert.match(nextChatTemplate, /不得再次把“开启新窗口”作为下一步|不得再次建议开启新窗口/);
+  assert.match(nextChatTemplate, /match_latest_user_message/);
+  assert.match(nextChatTemplate, /第一句、进度说明和最终报告/);
+  assert.match(nextChatTemplate, /忽略代码、路径、命令和字段名/);
+  assert.match(nextChatTemplate, /expected_changed_files/);
+  assert.match(nextChatTemplate, /receiver_check_config/);
+  assert.match(nextChatTemplate, /receiver-check --config <receiver_check_config> --repo <target-repo> --json/);
+  assert.match(nextChatTemplate, /不等同于重跑来源窗口完整测试/);
+  assert.match(nextChatTemplate, /新增、缺失或意外文件/);
+  assert.match(nextChatTemplate, /receiver_task_status/);
+  assert.match(nextChatTemplate, /repository_state_status/);
+  assert.match(nextChatTemplate, /declared_checks_status/);
+  assert.match(nextChatTemplate, /handoff_acceptance/);
+  assert.match(nextChatTemplate, /difference_found.*不等于 Agent 执行失败/s);
 });
 
 test("benchmark summary classifies large-sample evidence with anonymized project ids", () => {

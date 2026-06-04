@@ -1,0 +1,104 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/basebrief/schemas/basebrief-receiver-check-result.schema.json",
+  "title": "BaseBrief Receiver Check Result v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "receiver_task_status",
+    "repository_state_status",
+    "declared_checks_status",
+    "handoff_acceptance",
+    "repository",
+    "changed_files",
+    "declared_checks",
+    "blocked_reason"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": "basebrief-receiver-check-result-v1"
+    },
+    "receiver_task_status": {
+      "enum": ["completed", "blocked"]
+    },
+    "repository_state_status": {
+      "enum": ["match", "difference_found", "not_applicable"]
+    },
+    "declared_checks_status": {
+      "enum": ["passed", "difference_found", "skipped", "blocked"]
+    },
+    "handoff_acceptance": {
+      "enum": ["pass", "difference_found", "blocked"]
+    },
+    "repository": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["branch", "head"],
+      "properties": {
+        "branch": {
+          "type": "string"
+        },
+        "head": {
+          "type": "string"
+        }
+      }
+    },
+    "changed_files": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["expected", "actual", "missing", "unexpected"],
+      "properties": {
+        "expected": {
+          "$ref": "#/$defs/stringArray"
+        },
+        "actual": {
+          "$ref": "#/$defs/stringArray"
+        },
+        "missing": {
+          "$ref": "#/$defs/stringArray"
+        },
+        "unexpected": {
+          "$ref": "#/$defs/stringArray"
+        }
+      }
+    },
+    "declared_checks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "kind", "path", "status", "detail"],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "kind": {
+            "enum": ["node_syntax", "artifact_check", "file_tokens"]
+          },
+          "path": {
+            "type": "string"
+          },
+          "status": {
+            "enum": ["passed", "difference_found", "blocked"]
+          },
+          "detail": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "blocked_reason": {
+      "type": "string"
+    }
+  },
+  "$defs": {
+    "stringArray": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  }
+}
+

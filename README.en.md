@@ -80,7 +80,8 @@ It only processes explicit input files and does not scan or modify other project
 - BB9 structured handoff contract
 - handoff builder and file-based Codex / Claude adapters
 - artifact checker
-- zero-dependency CLI Lite: `init`, `build`, `check`, `seal`, `diff`
+- optional read-only Receiver Safe Check v1
+- zero-dependency CLI Lite: `init`, `build`, `check`, `receiver-check`, `seal`, `diff`
 - local file-based Seal/Diff v1
 
 BaseBrief is not a chat client, agent runtime, hosted platform, secret manager, project-management system, or provider gateway.
@@ -91,6 +92,7 @@ BaseBrief is not a chat client, agent runtime, hosted platform, secret manager, 
 - [Integrations](docs/integrations.md)
 - [Mode selection](docs/mode-selection.md)
 - [CLI Lite](docs/cli-lite.md)
+- [Receiver Safe Check](docs/receiver-check.md)
 - [Known limitations](docs/known-limitations.md)
 - [Documentation index](docs/index.md)
 - [Public minimal example](examples/minimal/README.md)

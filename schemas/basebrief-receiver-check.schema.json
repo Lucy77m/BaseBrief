@@ -1,0 +1,131 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/basebrief/schemas/basebrief-receiver-check.schema.json",
+  "title": "BaseBrief Receiver Check v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "expected_branch",
+    "expected_head",
+    "expected_changed_files"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": "basebrief-receiver-check-v1"
+    },
+    "expected_branch": {
+      "type": "string",
+      "minLength": 1
+    },
+    "expected_head": {
+      "type": "string",
+      "minLength": 1
+    },
+    "expected_changed_files": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/repositoryRelativePath"
+      }
+    },
+    "declared_checks": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "oneOf": [
+          {
+            "$ref": "#/$defs/nodeSyntaxCheck"
+          },
+          {
+            "$ref": "#/$defs/artifactCheck"
+          },
+          {
+            "$ref": "#/$defs/fileTokensCheck"
+          }
+        ]
+      }
+    }
+  },
+  "$defs": {
+    "repositoryRelativePath": {
+      "type": "string",
+      "minLength": 1
+    },
+    "checkId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "nodeSyntaxCheck": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "kind", "path"],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/checkId"
+        },
+        "kind": {
+          "const": "node_syntax"
+        },
+        "path": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/repositoryRelativePath"
+            },
+            {
+              "pattern": "\\.(?:cjs|js|mjs)$"
+            }
+          ]
+        }
+      }
+    },
+    "artifactCheck": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "kind", "path"],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/checkId"
+        },
+        "kind": {
+          "const": "artifact_check"
+        },
+        "path": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/repositoryRelativePath"
+            },
+            {
+              "pattern": "\\.(?:json|md|txt)$"
+            }
+          ]
+        }
+      }
+    },
+    "fileTokensCheck": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "kind", "path", "tokens"],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/checkId"
+        },
+        "kind": {
+          "const": "file_tokens"
+        },
+        "path": {
+          "$ref": "#/$defs/repositoryRelativePath"
+        },
+        "tokens": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    }
+  }
+}

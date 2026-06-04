@@ -10,6 +10,17 @@
 
 如果任务碰 backend、provider、`.env`、部署、state、memory、gateway，或一开始就跨 3 个以上业务文件，停止使用本模板并升级 Full。
 
+交接保存前必须满足：
+
+- `handoff_status: ready_for_receiver`
+- `handoff_protocol_version: receiver-ready-v1`
+- `generated_at: 【ISO-8601-with-timezone】`
+- `preferred_language: zh-CN`
+- `response_language: match_latest_user_message`
+- `receiver_check_config: 【仓库相对配置路径或 not_applicable】`
+- 来源窗口验证结果明确标注为“来源窗口已验证”
+- 接收窗口未重跑的检查不得写成“接收窗口本轮已验证”
+
 ---
 
 ## 1. 项目定位
@@ -23,6 +34,12 @@
 - 当前阶段：**【填写】**
 - 本轮目标：**【填写】**
 - 本轮不做：**【填写】**
+- `handoff_status`：`ready_for_receiver`
+- `handoff_protocol_version`：`receiver-ready-v1`
+- `generated_at`：`【ISO-8601-with-timezone】`
+- `preferred_language`：`zh-CN`
+- `response_language`：`match_latest_user_message`
+- `receiver_check_config`：`【仓库相对配置路径或 not_applicable】`
 
 ---
 
@@ -59,14 +76,52 @@
 
 ---
 
-## 7. 下一步
+## 7. 接收任务与验收后动作
 
-- 当前下一步：**【填写】**
-- 期望输出：**【填写】**
+- `receiver_entry_task`：**【接收窗口现在必须执行的核验或接手任务】**
+- 接收任务期望输出：**【填写】**
+- `post_acceptance_next_action`：**【接力验收完成后，项目真正应推进的动作】**
+
+接收窗口已经开始后，不得再次把“开启新窗口”作为下一步。
+
+接收报告必须输出：
+
+- `receiver_task_status: completed | blocked`
+- `repository_state_status: match | difference_found | not_applicable`
+- `declared_checks_status: passed | difference_found | skipped | blocked`
+- `handoff_acceptance: pass | difference_found | blocked`
+
+`difference_found` 表示接收任务正确完成并准确报告差异，不等于 Agent 执行失败。
 
 ---
 
-## 8. open_questions / 待确认问题
+## 8. expected_changed_files / 预期变更文件
+
+- 工作树存在计划内未提交修改时，按稳定顺序精确列出仓库相对路径。
+- 工作树干净或不适用时写 `not_applicable`。
+- 接收窗口必须机械比对实际清单，并报告新增、缺失或意外文件。
+
+---
+
+## 9. 响应语言
+
+- 用户明确指定语言时优先遵守。
+- 否则按用户最新消息的自然语言主体回复，忽略代码、路径、命令和字段名。
+- 混合语言且无法判断时使用 `preferred_language`；本 zh-CN 模板默认中文。
+- Agent 自己生成的第一句、进度说明和最终报告均遵守该语言。
+- 路径、命令、代码和协议字段保留原文；平台自动工具日志不纳入语言保证。
+
+---
+
+## 10. 可选 Receiver Safe Check
+
+- 默认 `receiver_check_config: not_applicable`，继续执行 state-only 手动核验。
+- 如提供仓库相对配置路径，运行：`node scripts/basebrief.js receiver-check --config <receiver_check_config> --repo <target-repo> --json`
+- Safe Check 是来源窗口声明的轻量只读核验，不等同于重跑来源窗口完整测试。
+
+---
+
+## 11. open_questions / 待确认问题
 
 - 【问题 1】
 - 【问题 2】

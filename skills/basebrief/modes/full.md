@@ -20,7 +20,19 @@
 - 路径 / 版本 / commit / 运行方式
 - `risk_boundaries`
 - 未完成事项
-- 下一步
+- `handoff_status: ready_for_receiver`
+- `handoff_protocol_version: receiver-ready-v1`
+- `generated_at`
+- `preferred_language`
+- `response_language: match_latest_user_message`
+- `receiver_entry_task`
+- `post_acceptance_next_action`
+- `expected_changed_files`
+- 可选 `receiver_check_config`
+- `receiver_task_status`
+- `repository_state_status`
+- `declared_checks_status`
+- `handoff_acceptance`
 - `open_questions`
 
 按需派生：
@@ -43,6 +55,22 @@
 - 缺信息就列 `open_questions`
 - 不要为了“完整”而编造路径、commit、构建状态
 - 复杂项目默认优先 Full，不要硬压成 Lite
+
+## Receiver-ready Finalization
+
+保存 Full 交接前：
+
+- 将交接生成与检查工作移入“已完成”，不要留在“正在进行”
+- 将已有测试结果标为“来源窗口已验证”
+- 写入最小协议元数据，并要求第一句、进度说明和最终报告跟随用户最新消息的自然语言主体
+- 工作树存在计划内未提交修改时，精确列出稳定排序的仓库相对路径 `expected_changed_files`
+- 明确接收窗口应立即执行的 `receiver_entry_task`
+- 明确接力验收完成后的 `post_acceptance_next_action`
+- 明确三项验收状态；正确报告差异属于 `difference_found`，不是执行失败
+- 默认写 `receiver_check_config: not_applicable`；如来源窗口显式准备了 Safe Check 配置，则只写仓库相对路径并要求运行固定 `receiver-check` 命令
+- 明确 Safe Check 是来源窗口声明的轻量核验，不是完整测试重跑
+- 要求接收窗口报告工作目录关系、重新核验目标仓库状态并记录实际摩擦
+- 不得让已经开始的接收窗口再次建议“开启新窗口”
 
 ## Handoff Sidecar Rule
 

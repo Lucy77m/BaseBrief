@@ -13,6 +13,7 @@
 - [CLI Lite](cli-lite.md)
 - [Adapter 输出](adapters.md)
 - [Artifact checks](checks.md)
+- [Receiver Safe Check](receiver-check.md)
 - [Seal/Diff](seal-diff.md)
 - [Known Limitations](known-limitations.md)
 
@@ -23,6 +24,7 @@
 - [ContextOps boundary](contextops.md)
 - [BB evolution log](evolution/bb-evolution-log.md)
 - [v0.2.2 first-run dogfooding](dogfooding/v0.2.2-first-run-workflow.md)
+- [Receiver-ready v1 evidence closure](dogfooding/receiver-ready-v1-evidence.md)
 - [Usability feedback template](../.github/ISSUE_TEMPLATE/usability_feedback.md)
 
 ## Cache-ready 实验历史
