@@ -67,4 +67,3 @@ These topics require separate design decisions or stronger repeated evidence. Th
 Future documentation and static-contract changes should use local automated checks without creating receiver threads. If receiver behavior changes and static checks cannot validate it, run at most one low-reasoning smoke case and stop after it passes. Full matrices require explicit user approval.
 
 See [Known Limitations](../known-limitations.md) and [Testing](../testing.md) for the maintained boundaries and validation budget.
-
