@@ -14,6 +14,7 @@
 - [Adapter 输出](adapters.md)
 - [Artifact checks](checks.md)
 - [Seal/Diff](seal-diff.md)
+- [Known Limitations](known-limitations.md)
 
 ## 方向与验证
 
@@ -21,6 +22,8 @@
 - [长期规划基线](roadmap/basebrief-long-term-baseline.md)
 - [ContextOps boundary](contextops.md)
 - [BB evolution log](evolution/bb-evolution-log.md)
+- [v0.2.2 first-run dogfooding](dogfooding/v0.2.2-first-run-workflow.md)
+- [Usability feedback template](../.github/ISSUE_TEMPLATE/usability_feedback.md)
 
 ## Cache-ready 实验历史
 

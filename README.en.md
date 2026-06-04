@@ -43,7 +43,7 @@ Use Lite for a small bounded continuation. Use Full for phase closure, complex w
 You can also build local artifacts from the public structured example:
 
 ```text
-node scripts/basebrief.js build --input examples/structured-handoff-lite.md --output-dir basebrief-output --check
+node scripts/basebrief.js build --input examples/structured-handoff-lite.md --output-dir tests/outputs/private/quickstart/build --check
 ```
 
 CLI Lite is an optional local script, not an installed CLI, plugin, or provider integration.
@@ -53,8 +53,8 @@ CLI Lite is an optional local script, not an installed CLI, plugin, or provider 
 Seal/Diff answers: what changed in facts, decisions, risks, and task boundaries between two phases?
 
 ```text
-node scripts/basebrief.js seal --input examples/seal-before-input.json --output basebrief-output/before.json
-node scripts/basebrief.js diff --before basebrief-output/before.json --after examples/seal-after-input.json
+node scripts/basebrief.js seal --input examples/seal-before-input.json --output tests/outputs/private/quickstart/before.json
+node scripts/basebrief.js diff --before tests/outputs/private/quickstart/before.json --after examples/seal-after-input.json
 ```
 
 It only processes explicit input files and does not scan or modify other projects.
@@ -91,6 +91,7 @@ BaseBrief is not a chat client, agent runtime, hosted platform, secret manager, 
 - [Integrations](docs/integrations.md)
 - [Mode selection](docs/mode-selection.md)
 - [CLI Lite](docs/cli-lite.md)
+- [Known limitations](docs/known-limitations.md)
 - [Documentation index](docs/index.md)
 - [Public minimal example](examples/minimal/README.md)
 

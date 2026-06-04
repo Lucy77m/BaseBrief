@@ -46,6 +46,8 @@ Adapter output is opt-in. Use `--adapters codex`, `--adapters claude`, or `--ada
 
 `--check` runs the artifact checker against the output directory after generation. Errors make the command exit nonzero.
 
+In human-readable output, `build --check` lists each error or warning after the summary so the finding can be reviewed directly.
+
 ### check
 
 ```text
@@ -53,6 +55,8 @@ node scripts/basebrief.js check --input <file-or-dir> [--json]
 ```
 
 This command delegates to the Phase 6 artifact checker. It does not duplicate the rule set.
+
+Human-readable output lists each finding with severity, rule id, file, line, and explanation. Warnings keep a zero exit code; errors exit nonzero. JSON output keeps the stable checker result shape.
 
 ### seal
 

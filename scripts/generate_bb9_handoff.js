@@ -139,13 +139,13 @@ function renderReadableBrief(input, mode) {
       "",
       "## assumptions",
       bulletList(input.assumptions),
-      "",
-      "## open_questions",
-      bulletList(input.openQuestions),
     );
   }
 
   lines.push(
+    "",
+    "## open_questions",
+    bulletList(input.openQuestions),
     "",
     "## risk_boundaries",
     bulletList(input.riskBoundaries),

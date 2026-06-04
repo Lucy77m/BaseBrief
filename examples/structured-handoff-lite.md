@@ -19,6 +19,10 @@ Prepare a short handoff with structured BB9 input attached as an appendix.
 - Do not place sidecar fields in the visible Lite body.
 - Use the marked JSON block as the only machine-readable source for builder tests.
 
+## open_questions
+
+- Whether the next continuation needs a Codex or Claude adapter.
+
 ## risk_boundaries
 
 - Do not write secrets.
@@ -44,6 +48,9 @@ Build handoff artifacts from the JSON appendix.
   "confirmed_decisions": [
     "Do not place sidecar fields in the visible Lite body.",
     "Use the marked JSON block as the only machine-readable source for builder tests."
+  ],
+  "open_questions": [
+    "Whether the next continuation needs a Codex or Claude adapter."
   ],
   "risk_boundaries": [
     "Do not write secrets.",

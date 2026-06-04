@@ -16,7 +16,7 @@ const {
 } = require("../scripts/basebrief_build_handoff");
 const { buildAdapterArtifacts, normalizeTargets } = require("../scripts/basebrief_build_adapters");
 const { checkArtifacts } = require("../scripts/basebrief_check_artifacts");
-const { HELP_TEXT, commandBuild, commandCheck, commandDiff, commandInit, commandSeal, run, starterInput } = require("../scripts/basebrief");
+const { HELP_TEXT, commandBuild, commandCheck, commandDiff, commandInit, commandSeal, formatHuman, run, starterInput } = require("../scripts/basebrief");
 const { createSealFromInput, diffSeals, readSealOrInput, SEAL_SCHEMA_VERSION } = require("../scripts/basebrief_seal");
 const { buildSummary, getPromptForVariant, SCENARIOS, PROVIDER_PROFILES } = require("../scripts/provider_cache_benchmark");
 const { classifyRelayUsage } = require("../scripts/provider_relay_usage_audit");
@@ -136,6 +136,22 @@ test("public quickstart and minimal examples provide a clean first-use path", ()
   assert.equal(result.status, "passed");
   assert.equal(result.errorCount, 0);
 });
+
+test("Quickstart Lite workflow builds and checks without warnings", () => withTempDir((tempDir) => {
+  const outputDir = path.join(tempDir, "quickstart", "build");
+  const buildResult = commandBuild({
+    input: path.join(repoRoot, "examples/structured-handoff-lite.md"),
+    "output-dir": outputDir,
+    check: true,
+  });
+  const checkResult = commandCheck({ input: outputDir });
+
+  assert.equal(buildResult.check.status, "passed");
+  assert.equal(buildResult.check.errorCount, 0);
+  assert.equal(buildResult.check.warningCount, 0);
+  assert.equal(checkResult.check.warningCount, 0);
+  assert.match(fs.readFileSync(path.join(outputDir, "readableBrief.md"), "utf8"), /## open_questions/);
+}));
 
 test("BB9 handoff contract and examples match schema boundaries", () => {
   const schema = readJson("schemas/bb9-handoff.schema.json");
@@ -560,11 +576,71 @@ test("CLI Lite check delegates to artifact checker", () => {
   assert(Array.isArray(result.check.findings));
 });
 
+test("CLI Lite human output explains warning findings and keeps warning exit zero", () => withTempDir((tempDir) => {
+  const filePath = path.join(tempDir, "codex-task.md");
+  fs.writeFileSync(filePath, [
+    "# BaseBrief Codex Task",
+    "",
+    "## Risk Boundaries",
+    "- keep the task bounded",
+    "",
+  ].join("\n"), "utf8");
+
+  const stdout = execFileSync(process.execPath, [
+    "scripts/basebrief.js",
+    "check",
+    "--input",
+    filePath,
+  ], { cwd: repoRoot, encoding: "utf8" });
+
+  assert.match(stdout, /warnings=1/);
+  assert.match(stdout, /WARNING artifact\.missing-open-questions codex-task\.md:1/);
+}));
+
+test("CLI Lite build human output explains error findings", () => withTempDir((tempDir) => {
+  const outputDir = path.join(tempDir, "dirty-out");
+  fs.mkdirSync(outputDir, { recursive: true });
+  fs.writeFileSync(path.join(outputDir, "codex-task.md"), [
+    "# BaseBrief Codex Task",
+    "",
+    "## Open Questions",
+    "- none",
+    "",
+  ].join("\n"), "utf8");
+
+  let error;
+  try {
+    execFileSync(process.execPath, [
+      "scripts/basebrief.js",
+      "build",
+      "--input",
+      "examples/structured-handoff-full.md",
+      "--output-dir",
+      outputDir,
+      "--check",
+    ], { cwd: repoRoot, encoding: "utf8" });
+  } catch (caught) {
+    error = caught;
+  }
+
+  assert(error, "CLI build --check should fail when checker reports errors");
+  assert(error.stdout.includes(`ERROR artifact.missing-${"risk"}-boundaries codex-task.md:1`));
+}));
+
 test("CLI Lite rejects missing command, missing args, and invalid adapter targets", () => {
   assert.equal(run(["node", "scripts/basebrief.js"]).command, "help");
   assert.equal(run(["node", "scripts/basebrief.js", "--help"]).command, "help");
   assert.equal(run(["node", "scripts/basebrief.js", "-h"]).command, "help");
   assert.match(HELP_TEXT, /docs\/quickstart-5min\.md/);
+  assert.match(formatHuman({
+    command: "check",
+    check: {
+      status: "passed",
+      errorCount: 0,
+      warningCount: 1,
+      findings: [{ severity: "WARNING", ruleId: "sample.warning", file: "sample.md", line: 1, message: "Review this." }],
+    },
+  }), /WARNING sample\.warning sample\.md:1 Review this\./);
   assert.throws(() => run(["node", "scripts/basebrief.js", "deploy"]), /Unknown command: deploy/);
   assert.throws(() => commandInit({}), /Missing --output-dir/);
   assert.throws(() => commandBuild({ "output-dir": "out" }), /Missing --input/);
@@ -988,6 +1064,7 @@ test("BB9 handoff generator keeps lite readable brief separate from sidecar", ()
 
   assert.match(output.readableBrief, /^# BaseBrief Lite Handoff/);
   assert.doesNotMatch(output.readableBrief, /## assumptions/);
+  assert.match(output.readableBrief, /## open_questions/);
   assert.match(output.cacheSidecar, /MODE: lite/);
   assert.match(output.cacheSidecar, /TAIL_REQUEST=Write the next-chat opener/);
   assert.notEqual(output.readableBrief, output.cacheSidecar);

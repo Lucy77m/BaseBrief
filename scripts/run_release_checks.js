@@ -66,6 +66,8 @@ function checkRequiredFiles() {
     "docs/usage.md",
     "docs/index.md",
     "docs/quickstart-5min.md",
+    "docs/known-limitations.md",
+    "docs/dogfooding/v0.2.2-first-run-workflow.md",
     "docs/integrations.md",
     "docs/adapters.md",
     "docs/walkthrough.md",
@@ -132,6 +134,7 @@ function checkRequiredFiles() {
     "examples/minimal/input-project-notes.md",
     "examples/minimal/output-basebrief-lite.md",
     "examples/minimal/next-chat-prompt.md",
+    ".github/ISSUE_TEMPLATE/usability_feedback.md",
   ];
   required.forEach((relativePath) => {
     assert(fs.existsSync(path.join(repoRoot, relativePath)), `Missing required file: ${relativePath}`);
@@ -145,6 +148,9 @@ function checkContentContracts() {
   const integrationsDoc = readText("docs/integrations.md");
   const docsIndex = readText("docs/index.md");
   const quickstartDoc = readText("docs/quickstart-5min.md");
+  const knownLimitationsDoc = readText("docs/known-limitations.md");
+  const dogfoodingDoc = readText("docs/dogfooding/v0.2.2-first-run-workflow.md");
+  const usabilityFeedbackTemplate = readText(".github/ISSUE_TEMPLATE/usability_feedback.md");
   const adaptersDoc = readText("docs/adapters.md");
   const walkthroughDoc = readText("docs/walkthrough.md");
   const modeSelectionDoc = readText("docs/mode-selection.md");
@@ -207,6 +213,14 @@ function checkContentContracts() {
   assert(quickstartDoc.includes("路径 A"), "quickstart must document the Skill-first path");
   assert(quickstartDoc.includes("路径 B"), "quickstart must document the local build path");
   assert(quickstartDoc.includes("路径 C"), "quickstart must document the Seal/Diff path");
+  assert(quickstartDoc.includes("tests/outputs/private/quickstart/build"), "quickstart build must use the ignored private output directory");
+  assert(quickstartDoc.includes("tests/outputs/private/quickstart/before.json"), "quickstart seal must use the ignored private output directory");
+  assert(knownLimitationsDoc.includes("Free-form Markdown"), "Known Limitations must document free-form Markdown input boundary");
+  assert(knownLimitationsDoc.includes("not a Git diff"), "Known Limitations must document Seal/Diff boundary");
+  assert(dogfoodingDoc.includes("artifact.missing-open-questions"), "Dogfooding record must document the first-run warning");
+  assert(dogfoodingDoc.includes("Remaining Friction"), "Dogfooding record must document remaining friction");
+  assert(usabilityFeedbackTemplate.includes("Do not include secrets"), "Usability feedback template must include a safety warning");
+  assert(usabilityFeedbackTemplate.includes("Expected Result"), "Usability feedback template must collect expected results");
   [
     "docs/experiments/cache-ready-lite.md",
     "docs/experiments/cache-ready-capsule.md",
@@ -256,6 +270,7 @@ function checkContentContracts() {
   assert(structuredFullExample.includes("BASEBRIEF_HANDOFF_JSON_END"), "structured full example must include handoff JSON end marker");
   assert(structuredLiteExample.includes("BASEBRIEF_HANDOFF_JSON_BEGIN"), "structured lite example must include handoff JSON begin marker");
   assert(structuredLiteExample.includes("BASEBRIEF_HANDOFF_JSON_END"), "structured lite example must include handoff JSON end marker");
+  assert(structuredLiteExample.includes('"open_questions"'), "structured lite example must include open questions");
   assert(roadmapDoc.includes("Do not add BB13"), "roadmap baseline must include experiment freeze rule");
   ["mimo", "deepseek", "relay-openai-gpt55-codex-oauth"].forEach((profileId) => {
     const profile = providerProfiles[profileId];
@@ -474,6 +489,9 @@ function checkArtifactChecker() {
     "examples/adapter-codex-task.md",
     "examples/adapter-claude-project-context.md",
     "examples/minimal",
+    "docs/known-limitations.md",
+    "docs/dogfooding/v0.2.2-first-run-workflow.md",
+    ".github/ISSUE_TEMPLATE/usability_feedback.md",
   ];
   inputs.forEach((relativePath) => {
     const stdout = execFileSync(process.execPath, [
@@ -490,6 +508,7 @@ function checkArtifactChecker() {
     const result = JSON.parse(stdout);
     assert(result.status === "passed", `Artifact checker must pass for ${relativePath}`);
     assert(result.errorCount === 0, `Artifact checker must report zero errors for ${relativePath}`);
+    assert(result.warningCount === 0, `Artifact checker must report zero warnings for ${relativePath}`);
     assert(Array.isArray(result.findings), `Artifact checker must return findings array for ${relativePath}`);
   });
   return inputs.length;
@@ -598,10 +617,110 @@ function checkCliLite() {
     assert(checkResult.command === "check", "CLI check must return command metadata");
     assert(checkResult.check.status === "passed", "CLI check must delegate to artifact checker");
     assert(Array.isArray(checkResult.check.findings), "CLI check must return checker findings array");
+
+    const warningPath = path.join(tempRoot, "codex-task.md");
+    fs.writeFileSync(warningPath, [
+      "# BaseBrief Codex Task",
+      "",
+      "## Risk Boundaries",
+      "- keep the task bounded",
+      "",
+    ].join("\n"), "utf8");
+    const warningStdout = execFileSync(process.execPath, [
+      "scripts/basebrief.js",
+      "check",
+      "--input",
+      warningPath,
+    ], {
+      cwd: repoRoot,
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "pipe"],
+      env: process.env,
+    });
+    assert(warningStdout.includes("WARNING artifact.missing-open-questions"), "CLI human output must explain warning findings");
   } finally {
     fs.rmSync(tempRoot, { recursive: true, force: true });
   }
-  return 5;
+  return 6;
+}
+
+function checkFirstRunWorkflow() {
+  const quickstartRoot = path.join(repoRoot, "tests", "outputs", "private", "quickstart");
+  fs.rmSync(quickstartRoot, { recursive: true, force: true });
+  try {
+    const buildDir = path.join(quickstartRoot, "build");
+    const buildResult = JSON.parse(execFileSync(process.execPath, [
+      "scripts/basebrief.js",
+      "build",
+      "--input",
+      "examples/structured-handoff-lite.md",
+      "--output-dir",
+      "tests/outputs/private/quickstart/build",
+      "--check",
+      "--json",
+    ], {
+      cwd: repoRoot,
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "pipe"],
+      env: process.env,
+    }));
+    assert(buildResult.check.errorCount === 0, "Quickstart build must report zero errors");
+    assert(buildResult.check.warningCount === 0, "Quickstart build must report zero warnings");
+    assert(fs.existsSync(path.join(buildDir, "readableBrief.md")), "Quickstart build must write readableBrief");
+
+    const checkResult = JSON.parse(execFileSync(process.execPath, [
+      "scripts/basebrief.js",
+      "check",
+      "--input",
+      "tests/outputs/private/quickstart/build",
+      "--json",
+    ], {
+      cwd: repoRoot,
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "pipe"],
+      env: process.env,
+    }));
+    assert(checkResult.check.errorCount === 0, "Quickstart direct check must report zero errors");
+    assert(checkResult.check.warningCount === 0, "Quickstart direct check must report zero warnings");
+
+    const sealPath = path.join(quickstartRoot, "before.json");
+    const sealResult = JSON.parse(execFileSync(process.execPath, [
+      "scripts/basebrief.js",
+      "seal",
+      "--input",
+      "examples/seal-before-input.json",
+      "--output",
+      "tests/outputs/private/quickstart/before.json",
+      "--json",
+    ], {
+      cwd: repoRoot,
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "pipe"],
+      env: process.env,
+    }));
+    assert(sealResult.command === "seal", "Quickstart seal must complete");
+    assert(fs.existsSync(sealPath), "Quickstart seal must write the before seal");
+
+    const diffResult = JSON.parse(execFileSync(process.execPath, [
+      "scripts/basebrief.js",
+      "diff",
+      "--before",
+      "tests/outputs/private/quickstart/before.json",
+      "--after",
+      "examples/seal-after-input.json",
+      "--json",
+    ], {
+      cwd: repoRoot,
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "pipe"],
+      env: process.env,
+    }));
+    assert(diffResult.diff.changed === true, "Quickstart diff must detect changes");
+    assert(diffResult.diff.summary.taskBoundaryChanged === true, "Quickstart diff must detect task-boundary changes");
+  } finally {
+    fs.rmSync(quickstartRoot, { recursive: true, force: true });
+  }
+  return 4;
 }
 
 function validateSealShape(seal) {
@@ -853,6 +972,7 @@ async function main() {
   const exampleCount = checkExamples();
   const artifactCheckInputs = checkArtifactChecker();
   const cliLiteCommands = checkCliLite();
+  const firstRunCommands = checkFirstRunWorkflow();
   const sealDiffCommands = checkSealDiff();
   const benchmarkSummaryStatus = checkBenchmarkSummaryIfPresent();
   const independentTests = checkIndependentTests();
@@ -866,6 +986,7 @@ async function main() {
   console.log(`example_files=${exampleCount}`);
   console.log(`artifact_check_inputs=${artifactCheckInputs}`);
   console.log(`cli_lite_commands=${cliLiteCommands}`);
+  console.log(`first_run_commands=${firstRunCommands}`);
   console.log(`seal_diff_commands=${sealDiffCommands}`);
   console.log(`benchmark_summary_status=${benchmarkSummaryStatus}`);
   console.log(`independent_test_files=${independentTests}`);

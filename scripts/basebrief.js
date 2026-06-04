@@ -294,11 +294,16 @@ function formatHuman(result) {
       lines.push(`check_status=${result.check.status}`);
       lines.push(`check_errors=${result.check.errorCount}`);
       lines.push(`check_warnings=${result.check.warningCount}`);
+      lines.push(...formatFindingLines(result.check.findings));
     }
     return `${lines.join(os.EOL)}${os.EOL}`;
   }
   if (result.command === "check") {
-    return `BaseBrief check ${result.check.status}: errors=${result.check.errorCount}, warnings=${result.check.warningCount}${os.EOL}`;
+    return [
+      `BaseBrief check ${result.check.status}: errors=${result.check.errorCount}, warnings=${result.check.warningCount}`,
+      ...formatFindingLines(result.check.findings),
+      "",
+    ].join(os.EOL);
   }
   if (result.command === "seal") {
     return `BaseBrief seal written to ${result.output}${os.EOL}checksum=${result.checksum}${os.EOL}`;
@@ -312,6 +317,12 @@ function formatHuman(result) {
     ].join(os.EOL);
   }
   return `${JSON.stringify(result, null, 2)}${os.EOL}`;
+}
+
+function formatFindingLines(findings = []) {
+  return findings.map(
+    (finding) => `${finding.severity} ${finding.ruleId} ${finding.file}:${finding.line} ${finding.message}`,
+  );
 }
 
 function cli() {
@@ -344,6 +355,8 @@ module.exports = {
   commandDiff,
   commandInit,
   commandSeal,
+  formatFindingLines,
+  formatHuman,
   parseOptions,
   run,
   starterInput,
