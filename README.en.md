@@ -105,6 +105,7 @@ BaseBrief is not a chat client, agent runtime, hosted platform, secret manager, 
 - [Receiver Safe Check](docs/receiver-check.md)
 - [Receiver Flow Draft](docs/receiver-flow.md)
 - [Receiver friction log](docs/dogfooding/receiver-friction-log.md)
+- [v0.3.2 Release Candidate](docs/releases/v0.3.2.md)
 - [v0.3.1 Release Candidate](docs/releases/v0.3.1.md)
 - [v0.3.0 receiver workflow baseline](docs/releases/v0.3.0.md)
 - [Known limitations](docs/known-limitations.md)

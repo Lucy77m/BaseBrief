@@ -110,6 +110,7 @@ This command writes a review-only receiver flow draft:
 The draft always uses `handoff_status: draft_needs_review`. It is not Auto Flow, does not create receiver threads, does not call providers, and does not promote the draft to `ready_for_receiver`.
 
 See [Receiver Flow Draft](receiver-flow.md) for boundaries and review requirements.
+The v0.3.2 release-candidate boundary is documented in [v0.3.2 Release Candidate](releases/v0.3.2.md).
 
 ### seal
 

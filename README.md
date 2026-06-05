@@ -105,6 +105,7 @@ BaseBrief 不是聊天客户端、Agent runtime、托管平台、密钥管理器
 - [Receiver Safe Check](docs/receiver-check.md)
 - [Receiver Flow Draft](docs/receiver-flow.md)
 - [Receiver friction log](docs/dogfooding/receiver-friction-log.md)
+- [v0.3.2 Release Candidate](docs/releases/v0.3.2.md)
 - [v0.3.1 Release Candidate](docs/releases/v0.3.1.md)
 - [v0.3.0 Receiver workflow baseline](docs/releases/v0.3.0.md)
 - [已知限制](docs/known-limitations.md)

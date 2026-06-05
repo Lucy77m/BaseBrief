@@ -283,12 +283,13 @@ Current v0.3.1 stabilization target:
 - document the v0.3.1 local release-candidate gate
 - avoid Auto Flow, new adapters, Web UI, provider requests, and broad receiver matrices.
 
-Current v0.3.2 draft target:
+Completed v0.3.2 draft skeleton:
 
 - add `receiver-flow` as a local draft skeleton only
 - write `flow-summary.json`, `receiver-check.json`, and `draft-context.md`
 - keep `handoff_status: draft_needs_review` until human review
 - avoid receiver thread creation, provider requests, Auto Flow completion, and automatic promotion to `ready_for_receiver`
+- document the v0.3.2 local release-candidate gate before any push, tag, or release
 
 ### Phase 9: ContextOps Vision
 

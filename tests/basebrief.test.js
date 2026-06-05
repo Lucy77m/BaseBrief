@@ -268,6 +268,50 @@ test("v0.3.1 receiver stabilization documents examples, local npm scripts, and r
   }
 });
 
+test("v0.3.2 receiver flow draft skeleton documents release boundaries", () => {
+  const readme = readText("README.md");
+  const englishReadme = readText("README.en.md");
+  const cliLite = readText("docs/cli-lite.md");
+  const docsIndex = readText("docs/index.md");
+  const testing = readText("docs/testing.md");
+  const roadmap = readText("docs/roadmap/basebrief-long-term-baseline.md");
+  const release = readText("docs/releases/v0.3.2.md");
+  const receiverFlow = readText("docs/receiver-flow.md");
+
+  assert.match(readme, /docs\/releases\/v0\.3\.2\.md/);
+  assert.match(englishReadme, /docs\/releases\/v0\.3\.2\.md/);
+  assert.match(cliLite, /receiver-flow --repo <target-repo> --output-dir <dir>/);
+  assert.match(cliLite, /releases\/v0\.3\.2\.md/);
+  assert.match(docsIndex, /releases\/v0\.3\.2\.md/);
+  assert.match(testing, /v0\.3\.2 Receiver Flow Draft Skeleton/);
+  assert.match(testing, /provider_probe_status=skipped/);
+  assert.match(roadmap, /Completed v0\.3\.2 draft skeleton/);
+  assert.match(release, /Receiver Flow Draft Skeleton/);
+  assert.match(release, /receiver-flow --repo <target-repo> --output-dir <dir>/);
+  assert.match(release, /flow-summary\.json/);
+  assert.match(release, /receiver-check\.json/);
+  assert.match(release, /draft-context\.md/);
+  assert.match(release, /handoff_status: draft_needs_review/);
+  assert.match(release, /No provider request/);
+  assert.match(release, /No receiver thread creation/);
+  assert.match(release, /No push, tag, or formal release/);
+  assert.match(release, /provider_probe_status=skipped/);
+  assert.match(release, /BB9 handoff schema is unchanged/);
+  assert.match(release, /Receiver Safe Check config and result schemas are unchanged/);
+  assert.match(receiverFlow, /Does not make provider requests/);
+  assert.doesNotMatch(release, /handoff_status:\s*ready_for_receiver/);
+
+  for (const relativePath of [
+    "docs/releases/v0.3.2.md",
+    "docs/receiver-flow.md",
+  ]) {
+    const result = checkArtifacts({ inputPath: path.join(repoRoot, relativePath) });
+    assert.equal(result.status, "passed", relativePath);
+    assert.equal(result.errorCount, 0, relativePath);
+    assert.equal(result.warningCount, 0, relativePath);
+  }
+});
+
 test("public quickstart and minimal examples provide a clean first-use path", () => {
   const quickstart = readText("docs/quickstart-5min.md");
   const minimalBrief = readText("examples/minimal/output-basebrief-lite.md");

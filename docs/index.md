@@ -20,7 +20,8 @@
 
 ## 方向与验证
 
-- [v0.3.1 release candidate](releases/v0.3.1.md)
+- [v0.3.2 release candidate](releases/v0.3.2.md)
+- [v0.3.1 receiver stabilization](releases/v0.3.1.md)
 - [v0.3.0 receiver workflow baseline](releases/v0.3.0.md)
 - [测试与验证记录](testing.md)
 - [长期规划基线](roadmap/basebrief-long-term-baseline.md)

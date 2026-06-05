@@ -578,3 +578,18 @@ Latest DeepSeek active prompt smoke result:
 - cache field visibility: `20/20`
 - sidecar-only was more expensive than the readable baselines and worse than `bb9Best`
 - conclusion: stop before DeepSeek large sample for this variant
+
+## v0.3.2 Receiver Flow Draft Skeleton
+
+`v0.3.2` receiver flow draft skeleton closure should use:
+
+```text
+git diff --check
+node --test tests/basebrief.test.js
+node scripts/run_release_checks.js
+npm run check
+```
+
+This closure does not require provider requests, external receiver matrices, OpenCode smoke, Claude Code smoke, Auto Flow runs, Web UI checks, Cursor adapter tests, or provider benchmarks. When provider environment variables are absent, release checks must keep `provider_probe_status=skipped`.
+
+`receiver-flow` generates draft-only output: `handoff_status: draft_needs_review`. The generated `flow-summary.json`, `receiver-check.json`, and `draft-context.md` must be reviewed before they are shared or rewritten into a `ready_for_receiver` handoff.

@@ -85,6 +85,7 @@ function checkRequiredFiles() {
     "docs/receiver-flow.md",
     "docs/releases/v0.3.0.md",
     "docs/releases/v0.3.1.md",
+    "docs/releases/v0.3.2.md",
     "docs/cli-lite.md",
     "docs/seal-diff.md",
     "docs/contextops.md",
@@ -188,6 +189,7 @@ function checkContentContracts() {
   const receiverFlowDoc = readText("docs/receiver-flow.md");
   const releaseCandidateDoc = readText("docs/releases/v0.3.0.md");
   const receiverStabilizationReleaseDoc = readText("docs/releases/v0.3.1.md");
+  const receiverFlowReleaseDoc = readText("docs/releases/v0.3.2.md");
   const cliLiteDoc = readText("docs/cli-lite.md");
   const sealDiffDoc = readText("docs/seal-diff.md");
   const contextOpsDoc = readText("docs/contextops.md");
@@ -235,6 +237,7 @@ function checkContentContracts() {
   assert(readme.includes("docs/receiver-flow.md"), "README.md should link to Receiver Flow Draft docs");
   assert(readme.includes("receiver-flow"), "README.md should mention receiver-flow command");
   assert(readme.includes("docs/dogfooding/receiver-friction-log.md"), "README.md should link to receiver friction log");
+  assert(readme.includes("docs/releases/v0.3.2.md"), "README.md should link to v0.3.2 release candidate");
   assert(readme.includes("docs/releases/v0.3.1.md"), "README.md should link to v0.3.1 release candidate");
   assert(readme.includes("docs/releases/v0.3.0.md"), "README.md should link to v0.3.0 release candidate");
   assert(readme.includes("docs/seal-diff.md"), "README.md should link to Seal/Diff docs");
@@ -254,6 +257,7 @@ function checkContentContracts() {
   assert(englishReadme.includes("docs/receiver-flow.md"), "README.en.md should link to Receiver Flow Draft docs");
   assert(englishReadme.includes("receiver-flow"), "README.en.md should mention receiver-flow command");
   assert(englishReadme.includes("docs/dogfooding/receiver-friction-log.md"), "README.en.md should link to receiver friction log");
+  assert(englishReadme.includes("docs/releases/v0.3.2.md"), "README.en.md should link to v0.3.2 release candidate");
   assert(englishReadme.includes("docs/releases/v0.3.1.md"), "README.en.md should link to v0.3.1 release candidate");
   assert(englishReadme.includes("docs/releases/v0.3.0.md"), "README.en.md should link to v0.3.0 release candidate");
   assert(englishReadme.includes("docs/seal-diff.md"), "README.en.md should link to Seal/Diff docs");
@@ -289,6 +293,7 @@ function checkContentContracts() {
   assert(docsIndex.includes("../examples/receiver/difference-found/README.md"), "Docs index should link receiver difference example");
   assert(docsIndex.includes("../examples/receiver/blocked/README.md"), "Docs index should link receiver blocked example");
   assert(docsIndex.includes("../examples/receiver/language-routing/README.md"), "Docs index should link receiver language routing example");
+  assert(docsIndex.includes("releases/v0.3.2.md"), "Docs index must link v0.3.2 release candidate");
   assert(docsIndex.includes("releases/v0.3.1.md"), "Docs index must link v0.3.1 release candidate");
   assert(docsIndex.includes("releases/v0.3.0.md"), "Docs index must link v0.3.0 release candidate");
   assert(receiverReadyDogfoodingDoc.includes("User-provided external evidence"), "Receiver-ready evidence must distinguish external evidence");
@@ -311,6 +316,7 @@ function checkContentContracts() {
   assert(testingDoc.includes("完整矩阵测试必须由用户明确批准"), "Testing docs must require approval for full receiver matrices");
   assert(testingDoc.includes("npm run check"), "Testing docs must document npm validation shortcut");
   assert(testingDoc.includes("v0.3.1 receiver stabilization"), "Testing docs must document v0.3.1 receiver stabilization budget");
+  assert(testingDoc.includes("v0.3.2 Receiver Flow Draft Skeleton"), "Testing docs must document v0.3.2 receiver flow closure");
   assert(testingDoc.includes("provider_probe_status=skipped"), "Testing docs must preserve skipped provider probe wording");
   assert(usabilityFeedbackTemplate.includes("Do not include secrets"), "Usability feedback template must include a safety warning");
   assert(usabilityFeedbackTemplate.includes("Expected Result"), "Usability feedback template must collect expected results");
@@ -354,6 +360,7 @@ function checkContentContracts() {
   assert(cliLiteDoc.includes("node scripts/basebrief.js diff"), "cli-lite.md must document diff command");
   assert(cliLiteDoc.includes("node scripts/basebrief.js receiver-flow"), "cli-lite.md must document receiver-flow command");
   assert(cliLiteDoc.includes("draft_needs_review"), "cli-lite.md must keep receiver-flow in draft status");
+  assert(cliLiteDoc.includes("releases/v0.3.2.md"), "cli-lite.md must link v0.3.2 release candidate");
   assert(sealDiffDoc.includes("scripts/basebrief_seal.js"), "seal-diff.md must document seal script");
   assert(sealDiffDoc.includes("basebrief-seal-v1"), "seal-diff.md must document seal schema version");
   assert(sealDiffDoc.includes("not a project-management system"), "seal-diff.md must state product boundary");
@@ -489,6 +496,18 @@ function checkContentContracts() {
   assert(receiverStabilizationReleaseDoc.includes("Auto Flow Skeleton is not introduced"), "v0.3.1 release candidate must keep Auto Flow out of scope");
   assert(receiverStabilizationReleaseDoc.includes("BB9 handoff schema is unchanged"), "v0.3.1 release candidate must protect BB9 schema");
   assert(receiverStabilizationReleaseDoc.includes("Receiver Safe Check config and result schemas are unchanged"), "v0.3.1 release candidate must protect receiver schemas");
+  assert(receiverFlowReleaseDoc.includes("Receiver Flow Draft Skeleton"), "v0.3.2 release candidate must describe receiver flow draft skeleton");
+  assert(receiverFlowReleaseDoc.includes("receiver-flow --repo <target-repo> --output-dir <dir>"), "v0.3.2 release candidate must document receiver-flow command");
+  assert(receiverFlowReleaseDoc.includes("flow-summary.json"), "v0.3.2 release candidate must document flow summary output");
+  assert(receiverFlowReleaseDoc.includes("receiver-check.json"), "v0.3.2 release candidate must document receiver-check output");
+  assert(receiverFlowReleaseDoc.includes("draft-context.md"), "v0.3.2 release candidate must document draft context output");
+  assert(receiverFlowReleaseDoc.includes("handoff_status: draft_needs_review"), "v0.3.2 release candidate must keep draft status explicit");
+  assert(receiverFlowReleaseDoc.includes("No provider request"), "v0.3.2 release candidate must state no provider request");
+  assert(receiverFlowReleaseDoc.includes("No receiver thread creation"), "v0.3.2 release candidate must state no receiver thread creation");
+  assert(receiverFlowReleaseDoc.includes("No push, tag, or formal release"), "v0.3.2 release candidate must keep release actions pending");
+  assert(receiverFlowReleaseDoc.includes("provider_probe_status=skipped"), "v0.3.2 release candidate must preserve skipped provider probe gate");
+  assert(receiverFlowReleaseDoc.includes("BB9 handoff schema is unchanged"), "v0.3.2 release candidate must protect BB9 schema");
+  assert(receiverFlowReleaseDoc.includes("Receiver Safe Check config and result schemas are unchanged"), "v0.3.2 release candidate must protect receiver schemas");
   assert(receiverCheckSchema.properties.schemaVersion.const === "basebrief-receiver-check-v1", "Receiver Safe Check config schema version mismatch");
   assert(receiverCheckResultSchema.properties.schemaVersion.const === "basebrief-receiver-check-result-v1", "Receiver Safe Check result schema version mismatch");
   assert(receiverCheckConfigExample.schemaVersion === "basebrief-receiver-check-v1", "Receiver Safe Check example schema version mismatch");
@@ -675,6 +694,7 @@ function checkArtifactChecker() {
     "docs/receiver-flow.md",
     "docs/releases/v0.3.0.md",
     "docs/releases/v0.3.1.md",
+    "docs/releases/v0.3.2.md",
     "examples/receiver-check-config.json",
     "examples/receiver/difference-found",
     "examples/receiver/blocked",
