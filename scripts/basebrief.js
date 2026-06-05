@@ -20,6 +20,7 @@ const {
   runStateValidate,
 } = require("./basebrief_project_state");
 const { commandDiff: commandSealDiff, commandSeal: commandCreateSeal } = require("./basebrief_seal");
+const { buildSidecarBundle } = require("./basebrief_sidecar");
 
 const STARTER_FILE = "basebrief-handoff-input.json";
 const HELP_TEXT = [
@@ -40,6 +41,7 @@ const HELP_TEXT = [
   "  node scripts/basebrief.js state-validate --repo <target-repo> [--json]",
   "  node scripts/basebrief.js state-history --repo <target-repo> [--json]",
   "  node scripts/basebrief.js state-advance --repo <target-repo> --source <receiver-ready.md> [--json]",
+  "  node scripts/basebrief.js sidecar-build --repo <target-repo> [--target generic|openclaw] [--output-dir <dir>] [--json]",
   "  node scripts/basebrief.js seal --input <markdown-or-json> --output <file>",
   "  node scripts/basebrief.js diff --before <file> --after <file>",
   "",
@@ -302,6 +304,14 @@ function commandStateAdvance(options) {
   });
 }
 
+function commandSidecarBuild(options) {
+  return buildSidecarBundle({
+    repoPath: options.repo,
+    target: options.target || "generic",
+    outputDir: options["output-dir"] || "",
+  });
+}
+
 function commandSeal(options) {
   return {
     ...commandCreateSeal({
@@ -338,6 +348,7 @@ function run(argv) {
   if (command === "state-validate") return commandStateValidate(options);
   if (command === "state-history") return commandStateHistory(options);
   if (command === "state-advance") return commandStateAdvance(options);
+  if (command === "sidecar-build") return commandSidecarBuild(options);
   if (command === "seal") return commandSeal(options);
   if (command === "diff") return commandDiff(options);
   throw new Error(`Unknown command: ${command}`);
@@ -426,6 +437,15 @@ function toPublicResult(result) {
       output: publicPath(result.output, cwd),
       source: publicPath(result.source, cwd),
       history_output: publicPath(result.history_output, cwd),
+    };
+  }
+  if (result.command === "sidecar-build") {
+    return {
+      ...result,
+      repo: publicPath(result.repo, cwd),
+      input: publicPath(result.input, cwd),
+      outputDir: publicPath(result.outputDir, cwd),
+      outputFiles: toRelativeMap(result.outputFiles, cwd),
     };
   }
   if (result.command === "seal") {
@@ -557,6 +577,15 @@ function formatHuman(result) {
       "",
     ].join(os.EOL);
   }
+  if (result.command === "sidecar-build") {
+    return [
+      `BaseBrief sidecar bundle written to ${result.outputDir}`,
+      `schemaVersion=${result.schemaVersion}`,
+      `target=${result.target}`,
+      `projectStateSchemaVersion=${result.projectStateSchemaVersion}`,
+      "",
+    ].join(os.EOL);
+  }
   if (result.command === "seal") {
     return `BaseBrief seal written to ${result.output}${os.EOL}checksum=${result.checksum}${os.EOL}`;
   }
@@ -629,6 +658,7 @@ module.exports = {
   commandStateRead,
   commandStateStatus,
   commandStateValidate,
+  commandSidecarBuild,
   commandSeal,
   formatFindingLines,
   formatHuman,

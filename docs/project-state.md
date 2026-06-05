@@ -12,6 +12,7 @@ node scripts/basebrief.js state-status --repo <target-repo> --json
 node scripts/basebrief.js state-validate --repo <target-repo> --json
 node scripts/basebrief.js state-history --repo <target-repo> --json
 node scripts/basebrief.js state-advance --repo <target-repo> --source <receiver-ready.md> --json
+node scripts/basebrief.js sidecar-build --repo <target-repo> --target generic --json
 ```
 
 `state-init` writes `<target-repo>/.basebrief/state.json` from an explicit
@@ -55,14 +56,31 @@ reviewed `receiver-ready.md` source. It archives the previous state under
 `.basebrief/history/` and overwrites `.basebrief/state.json` with the new
 reviewed state. The schema remains `basebrief-project-state-v1`.
 
+## Sidecar Bundle
+
+`sidecar-build` is the v0.8.0 consumer layer for Project State. It reads an
+existing valid `.basebrief/state.json` and writes a local receiver handoff
+bundle without changing the Project State file or schema.
+
+The command supports `generic` and `openclaw` targets. The `openclaw` target is
+formatting and safety wording only: no runtime integration, no provider
+request, no raw private output, no OpenClaw/Hermes profile/config/memory
+writes, and no schema change.
+
+Default output is `.basebrief/sidecar/<target>/`. Public dogfooding records
+should summarize the result only; raw sidecar output belongs in ignored private
+directories.
+
 ## Boundaries
 
 - No provider request.
+- No raw private output.
 - No Auto Flow.
 - No receiver thread creation.
 - No secret storage.
 - No automatic promotion from draft to ready.
 - No schema change.
+- No runtime integration.
 - BB9 handoff schema is unchanged.
 - Receiver Safe Check config and result schemas are unchanged.
 

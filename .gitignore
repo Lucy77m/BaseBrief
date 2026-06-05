@@ -1,6 +1,7 @@
 node_modules/
 dist/
 .cache/
+.basebrief/
 .env
 .env.local
 .env.development

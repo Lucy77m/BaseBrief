@@ -114,6 +114,7 @@ function checkRequiredFiles() {
     "docs/releases/v0.6.2.md",
     "docs/releases/v0.6.3.md",
     "docs/releases/v0.7.0.md",
+    "docs/releases/v0.8.0.md",
     "docs/testing-v0.4.x-test-matrix.md",
     "docs/testing-v0.6.x-test-matrix.md",
     "docs/testing-v0.7.x-test-matrix.md",
@@ -151,6 +152,7 @@ function checkRequiredFiles() {
     "scripts/basebrief_receiver_flow.js",
     "scripts/basebrief_review_draft.js",
     "scripts/basebrief_project_state.js",
+    "scripts/basebrief_sidecar.js",
     "scripts/basebrief_seal.js",
     "scripts/bb9_provider_profiles.json",
     "schemas/bb9-handoff.schema.json",
@@ -243,6 +245,8 @@ function checkContentContracts() {
   const projectStateSelfDogfoodingV062Doc = readText("docs/dogfooding/project-state-self-dogfooding-v0.6.2.md");
   const projectStateLifecycleReadinessDogfoodingDoc = readText("docs/dogfooding/project-state-lifecycle-readiness-v0.6.3.md");
   const projectStateLifecycleDogfoodingV070Doc = readText("docs/dogfooding/project-state-lifecycle-v0.7.0.md");
+  const basebriefSelfValidationPreV08Doc = readText("docs/dogfooding/basebrief-self-validation-pre-v0.8.md");
+  const preV08FrictionLogDoc = readText("docs/dogfooding/pre-v0.8-friction-log.md");
   const testingDoc = readText("docs/testing.md");
   const usabilityFeedbackTemplate = readText(".github/ISSUE_TEMPLATE/usability_feedback.md");
   const adaptersDoc = readText("docs/adapters.md");
@@ -267,6 +271,7 @@ function checkContentContracts() {
   const projectStateV062ReleaseDoc = readText("docs/releases/v0.6.2.md");
   const projectStateV063ReleaseDoc = readText("docs/releases/v0.6.3.md");
   const projectStateV070ReleaseDoc = readText("docs/releases/v0.7.0.md");
+  const sidecarV080ReleaseDoc = readText("docs/releases/v0.8.0.md");
   const postReleaseBaselineDoc = readText("docs/baselines/v0.4.0-post-release-baseline.md");
   const v060PostReleaseBaselineDoc = readText("docs/baselines/v0.6.0-post-release-baseline.md");
   const projectStateModelDoc = readText("docs/design/project-state-model.md");
@@ -464,6 +469,7 @@ function checkContentContracts() {
   assert(docsIndex.includes("../examples/receiver-flow-review/rejected-empty/README.md"), "Docs index should link rejected empty draft example");
   assert(docsIndex.includes("../examples/project-state/README.md"), "Docs index should link project-state example");
   assert(docsIndex.includes("releases/v0.6.0.md"), "Docs index must link v0.6.0 project-state release");
+  assert(docsIndex.includes("releases/v0.8.0.md"), "Docs index must link v0.8.0 sidecar release candidate");
   assert(docsIndex.includes("releases/v0.7.0.md"), "Docs index must link v0.7.0 lifecycle release candidate");
   assert(docsIndex.includes("releases/v0.6.3.md"), "Docs index must link v0.6.3 lifecycle readiness candidate");
   assert(docsIndex.includes("releases/v0.6.2.md"), "Docs index must link v0.6.2 self-dogfooding evidence candidate");
@@ -546,12 +552,17 @@ function checkContentContracts() {
   assert(projectStateDoc.includes("state-validate --repo <target-repo>"), "Project State docs must document state-validate");
   assert(projectStateDoc.includes("state-history --repo <target-repo>"), "Project State docs must document state-history");
   assert(projectStateDoc.includes("state-advance --repo <target-repo> --source <receiver-ready.md>"), "Project State docs must document state-advance");
+  assert(projectStateDoc.includes("sidecar-build --repo <target-repo>"), "Project State docs must document sidecar-build");
   assert(projectStateDoc.includes(".basebrief/state.json"), "Project State docs must document output file");
   assert(projectStateDoc.includes(".basebrief/history/"), "Project State docs must document history output");
+  assert(projectStateDoc.includes(".basebrief/sidecar/<target>/"), "Project State docs must document sidecar output directory");
   assert(projectStateDoc.includes("basebrief-project-state-v1"), "Project State docs must document schema version");
   assert(projectStateDoc.includes("No provider request"), "Project State docs must state no provider request");
+  assert(projectStateDoc.includes("No raw private output"), "Project State docs must state no raw private output");
+  assert(projectStateDoc.includes("No runtime integration"), "Project State docs must state no runtime integration");
   assert(projectStateDoc.includes("No Auto Flow"), "Project State docs must state no Auto Flow");
   assert(projectStateDoc.includes("No receiver thread creation"), "Project State docs must state no receiver thread creation");
+  assert(projectStateDoc.includes("No schema change"), "Project State docs must state no schema change");
   assert(projectStateDoc.includes("BB9 handoff schema is unchanged"), "Project State docs must protect BB9 schema");
   assert(projectStateDoc.includes("Receiver Safe Check config and result schemas are unchanged"), "Project State docs must protect receiver schemas");
   assert(knownLimitationsDoc.includes("does not automatically decide when a handoff is stale"), "Known Limitations must document generated_at boundary");
@@ -629,8 +640,15 @@ function checkContentContracts() {
   assert(cliLiteDoc.includes("node scripts/basebrief.js state-validate --repo <target-repo>"), "cli-lite.md must document state-validate command");
   assert(cliLiteDoc.includes("node scripts/basebrief.js state-history --repo <target-repo>"), "cli-lite.md must document state-history command");
   assert(cliLiteDoc.includes("node scripts/basebrief.js state-advance --repo <target-repo> --source <receiver-ready.md>"), "cli-lite.md must document state-advance command");
+  assert(cliLiteDoc.includes("node scripts/basebrief.js sidecar-build --repo <target-repo>"), "cli-lite.md must document sidecar-build command");
+  assert(cliLiteDoc.includes("--target generic|openclaw"), "cli-lite.md must document sidecar target option");
   assert(cliLiteDoc.includes("basebrief-project-state-v1"), "cli-lite.md must document project-state schema version");
   assert(cliLiteDoc.includes(".basebrief/history/"), "cli-lite.md must document project-state history directory");
+  assert(cliLiteDoc.includes(".basebrief/sidecar/<target>/"), "cli-lite.md must document sidecar output directory");
+  assert(cliLiteDoc.includes("No raw private output"), "cli-lite.md must document sidecar raw-output boundary");
+  assert(cliLiteDoc.includes("No runtime"), "cli-lite.md must document sidecar runtime boundary");
+  assert(cliLiteDoc.includes("wait for user confirmation"), "cli-lite.md must document receiver confirmation boundary");
+  assert(cliLiteDoc.includes("releases/v0.8.0.md"), "cli-lite.md must link v0.8.0 sidecar release candidate");
   assert(cliLiteDoc.includes("releases/v0.7.0.md"), "cli-lite.md must link v0.7.0 lifecycle release candidate");
   assert(cliLiteDoc.includes("releases/v0.6.0.md"), "cli-lite.md must link v0.6.0 project-state release");
   assert(cliLiteDoc.includes("releases/v0.3.2.md"), "cli-lite.md must link v0.3.2 release candidate");
@@ -1006,6 +1024,29 @@ function checkContentContracts() {
   assert(projectStateLifecycleDogfoodingV070Doc.includes("No provider request"), "v0.7.0 dogfooding doc must state no provider request");
   assert(projectStateLifecycleDogfoodingV070Doc.includes("No schema change"), "v0.7.0 dogfooding doc must state no schema change");
   assert(projectStateLifecycleDogfoodingV070Doc.includes("provider_probe_status=skipped"), "v0.7.0 dogfooding doc must preserve skipped provider gate");
+  assert(basebriefSelfValidationPreV08Doc.includes("BaseBrief Self-Validation Pre-v0.8"), "Pre-v0.8 self-validation doc must have stable title");
+  assert(basebriefSelfValidationPreV08Doc.includes("receiver-flow --guided"), "Pre-v0.8 self-validation doc must document guided command shape");
+  assert(basebriefSelfValidationPreV08Doc.includes("review-draft"), "Pre-v0.8 self-validation doc must document review gate");
+  assert(basebriefSelfValidationPreV08Doc.includes("state-init"), "Pre-v0.8 self-validation doc must document state-init");
+  assert(basebriefSelfValidationPreV08Doc.includes("state-read --json"), "Pre-v0.8 self-validation doc must document state-read");
+  assert(basebriefSelfValidationPreV08Doc.includes("basebrief-project-state-v1"), "Pre-v0.8 self-validation doc must preserve state schema");
+  assert(basebriefSelfValidationPreV08Doc.includes("No provider request"), "Pre-v0.8 self-validation doc must state no provider request");
+  assert(basebriefSelfValidationPreV08Doc.includes("No raw private output"), "Pre-v0.8 self-validation doc must reject raw private output");
+  assert(basebriefSelfValidationPreV08Doc.includes("No v0.8 implementation yet"), "Pre-v0.8 self-validation doc must reject v0.8 implementation");
+  assert(basebriefSelfValidationPreV08Doc.includes("provider_probe_status=skipped"), "Pre-v0.8 self-validation doc must preserve skipped provider gate");
+  assert(basebriefSelfValidationPreV08Doc.includes("receiver-window-acceptance-retry"), "Pre-v0.8 self-validation doc must record receiver acceptance retry");
+  assert(basebriefSelfValidationPreV08Doc.includes("wait for user confirmation"), "Pre-v0.8 self-validation doc must record explicit user-confirmation requirement");
+  assert(preV08FrictionLogDoc.includes("Pre-v0.8 Friction Log"), "Pre-v0.8 friction log must have stable title");
+  assert(preV08FrictionLogDoc.includes("review-checklist-required"), "Pre-v0.8 friction log must document review checklist friction");
+  assert(preV08FrictionLogDoc.includes("state-artifact-local-only"), "Pre-v0.8 friction log must document local state artifact boundary");
+  assert(preV08FrictionLogDoc.includes("receiver-acceptance-explicit-confirmation"), "Pre-v0.8 friction log must document explicit receiver confirmation friction");
+  assert(preV08FrictionLogDoc.includes("receiver-acceptance-retry-passed"), "Pre-v0.8 friction log must document receiver retry pass");
+  assert(preV08FrictionLogDoc.includes("No provider request"), "Pre-v0.8 friction log must state no provider request");
+  assert(preV08FrictionLogDoc.includes("No raw private output"), "Pre-v0.8 friction log must reject raw private output");
+  assert(preV08FrictionLogDoc.includes("No v0.8 implementation yet"), "Pre-v0.8 friction log must reject v0.8 implementation");
+  assert(preV08FrictionLogDoc.includes("provider_probe_status=skipped"), "Pre-v0.8 friction log must preserve skipped provider gate");
+  assert(docsIndex.includes("dogfooding/basebrief-self-validation-pre-v0.8.md"), "Docs index must link Pre-v0.8 self-validation evidence");
+  assert(docsIndex.includes("dogfooding/pre-v0.8-friction-log.md"), "Docs index must link Pre-v0.8 friction log");
   assert(projectStateV063ReleaseDoc.includes("Lifecycle Readiness Gate Candidate"), "v0.6.3 release doc must describe readiness candidate");
   assert(projectStateV063ReleaseDoc.includes("not a lifecycle release"), "v0.6.3 release doc must reject lifecycle release status");
   assert(projectStateV063ReleaseDoc.includes("No state lifecycle commands"), "v0.6.3 release doc must state no lifecycle commands");
@@ -1025,6 +1066,16 @@ function checkContentContracts() {
   assert(projectStateV070ReleaseDoc.includes("No schema change"), "v0.7.0 release doc must state no schema change");
   assert(projectStateV070ReleaseDoc.includes("provider_probe_status=skipped"), "v0.7.0 release doc must preserve skipped provider probe gate");
   assert(projectStateV070ReleaseDoc.includes("BASEBRIEF_PROVIDER_API_KEY"), "v0.7.0 release doc must document provider env shape only");
+  assert(sidecarV080ReleaseDoc.includes("Sidecar Handoff Bundle Candidate"), "v0.8.0 release doc must describe sidecar candidate");
+  assert(sidecarV080ReleaseDoc.includes("sidecar-build --repo <target-repo>"), "v0.8.0 release doc must document sidecar-build");
+  assert(sidecarV080ReleaseDoc.includes("basebrief-project-state-v1"), "v0.8.0 release doc must preserve project-state schema");
+  assert(sidecarV080ReleaseDoc.includes("No provider request"), "v0.8.0 release doc must state no provider request");
+  assert(sidecarV080ReleaseDoc.includes("No raw private output"), "v0.8.0 release doc must state no raw private output");
+  assert(sidecarV080ReleaseDoc.includes("No runtime integration"), "v0.8.0 release doc must state no runtime integration");
+  assert(sidecarV080ReleaseDoc.includes("No schema change"), "v0.8.0 release doc must state no schema change");
+  assert(sidecarV080ReleaseDoc.includes("No Auto Flow"), "v0.8.0 release doc must state no Auto Flow");
+  assert(sidecarV080ReleaseDoc.includes("Wait for user confirmation"), "v0.8.0 release doc must state user-confirmation boundary");
+  assert(sidecarV080ReleaseDoc.includes("provider_probe_status=skipped"), "v0.8.0 release doc must preserve skipped provider gate");
   assert(projectStateSchema.properties.schemaVersion.const === "basebrief-project-state-v1", "Project State schema version mismatch");
   assert(projectStateExample.schemaVersion === "basebrief-project-state-v1", "Project State example schema version mismatch");
   assert(projectStateExample.source.handoff_status === "ready_for_receiver", "Project State example must use ready source status");
@@ -1103,7 +1154,7 @@ function checkSecurity() {
     /OPENAI_API_KEY\s*=/i,
     /ANTHROPIC_API_KEY\s*=/i,
     /OPENROUTER_API_KEY\s*=/i,
-    /sk-[A-Za-z0-9]{10,}/,
+    /\bsk-[A-Za-z0-9]{10,}/,
   ];
   const forbiddenPathParts = ["node_modules", "dist", ".cache"];
   const forbiddenFileNames = [".env", ".env.local", ".env.production", ".env.development", ".env.test"];
@@ -1338,6 +1389,7 @@ function checkCliLite() {
     assert(helpStdout.includes("state-validate --repo <target-repo>"), "CLI help must expose Project State validate");
     assert(helpStdout.includes("state-history --repo <target-repo>"), "CLI help must expose Project State history");
     assert(helpStdout.includes("state-advance --repo <target-repo> --source <receiver-ready.md>"), "CLI help must expose Project State advance");
+    assert(helpStdout.includes("sidecar-build --repo <target-repo>"), "CLI help must expose Sidecar build");
 
     const noCommandStdout = execFileSync(process.execPath, [
       "scripts/basebrief.js",
@@ -1971,7 +2023,7 @@ function checkBenchmarkSummaryIfPresent() {
       assert(summary.projectCount >= 1, "Benchmark summary must include project count");
     }
     assert(summary.requestCount >= summary.validRequestCount, "Benchmark summary request counts are inconsistent");
-    assert(!JSON.stringify(summary).match(/[A-Z]:\\|\/home\/|sk-[A-Za-z0-9]{10,}/), "Benchmark summary contains private path or key-like content");
+    assert(!JSON.stringify(summary).match(/[A-Z]:\\|\/home\/|\bsk-[A-Za-z0-9]{10,}/), "Benchmark summary contains private path or key-like content");
     statuses.push(`${summary.mode || summary.providerProfileId || "absolute"}:${summary.conclusionLevel || summary.usageInterpretation || "present"}`);
   });
   return statuses.length ? statuses.join(",") : "absent";

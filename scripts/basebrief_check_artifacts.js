@@ -8,7 +8,7 @@ const SCANNED_EXTENSIONS = new Set([".md", ".json", ".txt"]);
 const SKIPPED_DIRS = new Set([".git", "node_modules", "dist", ".cache", "coverage", "private"]);
 
 const SECRET_PATTERNS = [
-  { ruleId: "secret.sk", pattern: /sk-[A-Za-z0-9]{10,}/ },
+  { ruleId: "secret.sk", pattern: /\bsk-[A-Za-z0-9]{10,}/ },
   { ruleId: "secret.bearer", pattern: /Bearer\s+[A-Za-z0-9._-]{10,}/i },
   { ruleId: "secret.github-token", pattern: /\bgh[opusr]_[A-Za-z0-9_]{10,}/ },
   { ruleId: "secret.aws-access-key", pattern: /\b(?:AKIA|ASIA)[A-Z0-9]{16}\b/ },

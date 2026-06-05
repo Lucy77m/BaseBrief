@@ -16,7 +16,7 @@ const {
 } = require("../scripts/basebrief_build_handoff");
 const { buildAdapterArtifacts, normalizeTargets } = require("../scripts/basebrief_build_adapters");
 const { checkArtifacts } = require("../scripts/basebrief_check_artifacts");
-const { HELP_TEXT, commandBuild, commandCheck, commandDiff, commandInit, commandReceiverCheck, commandReceiverFlow, commandReceiverInit, commandReviewDraft, commandStateAdvance, commandStateHistory, commandStateInit, commandStateRead, commandStateStatus, commandStateValidate, commandSeal, formatHuman, run, starterInput } = require("../scripts/basebrief");
+const { HELP_TEXT, commandBuild, commandCheck, commandDiff, commandInit, commandReceiverCheck, commandReceiverFlow, commandReceiverInit, commandReviewDraft, commandSidecarBuild, commandStateAdvance, commandStateHistory, commandStateInit, commandStateRead, commandStateStatus, commandStateValidate, commandSeal, formatHuman, run, starterInput } = require("../scripts/basebrief");
 const {
   CONFIG_SCHEMA_VERSION: RECEIVER_CHECK_SCHEMA_VERSION,
   RESULT_SCHEMA_VERSION: RECEIVER_CHECK_RESULT_SCHEMA_VERSION,
@@ -28,6 +28,7 @@ const { buildReceiverCheckConfig, runReceiverInit } = require("../scripts/basebr
 const { FLOW_SCHEMA_VERSION, runReceiverFlow } = require("../scripts/basebrief_receiver_flow");
 const { REVIEW_DRAFT_SCHEMA_VERSION, runReviewDraft } = require("../scripts/basebrief_review_draft");
 const { PROJECT_STATE_SCHEMA_VERSION, runStateAdvance, runStateHistory, runStateInit, runStateRead, runStateStatus, runStateValidate } = require("../scripts/basebrief_project_state");
+const { SIDECAR_SCHEMA_VERSION, buildSidecarBundle } = require("../scripts/basebrief_sidecar");
 const { createSealFromInput, diffSeals, readSealOrInput, SEAL_SCHEMA_VERSION } = require("../scripts/basebrief_seal");
 const { buildSummary, getPromptForVariant, SCENARIOS, PROVIDER_PROFILES } = require("../scripts/provider_cache_benchmark");
 const { classifyRelayUsage } = require("../scripts/provider_relay_usage_audit");
@@ -948,6 +949,44 @@ test("v0.7.0 project state lifecycle documents commands without schema or provid
     "docs/dogfooding/project-state-lifecycle-v0.7.0.md",
     "docs/testing-v0.7.x-test-matrix.md",
     "docs/releases/v0.7.0.md",
+  ]) {
+    const result = checkArtifacts({ inputPath: path.join(repoRoot, relativePath) });
+    assert.equal(result.status, "passed", relativePath);
+    assert.equal(result.errorCount, 0, relativePath);
+  }
+});
+
+test("v0.8.0 sidecar handoff bundle documents local-only project-state consumption", () => {
+  const docsIndex = readText("docs/index.md");
+  const cliLite = readText("docs/cli-lite.md");
+  const projectState = readText("docs/project-state.md");
+  const release = readText("docs/releases/v0.8.0.md");
+
+  assert.match(docsIndex, /releases\/v0\.8\.0\.md/);
+  assert.match(cliLite, /sidecar-build --repo <target-repo>/);
+  assert.match(cliLite, /--target generic\|openclaw/);
+  assert.match(projectState, /sidecar-build --repo <target-repo>/);
+  assert.match(projectState, /basebrief-project-state-v1/);
+  assert.match(projectState, /\.basebrief\/sidecar\/<target>\//);
+
+  for (const doc of [cliLite, projectState, release]) {
+    assert.match(doc, /No provider request/);
+    assert.match(doc, /No raw private output/);
+    assert.match(doc, /No runtime integration|No runtime/);
+    assert.match(doc, /No schema change/);
+  }
+
+  assert.match(release, /Sidecar Handoff Bundle Candidate/);
+  assert.match(release, /handoff\.md/);
+  assert.match(release, /next-chat-prompt\.md/);
+  assert.match(release, /manifest\.json/);
+  assert.match(release, /Wait for user confirmation/);
+  assert.match(release, /provider_probe_status=skipped/);
+
+  for (const relativePath of [
+    "docs/cli-lite.md",
+    "docs/project-state.md",
+    "docs/releases/v0.8.0.md",
   ]) {
     const result = checkArtifacts({ inputPath: path.join(repoRoot, relativePath) });
     assert.equal(result.status, "passed", relativePath);
@@ -2588,9 +2627,99 @@ test("Project state lifecycle rejects unsafe or unreviewed advance", () => withT
   assert.throws(() => runStateAdvance({ repoPath: repoDir, sourcePath: readyPath }), /validation failed before advance/);
 }));
 
+test("Sidecar build writes generic bundle from valid project state", () => withTempDir((tempDir) => {
+  const repoDir = createReceiverCheckRepo(tempDir);
+  const { draftPath } = createGuidedDraft(tempDir, {
+    guidedAnswers: {
+      risk_boundaries: [
+        "Do not call providers.",
+        "Do not write secrets or raw private output.",
+      ].join("\n"),
+    },
+  });
+  const readyPath = path.join(tempDir, "receiver-ready.md");
+  runReviewDraft({ draftPath, outputPath: readyPath });
+  runStateInit({ repoPath: repoDir, sourcePath: readyPath });
+
+  const outputDir = path.join(tempDir, "generic-sidecar");
+  const result = buildSidecarBundle({ repoPath: repoDir, target: "generic", outputDir });
+  const manifest = JSON.parse(fs.readFileSync(path.join(outputDir, "manifest.json"), "utf8"));
+  const stateSummary = JSON.parse(fs.readFileSync(path.join(outputDir, "state-summary.json"), "utf8"));
+  const prompt = fs.readFileSync(path.join(outputDir, "next-chat-prompt.md"), "utf8");
+
+  assert.equal(result.command, "sidecar-build");
+  assert.equal(result.schemaVersion, SIDECAR_SCHEMA_VERSION);
+  assert.equal(result.projectStateSchemaVersion, PROJECT_STATE_SCHEMA_VERSION);
+  assert.equal(result.target, "generic");
+  assert.equal(manifest.schemaVersion, SIDECAR_SCHEMA_VERSION);
+  assert.equal(manifest.projectStateSchemaVersion, PROJECT_STATE_SCHEMA_VERSION);
+  assert.equal(manifest.output_files.handoff, "handoff.md");
+  assert.equal(stateSummary.projectStateSchemaVersion, PROJECT_STATE_SCHEMA_VERSION);
+  assert.match(stateSummary.current_goal, /Prepare a reviewed receiver handoff/);
+  assert.match(prompt, /current_goal/);
+  assert.match(prompt, /receiver_entry_task/);
+  assert.match(prompt, /wait for user confirmation/i);
+  assert.match(prompt, /No provider request/);
+  assert.match(prompt, /No raw private output/);
+  assert.match(prompt, /No runtime integration/);
+  assert.match(prompt, /No schema change/);
+  assert.match(prompt, /No auto-advance/);
+  assert(stateSummary.risk_boundaries.length >= 2);
+  assert.doesNotMatch(JSON.stringify(manifest), /[A-Z]:\\/);
+  assert.doesNotMatch(JSON.stringify(stateSummary), /[A-Z]:\\/);
+  assert.equal(checkArtifacts({ inputPath: outputDir }).status, "passed");
+}));
+
+test("Sidecar build writes OpenClaw-safe bundle without runtime integration", () => withTempDir((tempDir) => {
+  const repoDir = createReceiverCheckRepo(tempDir);
+  const { draftPath } = createGuidedDraft(tempDir, {
+    guidedAnswers: {
+      risk_boundaries: [
+        "Do not call providers.",
+        "Do not write secrets.",
+      ].join("\n"),
+    },
+  });
+  const readyPath = path.join(tempDir, "receiver-ready.md");
+  runReviewDraft({ draftPath, outputPath: readyPath });
+  runStateInit({ repoPath: repoDir, sourcePath: readyPath });
+
+  const outputDir = path.join(tempDir, "openclaw-sidecar");
+  const result = commandSidecarBuild({ repo: repoDir, target: "openclaw", "output-dir": outputDir });
+  const prompt = fs.readFileSync(path.join(outputDir, "next-chat-prompt.md"), "utf8");
+  const risks = fs.readFileSync(path.join(outputDir, "risk-boundaries.md"), "utf8");
+
+  assert.equal(result.target, "openclaw");
+  assert.match(prompt, /OpenClaw\/Hermes runtime/);
+  assert.match(prompt, /profile\/config\/memory\/workspace/);
+  assert.match(risks, /Do not connect OpenClaw or Hermes runtime/);
+  assert.match(risks, /No provider request/);
+  assert.equal(checkArtifacts({ inputPath: outputDir }).status, "passed");
+}));
+
+test("Sidecar build rejects missing state, invalid state, unsupported target, and non-empty output", () => withTempDir((tempDir) => {
+  const repoDir = createReceiverCheckRepo(tempDir);
+  assert.throws(() => buildSidecarBundle({ repoPath: repoDir }), /project-state does not exist/);
+  assert.throws(() => buildSidecarBundle({ repoPath: repoDir, target: "runtime" }), /Unsupported sidecar target/);
+
+  const { draftPath } = createGuidedDraft(tempDir);
+  const readyPath = path.join(tempDir, "receiver-ready.md");
+  runReviewDraft({ draftPath, outputPath: readyPath });
+  runStateInit({ repoPath: repoDir, sourcePath: readyPath });
+
+  const occupied = path.join(tempDir, "occupied-sidecar");
+  fs.mkdirSync(occupied, { recursive: true });
+  fs.writeFileSync(path.join(occupied, "existing.txt"), "already here\n", "utf8");
+  assert.throws(() => buildSidecarBundle({ repoPath: repoDir, outputDir: occupied }), /already exists and is not empty/);
+
+  fs.writeFileSync(path.join(repoDir, ".basebrief", "state.json"), `${JSON.stringify({ schemaVersion: "wrong" }, null, 2)}\n`, "utf8");
+  assert.throws(() => buildSidecarBundle({ repoPath: repoDir, outputDir: path.join(tempDir, "invalid-sidecar") }), /project-state validation failed/);
+}));
+
 test("CLI Lite exposes project state commands with public-safe json paths", () => withTempDir((tempDir) => {
   const repoDir = path.join(repoRoot, "tests", "outputs", "private", `state-repo-${Date.now()}`);
   const sourceDir = path.join(repoRoot, "tests", "outputs", "private", `state-source-${Date.now()}`);
+  const sidecarDir = path.join(repoRoot, "tests", "outputs", "private", `sidecar-${Date.now()}`);
   try {
     fs.mkdirSync(sourceDir, { recursive: true });
     const fixtureRepo = createReceiverCheckRepo(tempDir);
@@ -2718,9 +2847,31 @@ test("CLI Lite exposes project state commands with public-safe json paths", () =
     assert.equal(historyAfterResult.command, "state-history");
     assert.equal(historyAfterResult.history_status, "available");
     assert.equal(historyAfterResult.entries.length, 1);
+
+    const sidecarCli = spawnSync(process.execPath, [
+      "scripts/basebrief.js",
+      "sidecar-build",
+      "--repo",
+      repoDir,
+      "--output-dir",
+      sidecarDir,
+      "--json",
+    ], { cwd: repoRoot, encoding: "utf8" });
+    assert.equal(sidecarCli.status, 0, sidecarCli.stderr);
+    const sidecarResult = JSON.parse(sidecarCli.stdout);
+    assert.equal(sidecarResult.command, "sidecar-build");
+    assert.equal(sidecarResult.schemaVersion, SIDECAR_SCHEMA_VERSION);
+    assert.equal(sidecarResult.projectStateSchemaVersion, PROJECT_STATE_SCHEMA_VERSION);
+    assert.equal(sidecarResult.target, "generic");
+    assert.equal(sidecarResult.repo.startsWith("tests"), true);
+    assert.equal(sidecarResult.input.startsWith("tests"), true);
+    assert.equal(sidecarResult.outputDir.startsWith("tests"), true);
+    assert.equal(sidecarResult.outputFiles.handoff.startsWith("tests"), true);
+    assert.match(HELP_TEXT, /sidecar-build --repo <target-repo>/);
   } finally {
     fs.rmSync(repoDir, { recursive: true, force: true });
     fs.rmSync(sourceDir, { recursive: true, force: true });
+    fs.rmSync(sidecarDir, { recursive: true, force: true });
   }
 }));
 

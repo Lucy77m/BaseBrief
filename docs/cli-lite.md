@@ -24,6 +24,7 @@ node scripts/basebrief.js state-status --repo . --json
 node scripts/basebrief.js state-validate --repo . --json
 node scripts/basebrief.js state-history --repo . --json
 node scripts/basebrief.js state-advance --repo . --source tests/outputs/private/receiver-ready.md --json
+node scripts/basebrief.js sidecar-build --repo . --target generic --output-dir tests/outputs/private/sidecar-generic --json
 node scripts/basebrief.js seal --input examples/seal-before-input.json --output tests/outputs/private/seal-before.json
 node scripts/basebrief.js diff --before examples/seal-before-input.json --after examples/seal-after-input.json --json
 ```
@@ -194,6 +195,41 @@ The v0.6.0 project-state boundary is documented in
 [v0.6.0 Project State Directory Candidate](releases/v0.6.0.md).
 The v0.7.0 lifecycle boundary is documented in
 [v0.7.0 Project State Lifecycle Candidate](releases/v0.7.0.md).
+
+### sidecar-build
+
+```text
+node scripts/basebrief.js sidecar-build --repo <target-repo> [--target generic|openclaw] [--output-dir <dir>] [--json]
+```
+
+`sidecar-build` reads the existing valid
+`<target-repo>/.basebrief/state.json` and writes a receiver handoff bundle. It
+does not create or advance Project State. It is a consumer of
+`basebrief-project-state-v1`; it does not change the schema.
+
+Default target is `generic`. Default output is
+`<target-repo>/.basebrief/sidecar/<target>/`. Tests and dogfooding should pass
+an ignored private `--output-dir`. The command refuses a non-empty output
+directory and does not provide a force overwrite flag.
+
+Generated files:
+
+- `handoff.md`
+- `next-chat-prompt.md`
+- `receiver-entry-task.md`
+- `risk-boundaries.md`
+- `state-summary.json`
+- `manifest.json`
+
+The `openclaw` target only adds stronger safety wording. It does not connect
+OpenClaw or Hermes runtime, does not write profile/config/memory/workspace
+files, and does not call providers.
+
+Boundary shorthand: No provider request, No raw private output, No runtime
+integration, No schema change, No Auto Flow, wait for user confirmation.
+
+The v0.8.0 sidecar boundary is documented in
+[v0.8.0 Sidecar Handoff Bundle Candidate](releases/v0.8.0.md).
 
 ### seal
 
