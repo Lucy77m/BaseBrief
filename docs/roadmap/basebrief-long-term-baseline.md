@@ -8,7 +8,7 @@ This document is the planning baseline for the next stages of BaseBrief. It is n
 
 BaseBrief should continue as one public skill entry with internal modes and supporting tools.
 
-Version `v0.2.0` completed the first local toolchain: structured handoff, provider profile metadata, file-based adapters, artifact checks, CLI Lite, and Seal/Diff v1. The `v0.2.1` public-entry polish and `v0.2.2` first-run workflow validation completed the initial usability closure. The current `v0.3.0` release candidate adds receiver-ready semantics, Receiver Safe Check v1, and an explicit `receiver-init -> receiver-check` local workflow without changing BB9 or the normal Full/Lite entry.
+Version `v0.2.0` completed the first local toolchain: structured handoff, provider profile metadata, file-based adapters, artifact checks, CLI Lite, and Seal/Diff v1. The `v0.2.1` public-entry polish and `v0.2.2` first-run workflow validation completed the initial usability closure. The `v0.3.0` release candidate adds receiver-ready semantics, Receiver Safe Check v1, and an explicit `receiver-init -> receiver-check` local workflow without changing BB9 or the normal Full/Lite entry. The current `v0.3.1` stabilization pass records receiver friction, adds public receiver examples, and adds local validation scripts without changing the receiver schemas or CLI command semantics.
 
 The useful product shape is no longer "choose a cache-ready mode for normal work." The stronger direction is:
 
@@ -235,7 +235,7 @@ Exit criteria:
 - Zero-install skill usage remains documented.
 - The CLI is optional, not required for normal template use.
 
-Current v0.3 target: `scripts/basebrief.js` is a zero-dependency Node wrapper for init, build, check, receiver-init, receiver-check, seal, and diff. It stays optional and does not create an npm package, global command, plugin, or provider integration.
+Current v0.3 target: `scripts/basebrief.js` is a zero-dependency Node wrapper for init, build, check, receiver-init, receiver-check, seal, and diff. Local npm scripts may wrap validation commands, but BaseBrief stays optional and does not create a published npm package, global command, plugin, or provider integration.
 
 ### Phase 8: Seal and Diff
 
@@ -274,6 +274,14 @@ Exit criteria:
 - Config and result contracts remain independent from BB9.
 - Temporary Git repositories prove pass, difference, blocked, and no-tracked-write behavior.
 - Public docs keep limitations and evidence scope explicit.
+
+Current v0.3.1 stabilization target:
+
+- record public-safe receiver friction in dogfooding docs
+- add examples for `difference_found`, `blocked`, and language routing
+- add minimal local npm scripts for validation only
+- document the v0.3.1 local release-candidate gate
+- avoid Auto Flow, new adapters, Web UI, provider requests, and broad receiver matrices.
 
 ### Phase 9: ContextOps Vision
 

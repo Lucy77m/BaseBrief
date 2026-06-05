@@ -194,6 +194,79 @@ test("v0.3.0 release candidate documents receiver workflow and release boundarie
   assert.match(roadmap, /v0\.3\.0/);
 });
 
+test("v0.3.1 receiver stabilization documents examples, local npm scripts, and release boundaries", () => {
+  const packageJson = readJson("package.json");
+  const readme = readText("README.md");
+  const englishReadme = readText("README.en.md");
+  const cliLite = readText("docs/cli-lite.md");
+  const docsIndex = readText("docs/index.md");
+  const testing = readText("docs/testing.md");
+  const roadmap = readText("docs/roadmap/basebrief-long-term-baseline.md");
+  const release = readText("docs/releases/v0.3.1.md");
+  const frictionLog = readText("docs/dogfooding/receiver-friction-log.md");
+  const differenceReadme = readText("examples/receiver/difference-found/README.md");
+  const blockedReadme = readText("examples/receiver/blocked/README.md");
+  const languageReadme = readText("examples/receiver/language-routing/README.md");
+  const differenceResult = readJson("examples/receiver/difference-found/receiver-check-result.json");
+  const blockedResult = readJson("examples/receiver/blocked/blocked-result.json");
+
+  assert.equal(packageJson.private, true);
+  assert.deepEqual(Object.keys(packageJson.scripts).sort(), ["check", "release-check", "test"]);
+  assert.equal(packageJson.scripts.test, "node --test tests/basebrief.test.js");
+  assert.equal(packageJson.scripts["release-check"], "node scripts/run_release_checks.js");
+  assert.equal(packageJson.scripts.check, "npm test && npm run release-check");
+  ["dependencies", "devDependencies", "peerDependencies", "optionalDependencies", "bin", "publishConfig", "files"].forEach((key) => {
+    assert.equal(key in packageJson, false, `package.json should not define ${key}`);
+  });
+
+  assert.match(readme, /npm run check/);
+  assert.match(readme, /不是发布到 npm 的 package/);
+  assert.match(readme, /docs\/releases\/v0\.3\.1\.md/);
+  assert.match(englishReadme, /not a published npm package/);
+  assert.match(englishReadme, /docs\/releases\/v0\.3\.1\.md/);
+  assert.match(cliLite, /not a published npm package/);
+  assert.match(cliLite, /npm run check/);
+  assert.match(docsIndex, /dogfooding\/receiver-friction-log\.md/);
+  assert.match(docsIndex, /releases\/v0\.3\.1\.md/);
+  assert.match(docsIndex, /examples\/receiver\/difference-found\/README\.md/);
+  assert.match(testing, /v0\.3\.1 receiver stabilization/);
+  assert.match(testing, /provider_probe_status=skipped/);
+  assert.match(roadmap, /Current v0\.3\.1 stabilization target/);
+  assert.match(roadmap, /document the v0\.3\.1 local release-candidate gate/);
+  assert.match(release, /Receiver Stabilization/);
+  assert.match(release, /BB9 handoff schema is unchanged/);
+  assert.match(release, /Receiver Safe Check config and result schemas are unchanged/);
+  assert.match(release, /Auto Flow Skeleton is not introduced/);
+  assert.match(release, /No provider request/);
+  assert.match(release, /provider_probe_status=skipped/);
+  assert.match(release, /No push, tag, or formal release/);
+  assert.match(frictionLog, /actual_handoff_friction/);
+  assert.match(frictionLog, /difference_found/);
+  assert.match(frictionLog, /blocked/);
+
+  assert.match(differenceReadme, /does not mean the agent failed/);
+  assert.equal(differenceResult.handoff_acceptance, "difference_found");
+  assert.equal(differenceResult.receiver_task_status, "completed");
+  assert.match(blockedReadme, /cannot run safely/);
+  assert.equal(blockedResult.handoff_acceptance, "blocked");
+  assert.equal(blockedResult.receiver_task_status, "blocked");
+  assert.match(languageReadme, /match_latest_user_message/);
+  assert.match(languageReadme, /technical literals/);
+
+  for (const relativePath of [
+    "docs/releases/v0.3.1.md",
+    "docs/dogfooding/receiver-friction-log.md",
+    "examples/receiver/difference-found",
+    "examples/receiver/blocked",
+    "examples/receiver/language-routing",
+  ]) {
+    const result = checkArtifacts({ inputPath: path.join(repoRoot, relativePath) });
+    assert.equal(result.status, "passed", relativePath);
+    assert.equal(result.errorCount, 0, relativePath);
+    assert.equal(result.warningCount, 0, relativePath);
+  }
+});
+
 test("public quickstart and minimal examples provide a clean first-use path", () => {
   const quickstart = readText("docs/quickstart-5min.md");
   const minimalBrief = readText("examples/minimal/output-basebrief-lite.md");

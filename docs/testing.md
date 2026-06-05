@@ -14,6 +14,16 @@ node scripts/run_release_checks.js
 node --test tests/basebrief.test.js
 ```
 
+本地快捷入口：
+
+```text
+npm test
+npm run release-check
+npm run check
+```
+
+这些 npm scripts 只包装上面的本地 Node 命令；它们不表示 BaseBrief 已成为发布 npm package 或安装式 CLI。
+
 ## Receiver 测试额度
 
 Receiver-ready 验证默认采用低额度策略：
@@ -23,6 +33,7 @@ Receiver-ready 验证默认采用低额度策略：
 - Smoke case 通过后立即停止，不追加便利性或“顺便验证”用例。
 - 完整矩阵测试必须由用户明确批准。
 - 已有 private 与用户提供的外部证据应优先复用，不为重复确认重新消耗接收线程额度。
+- v0.3.1 receiver stabilization 文档与示例改动默认只跑本地自动检查，不创建新的 receiver 矩阵。
 
 这项预算规则不降低发布检查标准。单元测试、release checks、Artifact Checker、`git diff --check` 和受保护接口检查仍按改动范围执行。
 
@@ -81,7 +92,18 @@ normalized 模式的公开结果默认写入 `tests/outputs/provider-cache-bench
 
 ## 最新一次本地结果
 
-最新一次 `v0.3.0` 发布候选本地验证未注入 provider 环境变量。`node scripts/run_release_checks.js` 已通过，关键结果为：
+`v0.3.1` receiver stabilization 收口验证应使用：
+
+```text
+git diff --check
+node --test tests/basebrief.test.js
+node scripts/run_release_checks.js
+npm run check
+```
+
+该收口不需要 provider 请求、外部 receiver 矩阵、OpenCode smoke、Claude Code smoke 或 Auto Flow run。未注入 provider 环境变量时，release check 必须保持 `provider_probe_status=skipped`。
+
+上一轮 `v0.3.0` 发布候选本地验证未注入 provider 环境变量。`node scripts/run_release_checks.js` 已通过，关键结果为：
 
 - 模式路由用例：`11` 条通过
 - 安全扫描文件数：`136`

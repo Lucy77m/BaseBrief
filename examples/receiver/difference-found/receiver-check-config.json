@@ -1,0 +1,7 @@
+{
+  "schemaVersion": "basebrief-receiver-check-v1",
+  "expected_branch": "main",
+  "expected_head": "0000000000000000000000000000000000000000",
+  "expected_changed_files": [],
+  "declared_checks": []
+}

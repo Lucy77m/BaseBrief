@@ -1,0 +1,8 @@
+{
+  "private": true,
+  "scripts": {
+    "test": "node --test tests/basebrief.test.js",
+    "release-check": "node scripts/run_release_checks.js",
+    "check": "npm test && npm run release-check"
+  }
+}

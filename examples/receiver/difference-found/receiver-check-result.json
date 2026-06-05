@@ -1,0 +1,23 @@
+{
+  "schemaVersion": "basebrief-receiver-check-result-v1",
+  "receiver_task_status": "completed",
+  "repository_state_status": "difference_found",
+  "declared_checks_status": "skipped",
+  "handoff_acceptance": "difference_found",
+  "repository": {
+    "branch": "main",
+    "head": "1111111111111111111111111111111111111111"
+  },
+  "changed_files": {
+    "expected": [],
+    "actual": [
+      "docs/unreviewed-change.md"
+    ],
+    "missing": [],
+    "unexpected": [
+      "docs/unreviewed-change.md"
+    ]
+  },
+  "declared_checks": [],
+  "blocked_reason": ""
+}

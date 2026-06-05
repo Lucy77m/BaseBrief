@@ -2,7 +2,7 @@
 
 CLI Lite is an optional local script wrapper around the existing BaseBrief handoff builder, adapter builder, and artifact checker.
 
-It is not an npm package, not a globally installed `basebrief` command, not a plugin, and not a provider integration. It does not read `.env` files or manage credentials.
+It is not a published npm package, not a globally installed `basebrief` command, not a plugin, and not a provider integration. It does not read `.env` files or manage credentials.
 
 Run it through Node:
 
@@ -16,6 +16,16 @@ node scripts/basebrief.js receiver-check --config examples/receiver-check-config
 node scripts/basebrief.js seal --input examples/seal-before-input.json --output tests/outputs/private/seal-before.json
 node scripts/basebrief.js diff --before examples/seal-before-input.json --after examples/seal-after-input.json --json
 ```
+
+The repository also includes minimal local npm scripts:
+
+```text
+npm test
+npm run release-check
+npm run check
+```
+
+These scripts are only validation shortcuts. They do not add a published package, global install flow, or new CLI surface.
 
 ## Commands
 

@@ -19,13 +19,15 @@
 
 ## 方向与验证
 
-- [v0.3.0 release candidate](releases/v0.3.0.md)
+- [v0.3.1 release candidate](releases/v0.3.1.md)
+- [v0.3.0 receiver workflow baseline](releases/v0.3.0.md)
 - [测试与验证记录](testing.md)
 - [长期规划基线](roadmap/basebrief-long-term-baseline.md)
 - [ContextOps boundary](contextops.md)
 - [BB evolution log](evolution/bb-evolution-log.md)
 - [v0.2.2 first-run dogfooding](dogfooding/v0.2.2-first-run-workflow.md)
 - [Receiver-ready v1 evidence closure](dogfooding/receiver-ready-v1-evidence.md)
+- [Receiver friction log](dogfooding/receiver-friction-log.md)
 - [Usability feedback template](../.github/ISSUE_TEMPLATE/usability_feedback.md)
 
 ## Cache-ready 实验历史
@@ -53,3 +55,6 @@
 - [Structured Lite Handoff](../examples/structured-handoff-lite.md)
 - [Codex Adapter 示例](../examples/adapter-codex-task.md)
 - [Claude Adapter 示例](../examples/adapter-claude-project-context.md)
+- [Receiver difference_found 示例](../examples/receiver/difference-found/README.md)
+- [Receiver blocked 示例](../examples/receiver/blocked/README.md)
+- [Receiver language-routing 示例](../examples/receiver/language-routing/README.md)

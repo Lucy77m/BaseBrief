@@ -48,6 +48,16 @@ node scripts/basebrief.js build --input examples/structured-handoff-lite.md --ou
 
 CLI Lite is an optional local script, not an installed CLI, plugin, or provider integration.
 
+This repository also provides minimal npm scripts as local validation shortcuts:
+
+```text
+npm test
+npm run release-check
+npm run check
+```
+
+These scripts only wrap local Node commands. BaseBrief is still not a published npm package, global command, plugin, or provider integration.
+
 ## Seal/Diff
 
 Seal/Diff answers: what changed in facts, decisions, risks, and task boundaries between two phases?
@@ -93,7 +103,9 @@ BaseBrief is not a chat client, agent runtime, hosted platform, secret manager, 
 - [Mode selection](docs/mode-selection.md)
 - [CLI Lite](docs/cli-lite.md)
 - [Receiver Safe Check](docs/receiver-check.md)
-- [v0.3.0 Release Candidate](docs/releases/v0.3.0.md)
+- [Receiver friction log](docs/dogfooding/receiver-friction-log.md)
+- [v0.3.1 Release Candidate](docs/releases/v0.3.1.md)
+- [v0.3.0 receiver workflow baseline](docs/releases/v0.3.0.md)
 - [Known limitations](docs/known-limitations.md)
 - [Documentation index](docs/index.md)
 - [Public minimal example](examples/minimal/README.md)

@@ -48,6 +48,16 @@ node scripts/basebrief.js build --input examples/structured-handoff-lite.md --ou
 
 CLI Lite 是可选的本地脚本，不是安装式 CLI、插件或 provider integration。
 
+本仓库也提供最小 npm scripts 作为本地验证快捷入口：
+
+```text
+npm test
+npm run release-check
+npm run check
+```
+
+这些 scripts 只包装本地 Node 命令；BaseBrief 仍不是发布到 npm 的 package、全局命令、插件或 provider integration。
+
 ## Seal/Diff
 
 Seal/Diff 用来回答：阶段前后，事实、决策、风险边界和下一步任务发生了什么变化？
@@ -93,7 +103,9 @@ BaseBrief 不是聊天客户端、Agent runtime、托管平台、密钥管理器
 - [模式选择](docs/mode-selection.md)
 - [CLI Lite](docs/cli-lite.md)
 - [Receiver Safe Check](docs/receiver-check.md)
-- [v0.3.0 Release Candidate](docs/releases/v0.3.0.md)
+- [Receiver friction log](docs/dogfooding/receiver-friction-log.md)
+- [v0.3.1 Release Candidate](docs/releases/v0.3.1.md)
+- [v0.3.0 Receiver workflow baseline](docs/releases/v0.3.0.md)
 - [已知限制](docs/known-limitations.md)
 - [完整文档索引](docs/index.md)
 - [公开最小示例](examples/minimal/README.md)

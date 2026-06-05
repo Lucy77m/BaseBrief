@@ -51,6 +51,7 @@ function walkFiles(dir) {
 
 function checkRequiredFiles() {
   const required = [
+    "package.json",
     "README.md",
     "skills/basebrief/SKILL.md",
     "skills/basebrief/modes/full.md",
@@ -73,6 +74,7 @@ function checkRequiredFiles() {
     "docs/known-limitations.md",
     "docs/dogfooding/v0.2.2-first-run-workflow.md",
     "docs/dogfooding/receiver-ready-v1-evidence.md",
+    "docs/dogfooding/receiver-friction-log.md",
     "docs/integrations.md",
     "docs/adapters.md",
     "docs/walkthrough.md",
@@ -81,6 +83,7 @@ function checkRequiredFiles() {
     "docs/checks.md",
     "docs/receiver-check.md",
     "docs/releases/v0.3.0.md",
+    "docs/releases/v0.3.1.md",
     "docs/cli-lite.md",
     "docs/seal-diff.md",
     "docs/contextops.md",
@@ -141,6 +144,13 @@ function checkRequiredFiles() {
     "examples/seal-after-input.json",
     "examples/next-chat-example.md",
     "examples/receiver-check-config.json",
+    "examples/receiver/difference-found/README.md",
+    "examples/receiver/difference-found/receiver-check-config.json",
+    "examples/receiver/difference-found/receiver-check-result.json",
+    "examples/receiver/blocked/README.md",
+    "examples/receiver/blocked/blocked-result.json",
+    "examples/receiver/language-routing/README.md",
+    "examples/receiver/language-routing/receiver-report.md",
     "examples/agent-task-example.md",
     "examples/minimal/README.md",
     "examples/minimal/input-project-notes.md",
@@ -154,6 +164,7 @@ function checkRequiredFiles() {
 }
 
 function checkContentContracts() {
+  const packageJson = readJson("package.json");
   const skill = readText("skills/basebrief/SKILL.md");
   const readme = readText("README.md");
   const englishReadme = readText("README.en.md");
@@ -163,6 +174,7 @@ function checkContentContracts() {
   const knownLimitationsDoc = readText("docs/known-limitations.md");
   const dogfoodingDoc = readText("docs/dogfooding/v0.2.2-first-run-workflow.md");
   const receiverReadyDogfoodingDoc = readText("docs/dogfooding/receiver-ready-v1-evidence.md");
+  const receiverFrictionDoc = readText("docs/dogfooding/receiver-friction-log.md");
   const testingDoc = readText("docs/testing.md");
   const usabilityFeedbackTemplate = readText(".github/ISSUE_TEMPLATE/usability_feedback.md");
   const adaptersDoc = readText("docs/adapters.md");
@@ -172,6 +184,7 @@ function checkContentContracts() {
   const checksDoc = readText("docs/checks.md");
   const receiverCheckDoc = readText("docs/receiver-check.md");
   const releaseCandidateDoc = readText("docs/releases/v0.3.0.md");
+  const receiverStabilizationReleaseDoc = readText("docs/releases/v0.3.1.md");
   const cliLiteDoc = readText("docs/cli-lite.md");
   const sealDiffDoc = readText("docs/seal-diff.md");
   const contextOpsDoc = readText("docs/contextops.md");
@@ -192,6 +205,18 @@ function checkContentContracts() {
   const cachePrefixTemplate = readText("templates/zh-CN/CACHE_PREFIX.md");
   const yaml = readText("skills/basebrief/agents/openai.yaml");
 
+  assert(packageJson.private === true, "package.json must stay private");
+  assert(
+    JSON.stringify(Object.keys(packageJson.scripts || {}).sort()) === JSON.stringify(["check", "release-check", "test"]),
+    "package.json must only expose local validation scripts",
+  );
+  assert(packageJson.scripts.test === "node --test tests/basebrief.test.js", "npm test must wrap the independent tests");
+  assert(packageJson.scripts["release-check"] === "node scripts/run_release_checks.js", "npm run release-check must wrap release checks");
+  assert(packageJson.scripts.check === "npm test && npm run release-check", "npm run check must run tests before release checks");
+  ["dependencies", "devDependencies", "peerDependencies", "optionalDependencies", "bin", "publishConfig", "files"].forEach((key) => {
+    assert(!(key in packageJson), `package.json must not define ${key}`);
+  });
+
   ["full", "lite", "cache-ready"].forEach((mode) => {
     assert(skill.includes(mode), `SKILL.md must mention mode: ${mode}`);
     assert(readme.includes(mode), `README.md must mention mode: ${mode}`);
@@ -204,9 +229,13 @@ function checkContentContracts() {
   assert(readme.includes("docs/handoff.md"), "README.md should link to handoff contract docs");
   assert(readme.includes("docs/cli-lite.md"), "README.md should link to CLI Lite docs");
   assert(readme.includes("docs/receiver-check.md"), "README.md should link to Receiver Safe Check docs");
+  assert(readme.includes("docs/dogfooding/receiver-friction-log.md"), "README.md should link to receiver friction log");
+  assert(readme.includes("docs/releases/v0.3.1.md"), "README.md should link to v0.3.1 release candidate");
   assert(readme.includes("docs/releases/v0.3.0.md"), "README.md should link to v0.3.0 release candidate");
   assert(readme.includes("docs/seal-diff.md"), "README.md should link to Seal/Diff docs");
   assert(readme.includes("零依赖 CLI Lite"), "README.md must describe the existing CLI Lite");
+  assert(readme.includes("npm run check"), "README.md must document npm validation shortcut");
+  assert(readme.includes("不是发布到 npm 的 package"), "README.md must keep npm scripts out of published-package scope");
   assert(!readme.includes("BaseBrief 当前不是 CLI"), "README.md must not describe CLI Lite as nonexistent");
   assert(!readme.includes("暂无 CLI"), "README.md must not contain the obsolete no-CLI status");
   assert(!readme.includes("BB2 experiment notes"), "README.md must keep experiment-history links out of the public entry");
@@ -217,10 +246,14 @@ function checkContentContracts() {
   assert(englishReadme.includes("docs/handoff.md"), "README.en.md should link to handoff docs");
   assert(englishReadme.includes("docs/cli-lite.md"), "README.en.md should link to CLI Lite docs");
   assert(englishReadme.includes("docs/receiver-check.md"), "README.en.md should link to Receiver Safe Check docs");
+  assert(englishReadme.includes("docs/dogfooding/receiver-friction-log.md"), "README.en.md should link to receiver friction log");
+  assert(englishReadme.includes("docs/releases/v0.3.1.md"), "README.en.md should link to v0.3.1 release candidate");
   assert(englishReadme.includes("docs/releases/v0.3.0.md"), "README.en.md should link to v0.3.0 release candidate");
   assert(englishReadme.includes("docs/seal-diff.md"), "README.en.md should link to Seal/Diff docs");
   assert(englishReadme.includes("Integrations"), "README.en.md should link to integrations docs");
   assert(englishReadme.includes("zero-dependency CLI Lite"), "README.en.md must describe the existing CLI Lite");
+  assert(englishReadme.includes("npm run check"), "README.en.md must document npm validation shortcut");
+  assert(englishReadme.includes("not a published npm package"), "README.en.md must keep npm scripts out of published-package scope");
   assert(!englishReadme.includes("not a CLI or plugin yet"), "README.en.md must not contain the obsolete no-CLI status");
   assert(englishReadme.includes("cache-ready"), "README.en.md must describe cache-ready mode");
   assert(!/two skills/i.test(englishReadme), "README.en.md must not imply two skills");
@@ -244,15 +277,27 @@ function checkContentContracts() {
   assert(dogfoodingDoc.includes("artifact.missing-open-questions"), "Dogfooding record must document the first-run warning");
   assert(dogfoodingDoc.includes("Remaining Friction"), "Dogfooding record must document remaining friction");
   assert(docsIndex.includes("dogfooding/receiver-ready-v1-evidence.md"), "Docs index must link receiver-ready v1 evidence");
+  assert(docsIndex.includes("dogfooding/receiver-friction-log.md"), "Docs index must link receiver friction log");
+  assert(docsIndex.includes("../examples/receiver/difference-found/README.md"), "Docs index should link receiver difference example");
+  assert(docsIndex.includes("../examples/receiver/blocked/README.md"), "Docs index should link receiver blocked example");
+  assert(docsIndex.includes("../examples/receiver/language-routing/README.md"), "Docs index should link receiver language routing example");
+  assert(docsIndex.includes("releases/v0.3.1.md"), "Docs index must link v0.3.1 release candidate");
   assert(docsIndex.includes("releases/v0.3.0.md"), "Docs index must link v0.3.0 release candidate");
   assert(receiverReadyDogfoodingDoc.includes("User-provided external evidence"), "Receiver-ready evidence must distinguish external evidence");
   assert(receiverReadyDogfoodingDoc.includes("not proof across all tools"), "Receiver-ready evidence must keep the interpretation scoped");
   assert(receiverReadyDogfoodingDoc.includes("Low-budget Validation Rule"), "Receiver-ready evidence must record the validation budget");
+  assert(receiverFrictionDoc.includes("actual_handoff_friction"), "Receiver friction log must record the report shape");
+  assert(receiverFrictionDoc.includes("difference_found"), "Receiver friction log must document difference_found");
+  assert(receiverFrictionDoc.includes("blocked"), "Receiver friction log must document blocked");
+  assert(receiverFrictionDoc.includes("v0.3.1"), "Receiver friction log must name v0.3.1 stabilization");
   assert(knownLimitationsDoc.includes("does not automatically decide when a handoff is stale"), "Known Limitations must document generated_at boundary");
   assert(knownLimitationsDoc.includes("does not add file-content hashes"), "Known Limitations must document deferred receiver integrity work");
   assert(knownLimitationsDoc.includes("not a general test runner"), "Known Limitations must scope Receiver Safe Check");
   assert(testingDoc.includes("最多 `1` 个 low-reasoning smoke case"), "Testing docs must cap receiver smoke cases");
   assert(testingDoc.includes("完整矩阵测试必须由用户明确批准"), "Testing docs must require approval for full receiver matrices");
+  assert(testingDoc.includes("npm run check"), "Testing docs must document npm validation shortcut");
+  assert(testingDoc.includes("v0.3.1 receiver stabilization"), "Testing docs must document v0.3.1 receiver stabilization budget");
+  assert(testingDoc.includes("provider_probe_status=skipped"), "Testing docs must preserve skipped provider probe wording");
   assert(usabilityFeedbackTemplate.includes("Do not include secrets"), "Usability feedback template must include a safety warning");
   assert(usabilityFeedbackTemplate.includes("Expected Result"), "Usability feedback template must collect expected results");
   [
@@ -288,7 +333,8 @@ function checkContentContracts() {
   assert(checksDoc.includes("--input"), "checks.md must document explicit input behavior");
   assert(checksDoc.includes("not a full security audit"), "checks.md must explain checker boundary");
   assert(cliLiteDoc.includes("scripts/basebrief.js"), "cli-lite.md must document CLI Lite script");
-  assert(cliLiteDoc.includes("not an npm package"), "cli-lite.md must state CLI Lite is not an npm package");
+  assert(cliLiteDoc.includes("not a published npm package"), "cli-lite.md must state CLI Lite is not a published npm package");
+  assert(cliLiteDoc.includes("npm run check"), "cli-lite.md must document npm validation shortcut");
   assert(cliLiteDoc.includes("node scripts/basebrief.js build"), "cli-lite.md must document build command");
   assert(cliLiteDoc.includes("node scripts/basebrief.js seal"), "cli-lite.md must document seal command");
   assert(cliLiteDoc.includes("node scripts/basebrief.js diff"), "cli-lite.md must document diff command");
@@ -416,6 +462,17 @@ function checkContentContracts() {
   assert(releaseCandidateDoc.includes("No Codex receiver thread"), "v0.3.0 release candidate must record receiver-thread boundary");
   assert(releaseCandidateDoc.includes("not cross-model stability proof"), "v0.3.0 release candidate must scope external smoke evidence");
   assert(releaseCandidateDoc.includes("No push, tag, or formal release"), "v0.3.0 release candidate must keep release actions pending");
+  assert(receiverStabilizationReleaseDoc.includes("Receiver Stabilization"), "v0.3.1 release candidate must describe receiver stabilization");
+  assert(receiverStabilizationReleaseDoc.includes("docs/dogfooding/receiver-friction-log.md") || receiverStabilizationReleaseDoc.includes("receiver friction log"), "v0.3.1 release candidate must reference receiver friction log");
+  assert(receiverStabilizationReleaseDoc.includes("difference_found"), "v0.3.1 release candidate must document difference_found");
+  assert(receiverStabilizationReleaseDoc.includes("blocked"), "v0.3.1 release candidate must document blocked");
+  assert(receiverStabilizationReleaseDoc.includes("npm run check"), "v0.3.1 release candidate must document npm validation script");
+  assert(receiverStabilizationReleaseDoc.includes("provider_probe_status=skipped"), "v0.3.1 release candidate must preserve skipped provider probe gate");
+  assert(receiverStabilizationReleaseDoc.includes("No provider request"), "v0.3.1 release candidate must state no provider request");
+  assert(receiverStabilizationReleaseDoc.includes("No push, tag, or formal release"), "v0.3.1 release candidate must keep release actions pending");
+  assert(receiverStabilizationReleaseDoc.includes("Auto Flow Skeleton is not introduced"), "v0.3.1 release candidate must keep Auto Flow out of scope");
+  assert(receiverStabilizationReleaseDoc.includes("BB9 handoff schema is unchanged"), "v0.3.1 release candidate must protect BB9 schema");
+  assert(receiverStabilizationReleaseDoc.includes("Receiver Safe Check config and result schemas are unchanged"), "v0.3.1 release candidate must protect receiver schemas");
   assert(receiverCheckSchema.properties.schemaVersion.const === "basebrief-receiver-check-v1", "Receiver Safe Check config schema version mismatch");
   assert(receiverCheckResultSchema.properties.schemaVersion.const === "basebrief-receiver-check-result-v1", "Receiver Safe Check result schema version mismatch");
   assert(receiverCheckConfigExample.schemaVersion === "basebrief-receiver-check-v1", "Receiver Safe Check example schema version mismatch");
@@ -568,6 +625,13 @@ function checkExamples() {
     "examples/seal-after-input.json",
     "examples/next-chat-example.md",
     "examples/receiver-check-config.json",
+    "examples/receiver/difference-found/README.md",
+    "examples/receiver/difference-found/receiver-check-config.json",
+    "examples/receiver/difference-found/receiver-check-result.json",
+    "examples/receiver/blocked/README.md",
+    "examples/receiver/blocked/blocked-result.json",
+    "examples/receiver/language-routing/README.md",
+    "examples/receiver/language-routing/receiver-report.md",
     "examples/agent-task-example.md",
     "examples/minimal/README.md",
     "examples/minimal/input-project-notes.md",
@@ -590,9 +654,14 @@ function checkArtifactChecker() {
     "docs/known-limitations.md",
     "docs/dogfooding/v0.2.2-first-run-workflow.md",
     "docs/dogfooding/receiver-ready-v1-evidence.md",
+    "docs/dogfooding/receiver-friction-log.md",
     "docs/receiver-check.md",
     "docs/releases/v0.3.0.md",
+    "docs/releases/v0.3.1.md",
     "examples/receiver-check-config.json",
+    "examples/receiver/difference-found",
+    "examples/receiver/blocked",
+    "examples/receiver/language-routing",
     ".github/ISSUE_TEMPLATE/usability_feedback.md",
   ];
   inputs.forEach((relativePath) => {
