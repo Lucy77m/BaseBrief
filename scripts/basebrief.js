@@ -11,7 +11,14 @@ const { runReceiverCheck } = require("./basebrief_receiver_check");
 const { collectGuidedAnswersFromStdin, runReceiverFlow } = require("./basebrief_receiver_flow");
 const { runReceiverInit } = require("./basebrief_receiver_init");
 const { runReviewDraft } = require("./basebrief_review_draft");
-const { runStateInit, runStateRead } = require("./basebrief_project_state");
+const {
+  runStateAdvance,
+  runStateHistory,
+  runStateInit,
+  runStateRead,
+  runStateStatus,
+  runStateValidate,
+} = require("./basebrief_project_state");
 const { commandDiff: commandSealDiff, commandSeal: commandCreateSeal } = require("./basebrief_seal");
 
 const STARTER_FILE = "basebrief-handoff-input.json";
@@ -29,6 +36,10 @@ const HELP_TEXT = [
   "  node scripts/basebrief.js review-draft --draft <draft-context.md> --output <receiver-ready.md> [--json]",
   "  node scripts/basebrief.js state-init --repo <target-repo> --source <receiver-ready.md> [--json]",
   "  node scripts/basebrief.js state-read --repo <target-repo> [--json]",
+  "  node scripts/basebrief.js state-status --repo <target-repo> [--json]",
+  "  node scripts/basebrief.js state-validate --repo <target-repo> [--json]",
+  "  node scripts/basebrief.js state-history --repo <target-repo> [--json]",
+  "  node scripts/basebrief.js state-advance --repo <target-repo> --source <receiver-ready.md> [--json]",
   "  node scripts/basebrief.js seal --input <markdown-or-json> --output <file>",
   "  node scripts/basebrief.js diff --before <file> --after <file>",
   "",
@@ -266,6 +277,31 @@ function commandStateRead(options) {
   });
 }
 
+function commandStateStatus(options) {
+  return runStateStatus({
+    repoPath: options.repo,
+  });
+}
+
+function commandStateValidate(options) {
+  return runStateValidate({
+    repoPath: options.repo,
+  });
+}
+
+function commandStateHistory(options) {
+  return runStateHistory({
+    repoPath: options.repo,
+  });
+}
+
+function commandStateAdvance(options) {
+  return runStateAdvance({
+    repoPath: options.repo,
+    sourcePath: options.source,
+  });
+}
+
 function commandSeal(options) {
   return {
     ...commandCreateSeal({
@@ -298,6 +334,10 @@ function run(argv) {
   if (command === "review-draft") return commandReviewDraft(options);
   if (command === "state-init") return commandStateInit(options);
   if (command === "state-read") return commandStateRead(options);
+  if (command === "state-status") return commandStateStatus(options);
+  if (command === "state-validate") return commandStateValidate(options);
+  if (command === "state-history") return commandStateHistory(options);
+  if (command === "state-advance") return commandStateAdvance(options);
   if (command === "seal") return commandSeal(options);
   if (command === "diff") return commandDiff(options);
   throw new Error(`Unknown command: ${command}`);
@@ -369,6 +409,23 @@ function toPublicResult(result) {
       ...result,
       repo: publicPath(result.repo, cwd),
       input: publicPath(result.input, cwd),
+    };
+  }
+  if (result.command === "state-status" || result.command === "state-validate" || result.command === "state-history") {
+    return {
+      ...result,
+      repo: publicPath(result.repo, cwd),
+      input: publicPath(result.input, cwd),
+    };
+  }
+  if (result.command === "state-advance") {
+    return {
+      ...result,
+      repo: publicPath(result.repo, cwd),
+      input: publicPath(result.input, cwd),
+      output: publicPath(result.output, cwd),
+      source: publicPath(result.source, cwd),
+      history_output: publicPath(result.history_output, cwd),
     };
   }
   if (result.command === "seal") {
@@ -464,6 +521,42 @@ function formatHuman(result) {
       "",
     ].join(os.EOL);
   }
+  if (result.command === "state-status") {
+    return [
+      `BaseBrief project state status for ${result.repo}`,
+      `exists=${result.exists}`,
+      `state_status=${result.state_status}`,
+      `validation_status=${result.validation_status}`,
+      result.updated_at ? `updated_at=${result.updated_at}` : "",
+      ...result.errors.map((error) => `error=${error}`),
+      "",
+    ].filter((line, index, lines) => line || index === lines.length - 1).join(os.EOL);
+  }
+  if (result.command === "state-validate") {
+    return [
+      `BaseBrief project state validation ${result.validation_status}`,
+      `exists=${result.exists}`,
+      `state_status=${result.state_status}`,
+      ...result.errors.map((error) => `error=${error}`),
+      "",
+    ].join(os.EOL);
+  }
+  if (result.command === "state-history") {
+    return [
+      `BaseBrief project state history ${result.history_status}`,
+      `entries=${result.entries.length}`,
+      "",
+    ].join(os.EOL);
+  }
+  if (result.command === "state-advance") {
+    return [
+      `BaseBrief project state advanced at ${result.output}`,
+      `schemaVersion=${result.schemaVersion}`,
+      `handoff_status=${result.state.source.handoff_status}`,
+      `history_output=${result.history_output}`,
+      "",
+    ].join(os.EOL);
+  }
   if (result.command === "seal") {
     return `BaseBrief seal written to ${result.output}${os.EOL}checksum=${result.checksum}${os.EOL}`;
   }
@@ -506,6 +599,9 @@ function cli() {
   if (result.command === "receiver-check" && result.result.handoff_acceptance === "blocked") {
     process.exitCode = 1;
   }
+  if (result.command === "state-validate" && result.validation_status !== "passed") {
+    process.exitCode = 1;
+  }
 }
 
 if (require.main === module) {
@@ -527,8 +623,12 @@ module.exports = {
   commandReceiverCheck,
   commandReceiverFlow,
   commandReviewDraft,
+  commandStateAdvance,
+  commandStateHistory,
   commandStateInit,
   commandStateRead,
+  commandStateStatus,
+  commandStateValidate,
   commandSeal,
   formatFindingLines,
   formatHuman,

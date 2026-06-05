@@ -84,6 +84,7 @@ function checkRequiredFiles() {
     "docs/dogfooding/project-state-self-dogfooding-v0.6.x.md",
     "docs/dogfooding/project-state-self-dogfooding-v0.6.2.md",
     "docs/dogfooding/project-state-lifecycle-readiness-v0.6.3.md",
+    "docs/dogfooding/project-state-lifecycle-v0.7.0.md",
     "docs/integrations.md",
     "docs/adapters.md",
     "docs/walkthrough.md",
@@ -98,6 +99,7 @@ function checkRequiredFiles() {
     "docs/design/project-state-model.md",
     "docs/design/project-state-validation-rules.md",
     "docs/design/project-state-lifecycle-readiness.md",
+    "docs/design/project-state-lifecycle-model.md",
     "docs/releases/v0.3.0.md",
     "docs/releases/v0.3.1.md",
     "docs/releases/v0.3.2.md",
@@ -111,8 +113,10 @@ function checkRequiredFiles() {
     "docs/releases/v0.6.0.md",
     "docs/releases/v0.6.2.md",
     "docs/releases/v0.6.3.md",
+    "docs/releases/v0.7.0.md",
     "docs/testing-v0.4.x-test-matrix.md",
     "docs/testing-v0.6.x-test-matrix.md",
+    "docs/testing-v0.7.x-test-matrix.md",
     "docs/cli-lite.md",
     "docs/seal-diff.md",
     "docs/contextops.md",
@@ -238,6 +242,7 @@ function checkContentContracts() {
   const projectStateSelfDogfoodingDoc = readText("docs/dogfooding/project-state-self-dogfooding-v0.6.x.md");
   const projectStateSelfDogfoodingV062Doc = readText("docs/dogfooding/project-state-self-dogfooding-v0.6.2.md");
   const projectStateLifecycleReadinessDogfoodingDoc = readText("docs/dogfooding/project-state-lifecycle-readiness-v0.6.3.md");
+  const projectStateLifecycleDogfoodingV070Doc = readText("docs/dogfooding/project-state-lifecycle-v0.7.0.md");
   const testingDoc = readText("docs/testing.md");
   const usabilityFeedbackTemplate = readText(".github/ISSUE_TEMPLATE/usability_feedback.md");
   const adaptersDoc = readText("docs/adapters.md");
@@ -261,13 +266,16 @@ function checkContentContracts() {
   const projectStateReleaseDoc = readText("docs/releases/v0.6.0.md");
   const projectStateV062ReleaseDoc = readText("docs/releases/v0.6.2.md");
   const projectStateV063ReleaseDoc = readText("docs/releases/v0.6.3.md");
+  const projectStateV070ReleaseDoc = readText("docs/releases/v0.7.0.md");
   const postReleaseBaselineDoc = readText("docs/baselines/v0.4.0-post-release-baseline.md");
   const v060PostReleaseBaselineDoc = readText("docs/baselines/v0.6.0-post-release-baseline.md");
   const projectStateModelDoc = readText("docs/design/project-state-model.md");
   const projectStateValidationRulesDoc = readText("docs/design/project-state-validation-rules.md");
   const projectStateLifecycleReadinessDoc = readText("docs/design/project-state-lifecycle-readiness.md");
+  const projectStateLifecycleModelDoc = readText("docs/design/project-state-lifecycle-model.md");
   const testMatrixDoc = readText("docs/testing-v0.4.x-test-matrix.md");
   const v06xTestMatrixDoc = readText("docs/testing-v0.6.x-test-matrix.md");
+  const v07xTestMatrixDoc = readText("docs/testing-v0.7.x-test-matrix.md");
   const cliLiteDoc = readText("docs/cli-lite.md");
   const sealDiffDoc = readText("docs/seal-diff.md");
   const contextOpsDoc = readText("docs/contextops.md");
@@ -327,11 +335,15 @@ function checkContentContracts() {
   assert(readme.includes("docs/dogfooding/project-state-self-dogfooding-v0.6.x.md"), "README.md should link to project-state self-dogfooding evidence");
   assert(readme.includes("docs/dogfooding/project-state-self-dogfooding-v0.6.2.md"), "README.md should link to v0.6.2 project-state self-dogfooding evidence");
   assert(readme.includes("docs/dogfooding/project-state-lifecycle-readiness-v0.6.3.md"), "README.md should link to v0.6.3 lifecycle readiness dogfooding");
+  assert(readme.includes("docs/dogfooding/project-state-lifecycle-v0.7.0.md"), "README.md should link to v0.7.0 lifecycle dogfooding");
   assert(readme.includes("docs/design/project-state-model.md"), "README.md should link to project-state model docs");
   assert(readme.includes("docs/design/project-state-validation-rules.md"), "README.md should link to project-state validation docs");
   assert(readme.includes("docs/design/project-state-lifecycle-readiness.md"), "README.md should link to project-state lifecycle readiness docs");
+  assert(readme.includes("docs/design/project-state-lifecycle-model.md"), "README.md should link to project-state lifecycle model docs");
   assert(readme.includes("docs/baselines/v0.6.0-post-release-baseline.md"), "README.md should link to v0.6.0 post-release baseline");
   assert(readme.includes("docs/testing-v0.6.x-test-matrix.md"), "README.md should link to v0.6.x test matrix");
+  assert(readme.includes("docs/testing-v0.7.x-test-matrix.md"), "README.md should link to v0.7.x test matrix");
+  assert(readme.includes("docs/releases/v0.7.0.md"), "README.md should link to v0.7.0 lifecycle release candidate");
   assert(readme.includes("docs/releases/v0.6.3.md"), "README.md should link to v0.6.3 lifecycle readiness candidate");
   assert(readme.includes("docs/releases/v0.6.2.md"), "README.md should link to v0.6.2 self-dogfooding evidence candidate");
   assert(readme.includes("docs/releases/v0.6.0.md"), "README.md should link to v0.6.0 project-state release");
@@ -374,11 +386,15 @@ function checkContentContracts() {
   assert(englishReadme.includes("docs/dogfooding/project-state-self-dogfooding-v0.6.x.md"), "README.en.md should link to project-state self-dogfooding evidence");
   assert(englishReadme.includes("docs/dogfooding/project-state-self-dogfooding-v0.6.2.md"), "README.en.md should link to v0.6.2 project-state self-dogfooding evidence");
   assert(englishReadme.includes("docs/dogfooding/project-state-lifecycle-readiness-v0.6.3.md"), "README.en.md should link to v0.6.3 lifecycle readiness dogfooding");
+  assert(englishReadme.includes("docs/dogfooding/project-state-lifecycle-v0.7.0.md"), "README.en.md should link to v0.7.0 lifecycle dogfooding");
   assert(englishReadme.includes("docs/design/project-state-model.md"), "README.en.md should link to project-state model docs");
   assert(englishReadme.includes("docs/design/project-state-validation-rules.md"), "README.en.md should link to project-state validation docs");
   assert(englishReadme.includes("docs/design/project-state-lifecycle-readiness.md"), "README.en.md should link to project-state lifecycle readiness docs");
+  assert(englishReadme.includes("docs/design/project-state-lifecycle-model.md"), "README.en.md should link to project-state lifecycle model docs");
   assert(englishReadme.includes("docs/baselines/v0.6.0-post-release-baseline.md"), "README.en.md should link to v0.6.0 post-release baseline");
   assert(englishReadme.includes("docs/testing-v0.6.x-test-matrix.md"), "README.en.md should link to v0.6.x test matrix");
+  assert(englishReadme.includes("docs/testing-v0.7.x-test-matrix.md"), "README.en.md should link to v0.7.x test matrix");
+  assert(englishReadme.includes("docs/releases/v0.7.0.md"), "README.en.md should link to v0.7.0 lifecycle release candidate");
   assert(englishReadme.includes("docs/releases/v0.6.3.md"), "README.en.md should link to v0.6.3 lifecycle readiness candidate");
   assert(englishReadme.includes("docs/releases/v0.6.2.md"), "README.en.md should link to v0.6.2 self-dogfooding evidence candidate");
   assert(englishReadme.includes("docs/releases/v0.6.0.md"), "README.en.md should link to v0.6.0 project-state release");
@@ -430,11 +446,13 @@ function checkContentContracts() {
   assert(docsIndex.includes("dogfooding/project-state-self-dogfooding-v0.6.x.md"), "Docs index must link project-state self-dogfooding evidence");
   assert(docsIndex.includes("dogfooding/project-state-self-dogfooding-v0.6.2.md"), "Docs index must link v0.6.2 project-state self-dogfooding evidence");
   assert(docsIndex.includes("dogfooding/project-state-lifecycle-readiness-v0.6.3.md"), "Docs index must link v0.6.3 lifecycle readiness dogfooding");
+  assert(docsIndex.includes("dogfooding/project-state-lifecycle-v0.7.0.md"), "Docs index must link v0.7.0 lifecycle dogfooding");
   assert(docsIndex.includes("receiver-flow.md"), "Docs index must link Receiver Flow Draft docs");
   assert(docsIndex.includes("project-state.md"), "Docs index must link Project State docs");
   assert(docsIndex.includes("design/project-state-model.md"), "Docs index must link project-state model docs");
   assert(docsIndex.includes("design/project-state-validation-rules.md"), "Docs index must link project-state validation docs");
   assert(docsIndex.includes("design/project-state-lifecycle-readiness.md"), "Docs index must link project-state lifecycle readiness docs");
+  assert(docsIndex.includes("design/project-state-lifecycle-model.md"), "Docs index must link project-state lifecycle model docs");
   assert(docsIndex.includes("../examples/receiver/difference-found/README.md"), "Docs index should link receiver difference example");
   assert(docsIndex.includes("../examples/receiver/blocked/README.md"), "Docs index should link receiver blocked example");
   assert(docsIndex.includes("../examples/receiver/language-routing/README.md"), "Docs index should link receiver language routing example");
@@ -446,10 +464,12 @@ function checkContentContracts() {
   assert(docsIndex.includes("../examples/receiver-flow-review/rejected-empty/README.md"), "Docs index should link rejected empty draft example");
   assert(docsIndex.includes("../examples/project-state/README.md"), "Docs index should link project-state example");
   assert(docsIndex.includes("releases/v0.6.0.md"), "Docs index must link v0.6.0 project-state release");
+  assert(docsIndex.includes("releases/v0.7.0.md"), "Docs index must link v0.7.0 lifecycle release candidate");
   assert(docsIndex.includes("releases/v0.6.3.md"), "Docs index must link v0.6.3 lifecycle readiness candidate");
   assert(docsIndex.includes("releases/v0.6.2.md"), "Docs index must link v0.6.2 self-dogfooding evidence candidate");
   assert(docsIndex.includes("baselines/v0.6.0-post-release-baseline.md"), "Docs index must link v0.6.0 post-release baseline");
   assert(docsIndex.includes("testing-v0.6.x-test-matrix.md"), "Docs index must link v0.6.x test matrix");
+  assert(docsIndex.includes("testing-v0.7.x-test-matrix.md"), "Docs index must link v0.7.x test matrix");
   assert(docsIndex.includes("releases/v0.5.1.md"), "Docs index must link v0.5.1 review draft gate candidate");
   assert(docsIndex.includes("releases/v0.5.2.md"), "Docs index must link v0.5.2 extract candidate");
   assert(docsIndex.includes("releases/v0.5.3.md"), "Docs index must link v0.5.3 review closure");
@@ -522,7 +542,12 @@ function checkContentContracts() {
   assert(receiverFlowDoc.includes("state-init --repo <target-repo> --source <receiver-ready.md>"), "Receiver Flow docs must point to project-state init after review");
   assert(projectStateDoc.includes("state-init --repo <target-repo> --source <receiver-ready.md>"), "Project State docs must document state-init");
   assert(projectStateDoc.includes("state-read --repo <target-repo>"), "Project State docs must document state-read");
+  assert(projectStateDoc.includes("state-status --repo <target-repo>"), "Project State docs must document state-status");
+  assert(projectStateDoc.includes("state-validate --repo <target-repo>"), "Project State docs must document state-validate");
+  assert(projectStateDoc.includes("state-history --repo <target-repo>"), "Project State docs must document state-history");
+  assert(projectStateDoc.includes("state-advance --repo <target-repo> --source <receiver-ready.md>"), "Project State docs must document state-advance");
   assert(projectStateDoc.includes(".basebrief/state.json"), "Project State docs must document output file");
+  assert(projectStateDoc.includes(".basebrief/history/"), "Project State docs must document history output");
   assert(projectStateDoc.includes("basebrief-project-state-v1"), "Project State docs must document schema version");
   assert(projectStateDoc.includes("No provider request"), "Project State docs must state no provider request");
   assert(projectStateDoc.includes("No Auto Flow"), "Project State docs must state no Auto Flow");
@@ -548,6 +573,8 @@ function checkContentContracts() {
   assert(testingDoc.includes("v0.6.0 Project State Directory Release"), "Testing docs must document v0.6.0 project-state release");
   assert(testingDoc.includes("v0.6.1 Stability And Self-Dogfooding"), "Testing docs must document v0.6.1 stabilization");
   assert(testingDoc.includes("testing-v0.6.x-test-matrix.md"), "Testing docs must link v0.6.x test matrix");
+  assert(testingDoc.includes("v0.7.0 Project State Lifecycle Candidate"), "Testing docs must document v0.7.0 lifecycle candidate");
+  assert(testingDoc.includes("testing-v0.7.x-test-matrix.md"), "Testing docs must link v0.7.x test matrix");
   assert(testingDoc.includes("provider_probe_status=skipped"), "Testing docs must preserve skipped provider probe wording");
   assert(usabilityFeedbackTemplate.includes("Do not include secrets"), "Usability feedback template must include a safety warning");
   assert(usabilityFeedbackTemplate.includes("Expected Result"), "Usability feedback template must collect expected results");
@@ -598,7 +625,13 @@ function checkContentContracts() {
   assert(cliLiteDoc.includes("ready_for_receiver"), "cli-lite.md must document review-draft ready status");
   assert(cliLiteDoc.includes("node scripts/basebrief.js state-init --repo <target-repo> --source <receiver-ready.md>"), "cli-lite.md must document state-init command");
   assert(cliLiteDoc.includes("node scripts/basebrief.js state-read --repo <target-repo>"), "cli-lite.md must document state-read command");
+  assert(cliLiteDoc.includes("node scripts/basebrief.js state-status --repo <target-repo>"), "cli-lite.md must document state-status command");
+  assert(cliLiteDoc.includes("node scripts/basebrief.js state-validate --repo <target-repo>"), "cli-lite.md must document state-validate command");
+  assert(cliLiteDoc.includes("node scripts/basebrief.js state-history --repo <target-repo>"), "cli-lite.md must document state-history command");
+  assert(cliLiteDoc.includes("node scripts/basebrief.js state-advance --repo <target-repo> --source <receiver-ready.md>"), "cli-lite.md must document state-advance command");
   assert(cliLiteDoc.includes("basebrief-project-state-v1"), "cli-lite.md must document project-state schema version");
+  assert(cliLiteDoc.includes(".basebrief/history/"), "cli-lite.md must document project-state history directory");
+  assert(cliLiteDoc.includes("releases/v0.7.0.md"), "cli-lite.md must link v0.7.0 lifecycle release candidate");
   assert(cliLiteDoc.includes("releases/v0.6.0.md"), "cli-lite.md must link v0.6.0 project-state release");
   assert(cliLiteDoc.includes("releases/v0.3.2.md"), "cli-lite.md must link v0.3.2 release candidate");
   assert(cliLiteDoc.includes("releases/v0.3.3.md"), "cli-lite.md must link v0.3.3 release candidate");
@@ -885,6 +918,16 @@ function checkContentContracts() {
   assert(projectStateLifecycleReadinessDoc.includes("No schema change"), "project-state lifecycle readiness doc must state no schema change");
   assert(projectStateLifecycleReadinessDoc.includes("provider_probe_status=skipped"), "project-state lifecycle readiness doc must preserve skipped provider wording");
   assert(projectStateLifecycleReadinessDoc.includes("BASEBRIEF_PROVIDER_API_KEY"), "project-state lifecycle readiness doc must document provider env shape only");
+  assert(projectStateLifecycleModelDoc.includes("Project State Lifecycle Model"), "project-state lifecycle model doc must have stable title");
+  assert(projectStateLifecycleModelDoc.includes("state-status"), "project-state lifecycle model doc must document state-status");
+  assert(projectStateLifecycleModelDoc.includes("state-validate"), "project-state lifecycle model doc must document state-validate");
+  assert(projectStateLifecycleModelDoc.includes("state-history"), "project-state lifecycle model doc must document state-history");
+  assert(projectStateLifecycleModelDoc.includes("state-advance"), "project-state lifecycle model doc must document state-advance");
+  assert(projectStateLifecycleModelDoc.includes(".basebrief/history/"), "project-state lifecycle model doc must document history directory");
+  assert(projectStateLifecycleModelDoc.includes("basebrief-project-state-v1"), "project-state lifecycle model doc must preserve state schema");
+  assert(projectStateLifecycleModelDoc.includes("No Auto Flow"), "project-state lifecycle model doc must state no Auto Flow");
+  assert(projectStateLifecycleModelDoc.includes("No provider request"), "project-state lifecycle model doc must state no provider request");
+  assert(projectStateLifecycleModelDoc.includes("No schema change"), "project-state lifecycle model doc must state no schema change");
   assert(v06xTestMatrixDoc.includes("BaseBrief v0.6.x Test Matrix"), "v0.6.x test matrix must have a stable title");
   assert(v06xTestMatrixDoc.includes("provider_probe_status=skipped"), "v0.6.x test matrix must preserve skipped provider wording");
   assert(v06xTestMatrixDoc.includes("BASEBRIEF_PROVIDER_BASE_URL"), "v0.6.x test matrix must document provider env shape only");
@@ -896,6 +939,13 @@ function checkContentContracts() {
   assert(v06xTestMatrixDoc.includes("v0.6.3 Lifecycle Readiness Gate"), "v0.6.x test matrix must document v0.6.3 readiness");
   assert(v06xTestMatrixDoc.includes("not automated yet"), "v0.6.x test matrix must classify deferred automation");
   assert(v06xTestMatrixDoc.includes("does not add state lifecycle commands"), "v0.6.x test matrix must keep lifecycle commands deferred");
+  assert(v07xTestMatrixDoc.includes("BaseBrief v0.7.x Test Matrix"), "v0.7.x test matrix must have a stable title");
+  assert(v07xTestMatrixDoc.includes("state-status-missing"), "v0.7.x test matrix must include missing status evidence");
+  assert(v07xTestMatrixDoc.includes("state-validate-invalid"), "v0.7.x test matrix must include invalid validate evidence");
+  assert(v07xTestMatrixDoc.includes("state-advance-archives-history"), "v0.7.x test matrix must include history archive evidence");
+  assert(v07xTestMatrixDoc.includes("state-advance-draft-rejected"), "v0.7.x test matrix must include draft advance rejection evidence");
+  assert(v07xTestMatrixDoc.includes("provider_probe_status=skipped"), "v0.7.x test matrix must preserve skipped provider wording");
+  assert(v07xTestMatrixDoc.includes("BASEBRIEF_PROVIDER_BASE_URL"), "v0.7.x test matrix must document provider env shape only");
   assert(projectStateSelfDogfoodingDoc.includes("receiver-flow --guided"), "project-state self-dogfooding must document guided step");
   assert(projectStateSelfDogfoodingDoc.includes("state-read --json"), "project-state self-dogfooding must document state-read step");
   assert(projectStateSelfDogfoodingDoc.includes("No provider request"), "project-state self-dogfooding must state no provider request");
@@ -946,6 +996,16 @@ function checkContentContracts() {
   assert(projectStateLifecycleReadinessDogfoodingDoc.includes("No provider request"), "v0.6.3 dogfooding doc must state no provider request");
   assert(projectStateLifecycleReadinessDogfoodingDoc.includes("No schema change"), "v0.6.3 dogfooding doc must state no schema change");
   assert(projectStateLifecycleReadinessDogfoodingDoc.includes("provider_probe_status=skipped"), "v0.6.3 dogfooding doc must preserve skipped provider gate");
+  assert(projectStateLifecycleDogfoodingV070Doc.includes("Project State Lifecycle v0.7.0"), "v0.7.0 dogfooding doc must have stable title");
+  assert(projectStateLifecycleDogfoodingV070Doc.includes("state-status"), "v0.7.0 dogfooding doc must document state-status");
+  assert(projectStateLifecycleDogfoodingV070Doc.includes("state-validate"), "v0.7.0 dogfooding doc must document state-validate");
+  assert(projectStateLifecycleDogfoodingV070Doc.includes("state-history"), "v0.7.0 dogfooding doc must document state-history");
+  assert(projectStateLifecycleDogfoodingV070Doc.includes("state-advance"), "v0.7.0 dogfooding doc must document state-advance");
+  assert(projectStateLifecycleDogfoodingV070Doc.includes("state-advance-archives-history"), "v0.7.0 dogfooding doc must include history archive evidence");
+  assert(projectStateLifecycleDogfoodingV070Doc.includes("No Auto Flow"), "v0.7.0 dogfooding doc must state no Auto Flow");
+  assert(projectStateLifecycleDogfoodingV070Doc.includes("No provider request"), "v0.7.0 dogfooding doc must state no provider request");
+  assert(projectStateLifecycleDogfoodingV070Doc.includes("No schema change"), "v0.7.0 dogfooding doc must state no schema change");
+  assert(projectStateLifecycleDogfoodingV070Doc.includes("provider_probe_status=skipped"), "v0.7.0 dogfooding doc must preserve skipped provider gate");
   assert(projectStateV063ReleaseDoc.includes("Lifecycle Readiness Gate Candidate"), "v0.6.3 release doc must describe readiness candidate");
   assert(projectStateV063ReleaseDoc.includes("not a lifecycle release"), "v0.6.3 release doc must reject lifecycle release status");
   assert(projectStateV063ReleaseDoc.includes("No state lifecycle commands"), "v0.6.3 release doc must state no lifecycle commands");
@@ -954,6 +1014,17 @@ function checkContentContracts() {
   assert(projectStateV063ReleaseDoc.includes("No schema change"), "v0.6.3 release doc must state no schema change");
   assert(projectStateV063ReleaseDoc.includes("provider_probe_status=skipped"), "v0.6.3 release doc must preserve skipped provider probe gate");
   assert(projectStateV063ReleaseDoc.includes("BASEBRIEF_PROVIDER_API_KEY"), "v0.6.3 release doc must document provider env shape only");
+  assert(projectStateV070ReleaseDoc.includes("Project State Lifecycle Candidate"), "v0.7.0 release doc must describe lifecycle candidate");
+  assert(projectStateV070ReleaseDoc.includes("state-status"), "v0.7.0 release doc must document state-status");
+  assert(projectStateV070ReleaseDoc.includes("state-validate"), "v0.7.0 release doc must document state-validate");
+  assert(projectStateV070ReleaseDoc.includes("state-history"), "v0.7.0 release doc must document state-history");
+  assert(projectStateV070ReleaseDoc.includes("state-advance"), "v0.7.0 release doc must document state-advance");
+  assert(projectStateV070ReleaseDoc.includes(".basebrief/history/"), "v0.7.0 release doc must document history output");
+  assert(projectStateV070ReleaseDoc.includes("No Auto Flow"), "v0.7.0 release doc must state no Auto Flow");
+  assert(projectStateV070ReleaseDoc.includes("No provider request"), "v0.7.0 release doc must state no provider request");
+  assert(projectStateV070ReleaseDoc.includes("No schema change"), "v0.7.0 release doc must state no schema change");
+  assert(projectStateV070ReleaseDoc.includes("provider_probe_status=skipped"), "v0.7.0 release doc must preserve skipped provider probe gate");
+  assert(projectStateV070ReleaseDoc.includes("BASEBRIEF_PROVIDER_API_KEY"), "v0.7.0 release doc must document provider env shape only");
   assert(projectStateSchema.properties.schemaVersion.const === "basebrief-project-state-v1", "Project State schema version mismatch");
   assert(projectStateExample.schemaVersion === "basebrief-project-state-v1", "Project State example schema version mismatch");
   assert(projectStateExample.source.handoff_status === "ready_for_receiver", "Project State example must use ready source status");
@@ -1169,13 +1240,16 @@ function checkArtifactChecker() {
     "docs/dogfooding/project-state-self-dogfooding-v0.6.x.md",
     "docs/dogfooding/project-state-self-dogfooding-v0.6.2.md",
     "docs/dogfooding/project-state-lifecycle-readiness-v0.6.3.md",
+    "docs/dogfooding/project-state-lifecycle-v0.7.0.md",
     "docs/baselines/v0.4.0-post-release-baseline.md",
     "docs/baselines/v0.6.0-post-release-baseline.md",
     "docs/design/project-state-model.md",
     "docs/design/project-state-validation-rules.md",
     "docs/design/project-state-lifecycle-readiness.md",
+    "docs/design/project-state-lifecycle-model.md",
     "docs/testing-v0.4.x-test-matrix.md",
     "docs/testing-v0.6.x-test-matrix.md",
+    "docs/testing-v0.7.x-test-matrix.md",
     "docs/receiver-check.md",
     "docs/receiver-flow.md",
     "docs/project-state.md",
@@ -1192,6 +1266,7 @@ function checkArtifactChecker() {
     "docs/releases/v0.6.0.md",
     "docs/releases/v0.6.2.md",
     "docs/releases/v0.6.3.md",
+    "docs/releases/v0.7.0.md",
     "examples/receiver-check-config.json",
     "examples/receiver/difference-found",
     "examples/receiver/blocked",
@@ -1259,6 +1334,10 @@ function checkCliLite() {
     assert(helpStdout.includes("review-draft --draft <draft-context.md> --output <receiver-ready.md>"), "CLI help must expose Review Draft Gate");
     assert(helpStdout.includes("state-init --repo <target-repo> --source <receiver-ready.md>"), "CLI help must expose Project State init");
     assert(helpStdout.includes("state-read --repo <target-repo>"), "CLI help must expose Project State read");
+    assert(helpStdout.includes("state-status --repo <target-repo>"), "CLI help must expose Project State status");
+    assert(helpStdout.includes("state-validate --repo <target-repo>"), "CLI help must expose Project State validate");
+    assert(helpStdout.includes("state-history --repo <target-repo>"), "CLI help must expose Project State history");
+    assert(helpStdout.includes("state-advance --repo <target-repo> --source <receiver-ready.md>"), "CLI help must expose Project State advance");
 
     const noCommandStdout = execFileSync(process.execPath, [
       "scripts/basebrief.js",
@@ -1547,6 +1626,94 @@ function checkCliLite() {
     assert(stateReadResult.input.replace(/\\/g, "/").endsWith(".basebrief/state.json"), "CLI state-read must report state input");
     assert(stateReadResult.state.source.handoff_status === "ready_for_receiver", "CLI state-read must return ready source status");
 
+    const stateStatusStdout = execFileSync(process.execPath, [
+      "scripts/basebrief.js",
+      "state-status",
+      "--repo",
+      receiverRepo,
+      "--json",
+    ], {
+      cwd: repoRoot,
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "pipe"],
+      env: process.env,
+    });
+    const stateStatusResult = JSON.parse(stateStatusStdout);
+    assert(stateStatusResult.command === "state-status", "CLI state-status must return command metadata");
+    assert(stateStatusResult.exists === true, "CLI state-status must report existing state");
+    assert(stateStatusResult.validation_status === "passed", "CLI state-status must report valid state");
+    assert(stateStatusResult.input.replace(/\\/g, "/").endsWith(".basebrief/state.json"), "CLI state-status must report state input");
+
+    const stateValidateStdout = execFileSync(process.execPath, [
+      "scripts/basebrief.js",
+      "state-validate",
+      "--repo",
+      receiverRepo,
+      "--json",
+    ], {
+      cwd: repoRoot,
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "pipe"],
+      env: process.env,
+    });
+    const stateValidateResult = JSON.parse(stateValidateStdout);
+    assert(stateValidateResult.command === "state-validate", "CLI state-validate must return command metadata");
+    assert(stateValidateResult.validation_status === "passed", "CLI state-validate must pass after state-init");
+    assert(Array.isArray(stateValidateResult.errors) && stateValidateResult.errors.length === 0, "CLI state-validate must return zero errors for valid state");
+
+    const stateHistoryBeforeStdout = execFileSync(process.execPath, [
+      "scripts/basebrief.js",
+      "state-history",
+      "--repo",
+      receiverRepo,
+      "--json",
+    ], {
+      cwd: repoRoot,
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "pipe"],
+      env: process.env,
+    });
+    const stateHistoryBeforeResult = JSON.parse(stateHistoryBeforeStdout);
+    assert(stateHistoryBeforeResult.command === "state-history", "CLI state-history must return command metadata");
+    assert(stateHistoryBeforeResult.history_status === "not_initialized", "CLI state-history must be empty before state-advance");
+
+    const stateAdvanceStdout = execFileSync(process.execPath, [
+      "scripts/basebrief.js",
+      "state-advance",
+      "--repo",
+      receiverRepo,
+      "--source",
+      receiverReadyPath,
+      "--json",
+    ], {
+      cwd: repoRoot,
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "pipe"],
+      env: process.env,
+    });
+    const stateAdvanceResult = JSON.parse(stateAdvanceStdout);
+    assert(stateAdvanceResult.command === "state-advance", "CLI state-advance must return command metadata");
+    assert(stateAdvanceResult.schemaVersion === "basebrief-project-state-v1", "CLI state-advance must preserve project-state schema");
+    assert(stateAdvanceResult.history_output.replace(/\\/g, "/").includes(".basebrief/history/"), "CLI state-advance must write history output");
+    assert(fs.existsSync(path.join(receiverRepo, ".basebrief", "history")), "CLI state-advance must create local history directory");
+
+    const stateHistoryAfterStdout = execFileSync(process.execPath, [
+      "scripts/basebrief.js",
+      "state-history",
+      "--repo",
+      receiverRepo,
+      "--json",
+    ], {
+      cwd: repoRoot,
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "pipe"],
+      env: process.env,
+    });
+    const stateHistoryAfterResult = JSON.parse(stateHistoryAfterStdout);
+    assert(stateHistoryAfterResult.history_status === "available", "CLI state-history must report available history after state-advance");
+    assert(stateHistoryAfterResult.entries.length === 1, "CLI state-history must report one archived entry");
+    assert(stateHistoryAfterResult.entries[0].validation_status === "passed", "CLI state-history archived entry must validate");
+
     const warningPath = path.join(tempRoot, "codex-task.md");
     fs.writeFileSync(warningPath, [
       "# BaseBrief Codex Task",
@@ -1570,7 +1737,7 @@ function checkCliLite() {
   } finally {
     fs.rmSync(tempRoot, { recursive: true, force: true });
   }
-  return 13;
+  return 17;
 }
 
 function checkFirstRunWorkflow() {

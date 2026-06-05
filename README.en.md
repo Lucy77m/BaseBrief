@@ -91,7 +91,7 @@ It only processes explicit input files and does not scan or modify other project
 - handoff builder and file-based Codex / Claude adapters
 - artifact checker
 - optional read-only Receiver Safe Check v1
-- zero-dependency CLI Lite: `init`, `build`, `check`, `receiver-init`, `receiver-check`, `receiver-flow`, `review-draft`, `state-init`, `state-read`, `seal`, `diff`
+- zero-dependency CLI Lite: `init`, `build`, `check`, `receiver-init`, `receiver-check`, `receiver-flow`, `review-draft`, `state-init`, `state-read`, `state-status`, `state-validate`, `state-history`, `state-advance`, `seal`, `diff`
 - local file-based Seal/Diff v1
 
 BaseBrief is not a chat client, agent runtime, hosted platform, secret manager, project-management system, or provider gateway.
@@ -108,6 +108,7 @@ BaseBrief is not a chat client, agent runtime, hosted platform, secret manager, 
 - [Project State model](docs/design/project-state-model.md)
 - [Project State validation rules](docs/design/project-state-validation-rules.md)
 - [Project State lifecycle readiness](docs/design/project-state-lifecycle-readiness.md)
+- [Project State lifecycle model](docs/design/project-state-lifecycle-model.md)
 - [Receiver friction log](docs/dogfooding/receiver-friction-log.md)
 - [Receiver Flow dogfooding evidence](docs/dogfooding/receiver-flow-dogfooding.md)
 - [Receiver Flow guided dogfooding](docs/dogfooding/receiver-flow-guided-dogfooding.md)
@@ -118,8 +119,11 @@ BaseBrief is not a chat client, agent runtime, hosted platform, secret manager, 
 - [Project State self-dogfooding v0.6.x](docs/dogfooding/project-state-self-dogfooding-v0.6.x.md)
 - [Project State self-dogfooding v0.6.2](docs/dogfooding/project-state-self-dogfooding-v0.6.2.md)
 - [Project State lifecycle readiness v0.6.3](docs/dogfooding/project-state-lifecycle-readiness-v0.6.3.md)
+- [Project State lifecycle v0.7.0](docs/dogfooding/project-state-lifecycle-v0.7.0.md)
 - [v0.6.0 post-release baseline](docs/baselines/v0.6.0-post-release-baseline.md)
 - [v0.6.x test matrix](docs/testing-v0.6.x-test-matrix.md)
+- [v0.7.x test matrix](docs/testing-v0.7.x-test-matrix.md)
+- [v0.7.0 Project State Lifecycle Candidate](docs/releases/v0.7.0.md)
 - [v0.6.3 Lifecycle Readiness Gate Candidate](docs/releases/v0.6.3.md)
 - [v0.6.2 Self-Dogfooding Evidence Candidate](docs/releases/v0.6.2.md)
 - [v0.6.0 Project State Directory Release](docs/releases/v0.6.0.md)

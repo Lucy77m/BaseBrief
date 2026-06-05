@@ -116,6 +116,22 @@ Expected release-check output without provider env remains:
 provider_probe_status=skipped
 ```
 
+## v0.7.0 Project State Lifecycle Candidate
+
+`v0.7.0` adds `state-status`, `state-validate`, `state-history`, and
+`state-advance` for the existing local `.basebrief/state.json` lifecycle.
+It keeps `basebrief-project-state-v1` unchanged and keeps `review-draft` as the
+required gate before state creation or advancement.
+
+The v0.7.x matrix is tracked in
+[testing-v0.7.x-test-matrix.md](testing-v0.7.x-test-matrix.md). Provider smoke
+remains private design-only evidence for this candidate; public release checks
+must still allow:
+
+```text
+provider_probe_status=skipped
+```
+
 ## Receiver 测试额度
 
 Receiver-ready 验证默认采用低额度策略：

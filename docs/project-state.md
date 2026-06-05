@@ -1,10 +1,17 @@
 # BaseBrief Project State
 
-`v0.6.0` adds a local project state directory for reviewed receiver handoffs:
+Project State is the local continuity layer for reviewed receiver handoffs.
+`v0.6.0` introduced `.basebrief/state.json`; `v0.7.0` adds lifecycle
+inspection and reviewed-state advancement without changing the
+`basebrief-project-state-v1` schema.
 
 ```bash
 node scripts/basebrief.js state-init --repo <target-repo> --source <receiver-ready.md> --json
 node scripts/basebrief.js state-read --repo <target-repo> --json
+node scripts/basebrief.js state-status --repo <target-repo> --json
+node scripts/basebrief.js state-validate --repo <target-repo> --json
+node scripts/basebrief.js state-history --repo <target-repo> --json
+node scripts/basebrief.js state-advance --repo <target-repo> --source <receiver-ready.md> --json
 ```
 
 `state-init` writes `<target-repo>/.basebrief/state.json` from an explicit
@@ -14,7 +21,7 @@ node scripts/basebrief.js state-read --repo <target-repo> --json
 handoff_status: ready_for_receiver
 ```
 
-The command records only local, mechanical state:
+The state file records only local, mechanical state:
 
 - `schemaVersion: basebrief-project-state-v1`
 - repository branch, HEAD, and changed files
@@ -25,8 +32,28 @@ The command records only local, mechanical state:
 - non-goal markers for provider requests, Auto Flow, receiver thread creation,
   and secret storage
 
-`state-read` reads the existing `.basebrief/state.json` and validates the schema
-version. It does not modify the target repo.
+## Lifecycle Commands
+
+`state-read` reads the existing `.basebrief/state.json` and validates the full
+project-state object. It does not modify the target repo.
+
+`state-status` is a read-only inspection command. It reports whether local
+state exists, whether it validates, the stored source metadata, and the stored
+repository snapshot. Missing state is reported as `validation_status: missing`
+instead of creating a file.
+
+`state-validate` is a stricter read-only gate. It returns
+`validation_status: passed` only when `.basebrief/state.json` exists and
+conforms to the current local validator. The CLI exits nonzero when validation
+fails.
+
+`state-history` lists archived state snapshots under `.basebrief/history/`.
+Before the first advancement it reports `history_status: not_initialized`.
+
+`state-advance` requires an existing valid `.basebrief/state.json` and a new
+reviewed `receiver-ready.md` source. It archives the previous state under
+`.basebrief/history/` and overwrites `.basebrief/state.json` with the new
+reviewed state. The schema remains `basebrief-project-state-v1`.
 
 ## Boundaries
 
@@ -35,9 +62,12 @@ version. It does not modify the target repo.
 - No receiver thread creation.
 - No secret storage.
 - No automatic promotion from draft to ready.
+- No schema change.
 - BB9 handoff schema is unchanged.
 - Receiver Safe Check config and result schemas are unchanged.
 
 `state-init` refuses to overwrite an existing state file and rejects `.env` or
-`.git` source/output paths. The state file is intended for local continuity only;
-review the receiver-ready source before creating it.
+`.git` source/output paths. `state-advance` uses the same reviewed-source guard
+and also rejects advancement when the existing state is missing or invalid. The
+state directory is intended for local continuity only; review the receiver-ready
+source before creating or advancing it.

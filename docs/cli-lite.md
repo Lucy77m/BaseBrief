@@ -20,6 +20,10 @@ node scripts/basebrief.js receiver-flow --repo . --output-dir tests/outputs/priv
 node scripts/basebrief.js review-draft --draft tests/outputs/private/receiver-flow/draft-context.md --output tests/outputs/private/receiver-ready.md --json
 node scripts/basebrief.js state-init --repo . --source tests/outputs/private/receiver-ready.md --json
 node scripts/basebrief.js state-read --repo . --json
+node scripts/basebrief.js state-status --repo . --json
+node scripts/basebrief.js state-validate --repo . --json
+node scripts/basebrief.js state-history --repo . --json
+node scripts/basebrief.js state-advance --repo . --source tests/outputs/private/receiver-ready.md --json
 node scripts/basebrief.js seal --input examples/seal-before-input.json --output tests/outputs/private/seal-before.json
 node scripts/basebrief.js diff --before examples/seal-before-input.json --after examples/seal-after-input.json --json
 ```
@@ -150,11 +154,15 @@ threads, and does not write `.env` or `.git` paths.
 The v0.5.1 release-candidate boundary is documented in
 [v0.5.1 Review Draft Gate Candidate](releases/v0.5.1.md).
 
-### state-init / state-read
+### state-init / state-read / state-status / state-validate / state-history / state-advance
 
 ```text
 node scripts/basebrief.js state-init --repo <target-repo> --source <receiver-ready.md> [--json]
 node scripts/basebrief.js state-read --repo <target-repo> [--json]
+node scripts/basebrief.js state-status --repo <target-repo> [--json]
+node scripts/basebrief.js state-validate --repo <target-repo> [--json]
+node scripts/basebrief.js state-history --repo <target-repo> [--json]
+node scripts/basebrief.js state-advance --repo <target-repo> --source <receiver-ready.md> [--json]
 ```
 
 `state-init` writes `<target-repo>/.basebrief/state.json` from an explicit
@@ -162,11 +170,30 @@ reviewed source with `handoff_status: ready_for_receiver`. It refuses overwrite
 and rejects `.env` or `.git` paths.
 
 `state-read` reads the existing local project state and validates
-`schemaVersion: basebrief-project-state-v1`. These commands do not call
-providers, do not create receiver threads, and do not run Auto Flow.
+`schemaVersion: basebrief-project-state-v1`.
+
+`state-status` reports whether `.basebrief/state.json` exists and validates.
+Missing state is reported as `validation_status: missing` without writing a
+file.
+
+`state-validate` is the stricter read-only gate. It exits nonzero when state is
+missing or invalid.
+
+`state-history` lists archived state snapshots under `.basebrief/history/`.
+
+`state-advance` requires an existing valid state and a reviewed
+`receiver-ready.md` source. It archives the previous state under
+`.basebrief/history/` and writes the next state to `.basebrief/state.json`.
+
+These commands do not call providers, do not create receiver threads, do not
+run Auto Flow, and do not change `basebrief-project-state-v1`.
+
+Boundary shorthand: No provider request, No Auto Flow, No schema change.
 
 The v0.6.0 project-state boundary is documented in
 [v0.6.0 Project State Directory Candidate](releases/v0.6.0.md).
+The v0.7.0 lifecycle boundary is documented in
+[v0.7.0 Project State Lifecycle Candidate](releases/v0.7.0.md).
 
 ### seal
 
