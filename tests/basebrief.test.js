@@ -773,6 +773,61 @@ test("v0.6.0 project state documents local state boundaries", () => {
   }
 });
 
+test("v0.6.2 self-dogfooding documents exception evidence without new lifecycle scope", () => {
+  const readme = readText("README.md");
+  const englishReadme = readText("README.en.md");
+  const docsIndex = readText("docs/index.md");
+  const frictionLog = readText("docs/dogfooding/receiver-friction-log.md");
+  const selfDogfooding = readText("docs/dogfooding/project-state-self-dogfooding-v0.6.2.md");
+  const v06xMatrix = readText("docs/testing-v0.6.x-test-matrix.md");
+  const release = readText("docs/releases/v0.6.2.md");
+
+  assert.match(readme, /docs\/dogfooding\/project-state-self-dogfooding-v0\.6\.2\.md/);
+  assert.match(readme, /docs\/releases\/v0\.6\.2\.md/);
+  assert.match(englishReadme, /docs\/dogfooding\/project-state-self-dogfooding-v0\.6\.2\.md/);
+  assert.match(englishReadme, /docs\/releases\/v0\.6\.2\.md/);
+  assert.match(docsIndex, /dogfooding\/project-state-self-dogfooding-v0\.6\.2\.md/);
+  assert.match(docsIndex, /releases\/v0\.6\.2\.md/);
+
+  for (const doc of [selfDogfooding, v06xMatrix, release]) {
+    assert.match(doc, /draft_needs_review/);
+    assert.match(doc, /ready_for_receiver/);
+    assert.match(doc, /basebrief-project-state-v1/);
+    assert.match(doc, /state-init-draft-rejected/);
+    assert.match(doc, /state-init-env-source-rejected/);
+    assert.match(doc, /state-init-git-source-rejected/);
+    assert.match(doc, /state-init-missing-field-rejected/);
+    assert.match(doc, /state-init-duplicate-rejected/);
+  }
+
+  assert.match(selfDogfooding, /receiver-flow --guided/);
+  assert.match(selfDogfooding, /review-draft-unchecked/);
+  assert.match(selfDogfooding, /state-read-missing-state/);
+  assert.match(selfDogfooding, /No provider request/);
+  assert.match(selfDogfooding, /not memory/);
+  assert.match(frictionLog, /v0\.6\.2 Project-State Self-Dogfooding/);
+  assert.match(frictionLog, /overreach_or_unwanted_automation/);
+  assert.match(frictionLog, /state-init-duplicate-rejected/);
+  assert.match(release, /Self-Dogfooding Evidence Candidate/);
+  assert.match(release, /No provider request/);
+  assert.match(release, /No Auto Flow/);
+  assert.match(release, /No state lifecycle commands/);
+  assert.match(release, /No schema change/);
+  assert.match(release, /provider_probe_status=skipped/);
+  assert.match(release, /BASEBRIEF_PROVIDER_BASE_URL/);
+  assert.match(release, /BASEBRIEF_PROVIDER_API_KEY/);
+  assert.match(release, /BASEBRIEF_PROVIDER_MODEL/);
+
+  for (const relativePath of [
+    "docs/dogfooding/project-state-self-dogfooding-v0.6.2.md",
+    "docs/releases/v0.6.2.md",
+  ]) {
+    const result = checkArtifacts({ inputPath: path.join(repoRoot, relativePath) });
+    assert.equal(result.status, "passed", relativePath);
+    assert.equal(result.errorCount, 0, relativePath);
+  }
+});
+
 test("public quickstart and minimal examples provide a clean first-use path", () => {
   const quickstart = readText("docs/quickstart-5min.md");
   const minimalBrief = readText("examples/minimal/output-basebrief-lite.md");

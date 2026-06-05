@@ -37,6 +37,28 @@ provider_probe_status=skipped
 - keep private output under `tests/outputs/private/`
 - keep public docs free of private absolute paths and credential-like values
 
+## v0.6.2 Self-Dogfooding Evidence
+
+Normal path evidence:
+
+- `receiver-flow --guided` creates `handoff_status: draft_needs_review`.
+- `review-draft` creates `handoff_status: ready_for_receiver`.
+- `state-init` writes `basebrief-project-state-v1`.
+- `state-read --json` reads the state back.
+
+Exception evidence:
+
+- `review-draft-unchecked`
+- `state-init-draft-rejected`
+- `state-read-missing-state`
+- `state-init-env-source-rejected`
+- `state-init-git-source-rejected`
+- `state-init-missing-field-rejected`
+- `state-init-duplicate-rejected`
+
+These cases are evidence for `v0.6.x` stabilization only. They do not add Auto
+Flow, lifecycle commands, schema changes, sidecar adapters, or provider calls.
+
 ## Path And Runner Coverage
 
 - PowerShell local path smoke

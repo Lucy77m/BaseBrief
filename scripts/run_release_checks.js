@@ -82,6 +82,7 @@ function checkRequiredFiles() {
     "docs/dogfooding/receiver-flow-v0.5.x-closure.md",
     "docs/dogfooding/project-state-dogfooding.md",
     "docs/dogfooding/project-state-self-dogfooding-v0.6.x.md",
+    "docs/dogfooding/project-state-self-dogfooding-v0.6.2.md",
     "docs/integrations.md",
     "docs/adapters.md",
     "docs/walkthrough.md",
@@ -106,6 +107,7 @@ function checkRequiredFiles() {
     "docs/releases/v0.5.2.md",
     "docs/releases/v0.5.3.md",
     "docs/releases/v0.6.0.md",
+    "docs/releases/v0.6.2.md",
     "docs/testing-v0.4.x-test-matrix.md",
     "docs/testing-v0.6.x-test-matrix.md",
     "docs/cli-lite.md",
@@ -231,6 +233,7 @@ function checkContentContracts() {
   const receiverFlowClosureDogfoodingDoc = readText("docs/dogfooding/receiver-flow-v0.5.x-closure.md");
   const projectStateDogfoodingDoc = readText("docs/dogfooding/project-state-dogfooding.md");
   const projectStateSelfDogfoodingDoc = readText("docs/dogfooding/project-state-self-dogfooding-v0.6.x.md");
+  const projectStateSelfDogfoodingV062Doc = readText("docs/dogfooding/project-state-self-dogfooding-v0.6.2.md");
   const testingDoc = readText("docs/testing.md");
   const usabilityFeedbackTemplate = readText(".github/ISSUE_TEMPLATE/usability_feedback.md");
   const adaptersDoc = readText("docs/adapters.md");
@@ -252,6 +255,7 @@ function checkContentContracts() {
   const extractReceiverFlowReleaseDoc = readText("docs/releases/v0.5.2.md");
   const receiverFlowClosureReleaseDoc = readText("docs/releases/v0.5.3.md");
   const projectStateReleaseDoc = readText("docs/releases/v0.6.0.md");
+  const projectStateV062ReleaseDoc = readText("docs/releases/v0.6.2.md");
   const postReleaseBaselineDoc = readText("docs/baselines/v0.4.0-post-release-baseline.md");
   const v060PostReleaseBaselineDoc = readText("docs/baselines/v0.6.0-post-release-baseline.md");
   const projectStateModelDoc = readText("docs/design/project-state-model.md");
@@ -315,10 +319,12 @@ function checkContentContracts() {
   assert(readme.includes("docs/dogfooding/receiver-flow-v0.5.x-closure.md"), "README.md should link to v0.5.x closure dogfooding evidence");
   assert(readme.includes("docs/dogfooding/project-state-dogfooding.md"), "README.md should link to project-state dogfooding evidence");
   assert(readme.includes("docs/dogfooding/project-state-self-dogfooding-v0.6.x.md"), "README.md should link to project-state self-dogfooding evidence");
+  assert(readme.includes("docs/dogfooding/project-state-self-dogfooding-v0.6.2.md"), "README.md should link to v0.6.2 project-state self-dogfooding evidence");
   assert(readme.includes("docs/design/project-state-model.md"), "README.md should link to project-state model docs");
   assert(readme.includes("docs/design/project-state-validation-rules.md"), "README.md should link to project-state validation docs");
   assert(readme.includes("docs/baselines/v0.6.0-post-release-baseline.md"), "README.md should link to v0.6.0 post-release baseline");
   assert(readme.includes("docs/testing-v0.6.x-test-matrix.md"), "README.md should link to v0.6.x test matrix");
+  assert(readme.includes("docs/releases/v0.6.2.md"), "README.md should link to v0.6.2 self-dogfooding evidence candidate");
   assert(readme.includes("docs/releases/v0.6.0.md"), "README.md should link to v0.6.0 project-state release");
   assert(readme.includes("docs/releases/v0.5.3.md"), "README.md should link to v0.5.3 review closure");
   assert(readme.includes("docs/releases/v0.5.2.md"), "README.md should link to v0.5.2 extract candidate");
@@ -357,10 +363,12 @@ function checkContentContracts() {
   assert(englishReadme.includes("docs/dogfooding/receiver-flow-v0.5.x-closure.md"), "README.en.md should link to v0.5.x closure dogfooding evidence");
   assert(englishReadme.includes("docs/dogfooding/project-state-dogfooding.md"), "README.en.md should link to project-state dogfooding evidence");
   assert(englishReadme.includes("docs/dogfooding/project-state-self-dogfooding-v0.6.x.md"), "README.en.md should link to project-state self-dogfooding evidence");
+  assert(englishReadme.includes("docs/dogfooding/project-state-self-dogfooding-v0.6.2.md"), "README.en.md should link to v0.6.2 project-state self-dogfooding evidence");
   assert(englishReadme.includes("docs/design/project-state-model.md"), "README.en.md should link to project-state model docs");
   assert(englishReadme.includes("docs/design/project-state-validation-rules.md"), "README.en.md should link to project-state validation docs");
   assert(englishReadme.includes("docs/baselines/v0.6.0-post-release-baseline.md"), "README.en.md should link to v0.6.0 post-release baseline");
   assert(englishReadme.includes("docs/testing-v0.6.x-test-matrix.md"), "README.en.md should link to v0.6.x test matrix");
+  assert(englishReadme.includes("docs/releases/v0.6.2.md"), "README.en.md should link to v0.6.2 self-dogfooding evidence candidate");
   assert(englishReadme.includes("docs/releases/v0.6.0.md"), "README.en.md should link to v0.6.0 project-state release");
   assert(englishReadme.includes("docs/releases/v0.5.3.md"), "README.en.md should link to v0.5.3 review closure");
   assert(englishReadme.includes("docs/releases/v0.5.2.md"), "README.en.md should link to v0.5.2 extract candidate");
@@ -408,6 +416,7 @@ function checkContentContracts() {
   assert(docsIndex.includes("dogfooding/receiver-flow-v0.5.x-closure.md"), "Docs index must link v0.5.x closure dogfooding evidence");
   assert(docsIndex.includes("dogfooding/project-state-dogfooding.md"), "Docs index must link project-state dogfooding evidence");
   assert(docsIndex.includes("dogfooding/project-state-self-dogfooding-v0.6.x.md"), "Docs index must link project-state self-dogfooding evidence");
+  assert(docsIndex.includes("dogfooding/project-state-self-dogfooding-v0.6.2.md"), "Docs index must link v0.6.2 project-state self-dogfooding evidence");
   assert(docsIndex.includes("receiver-flow.md"), "Docs index must link Receiver Flow Draft docs");
   assert(docsIndex.includes("project-state.md"), "Docs index must link Project State docs");
   assert(docsIndex.includes("design/project-state-model.md"), "Docs index must link project-state model docs");
@@ -423,6 +432,7 @@ function checkContentContracts() {
   assert(docsIndex.includes("../examples/receiver-flow-review/rejected-empty/README.md"), "Docs index should link rejected empty draft example");
   assert(docsIndex.includes("../examples/project-state/README.md"), "Docs index should link project-state example");
   assert(docsIndex.includes("releases/v0.6.0.md"), "Docs index must link v0.6.0 project-state release");
+  assert(docsIndex.includes("releases/v0.6.2.md"), "Docs index must link v0.6.2 self-dogfooding evidence candidate");
   assert(docsIndex.includes("baselines/v0.6.0-post-release-baseline.md"), "Docs index must link v0.6.0 post-release baseline");
   assert(docsIndex.includes("testing-v0.6.x-test-matrix.md"), "Docs index must link v0.6.x test matrix");
   assert(docsIndex.includes("releases/v0.5.1.md"), "Docs index must link v0.5.1 review draft gate candidate");
@@ -854,9 +864,49 @@ function checkContentContracts() {
   assert(v06xTestMatrixDoc.includes("BaseBrief v0.6.x Test Matrix"), "v0.6.x test matrix must have a stable title");
   assert(v06xTestMatrixDoc.includes("provider_probe_status=skipped"), "v0.6.x test matrix must preserve skipped provider wording");
   assert(v06xTestMatrixDoc.includes("BASEBRIEF_PROVIDER_BASE_URL"), "v0.6.x test matrix must document provider env shape only");
+  assert(v06xTestMatrixDoc.includes("v0.6.2 Self-Dogfooding Evidence"), "v0.6.x test matrix must document v0.6.2 evidence");
+  assert(v06xTestMatrixDoc.includes("state-init-draft-rejected"), "v0.6.x test matrix must include draft rejection evidence");
+  assert(v06xTestMatrixDoc.includes("state-init-env-source-rejected"), "v0.6.x test matrix must include .env source rejection evidence");
+  assert(v06xTestMatrixDoc.includes("state-init-git-source-rejected"), "v0.6.x test matrix must include .git source rejection evidence");
+  assert(v06xTestMatrixDoc.includes("state-init-duplicate-rejected"), "v0.6.x test matrix must include duplicate state rejection evidence");
   assert(projectStateSelfDogfoodingDoc.includes("receiver-flow --guided"), "project-state self-dogfooding must document guided step");
   assert(projectStateSelfDogfoodingDoc.includes("state-read --json"), "project-state self-dogfooding must document state-read step");
   assert(projectStateSelfDogfoodingDoc.includes("No provider request"), "project-state self-dogfooding must state no provider request");
+  assert(projectStateSelfDogfoodingV062Doc.includes("Project State Self-Dogfooding v0.6.2"), "v0.6.2 self-dogfooding must have stable title");
+  assert(projectStateSelfDogfoodingV062Doc.includes("receiver-flow --guided"), "v0.6.2 self-dogfooding must document guided step");
+  assert(projectStateSelfDogfoodingV062Doc.includes("review-draft"), "v0.6.2 self-dogfooding must document review-draft");
+  assert(projectStateSelfDogfoodingV062Doc.includes("state-init"), "v0.6.2 self-dogfooding must document state-init");
+  assert(projectStateSelfDogfoodingV062Doc.includes("state-read --json"), "v0.6.2 self-dogfooding must document state-read");
+  assert(projectStateSelfDogfoodingV062Doc.includes("draft_needs_review"), "v0.6.2 self-dogfooding must document draft status");
+  assert(projectStateSelfDogfoodingV062Doc.includes("ready_for_receiver"), "v0.6.2 self-dogfooding must document receiver-ready status");
+  assert(projectStateSelfDogfoodingV062Doc.includes("basebrief-project-state-v1"), "v0.6.2 self-dogfooding must document state schema");
+  assert(projectStateSelfDogfoodingV062Doc.includes("review-draft-unchecked"), "v0.6.2 self-dogfooding must include unchecked review evidence");
+  assert(projectStateSelfDogfoodingV062Doc.includes("state-init-draft-rejected"), "v0.6.2 self-dogfooding must include draft rejection evidence");
+  assert(projectStateSelfDogfoodingV062Doc.includes("state-read-missing-state"), "v0.6.2 self-dogfooding must include missing state evidence");
+  assert(projectStateSelfDogfoodingV062Doc.includes("state-init-env-source-rejected"), "v0.6.2 self-dogfooding must include .env path rejection evidence");
+  assert(projectStateSelfDogfoodingV062Doc.includes("state-init-git-source-rejected"), "v0.6.2 self-dogfooding must include .git path rejection evidence");
+  assert(projectStateSelfDogfoodingV062Doc.includes("state-init-missing-field-rejected"), "v0.6.2 self-dogfooding must include missing field evidence");
+  assert(projectStateSelfDogfoodingV062Doc.includes("state-init-duplicate-rejected"), "v0.6.2 self-dogfooding must include duplicate state evidence");
+  assert(projectStateSelfDogfoodingV062Doc.includes("No provider request"), "v0.6.2 self-dogfooding must state no provider request");
+  assert(projectStateSelfDogfoodingV062Doc.includes("not memory"), "v0.6.2 self-dogfooding must protect state model non-goals");
+  assert(receiverFrictionDoc.includes("v0.6.2 Project-State Self-Dogfooding"), "receiver friction log must include v0.6.2 entry");
+  assert(receiverFrictionDoc.includes("overreach_or_unwanted_automation"), "receiver friction log must track unwanted automation");
+  assert(receiverFrictionDoc.includes("state-init-duplicate-rejected"), "receiver friction log must include duplicate state test case");
+  assert(projectStateV062ReleaseDoc.includes("Self-Dogfooding Evidence Candidate"), "v0.6.2 release doc must describe evidence candidate");
+  assert(projectStateV062ReleaseDoc.includes("basebrief-project-state-v1"), "v0.6.2 release doc must document state schema");
+  assert(projectStateV062ReleaseDoc.includes("draft_needs_review"), "v0.6.2 release doc must document draft status");
+  assert(projectStateV062ReleaseDoc.includes("ready_for_receiver"), "v0.6.2 release doc must document receiver-ready status");
+  assert(projectStateV062ReleaseDoc.includes("state-init"), "v0.6.2 release doc must document state-init");
+  assert(projectStateV062ReleaseDoc.includes("state-read --json"), "v0.6.2 release doc must document state-read");
+  assert(projectStateV062ReleaseDoc.includes("state-init-draft-rejected"), "v0.6.2 release doc must include draft rejection evidence");
+  assert(projectStateV062ReleaseDoc.includes("state-init-missing-field-rejected"), "v0.6.2 release doc must include missing field evidence");
+  assert(projectStateV062ReleaseDoc.includes("state-init-duplicate-rejected"), "v0.6.2 release doc must include duplicate state evidence");
+  assert(projectStateV062ReleaseDoc.includes("No provider request"), "v0.6.2 release doc must state no provider request");
+  assert(projectStateV062ReleaseDoc.includes("No Auto Flow"), "v0.6.2 release doc must state no Auto Flow");
+  assert(projectStateV062ReleaseDoc.includes("No state lifecycle commands"), "v0.6.2 release doc must state no state lifecycle commands");
+  assert(projectStateV062ReleaseDoc.includes("No schema change"), "v0.6.2 release doc must state no schema change");
+  assert(projectStateV062ReleaseDoc.includes("provider_probe_status=skipped"), "v0.6.2 release doc must preserve skipped provider probe gate");
+  assert(projectStateV062ReleaseDoc.includes("BASEBRIEF_PROVIDER_API_KEY"), "v0.6.2 release doc must document provider env shape only");
   assert(projectStateSchema.properties.schemaVersion.const === "basebrief-project-state-v1", "Project State schema version mismatch");
   assert(projectStateExample.schemaVersion === "basebrief-project-state-v1", "Project State example schema version mismatch");
   assert(projectStateExample.source.handoff_status === "ready_for_receiver", "Project State example must use ready source status");
@@ -1070,6 +1120,7 @@ function checkArtifactChecker() {
     "docs/dogfooding/receiver-flow-extract-dogfooding.md",
     "docs/dogfooding/project-state-dogfooding.md",
     "docs/dogfooding/project-state-self-dogfooding-v0.6.x.md",
+    "docs/dogfooding/project-state-self-dogfooding-v0.6.2.md",
     "docs/baselines/v0.4.0-post-release-baseline.md",
     "docs/baselines/v0.6.0-post-release-baseline.md",
     "docs/design/project-state-model.md",
@@ -1090,6 +1141,7 @@ function checkArtifactChecker() {
     "docs/releases/v0.5.2.md",
     "docs/releases/v0.5.3.md",
     "docs/releases/v0.6.0.md",
+    "docs/releases/v0.6.2.md",
     "examples/receiver-check-config.json",
     "examples/receiver/difference-found",
     "examples/receiver/blocked",

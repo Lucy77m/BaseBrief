@@ -40,6 +40,31 @@ Use short status words such as `yes`, `no`, `partial`, `not_applicable`, `pass`,
 - `overreach_or_unwanted_automation`: automation should be recorded as friction when it confirms, edits, or publishes beyond the reviewed handoff.
 - `automation_decision`: a `yes` recommendation is not the same as an added automated test; keep test IDs and resolution fields explicit.
 
+## v0.6.2 Project-State Self-Dogfooding
+
+```text
+actual_handoff_friction:
+- cwd_match: yes
+- receiver_check_result: not_applicable
+- changed_files_match: yes
+- source_vs_receiver_verification_clear: yes
+- language_match: yes
+- scope_drift: no
+- overreach_or_unwanted_automation: no
+- notes: self-dogfooding confirmed that draft output, reviewed output, state creation, and state readback are separate review points. The useful friction is the manual review gate before durable state; the unwanted automation risk would be promoting draft text directly into project state.
+
+automation_decision:
+- should_become_automated_test: yes
+- test_case_id_if_added: review-draft-unchecked, state-init-draft-rejected, state-read-missing-state, state-init-env-source-rejected, state-init-git-source-rejected, state-init-missing-field-rejected, state-init-duplicate-rejected
+- resolved_in_commit: same v0.6.2 commit
+- resolved_in_version: v0.6.2
+- still_open: yes
+```
+
+Lifecycle automation remains deferred. The `v0.6.2` evidence supports stronger
+docs and tests, not automatic `ready_for_receiver` promotion, Auto Flow, or
+state lifecycle commands.
+
 ## Stabilization Decisions
 
 - Keep `difference_found` as a completed receiver task, not an agent failure.
