@@ -24,6 +24,7 @@
 - [v0.8.1 Sidecar Check Hardening](releases/v0.8.1.md)
 - [v0.8.2 Sidecar Receiver Acceptance Evidence](releases/v0.8.2.md)
 - [v0.8.3 Sidecar Discoverability Polish](releases/v0.8.3.md)
+- [v0.8.4 External Receiver Smoke Evidence](releases/v0.8.4.md)
 - [Seal/Diff](seal-diff.md)
 - [Known Limitations](known-limitations.md)
 
@@ -34,6 +35,7 @@
 - [v0.8.1 sidecar check hardening candidate](releases/v0.8.1.md)
 - [v0.8.2 sidecar receiver acceptance evidence candidate](releases/v0.8.2.md)
 - [v0.8.3 sidecar discoverability polish candidate](releases/v0.8.3.md)
+- [v0.8.4 external receiver smoke evidence candidate](releases/v0.8.4.md)
 - [v0.7.0 project state lifecycle candidate](releases/v0.7.0.md)
 - [v0.6.3 lifecycle readiness gate candidate](releases/v0.6.3.md)
 - [v0.6.2 self-dogfooding evidence candidate](releases/v0.6.2.md)
@@ -73,6 +75,7 @@
 - [BaseBrief self-validation Pre-v0.8](dogfooding/basebrief-self-validation-pre-v0.8.md)
 - [Pre-v0.8 friction log](dogfooding/pre-v0.8-friction-log.md)
 - [Sidecar receiver acceptance v0.8.2](dogfooding/sidecar-receiver-acceptance-v0.8.2.md)
+- [Sidecar external receiver smoke v0.8.4](dogfooding/sidecar-external-receiver-smoke-v0.8.4.md)
 - [Usability feedback template](../.github/ISSUE_TEMPLATE/usability_feedback.md)
 
 ## Cache-ready 实验历史

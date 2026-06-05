@@ -1122,6 +1122,56 @@ test("v0.8.3 sidecar discoverability polish links README and docs", () => {
   }
 });
 
+test("v0.8.4 external receiver smoke evidence stays manual and public-safe", () => {
+  const docsIndex = readText("docs/index.md");
+  const testing = readText("docs/testing.md");
+  const matrix = readText("docs/testing-v0.8.x-test-matrix.md");
+  const dogfooding = readText("docs/dogfooding/sidecar-external-receiver-smoke-v0.8.4.md");
+  const release = readText("docs/releases/v0.8.4.md");
+
+  assert.match(docsIndex, /releases\/v0\.8\.4\.md/);
+  assert.match(docsIndex, /dogfooding\/sidecar-external-receiver-smoke-v0\.8\.4\.md/);
+  assert.match(testing, /v0\.8\.4 External Receiver Smoke Evidence/);
+  assert.match(testing, /manual_required/);
+  assert.match(matrix, /v0\.8\.4 External Receiver Smoke Evidence/);
+
+  for (const doc of [matrix, dogfooding, release]) {
+    assert.match(doc, /sidecar-build/);
+    assert.match(doc, /sidecar-check/);
+    assert.match(doc, /generic/);
+    assert.match(doc, /openclaw/);
+    assert.match(doc, /manual_required/);
+    assert.match(doc, /No provider request/);
+    assert.match(doc, /No raw private output/);
+    assert.match(doc, /No runtime integration/);
+    assert.match(doc, /No schema change/);
+    assert.match(doc, /provider_probe_status=skipped/);
+  }
+
+  assert.match(dogfooding, /OpenCode CLI availability \| available/);
+  assert.match(dogfooding, /Claude Code CLI availability \| available/);
+  assert.match(dogfooding, /0 errors, 0 warnings/);
+  assert.match(dogfooding, /wait for user confirmation/i);
+  assert.match(dogfooding, /did not invoke external receiver prompts/);
+  assert.doesNotMatch(dogfooding, /OpenCode generic receiver prompt execution \| passed/);
+  assert.doesNotMatch(dogfooding, /Claude Code generic receiver prompt execution \| passed/);
+  assert.match(release, /External Receiver Smoke Evidence Candidate/);
+  assert.match(release, /No Auto Flow/);
+  assert.match(release, /Wait for user confirmation/);
+  assert.match(release, /basebrief-project-state-v1/);
+  assert.match(release, /basebrief-sidecar-v1/);
+
+  for (const relativePath of [
+    "docs/testing-v0.8.x-test-matrix.md",
+    "docs/dogfooding/sidecar-external-receiver-smoke-v0.8.4.md",
+    "docs/releases/v0.8.4.md",
+  ]) {
+    const result = checkArtifacts({ inputPath: path.join(repoRoot, relativePath) });
+    assert.equal(result.status, "passed", relativePath);
+    assert.equal(result.errorCount, 0, relativePath);
+  }
+});
+
 test("public quickstart and minimal examples provide a clean first-use path", () => {
   const quickstart = readText("docs/quickstart-5min.md");
   const minimalBrief = readText("examples/minimal/output-basebrief-lite.md");

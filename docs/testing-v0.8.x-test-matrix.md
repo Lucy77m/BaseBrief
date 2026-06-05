@@ -36,6 +36,16 @@ This matrix covers the local v0.8 sidecar handoff work.
   `provider_probe_status=skipped`, and the public-safe boundaries.
 - `basebrief-project-state-v1` and `basebrief-sidecar-v1` remain unchanged.
 
+## v0.8.4 External Receiver Smoke Evidence
+
+- Generate ignored private `generic` and `openclaw` smoke bundles.
+- Run `sidecar-check` and artifact `check --input` against both bundles.
+- Record OpenCode and Claude Code CLI availability without invoking receiver
+  prompts from Codex.
+- Mark external receiver execution `manual_required`; do not claim pass until a
+  user-approved external runner smoke returns public-safe acceptance evidence.
+- Preserve `basebrief-project-state-v1` and `basebrief-sidecar-v1`.
+
 ## Standard Local Commands
 
 ```text

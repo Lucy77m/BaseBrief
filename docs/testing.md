@@ -749,3 +749,26 @@ Expected release-check output without provider env remains:
 ```text
 provider_probe_status=skipped
 ```
+
+## v0.8.4 External Receiver Smoke Evidence
+
+`v0.8.4` prepares a public-safe external receiver smoke packet for the v0.8.x
+Sidecar flow. It generates `generic` and `openclaw` sidecar bundles, validates
+both with `sidecar-check`, and checks both with Artifact Checker.
+
+OpenCode and Claude Code CLI availability was recorded, but Codex did not pass
+the receiver prompts into those tools because that would be an external
+runner/model invocation. The receiver execution status is therefore
+`manual_required`, not `passed`.
+
+The v0.8.x matrix is tracked in
+[testing-v0.8.x-test-matrix.md](testing-v0.8.x-test-matrix.md). This closure
+does not require provider smoke, receiver thread creation, Auto Flow runs,
+runtime integration, OpenClaw/Hermes runtime connection, or provider
+benchmarks. No raw private output is copied into public docs.
+
+Expected release-check output without provider env remains:
+
+```text
+provider_probe_status=skipped
+```
