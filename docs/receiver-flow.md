@@ -30,6 +30,16 @@ handoff_status: draft_needs_review
 
 Do not share it as a final receiver-ready handoff until it has been reviewed and edited into the normal receiver-ready format.
 
+After `receiver-flow --guided`, the local review gate is:
+
+```text
+node scripts/basebrief.js review-draft --draft <draft-context.md> --output <receiver-ready.md> --json
+```
+
+`review-draft` is not automatic promotion. It only accepts a draft whose human
+fields have been explicitly reviewed, whose checklist lines are checked, and
+whose blocked markers are gone.
+
 ## What It Collects
 
 - target repository branch
@@ -49,6 +59,7 @@ If the output directory is inside the target repository and visible to Git, the 
 - Does not make provider requests.
 - Does not create receiver threads.
 - Does not promote guided answers to `ready_for_receiver`.
+- Does not run `receiver-flow --extract`.
 - Does not overwrite existing output files.
 - Does not write tracked target-repository files.
 - Does not set `handoff_status: ready_for_receiver`.

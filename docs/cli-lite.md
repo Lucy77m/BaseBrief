@@ -16,6 +16,7 @@ node scripts/basebrief.js check --input examples/adapter-codex-task.md --json
 node scripts/basebrief.js receiver-init --repo . --output tests/outputs/private/receiver-check.json --json
 node scripts/basebrief.js receiver-check --config examples/receiver-check-config.json --repo . --json
 node scripts/basebrief.js receiver-flow --repo . --output-dir tests/outputs/private/receiver-flow --json
+node scripts/basebrief.js review-draft --draft tests/outputs/private/receiver-flow/draft-context.md --output tests/outputs/private/receiver-ready.md --json
 node scripts/basebrief.js seal --input examples/seal-before-input.json --output tests/outputs/private/seal-before.json
 node scripts/basebrief.js diff --before examples/seal-before-input.json --after examples/seal-after-input.json --json
 ```
@@ -119,6 +120,25 @@ Auto Flow and does not produce `ready_for_receiver`.
 See [Receiver Flow Draft](receiver-flow.md) for boundaries and review requirements.
 The v0.3.2 release-candidate boundary is documented in [v0.3.2 Release Candidate](releases/v0.3.2.md).
 The v0.3.3 dogfooding evidence keeps this command draft-only and is documented in [v0.3.3 Release Candidate](releases/v0.3.3.md).
+
+### review-draft
+
+```text
+node scripts/basebrief.js review-draft --draft <draft-context.md> --output <receiver-ready.md> [--json]
+```
+
+This command is the explicit human review gate after `receiver-flow --guided`.
+It requires `handoff_status: draft_needs_review`, all six guided human fields,
+no `[EMPTY]`, `[NEEDS_REVIEW]`, or `[CANDIDATE]` markers, and six checked
+review checklist lines in the form `- [x] <field> reviewed`.
+
+Successful output uses `handoff_status: ready_for_receiver` and
+`handoff_protocol_version: receiver-ready-v1`. The command does not call
+providers, does not run `receiver-flow --extract`, does not create receiver
+threads, and does not write `.env` or `.git` paths.
+
+The v0.5.1 release-candidate boundary is documented in
+[v0.5.1 Review Draft Gate Candidate](releases/v0.5.1.md).
 
 ### seal
 

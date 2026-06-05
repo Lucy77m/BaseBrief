@@ -10,6 +10,7 @@ const { checkArtifacts } = require("./basebrief_check_artifacts");
 const { runReceiverCheck } = require("./basebrief_receiver_check");
 const { collectGuidedAnswersFromStdin, runReceiverFlow } = require("./basebrief_receiver_flow");
 const { runReceiverInit } = require("./basebrief_receiver_init");
+const { runReviewDraft } = require("./basebrief_review_draft");
 const { commandDiff: commandSealDiff, commandSeal: commandCreateSeal } = require("./basebrief_seal");
 
 const STARTER_FILE = "basebrief-handoff-input.json";
@@ -23,6 +24,7 @@ const HELP_TEXT = [
   "  node scripts/basebrief.js receiver-init --repo <target-repo> --output <receiver-check.json> [--json]",
   "  node scripts/basebrief.js receiver-check --config <json> --repo <target-repo> [--json]",
   "  node scripts/basebrief.js receiver-flow --repo <target-repo> --output-dir <dir> [--guided] [--json]",
+  "  node scripts/basebrief.js review-draft --draft <draft-context.md> --output <receiver-ready.md> [--json]",
   "  node scripts/basebrief.js seal --input <markdown-or-json> --output <file>",
   "  node scripts/basebrief.js diff --before <file> --after <file>",
   "",
@@ -238,6 +240,13 @@ function commandReceiverFlow(options) {
   });
 }
 
+function commandReviewDraft(options) {
+  return runReviewDraft({
+    draftPath: options.draft,
+    outputPath: options.output,
+  });
+}
+
 function commandSeal(options) {
   return {
     ...commandCreateSeal({
@@ -267,6 +276,7 @@ function run(argv) {
   if (command === "receiver-init") return commandReceiverInit(options);
   if (command === "receiver-check") return commandReceiverCheck(options);
   if (command === "receiver-flow") return commandReceiverFlow(options);
+  if (command === "review-draft") return commandReviewDraft(options);
   if (command === "seal") return commandSeal(options);
   if (command === "diff") return commandDiff(options);
   throw new Error(`Unknown command: ${command}`);
@@ -315,6 +325,13 @@ function toPublicResult(result) {
       ...result,
       outputDir: publicPath(result.outputDir, cwd),
       outputFiles: toRelativeMap(result.outputFiles, cwd),
+    };
+  }
+  if (result.command === "review-draft") {
+    return {
+      ...result,
+      source_draft: publicPath(result.source_draft, cwd),
+      output: publicPath(result.output, cwd),
     };
   }
   if (result.command === "seal") {
@@ -385,6 +402,14 @@ function formatHuman(result) {
       "",
     ].join(os.EOL);
   }
+  if (result.command === "review-draft") {
+    return [
+      `BaseBrief receiver-ready handoff written to ${result.output}`,
+      `handoff_status=${result.handoff_status}`,
+      `reviewed_fields=${result.reviewed_fields.length}`,
+      "",
+    ].join(os.EOL);
+  }
   if (result.command === "seal") {
     return `BaseBrief seal written to ${result.output}${os.EOL}checksum=${result.checksum}${os.EOL}`;
   }
@@ -447,6 +472,7 @@ module.exports = {
   commandReceiverInit,
   commandReceiverCheck,
   commandReceiverFlow,
+  commandReviewDraft,
   commandSeal,
   formatFindingLines,
   formatHuman,

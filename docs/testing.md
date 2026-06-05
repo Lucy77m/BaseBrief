@@ -50,6 +50,21 @@ review checklist. It does not add `review-draft`, `receiver-flow --extract`,
 `.basebrief/`, Auto Flow, Web UI, adapter expansion, provider requests, npm
 publishing, push, tag, or formal release.
 
+## v0.5.1 Review Draft Gate Candidate
+
+`v0.5.1` adds `review-draft` as the explicit gate between a reviewed guided draft
+and `handoff_status: ready_for_receiver`. It requires checked review checklist
+lines, all six human fields, and no `[EMPTY]`, `[NEEDS_REVIEW]`, or `[CANDIDATE]`
+markers. It does not add `receiver-flow --extract`, `.basebrief/`, Auto Flow, Web
+UI, adapter expansion, provider requests, npm publishing, push, tag, or formal
+release.
+
+Expected release-check output without provider env remains:
+
+```text
+provider_probe_status=skipped
+```
+
 ## Receiver 测试额度
 
 Receiver-ready 验证默认采用低额度策略：
@@ -136,7 +151,7 @@ npm run check
 - 相对链接检查：`122` 条有效
 - 公开示例文件：`28` 个存在
 - artifact checker 输入：`12` 个通过
-- CLI Lite 命令：`8` 条通过
+- CLI Lite 命令：`9` 条通过
 - 首次使用闭环命令：`6` 条通过
 - Seal/Diff 命令：`3` 条通过
 - 独立测试文件：`1` 个通过

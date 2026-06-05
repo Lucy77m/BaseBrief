@@ -16,7 +16,7 @@ const {
 } = require("../scripts/basebrief_build_handoff");
 const { buildAdapterArtifacts, normalizeTargets } = require("../scripts/basebrief_build_adapters");
 const { checkArtifacts } = require("../scripts/basebrief_check_artifacts");
-const { HELP_TEXT, commandBuild, commandCheck, commandDiff, commandInit, commandReceiverCheck, commandReceiverFlow, commandReceiverInit, commandSeal, formatHuman, run, starterInput } = require("../scripts/basebrief");
+const { HELP_TEXT, commandBuild, commandCheck, commandDiff, commandInit, commandReceiverCheck, commandReceiverFlow, commandReceiverInit, commandReviewDraft, commandSeal, formatHuman, run, starterInput } = require("../scripts/basebrief");
 const {
   CONFIG_SCHEMA_VERSION: RECEIVER_CHECK_SCHEMA_VERSION,
   RESULT_SCHEMA_VERSION: RECEIVER_CHECK_RESULT_SCHEMA_VERSION,
@@ -26,6 +26,7 @@ const {
 } = require("../scripts/basebrief_receiver_check");
 const { buildReceiverCheckConfig, runReceiverInit } = require("../scripts/basebrief_receiver_init");
 const { FLOW_SCHEMA_VERSION, runReceiverFlow } = require("../scripts/basebrief_receiver_flow");
+const { REVIEW_DRAFT_SCHEMA_VERSION, runReviewDraft } = require("../scripts/basebrief_review_draft");
 const { createSealFromInput, diffSeals, readSealOrInput, SEAL_SCHEMA_VERSION } = require("../scripts/basebrief_seal");
 const { buildSummary, getPromptForVariant, SCENARIOS, PROVIDER_PROFILES } = require("../scripts/provider_cache_benchmark");
 const { classifyRelayUsage } = require("../scripts/provider_relay_usage_audit");
@@ -96,6 +97,34 @@ function writeReceiverCheckConfig(tempDir, config, name = "receiver-check.json")
   const configPath = path.join(tempDir, name);
   fs.writeFileSync(configPath, `${JSON.stringify(config, null, 2)}\n`, "utf8");
   return configPath;
+}
+
+function createGuidedDraft(tempDir, overrides = {}) {
+  const fixtureRoot = path.join(tempDir, `guided-fixture-${Math.random().toString(16).slice(2)}`);
+  fs.mkdirSync(fixtureRoot, { recursive: true });
+  const repoDir = createReceiverCheckRepo(fixtureRoot);
+  const outputDir = path.join(fixtureRoot, "guided-flow");
+  const guidedAnswers = {
+    current_goal: "Prepare a reviewed receiver handoff.",
+    verified_facts: "The local receiver flow draft was generated from a test fixture.",
+    confirmed_decisions: "The draft must stay human-reviewed before receiver use.",
+    risk_boundaries: "Do not read env files or write provider credentials.",
+    receiver_entry_task: "Inspect the reviewed receiver handoff first.",
+    open_questions: "No open questions remain for this fixture.",
+    ...overrides.guidedAnswers,
+  };
+  runReceiverFlow({
+    repoPath: repoDir,
+    outputDir,
+    guided: true,
+    guidedAnswers,
+  });
+  const draftPath = path.join(outputDir, "draft-context.md");
+  if (overrides.reviewed !== false) {
+    const reviewedDraft = fs.readFileSync(draftPath, "utf8").replace(/- \[ \]/g, "- [x]");
+    fs.writeFileSync(draftPath, reviewedDraft, "utf8");
+  }
+  return { draftPath, outputDir, repoDir };
 }
 
 function validateBb9HandoffInputAgainstSchema(input, schema) {
@@ -519,6 +548,45 @@ test("v0.5.0 guided receiver flow documents human-input draft boundaries", () =>
   for (const relativePath of [
     "docs/dogfooding/receiver-flow-guided-dogfooding.md",
     "docs/releases/v0.5.0.md",
+  ]) {
+    const result = checkArtifacts({ inputPath: path.join(repoRoot, relativePath) });
+    assert.equal(result.status, "passed", relativePath);
+    assert.equal(result.errorCount, 0, relativePath);
+    assert.equal(result.warningCount, 0, relativePath);
+  }
+});
+
+test("v0.5.1 review draft gate documents receiver-ready promotion boundaries", () => {
+  const readme = readText("README.md");
+  const englishReadme = readText("README.en.md");
+  const cliLite = readText("docs/cli-lite.md");
+  const docsIndex = readText("docs/index.md");
+  const testing = readText("docs/testing.md");
+  const receiverFlow = readText("docs/receiver-flow.md");
+  const dogfooding = readText("docs/dogfooding/receiver-flow-review-draft-dogfooding.md");
+  const release = readText("docs/releases/v0.5.1.md");
+
+  assert.match(readme, /docs\/releases\/v0\.5\.1\.md/);
+  assert.match(englishReadme, /docs\/releases\/v0\.5\.1\.md/);
+  assert.match(docsIndex, /releases\/v0\.5\.1\.md/);
+  assert.match(docsIndex, /dogfooding\/receiver-flow-review-draft-dogfooding\.md/);
+  assert.match(cliLite, /review-draft --draft <draft-context\.md> --output <receiver-ready\.md>/);
+  assert.match(receiverFlow, /review-draft --draft <draft-context\.md> --output <receiver-ready\.md>/);
+  assert.match(testing, /v0\.5\.1 Review Draft Gate Candidate/);
+  assert.match(dogfooding, /review-draft-self-smoke/);
+  assert.match(dogfooding, /provider_request_performed`: false/);
+  assert.match(release, /Review Draft Gate Candidate/);
+  assert.match(release, /ready_for_receiver/);
+  assert.match(release, /No provider request/);
+  assert.match(release, /No receiver-flow --extract/);
+  assert.match(release, /No Auto Flow/);
+  assert.match(release, /No `.basebrief\/`/);
+  assert.match(release, /provider_probe_status=skipped/);
+  assert.match(release, /No push, tag, or formal release/);
+
+  for (const relativePath of [
+    "docs/dogfooding/receiver-flow-review-draft-dogfooding.md",
+    "docs/releases/v0.5.1.md",
   ]) {
     const result = checkArtifacts({ inputPath: path.join(repoRoot, relativePath) });
     assert.equal(result.status, "passed", relativePath);
@@ -1732,6 +1800,123 @@ test("CLI Lite exposes Receiver flow draft with public-safe json paths", () => w
     assert.equal(result.outputFiles.draftContext.includes("draft-context.md"), true);
   } finally {
     fs.rmSync(cliOutputDir, { recursive: true, force: true });
+  }
+}));
+
+test("Review draft gate promotes a fully reviewed guided draft to receiver-ready", () => withTempDir((tempDir) => {
+  const { draftPath } = createGuidedDraft(tempDir);
+  const outputPath = path.join(tempDir, "receiver-ready.md");
+  const result = runReviewDraft({ draftPath, outputPath });
+  const ready = fs.readFileSync(outputPath, "utf8");
+
+  assert.equal(result.command, "review-draft");
+  assert.equal(result.schemaVersion, REVIEW_DRAFT_SCHEMA_VERSION);
+  assert.equal(result.handoff_status, "ready_for_receiver");
+  assert.deepEqual(result.reviewed_fields, [
+    "current_goal",
+    "verified_facts",
+    "confirmed_decisions",
+    "risk_boundaries",
+    "receiver_entry_task",
+    "open_questions",
+  ]);
+  assert.match(ready, /handoff_status: ready_for_receiver/);
+  assert.match(ready, /handoff_protocol_version: receiver-ready-v1/);
+  assert.match(ready, /## Review Summary/);
+  assert.match(ready, /## current_goal/);
+  assert.match(ready, /## verified_facts/);
+  assert.match(ready, /## confirmed_decisions/);
+  assert.match(ready, /## risk_boundaries/);
+  assert.match(ready, /## receiver_entry_task/);
+  assert.match(ready, /## open_questions/);
+  assert.equal(checkArtifacts({ inputPath: outputPath }).status, "passed");
+}));
+
+test("Review draft gate rejects blocked markers and unchecked checklist items", () => withTempDir((tempDir) => {
+  for (const marker of ["[EMPTY]", "[NEEDS_REVIEW]", "[CANDIDATE: docs/example.md]"]) {
+    const { draftPath } = createGuidedDraft(tempDir);
+    fs.appendFileSync(draftPath, `${os.EOL}${marker}${os.EOL}`, "utf8");
+    assert.throws(
+      () => runReviewDraft({ draftPath, outputPath: path.join(tempDir, `blocked-${marker.replace(/[^a-z]/gi, "")}.md`) }),
+      /blocked review markers/,
+      marker,
+    );
+  }
+
+  const { draftPath } = createGuidedDraft(tempDir, { reviewed: false });
+  assert.throws(
+    () => runReviewDraft({ draftPath, outputPath: path.join(tempDir, "unchecked.md") }),
+    /checklist is not fully reviewed/,
+  );
+}));
+
+test("Review draft gate rejects missing fields, wrong status, overwrite, and sensitive paths", () => withTempDir((tempDir) => {
+  const { draftPath } = createGuidedDraft(tempDir);
+  const missingFieldDraft = path.join(tempDir, "missing-field.md");
+  fs.copyFileSync(draftPath, missingFieldDraft);
+  fs.writeFileSync(
+    missingFieldDraft,
+    fs.readFileSync(missingFieldDraft, "utf8").replace(/### open_questions[\s\S]*?## Review Checklist/, "## Review Checklist"),
+    "utf8",
+  );
+  assert.throws(
+    () => runReviewDraft({ draftPath: missingFieldDraft, outputPath: path.join(tempDir, "missing-ready.md") }),
+    /missing required human fields: open_questions/,
+  );
+
+  const wrongStatusDraft = path.join(tempDir, "wrong-status.md");
+  fs.copyFileSync(draftPath, wrongStatusDraft);
+  fs.writeFileSync(
+    wrongStatusDraft,
+    fs.readFileSync(wrongStatusDraft, "utf8").replace("handoff_status: draft_needs_review", "handoff_status: ready_for_receiver"),
+    "utf8",
+  );
+  assert.throws(
+    () => runReviewDraft({ draftPath: wrongStatusDraft, outputPath: path.join(tempDir, "wrong-ready.md") }),
+    /must have handoff_status: draft_needs_review/,
+  );
+
+  const existingOutput = path.join(tempDir, "existing.md");
+  fs.writeFileSync(existingOutput, "existing\n", "utf8");
+  assert.throws(() => runReviewDraft({ draftPath, outputPath: existingOutput }), /already exists/);
+  assert.throws(() => runReviewDraft({ draftPath, outputPath: path.join(tempDir, ".env.ready.md") }), /must not use an \.env path/);
+  assert.throws(() => runReviewDraft({ draftPath, outputPath: path.join(tempDir, ".git", "ready.md") }), /must not use a \.git path/);
+  assert.throws(() => runReviewDraft({ draftPath: path.join(tempDir, ".env.draft.md"), outputPath: path.join(tempDir, "ready.md") }), /must not use an \.env path/);
+}));
+
+test("CLI Lite exposes review-draft with public-safe json paths", () => withTempDir((tempDir) => {
+  const { draftPath } = createGuidedDraft(tempDir);
+  const directOutput = path.join(tempDir, "direct-ready.md");
+  const direct = commandReviewDraft({ draft: draftPath, output: directOutput });
+  assert.equal(direct.command, "review-draft");
+  assert.equal(direct.handoff_status, "ready_for_receiver");
+
+  const cliDraftDir = path.join(repoRoot, "tests", "outputs", "private", `review-draft-${Date.now()}`);
+  const cliDraftPath = path.join(cliDraftDir, "draft-context.md");
+  const cliOutputPath = path.join(repoRoot, "tests", "outputs", "private", `receiver-ready-${Date.now()}.md`);
+  try {
+    fs.mkdirSync(cliDraftDir, { recursive: true });
+    fs.copyFileSync(draftPath, cliDraftPath);
+    assert.match(HELP_TEXT, /review-draft --draft <draft-context\.md> --output <receiver-ready\.md>/);
+    const cli = spawnSync(process.execPath, [
+      "scripts/basebrief.js",
+      "review-draft",
+      "--draft",
+      cliDraftPath,
+      "--output",
+      cliOutputPath,
+      "--json",
+    ], { cwd: repoRoot, encoding: "utf8" });
+    assert.equal(cli.status, 0, cli.stderr);
+    const result = JSON.parse(cli.stdout);
+    assert.equal(result.command, "review-draft");
+    assert.equal(result.handoff_status, "ready_for_receiver");
+    assert.equal(result.source_draft.startsWith("tests"), true);
+    assert.equal(result.output.startsWith("tests"), true);
+    assert(fs.existsSync(cliOutputPath));
+  } finally {
+    fs.rmSync(cliDraftDir, { recursive: true, force: true });
+    fs.rmSync(cliOutputPath, { force: true });
   }
 }));
 
