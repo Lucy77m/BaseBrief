@@ -15,11 +15,13 @@
 - [Artifact checks](checks.md)
 - [Receiver Safe Check](receiver-check.md)
 - [Receiver Flow Draft](receiver-flow.md)
+- [Project State](project-state.md)
 - [Seal/Diff](seal-diff.md)
 - [Known Limitations](known-limitations.md)
 
 ## 方向与验证
 
+- [v0.6.0 project state directory candidate](releases/v0.6.0.md)
 - [v0.5.3 receiver flow review closure](releases/v0.5.3.md)
 - [v0.5.2 receiver flow extract candidate](releases/v0.5.2.md)
 - [v0.5.1 review draft gate candidate](releases/v0.5.1.md)
@@ -44,6 +46,7 @@
 - [Receiver Flow review-draft dogfooding](dogfooding/receiver-flow-review-draft-dogfooding.md)
 - [Receiver Flow extract dogfooding](dogfooding/receiver-flow-extract-dogfooding.md)
 - [Receiver Flow v0.5.x closure dogfooding](dogfooding/receiver-flow-v0.5.x-closure.md)
+- [Project State dogfooding](dogfooding/project-state-dogfooding.md)
 - [Usability feedback template](../.github/ISSUE_TEMPLATE/usability_feedback.md)
 
 ## Cache-ready 实验历史
@@ -80,3 +83,4 @@
 - [Receiver Flow valid reviewed draft](../examples/receiver-flow-review/valid-ready/README.md)
 - [Receiver Flow rejected candidate draft](../examples/receiver-flow-review/rejected-candidate/README.md)
 - [Receiver Flow rejected empty draft](../examples/receiver-flow-review/rejected-empty/README.md)
+- [Project State local state example](../examples/project-state/README.md)

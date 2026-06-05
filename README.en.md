@@ -91,7 +91,7 @@ It only processes explicit input files and does not scan or modify other project
 - handoff builder and file-based Codex / Claude adapters
 - artifact checker
 - optional read-only Receiver Safe Check v1
-- zero-dependency CLI Lite: `init`, `build`, `check`, `receiver-init`, `receiver-check`, `receiver-flow`, `review-draft`, `seal`, `diff`
+- zero-dependency CLI Lite: `init`, `build`, `check`, `receiver-init`, `receiver-check`, `receiver-flow`, `review-draft`, `state-init`, `state-read`, `seal`, `diff`
 - local file-based Seal/Diff v1
 
 BaseBrief is not a chat client, agent runtime, hosted platform, secret manager, project-management system, or provider gateway.
@@ -104,12 +104,15 @@ BaseBrief is not a chat client, agent runtime, hosted platform, secret manager, 
 - [CLI Lite](docs/cli-lite.md)
 - [Receiver Safe Check](docs/receiver-check.md)
 - [Receiver Flow Draft](docs/receiver-flow.md)
+- [Project State](docs/project-state.md)
 - [Receiver friction log](docs/dogfooding/receiver-friction-log.md)
 - [Receiver Flow dogfooding evidence](docs/dogfooding/receiver-flow-dogfooding.md)
 - [Receiver Flow guided dogfooding](docs/dogfooding/receiver-flow-guided-dogfooding.md)
 - [Receiver Flow review-draft dogfooding](docs/dogfooding/receiver-flow-review-draft-dogfooding.md)
 - [Receiver Flow extract dogfooding](docs/dogfooding/receiver-flow-extract-dogfooding.md)
 - [Receiver Flow v0.5.x closure dogfooding](docs/dogfooding/receiver-flow-v0.5.x-closure.md)
+- [Project State dogfooding](docs/dogfooding/project-state-dogfooding.md)
+- [v0.6.0 Project State Directory Candidate](docs/releases/v0.6.0.md)
 - [v0.5.3 Receiver Flow Review Closure](docs/releases/v0.5.3.md)
 - [v0.5.2 Receiver Flow Extract Candidate](docs/releases/v0.5.2.md)
 - [v0.5.1 Review Draft Gate Candidate](docs/releases/v0.5.1.md)

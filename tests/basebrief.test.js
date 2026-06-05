@@ -16,7 +16,7 @@ const {
 } = require("../scripts/basebrief_build_handoff");
 const { buildAdapterArtifacts, normalizeTargets } = require("../scripts/basebrief_build_adapters");
 const { checkArtifacts } = require("../scripts/basebrief_check_artifacts");
-const { HELP_TEXT, commandBuild, commandCheck, commandDiff, commandInit, commandReceiverCheck, commandReceiverFlow, commandReceiverInit, commandReviewDraft, commandSeal, formatHuman, run, starterInput } = require("../scripts/basebrief");
+const { HELP_TEXT, commandBuild, commandCheck, commandDiff, commandInit, commandReceiverCheck, commandReceiverFlow, commandReceiverInit, commandReviewDraft, commandStateInit, commandStateRead, commandSeal, formatHuman, run, starterInput } = require("../scripts/basebrief");
 const {
   CONFIG_SCHEMA_VERSION: RECEIVER_CHECK_SCHEMA_VERSION,
   RESULT_SCHEMA_VERSION: RECEIVER_CHECK_RESULT_SCHEMA_VERSION,
@@ -27,6 +27,7 @@ const {
 const { buildReceiverCheckConfig, runReceiverInit } = require("../scripts/basebrief_receiver_init");
 const { FLOW_SCHEMA_VERSION, runReceiverFlow } = require("../scripts/basebrief_receiver_flow");
 const { REVIEW_DRAFT_SCHEMA_VERSION, runReviewDraft } = require("../scripts/basebrief_review_draft");
+const { PROJECT_STATE_SCHEMA_VERSION, runStateInit, runStateRead } = require("../scripts/basebrief_project_state");
 const { createSealFromInput, diffSeals, readSealOrInput, SEAL_SCHEMA_VERSION } = require("../scripts/basebrief_seal");
 const { buildSummary, getPromptForVariant, SCENARIOS, PROVIDER_PROFILES } = require("../scripts/provider_cache_benchmark");
 const { classifyRelayUsage } = require("../scripts/provider_relay_usage_audit");
@@ -679,6 +680,67 @@ test("v0.5.3 receiver flow review closure documents accepted and rejected exampl
     assert.equal(result.status, "passed", relativePath);
     assert.equal(result.errorCount, 0, relativePath);
     assert.equal(result.warningCount, 0, relativePath);
+  }
+});
+
+test("v0.6.0 project state documents local state boundaries", () => {
+  const readme = readText("README.md");
+  const englishReadme = readText("README.en.md");
+  const docsIndex = readText("docs/index.md");
+  const cliLite = readText("docs/cli-lite.md");
+  const receiverFlow = readText("docs/receiver-flow.md");
+  const testing = readText("docs/testing.md");
+  const roadmap = readText("docs/roadmap/basebrief-long-term-baseline.md");
+  const projectState = readText("docs/project-state.md");
+  const dogfooding = readText("docs/dogfooding/project-state-dogfooding.md");
+  const release = readText("docs/releases/v0.6.0.md");
+  const schema = readJson("schemas/basebrief-project-state.schema.json");
+  const exampleState = readJson("examples/project-state/state.json");
+
+  assert.match(readme, /docs\/project-state\.md/);
+  assert.match(readme, /docs\/releases\/v0\.6\.0\.md/);
+  assert.match(englishReadme, /state-init/);
+  assert.match(englishReadme, /docs\/project-state\.md/);
+  assert.match(docsIndex, /project-state\.md/);
+  assert.match(docsIndex, /releases\/v0\.6\.0\.md/);
+  assert.match(docsIndex, /dogfooding\/project-state-dogfooding\.md/);
+  assert.match(docsIndex, /examples\/project-state\/README\.md/);
+  assert.match(cliLite, /state-init --repo <target-repo> --source <receiver-ready\.md>/);
+  assert.match(cliLite, /state-read --repo <target-repo>/);
+  assert.match(receiverFlow, /\.basebrief\/state\.json/);
+  assert.match(testing, /v0\.6\.0 Project State Directory Candidate/);
+  assert.match(roadmap, /v0\.6\.0/);
+  assert.match(projectState, /basebrief-project-state-v1/);
+  assert.match(projectState, /No provider request/);
+  assert.match(projectState, /No Auto Flow/);
+  assert.match(projectState, /Receiver Safe Check config and result schemas are unchanged/);
+  assert.match(dogfooding, /state-init --repo <target-repo> --source <receiver-ready\.md>/);
+  assert.match(dogfooding, /No provider request/);
+  assert.match(release, /Project State Directory Candidate/);
+  assert.match(release, /\.basebrief\/state\.json/);
+  assert.match(release, /basebrief-project-state-v1/);
+  assert.match(release, /state-init/);
+  assert.match(release, /state-read/);
+  assert.match(release, /No provider request/);
+  assert.match(release, /No Auto Flow/);
+  assert.match(release, /No receiver thread creation/);
+  assert.match(release, /No push, tag, or formal release/);
+  assert.match(release, /provider_probe_status=skipped/);
+  assert.match(release, /BB9 handoff schema is unchanged/);
+  assert.match(release, /Receiver Safe Check config and result schemas are unchanged/);
+  assert.equal(schema.properties.schemaVersion.const, PROJECT_STATE_SCHEMA_VERSION);
+  assert.equal(exampleState.schemaVersion, PROJECT_STATE_SCHEMA_VERSION);
+  assert.equal(exampleState.source.handoff_status, "ready_for_receiver");
+
+  for (const relativePath of [
+    "docs/project-state.md",
+    "docs/dogfooding/project-state-dogfooding.md",
+    "docs/releases/v0.6.0.md",
+    "examples/project-state",
+  ]) {
+    const result = checkArtifacts({ inputPath: path.join(repoRoot, relativePath) });
+    assert.equal(result.status, "passed", relativePath);
+    assert.equal(result.errorCount, 0, relativePath);
   }
 });
 
@@ -2158,6 +2220,114 @@ test("CLI Lite exposes review-draft with public-safe json paths", () => withTemp
   } finally {
     fs.rmSync(cliDraftDir, { recursive: true, force: true });
     fs.rmSync(cliOutputPath, { force: true });
+  }
+}));
+
+test("Project state init writes and reads local .basebrief state from receiver-ready", () => withTempDir((tempDir) => {
+  const repoDir = createReceiverCheckRepo(tempDir);
+  const { draftPath } = createGuidedDraft(tempDir);
+  const readyPath = path.join(tempDir, "receiver-ready.md");
+  runReviewDraft({ draftPath, outputPath: readyPath });
+
+  const result = runStateInit({ repoPath: repoDir, sourcePath: readyPath });
+  const statePath = path.join(repoDir, ".basebrief", "state.json");
+  const state = JSON.parse(fs.readFileSync(statePath, "utf8"));
+  const readResult = runStateRead({ repoPath: repoDir });
+
+  assert.equal(result.command, "state-init");
+  assert.equal(result.schemaVersion, PROJECT_STATE_SCHEMA_VERSION);
+  assert.equal(result.output, statePath);
+  assert.equal(state.schemaVersion, PROJECT_STATE_SCHEMA_VERSION);
+  assert.equal(state.state_status, "local_project_state");
+  assert.equal(state.source.file, "receiver-ready.md");
+  assert.equal(state.source.handoff_status, "ready_for_receiver");
+  assert.equal(state.repository.branch, git(repoDir, ["branch", "--show-current"]));
+  assert.equal(state.repository.head, git(repoDir, ["rev-parse", "HEAD"]));
+  assert.deepEqual(state.repository.changed_files, []);
+  assert.match(state.handoff.current_goal, /Prepare a reviewed receiver handoff/);
+  assert.match(state.handoff.receiver_entry_task, /Inspect the reviewed receiver handoff first/);
+  assert.doesNotMatch(JSON.stringify(state), /[A-Z]:\\/);
+  assert.equal(readResult.command, "state-read");
+  assert.deepEqual(readResult.state, state);
+  assert.equal(checkArtifacts({ inputPath: path.join(repoDir, ".basebrief") }).status, "passed");
+}));
+
+test("Project state init rejects unsafe or unreviewed sources and overwrite", () => withTempDir((tempDir) => {
+  const repoDir = createReceiverCheckRepo(tempDir);
+  const { draftPath } = createGuidedDraft(tempDir);
+  const readyPath = path.join(tempDir, "receiver-ready.md");
+  runReviewDraft({ draftPath, outputPath: readyPath });
+
+  const draftOnly = path.join(tempDir, "draft-only.md");
+  fs.copyFileSync(draftPath, draftOnly);
+  assert.throws(() => runStateInit({ repoPath: repoDir, sourcePath: draftOnly }), /handoff_status: ready_for_receiver/);
+
+  const missingFieldReady = path.join(tempDir, "missing-field-ready.md");
+  fs.writeFileSync(
+    missingFieldReady,
+    fs.readFileSync(readyPath, "utf8").replace(/## open_questions[\s\S]*$/, ""),
+    "utf8",
+  );
+  assert.throws(() => runStateInit({ repoPath: repoDir, sourcePath: missingFieldReady }), /missing required sections: open_questions/);
+
+  assert.throws(() => runStateInit({ repoPath: repoDir, sourcePath: path.join(tempDir, ".env.ready.md") }), /must not use an \.env path/);
+  assert.throws(() => runStateInit({ repoPath: repoDir, sourcePath: path.join(repoDir, ".git", "ready.md") }), /must not use a \.git path/);
+
+  runStateInit({ repoPath: repoDir, sourcePath: readyPath });
+  assert.throws(() => runStateInit({ repoPath: repoDir, sourcePath: readyPath }), /already exists/);
+}));
+
+test("CLI Lite exposes project state commands with public-safe json paths", () => withTempDir((tempDir) => {
+  const repoDir = path.join(repoRoot, "tests", "outputs", "private", `state-repo-${Date.now()}`);
+  const sourceDir = path.join(repoRoot, "tests", "outputs", "private", `state-source-${Date.now()}`);
+  try {
+    fs.mkdirSync(sourceDir, { recursive: true });
+    const fixtureRepo = createReceiverCheckRepo(tempDir);
+    fs.rmSync(repoDir, { recursive: true, force: true });
+    fs.cpSync(fixtureRepo, repoDir, { recursive: true });
+    const { draftPath } = createGuidedDraft(tempDir);
+    const readyPath = path.join(sourceDir, "receiver-ready.md");
+    runReviewDraft({ draftPath, outputPath: readyPath });
+
+    const direct = commandStateInit({ repo: repoDir, source: readyPath });
+    assert.equal(direct.command, "state-init");
+    assert.equal(commandStateRead({ repo: repoDir }).state.schemaVersion, PROJECT_STATE_SCHEMA_VERSION);
+
+    fs.rmSync(path.join(repoDir, ".basebrief"), { recursive: true, force: true });
+    assert.match(HELP_TEXT, /state-init --repo <target-repo> --source <receiver-ready\.md>/);
+    assert.match(HELP_TEXT, /state-read --repo <target-repo>/);
+    const initCli = spawnSync(process.execPath, [
+      "scripts/basebrief.js",
+      "state-init",
+      "--repo",
+      repoDir,
+      "--source",
+      readyPath,
+      "--json",
+    ], { cwd: repoRoot, encoding: "utf8" });
+    assert.equal(initCli.status, 0, initCli.stderr);
+    const initResult = JSON.parse(initCli.stdout);
+    assert.equal(initResult.command, "state-init");
+    assert.equal(initResult.schemaVersion, PROJECT_STATE_SCHEMA_VERSION);
+    assert.equal(initResult.repo.startsWith("tests"), true);
+    assert.equal(initResult.source.startsWith("tests"), true);
+    assert.equal(initResult.output.replace(/\\/g, "/").endsWith(".basebrief/state.json"), true);
+
+    const readCli = spawnSync(process.execPath, [
+      "scripts/basebrief.js",
+      "state-read",
+      "--repo",
+      repoDir,
+      "--json",
+    ], { cwd: repoRoot, encoding: "utf8" });
+    assert.equal(readCli.status, 0, readCli.stderr);
+    const readResult = JSON.parse(readCli.stdout);
+    assert.equal(readResult.command, "state-read");
+    assert.equal(readResult.schemaVersion, PROJECT_STATE_SCHEMA_VERSION);
+    assert.equal(readResult.input.replace(/\\/g, "/").endsWith(".basebrief/state.json"), true);
+  } finally {
+    fs.rmSync(repoDir, { recursive: true, force: true });
+    fs.rmSync(sourceDir, { recursive: true, force: true });
   }
 }));
 

@@ -11,6 +11,7 @@ const { runReceiverCheck } = require("./basebrief_receiver_check");
 const { collectGuidedAnswersFromStdin, runReceiverFlow } = require("./basebrief_receiver_flow");
 const { runReceiverInit } = require("./basebrief_receiver_init");
 const { runReviewDraft } = require("./basebrief_review_draft");
+const { runStateInit, runStateRead } = require("./basebrief_project_state");
 const { commandDiff: commandSealDiff, commandSeal: commandCreateSeal } = require("./basebrief_seal");
 
 const STARTER_FILE = "basebrief-handoff-input.json";
@@ -26,6 +27,8 @@ const HELP_TEXT = [
   "  node scripts/basebrief.js receiver-flow --repo <target-repo> --output-dir <dir> [--guided] [--json]",
   "  node scripts/basebrief.js receiver-flow --repo <target-repo> --output-dir <dir> --extract --source <draft-or-context.md> [--json]",
   "  node scripts/basebrief.js review-draft --draft <draft-context.md> --output <receiver-ready.md> [--json]",
+  "  node scripts/basebrief.js state-init --repo <target-repo> --source <receiver-ready.md> [--json]",
+  "  node scripts/basebrief.js state-read --repo <target-repo> [--json]",
   "  node scripts/basebrief.js seal --input <markdown-or-json> --output <file>",
   "  node scripts/basebrief.js diff --before <file> --after <file>",
   "",
@@ -250,6 +253,19 @@ function commandReviewDraft(options) {
   });
 }
 
+function commandStateInit(options) {
+  return runStateInit({
+    repoPath: options.repo,
+    sourcePath: options.source,
+  });
+}
+
+function commandStateRead(options) {
+  return runStateRead({
+    repoPath: options.repo,
+  });
+}
+
 function commandSeal(options) {
   return {
     ...commandCreateSeal({
@@ -280,6 +296,8 @@ function run(argv) {
   if (command === "receiver-check") return commandReceiverCheck(options);
   if (command === "receiver-flow") return commandReceiverFlow(options);
   if (command === "review-draft") return commandReviewDraft(options);
+  if (command === "state-init") return commandStateInit(options);
+  if (command === "state-read") return commandStateRead(options);
   if (command === "seal") return commandSeal(options);
   if (command === "diff") return commandDiff(options);
   throw new Error(`Unknown command: ${command}`);
@@ -336,6 +354,21 @@ function toPublicResult(result) {
       ...result,
       source_draft: publicPath(result.source_draft, cwd),
       output: publicPath(result.output, cwd),
+    };
+  }
+  if (result.command === "state-init") {
+    return {
+      ...result,
+      repo: publicPath(result.repo, cwd),
+      output: publicPath(result.output, cwd),
+      source: publicPath(result.source, cwd),
+    };
+  }
+  if (result.command === "state-read") {
+    return {
+      ...result,
+      repo: publicPath(result.repo, cwd),
+      input: publicPath(result.input, cwd),
     };
   }
   if (result.command === "seal") {
@@ -415,6 +448,22 @@ function formatHuman(result) {
       "",
     ].join(os.EOL);
   }
+  if (result.command === "state-init") {
+    return [
+      `BaseBrief project state written to ${result.output}`,
+      `schemaVersion=${result.schemaVersion}`,
+      `handoff_status=${result.state.source.handoff_status}`,
+      "",
+    ].join(os.EOL);
+  }
+  if (result.command === "state-read") {
+    return [
+      `BaseBrief project state read from ${result.input}`,
+      `schemaVersion=${result.schemaVersion}`,
+      `state_status=${result.state.state_status}`,
+      "",
+    ].join(os.EOL);
+  }
   if (result.command === "seal") {
     return `BaseBrief seal written to ${result.output}${os.EOL}checksum=${result.checksum}${os.EOL}`;
   }
@@ -478,6 +527,8 @@ module.exports = {
   commandReceiverCheck,
   commandReceiverFlow,
   commandReviewDraft,
+  commandStateInit,
+  commandStateRead,
   commandSeal,
   formatFindingLines,
   formatHuman,

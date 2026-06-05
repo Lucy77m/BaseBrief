@@ -1,0 +1,34 @@
+{
+  "schemaVersion": "basebrief-project-state-v1",
+  "state_status": "local_project_state",
+  "generated_at": "2026-06-05T00:00:00.000Z",
+  "updated_at": "2026-06-05T00:00:00.000Z",
+  "source": {
+    "kind": "receiver-ready",
+    "file": "receiver-ready.md",
+    "handoff_status": "ready_for_receiver"
+  },
+  "repository": {
+    "branch": "main",
+    "head": "example-head",
+    "changed_files": []
+  },
+  "handoff": {
+    "current_goal": "Continue local project work from a reviewed receiver-ready handoff.",
+    "verified_facts": "The handoff was reviewed before state initialization.",
+    "confirmed_decisions": "Keep project state local and explicit.",
+    "risk_boundaries": "Do not store secrets, provider requests, or private absolute paths.",
+    "receiver_entry_task": "Read .basebrief/state.json and inspect the receiver-ready source before editing.",
+    "open_questions": "None for this public-safe example."
+  },
+  "review": {
+    "required_before_receiver": true,
+    "ready_source_required": true
+  },
+  "non_goals": [
+    "no_provider_request",
+    "no_auto_flow",
+    "no_receiver_thread",
+    "no_secret_storage"
+  ]
+}

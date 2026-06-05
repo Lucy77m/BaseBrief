@@ -47,6 +47,17 @@ node scripts/basebrief.js review-draft --draft <draft-context.md> --output <rece
 fields have been explicitly reviewed, whose checklist lines are checked, and
 whose blocked markers are gone.
 
+After a reviewed `receiver-ready.md` exists, `v0.6.0` can store local continuity
+state with:
+
+```text
+node scripts/basebrief.js state-init --repo <target-repo> --source <receiver-ready.md> --json
+node scripts/basebrief.js state-read --repo <target-repo> --json
+```
+
+Project state is stored at `.basebrief/state.json`. It is local continuity
+state, not Auto Flow and not a receiver thread.
+
 ## What It Collects
 
 - target repository branch
@@ -72,5 +83,6 @@ If the output directory is inside the target repository and visible to Git, the 
 - Does not overwrite existing output files.
 - Does not write tracked target-repository files.
 - Does not set `handoff_status: ready_for_receiver`.
+- Project state requires a separate reviewed `receiver-ready.md` source.
 
 Use `receiver-check` only after the draft and generated config have been reviewed.

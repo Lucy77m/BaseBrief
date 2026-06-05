@@ -1,0 +1,125 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "basebrief-project-state.schema.json",
+  "title": "BaseBrief Project State v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "state_status",
+    "generated_at",
+    "updated_at",
+    "source",
+    "repository",
+    "handoff",
+    "review",
+    "non_goals"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": "basebrief-project-state-v1"
+    },
+    "state_status": {
+      "const": "local_project_state"
+    },
+    "generated_at": {
+      "type": "string"
+    },
+    "updated_at": {
+      "type": "string"
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "file", "handoff_status"],
+      "properties": {
+        "kind": {
+          "const": "receiver-ready"
+        },
+        "file": {
+          "type": "string",
+          "minLength": 1
+        },
+        "handoff_status": {
+          "const": "ready_for_receiver"
+        }
+      }
+    },
+    "repository": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["branch", "head", "changed_files"],
+      "properties": {
+        "branch": {
+          "type": "string"
+        },
+        "head": {
+          "type": "string"
+        },
+        "changed_files": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "handoff": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "current_goal",
+        "verified_facts",
+        "confirmed_decisions",
+        "risk_boundaries",
+        "receiver_entry_task",
+        "open_questions"
+      ],
+      "properties": {
+        "current_goal": {
+          "type": "string",
+          "minLength": 1
+        },
+        "verified_facts": {
+          "type": "string",
+          "minLength": 1
+        },
+        "confirmed_decisions": {
+          "type": "string",
+          "minLength": 1
+        },
+        "risk_boundaries": {
+          "type": "string",
+          "minLength": 1
+        },
+        "receiver_entry_task": {
+          "type": "string",
+          "minLength": 1
+        },
+        "open_questions": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "review": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["required_before_receiver", "ready_source_required"],
+      "properties": {
+        "required_before_receiver": {
+          "const": true
+        },
+        "ready_source_required": {
+          "const": true
+        }
+      }
+    },
+    "non_goals": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  }
+}
