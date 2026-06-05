@@ -28,6 +28,14 @@ This matrix covers the local v0.8 sidecar handoff work.
 - Confirm both targets pass with 0 errors and 0 warnings.
 - Confirm root `.basebrief/` is removed after validation.
 
+## v0.8.3 Discoverability Polish
+
+- README and README.en expose `sidecar-build` and `sidecar-check`.
+- Docs index links v0.8.0, v0.8.1, v0.8.2, and v0.8.3 records.
+- Release checks assert Sidecar docs preserve `generic`, `openclaw`,
+  `provider_probe_status=skipped`, and the public-safe boundaries.
+- `basebrief-project-state-v1` and `basebrief-sidecar-v1` remain unchanged.
+
 ## Standard Local Commands
 
 ```text

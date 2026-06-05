@@ -58,6 +58,17 @@ npm run check
 
 这些 scripts 只包装本地 Node 命令；BaseBrief 仍不是发布到 npm 的 package、全局命令、插件或 provider integration。
 
+## Project State Sidecar
+
+当仓库里已有有效的 `.basebrief/state.json` 时，可以用 Sidecar 把 Project State 打包成新窗口可接手的本地 bundle：
+
+```text
+node scripts/basebrief.js sidecar-build --repo . --target generic --output-dir tests/outputs/private/sidecar-generic --json
+node scripts/basebrief.js sidecar-check --input tests/outputs/private/sidecar-generic --json
+```
+
+`sidecar-build` 生成 `generic` 或 `openclaw` handoff bundle；`sidecar-check` 只读验收 bundle 结构和接手边界。v0.8.x Sidecar 是 `basebrief-project-state-v1` 的本地消费层，不改变 schema，不是 Auto Flow，不创建新会话，不调用 provider，也不接入 OpenClaw/Hermes runtime。Sidecar 公开边界保持 No provider request / No raw private output / No runtime integration / No schema change；未注入 provider 环境变量时 release checks 保持 `provider_probe_status=skipped`。公开记录见 [v0.8.0](docs/releases/v0.8.0.md)、[v0.8.1](docs/releases/v0.8.1.md)、[v0.8.2](docs/releases/v0.8.2.md)、[v0.8.3](docs/releases/v0.8.3.md) 与 [v0.8.x test matrix](docs/testing-v0.8.x-test-matrix.md)。
+
 ## Seal/Diff
 
 Seal/Diff 用来回答：阶段前后，事实、决策、风险边界和下一步任务发生了什么变化？
@@ -91,7 +102,8 @@ node scripts/basebrief.js diff --before tests/outputs/private/quickstart/before.
 - Handoff Builder 与 Codex / Claude 文件型 Adapter
 - Artifact Checker
 - 可选、只读的 Receiver Safe Check v1
-- 零依赖 CLI Lite：`init`、`build`、`check`、`receiver-init`、`receiver-check`、`receiver-flow`、`review-draft`、`state-init`、`state-read`、`state-status`、`state-validate`、`state-history`、`state-advance`、`seal`、`diff`
+- 零依赖 CLI Lite：`init`、`build`、`check`、`receiver-init`、`receiver-check`、`receiver-flow`、`review-draft`、`state-init`、`state-read`、`state-status`、`state-validate`、`state-history`、`state-advance`、`sidecar-build`、`sidecar-check`、`seal`、`diff`
+- Project State Sidecar：从本地 `basebrief-project-state-v1` 生成 `generic` / `openclaw` bundle，并用 `basebrief-sidecar-v1` 做只读结构验收
 - 本地、文件型 Seal/Diff v1
 
 BaseBrief 不是聊天客户端、Agent runtime、托管平台、密钥管理器、项目管理系统或 provider gateway。
@@ -109,6 +121,12 @@ BaseBrief 不是聊天客户端、Agent runtime、托管平台、密钥管理器
 - [Project State validation rules](docs/design/project-state-validation-rules.md)
 - [Project State lifecycle readiness](docs/design/project-state-lifecycle-readiness.md)
 - [Project State lifecycle model](docs/design/project-state-lifecycle-model.md)
+- [v0.8.x sidecar test matrix](docs/testing-v0.8.x-test-matrix.md)
+- [v0.8.3 Sidecar Discoverability Polish](docs/releases/v0.8.3.md)
+- [v0.8.2 Sidecar Receiver Acceptance Evidence](docs/releases/v0.8.2.md)
+- [v0.8.1 Sidecar Check Hardening](docs/releases/v0.8.1.md)
+- [v0.8.0 Sidecar Handoff Bundle](docs/releases/v0.8.0.md)
+- [Sidecar receiver acceptance v0.8.2](docs/dogfooding/sidecar-receiver-acceptance-v0.8.2.md)
 - [Receiver friction log](docs/dogfooding/receiver-friction-log.md)
 - [Receiver Flow dogfooding evidence](docs/dogfooding/receiver-flow-dogfooding.md)
 - [Receiver Flow guided dogfooding](docs/dogfooding/receiver-flow-guided-dogfooding.md)

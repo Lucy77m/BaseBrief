@@ -58,6 +58,17 @@ npm run check
 
 These scripts only wrap local Node commands. BaseBrief is still not a published npm package, global command, plugin, or provider integration.
 
+## Project State Sidecar
+
+When a repository already has a valid `.basebrief/state.json`, Sidecar can package that Project State into a local bundle for the next chat:
+
+```text
+node scripts/basebrief.js sidecar-build --repo . --target generic --output-dir tests/outputs/private/sidecar-generic --json
+node scripts/basebrief.js sidecar-check --input tests/outputs/private/sidecar-generic --json
+```
+
+`sidecar-build` creates a `generic` or `openclaw` handoff bundle. `sidecar-check` is a read-only structure gate for the bundle and receiver boundaries. The v0.8.x Sidecar is a local consumer layer for `basebrief-project-state-v1`; it does not change the schema, is not Auto Flow, does not create sessions, does not call providers, and does not integrate with the OpenClaw/Hermes runtime. Sidecar public boundaries stay No provider request / No raw private output / No runtime integration / No schema change; when provider environment variables are absent, release checks keep `provider_probe_status=skipped`. Public records: [v0.8.0](docs/releases/v0.8.0.md), [v0.8.1](docs/releases/v0.8.1.md), [v0.8.2](docs/releases/v0.8.2.md), [v0.8.3](docs/releases/v0.8.3.md), and the [v0.8.x test matrix](docs/testing-v0.8.x-test-matrix.md).
+
 ## Seal/Diff
 
 Seal/Diff answers: what changed in facts, decisions, risks, and task boundaries between two phases?
@@ -91,7 +102,8 @@ It only processes explicit input files and does not scan or modify other project
 - handoff builder and file-based Codex / Claude adapters
 - artifact checker
 - optional read-only Receiver Safe Check v1
-- zero-dependency CLI Lite: `init`, `build`, `check`, `receiver-init`, `receiver-check`, `receiver-flow`, `review-draft`, `state-init`, `state-read`, `state-status`, `state-validate`, `state-history`, `state-advance`, `seal`, `diff`
+- zero-dependency CLI Lite: `init`, `build`, `check`, `receiver-init`, `receiver-check`, `receiver-flow`, `review-draft`, `state-init`, `state-read`, `state-status`, `state-validate`, `state-history`, `state-advance`, `sidecar-build`, `sidecar-check`, `seal`, `diff`
+- Project State Sidecar: builds `generic` / `openclaw` bundles from local `basebrief-project-state-v1` state and checks them with `basebrief-sidecar-v1`
 - local file-based Seal/Diff v1
 
 BaseBrief is not a chat client, agent runtime, hosted platform, secret manager, project-management system, or provider gateway.
@@ -109,6 +121,12 @@ BaseBrief is not a chat client, agent runtime, hosted platform, secret manager, 
 - [Project State validation rules](docs/design/project-state-validation-rules.md)
 - [Project State lifecycle readiness](docs/design/project-state-lifecycle-readiness.md)
 - [Project State lifecycle model](docs/design/project-state-lifecycle-model.md)
+- [v0.8.x sidecar test matrix](docs/testing-v0.8.x-test-matrix.md)
+- [v0.8.3 Sidecar Discoverability Polish](docs/releases/v0.8.3.md)
+- [v0.8.2 Sidecar Receiver Acceptance Evidence](docs/releases/v0.8.2.md)
+- [v0.8.1 Sidecar Check Hardening](docs/releases/v0.8.1.md)
+- [v0.8.0 Sidecar Handoff Bundle](docs/releases/v0.8.0.md)
+- [Sidecar receiver acceptance v0.8.2](docs/dogfooding/sidecar-receiver-acceptance-v0.8.2.md)
 - [Receiver friction log](docs/dogfooding/receiver-friction-log.md)
 - [Receiver Flow dogfooding evidence](docs/dogfooding/receiver-flow-dogfooding.md)
 - [Receiver Flow guided dogfooding](docs/dogfooding/receiver-flow-guided-dogfooding.md)

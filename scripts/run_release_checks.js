@@ -118,6 +118,7 @@ function checkRequiredFiles() {
     "docs/releases/v0.8.0.md",
     "docs/releases/v0.8.1.md",
     "docs/releases/v0.8.2.md",
+    "docs/releases/v0.8.3.md",
     "docs/testing-v0.4.x-test-matrix.md",
     "docs/testing-v0.6.x-test-matrix.md",
     "docs/testing-v0.7.x-test-matrix.md",
@@ -279,6 +280,7 @@ function checkContentContracts() {
   const sidecarV080ReleaseDoc = readText("docs/releases/v0.8.0.md");
   const sidecarV081ReleaseDoc = readText("docs/releases/v0.8.1.md");
   const sidecarV082ReleaseDoc = readText("docs/releases/v0.8.2.md");
+  const sidecarV083ReleaseDoc = readText("docs/releases/v0.8.3.md");
   const postReleaseBaselineDoc = readText("docs/baselines/v0.4.0-post-release-baseline.md");
   const v060PostReleaseBaselineDoc = readText("docs/baselines/v0.6.0-post-release-baseline.md");
   const projectStateModelDoc = readText("docs/design/project-state-model.md");
@@ -338,6 +340,17 @@ function checkContentContracts() {
   assert(readme.includes("docs/receiver-flow.md"), "README.md should link to Receiver Flow Draft docs");
   assert(readme.includes("docs/project-state.md"), "README.md should link to Project State docs");
   assert(readme.includes("receiver-flow"), "README.md should mention receiver-flow command");
+  assert(readme.includes("sidecar-build"), "README.md should mention sidecar-build command");
+  assert(readme.includes("sidecar-check"), "README.md should mention sidecar-check command");
+  assert(readme.includes("generic"), "README.md should mention generic sidecar target");
+  assert(readme.includes("openclaw"), "README.md should mention openclaw sidecar target");
+  assert(readme.includes("basebrief-project-state-v1"), "README.md should mention Project State schema");
+  assert(readme.includes("basebrief-sidecar-v1"), "README.md should mention Sidecar schema");
+  assert(readme.includes("No provider request"), "README.md should preserve sidecar no-provider boundary");
+  assert(readme.includes("No raw private output"), "README.md should preserve sidecar raw-output boundary");
+  assert(readme.includes("No runtime integration"), "README.md should preserve sidecar runtime boundary");
+  assert(readme.includes("No schema change"), "README.md should preserve sidecar schema boundary");
+  assert(readme.includes("provider_probe_status=skipped"), "README.md should preserve skipped provider probe wording");
   assert(readme.includes("docs/dogfooding/receiver-friction-log.md"), "README.md should link to receiver friction log");
   assert(readme.includes("docs/dogfooding/receiver-flow-dogfooding.md"), "README.md should link to receiver-flow dogfooding evidence");
   assert(readme.includes("docs/dogfooding/receiver-flow-guided-dogfooding.md"), "README.md should link to guided receiver-flow dogfooding evidence");
@@ -356,6 +369,11 @@ function checkContentContracts() {
   assert(readme.includes("docs/baselines/v0.6.0-post-release-baseline.md"), "README.md should link to v0.6.0 post-release baseline");
   assert(readme.includes("docs/testing-v0.6.x-test-matrix.md"), "README.md should link to v0.6.x test matrix");
   assert(readme.includes("docs/testing-v0.7.x-test-matrix.md"), "README.md should link to v0.7.x test matrix");
+  assert(readme.includes("docs/testing-v0.8.x-test-matrix.md"), "README.md should link to v0.8.x sidecar test matrix");
+  assert(readme.includes("docs/releases/v0.8.3.md"), "README.md should link to v0.8.3 sidecar discoverability polish");
+  assert(readme.includes("docs/releases/v0.8.2.md"), "README.md should link to v0.8.2 sidecar receiver acceptance evidence");
+  assert(readme.includes("docs/releases/v0.8.1.md"), "README.md should link to v0.8.1 sidecar check hardening");
+  assert(readme.includes("docs/releases/v0.8.0.md"), "README.md should link to v0.8.0 sidecar handoff bundle");
   assert(readme.includes("docs/releases/v0.7.0.md"), "README.md should link to v0.7.0 lifecycle release candidate");
   assert(readme.includes("docs/releases/v0.6.3.md"), "README.md should link to v0.6.3 lifecycle readiness candidate");
   assert(readme.includes("docs/releases/v0.6.2.md"), "README.md should link to v0.6.2 self-dogfooding evidence candidate");
@@ -389,6 +407,17 @@ function checkContentContracts() {
   assert(englishReadme.includes("receiver-flow"), "README.en.md should mention receiver-flow command");
   assert(englishReadme.includes("state-init"), "README.en.md should mention state-init command");
   assert(englishReadme.includes("state-read"), "README.en.md should mention state-read command");
+  assert(englishReadme.includes("sidecar-build"), "README.en.md should mention sidecar-build command");
+  assert(englishReadme.includes("sidecar-check"), "README.en.md should mention sidecar-check command");
+  assert(englishReadme.includes("generic"), "README.en.md should mention generic sidecar target");
+  assert(englishReadme.includes("openclaw"), "README.en.md should mention openclaw sidecar target");
+  assert(englishReadme.includes("basebrief-project-state-v1"), "README.en.md should mention Project State schema");
+  assert(englishReadme.includes("basebrief-sidecar-v1"), "README.en.md should mention Sidecar schema");
+  assert(englishReadme.includes("No provider request"), "README.en.md should preserve sidecar no-provider boundary");
+  assert(englishReadme.includes("No raw private output"), "README.en.md should preserve sidecar raw-output boundary");
+  assert(englishReadme.includes("No runtime integration"), "README.en.md should preserve sidecar runtime boundary");
+  assert(englishReadme.includes("No schema change"), "README.en.md should preserve sidecar schema boundary");
+  assert(englishReadme.includes("provider_probe_status=skipped"), "README.en.md should preserve skipped provider probe wording");
   assert(englishReadme.includes("docs/dogfooding/receiver-friction-log.md"), "README.en.md should link to receiver friction log");
   assert(englishReadme.includes("docs/dogfooding/receiver-flow-dogfooding.md"), "README.en.md should link to receiver-flow dogfooding evidence");
   assert(englishReadme.includes("docs/dogfooding/receiver-flow-guided-dogfooding.md"), "README.en.md should link to guided receiver-flow dogfooding evidence");
@@ -407,6 +436,11 @@ function checkContentContracts() {
   assert(englishReadme.includes("docs/baselines/v0.6.0-post-release-baseline.md"), "README.en.md should link to v0.6.0 post-release baseline");
   assert(englishReadme.includes("docs/testing-v0.6.x-test-matrix.md"), "README.en.md should link to v0.6.x test matrix");
   assert(englishReadme.includes("docs/testing-v0.7.x-test-matrix.md"), "README.en.md should link to v0.7.x test matrix");
+  assert(englishReadme.includes("docs/testing-v0.8.x-test-matrix.md"), "README.en.md should link to v0.8.x sidecar test matrix");
+  assert(englishReadme.includes("docs/releases/v0.8.3.md"), "README.en.md should link to v0.8.3 sidecar discoverability polish");
+  assert(englishReadme.includes("docs/releases/v0.8.2.md"), "README.en.md should link to v0.8.2 sidecar receiver acceptance evidence");
+  assert(englishReadme.includes("docs/releases/v0.8.1.md"), "README.en.md should link to v0.8.1 sidecar check hardening");
+  assert(englishReadme.includes("docs/releases/v0.8.0.md"), "README.en.md should link to v0.8.0 sidecar handoff bundle");
   assert(englishReadme.includes("docs/releases/v0.7.0.md"), "README.en.md should link to v0.7.0 lifecycle release candidate");
   assert(englishReadme.includes("docs/releases/v0.6.3.md"), "README.en.md should link to v0.6.3 lifecycle readiness candidate");
   assert(englishReadme.includes("docs/releases/v0.6.2.md"), "README.en.md should link to v0.6.2 self-dogfooding evidence candidate");
@@ -480,6 +514,7 @@ function checkContentContracts() {
   assert(docsIndex.includes("releases/v0.8.0.md"), "Docs index must link v0.8.0 sidecar release candidate");
   assert(docsIndex.includes("releases/v0.8.1.md"), "Docs index must link v0.8.1 sidecar check hardening candidate");
   assert(docsIndex.includes("releases/v0.8.2.md"), "Docs index must link v0.8.2 sidecar receiver acceptance evidence candidate");
+  assert(docsIndex.includes("releases/v0.8.3.md"), "Docs index must link v0.8.3 sidecar discoverability polish candidate");
   assert(docsIndex.includes("releases/v0.7.0.md"), "Docs index must link v0.7.0 lifecycle release candidate");
   assert(docsIndex.includes("releases/v0.6.3.md"), "Docs index must link v0.6.3 lifecycle readiness candidate");
   assert(docsIndex.includes("releases/v0.6.2.md"), "Docs index must link v0.6.2 self-dogfooding evidence candidate");
@@ -1118,6 +1153,20 @@ function checkContentContracts() {
   assert(sidecarV082ReleaseDoc.includes("No Auto Flow"), "v0.8.2 release doc must state no Auto Flow");
   assert(sidecarV082ReleaseDoc.includes("Wait for user confirmation"), "v0.8.2 release doc must state user-confirmation boundary");
   assert(sidecarV082ReleaseDoc.includes("provider_probe_status=skipped"), "v0.8.2 release doc must preserve skipped provider gate");
+  assert(sidecarV083ReleaseDoc.includes("Sidecar Discoverability Polish Candidate"), "v0.8.3 release doc must describe sidecar discoverability polish");
+  assert(sidecarV083ReleaseDoc.includes("sidecar-build"), "v0.8.3 release doc must document sidecar-build");
+  assert(sidecarV083ReleaseDoc.includes("sidecar-check"), "v0.8.3 release doc must document sidecar-check");
+  assert(sidecarV083ReleaseDoc.includes("generic"), "v0.8.3 release doc must document generic target");
+  assert(sidecarV083ReleaseDoc.includes("openclaw"), "v0.8.3 release doc must document openclaw target");
+  assert(sidecarV083ReleaseDoc.includes("basebrief-project-state-v1"), "v0.8.3 release doc must preserve project-state schema");
+  assert(sidecarV083ReleaseDoc.includes("basebrief-sidecar-v1"), "v0.8.3 release doc must preserve sidecar schema");
+  assert(sidecarV083ReleaseDoc.includes("No provider request"), "v0.8.3 release doc must state no provider request");
+  assert(sidecarV083ReleaseDoc.includes("No raw private output"), "v0.8.3 release doc must state no raw private output");
+  assert(sidecarV083ReleaseDoc.includes("No runtime integration"), "v0.8.3 release doc must state no runtime integration");
+  assert(sidecarV083ReleaseDoc.includes("No schema change"), "v0.8.3 release doc must state no schema change");
+  assert(sidecarV083ReleaseDoc.includes("No Auto Flow"), "v0.8.3 release doc must state no Auto Flow");
+  assert(sidecarV083ReleaseDoc.includes("Wait for user confirmation"), "v0.8.3 release doc must state user-confirmation boundary");
+  assert(sidecarV083ReleaseDoc.includes("provider_probe_status=skipped"), "v0.8.3 release doc must preserve skipped provider gate");
   assert(sidecarReceiverAcceptanceV082Doc.includes("Sidecar Receiver Acceptance v0.8.2"), "v0.8.2 dogfooding doc must have stable title");
   assert(sidecarReceiverAcceptanceV082Doc.includes("sidecar-build"), "v0.8.2 dogfooding doc must document sidecar-build");
   assert(sidecarReceiverAcceptanceV082Doc.includes("sidecar-check"), "v0.8.2 dogfooding doc must document sidecar-check");
@@ -1139,6 +1188,8 @@ function checkContentContracts() {
   assert(v08xTestMatrixDoc.includes("No raw private output"), "v0.8.x matrix must state no raw private output");
   assert(v08xTestMatrixDoc.includes("No runtime integration"), "v0.8.x matrix must state no runtime integration");
   assert(v08xTestMatrixDoc.includes("No schema change"), "v0.8.x matrix must state no schema change");
+  assert(v08xTestMatrixDoc.includes("v0.8.3 Discoverability Polish"), "v0.8.x matrix must document v0.8.3 discoverability polish");
+  assert(v08xTestMatrixDoc.includes("basebrief-sidecar-v1"), "v0.8.x matrix must preserve sidecar schema");
   assert(v08xTestMatrixDoc.includes("provider_probe_status=skipped"), "v0.8.x matrix must preserve skipped provider gate");
   assert(projectStateSchema.properties.schemaVersion.const === "basebrief-project-state-v1", "Project State schema version mismatch");
   assert(projectStateExample.schemaVersion === "basebrief-project-state-v1", "Project State example schema version mismatch");
@@ -1385,6 +1436,7 @@ function checkArtifactChecker() {
     "docs/releases/v0.8.0.md",
     "docs/releases/v0.8.1.md",
     "docs/releases/v0.8.2.md",
+    "docs/releases/v0.8.3.md",
     "examples/receiver-check-config.json",
     "examples/receiver/difference-found",
     "examples/receiver/blocked",

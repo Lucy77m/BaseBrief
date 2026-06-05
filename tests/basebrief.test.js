@@ -1075,6 +1075,53 @@ test("v0.8.2 sidecar receiver acceptance evidence stays public-safe", () => {
   }
 });
 
+test("v0.8.3 sidecar discoverability polish links README and docs", () => {
+  const readme = readText("README.md");
+  const englishReadme = readText("README.en.md");
+  const docsIndex = readText("docs/index.md");
+  const matrix = readText("docs/testing-v0.8.x-test-matrix.md");
+  const release = readText("docs/releases/v0.8.3.md");
+
+  for (const doc of [readme, englishReadme, matrix, release]) {
+    assert.match(doc, /sidecar-build/);
+    assert.match(doc, /sidecar-check/);
+    assert.match(doc, /generic/);
+    assert.match(doc, /openclaw/);
+    assert.match(doc, /provider_probe_status=skipped/);
+  }
+
+  for (const doc of [readme, englishReadme, release]) {
+    assert.match(doc, /No provider request/);
+    assert.match(doc, /No raw private output/);
+    assert.match(doc, /No runtime integration/);
+    assert.match(doc, /No schema change/);
+    assert.match(doc, /basebrief-project-state-v1/);
+    assert.match(doc, /basebrief-sidecar-v1/);
+  }
+
+  assert.match(readme, /docs\/releases\/v0\.8\.0\.md/);
+  assert.match(readme, /docs\/releases\/v0\.8\.1\.md/);
+  assert.match(readme, /docs\/releases\/v0\.8\.2\.md/);
+  assert.match(readme, /docs\/releases\/v0\.8\.3\.md/);
+  assert.match(englishReadme, /docs\/testing-v0\.8\.x-test-matrix\.md/);
+  assert.match(docsIndex, /releases\/v0\.8\.3\.md/);
+  assert.match(matrix, /v0\.8\.3 Discoverability Polish/);
+  assert.match(release, /Sidecar Discoverability Polish Candidate/);
+  assert.match(release, /No Auto Flow/);
+  assert.match(release, /Wait for user confirmation/);
+
+  for (const relativePath of [
+    "README.md",
+    "README.en.md",
+    "docs/testing-v0.8.x-test-matrix.md",
+    "docs/releases/v0.8.3.md",
+  ]) {
+    const result = checkArtifacts({ inputPath: path.join(repoRoot, relativePath) });
+    assert.equal(result.status, "passed", relativePath);
+    assert.equal(result.errorCount, 0, relativePath);
+  }
+});
+
 test("public quickstart and minimal examples provide a clean first-use path", () => {
   const quickstart = readText("docs/quickstart-5min.md");
   const minimalBrief = readText("examples/minimal/output-basebrief-lite.md");
