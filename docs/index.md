@@ -20,6 +20,7 @@
 
 ## 方向与验证
 
+- [v0.5.3 receiver flow review closure](releases/v0.5.3.md)
 - [v0.5.2 receiver flow extract candidate](releases/v0.5.2.md)
 - [v0.5.1 review draft gate candidate](releases/v0.5.1.md)
 - [v0.5.0 guided receiver flow candidate](releases/v0.5.0.md)
@@ -42,6 +43,7 @@
 - [Receiver Flow guided dogfooding](dogfooding/receiver-flow-guided-dogfooding.md)
 - [Receiver Flow review-draft dogfooding](dogfooding/receiver-flow-review-draft-dogfooding.md)
 - [Receiver Flow extract dogfooding](dogfooding/receiver-flow-extract-dogfooding.md)
+- [Receiver Flow v0.5.x closure dogfooding](dogfooding/receiver-flow-v0.5.x-closure.md)
 - [Usability feedback template](../.github/ISSUE_TEMPLATE/usability_feedback.md)
 
 ## Cache-ready 实验历史
@@ -75,3 +77,6 @@
 - [Receiver Flow clean repo draft](../examples/receiver-flow/clean-repo/README.md)
 - [Receiver Flow dirty repo draft](../examples/receiver-flow/dirty-repo/README.md)
 - [Receiver Flow visible output draft](../examples/receiver-flow/visible-output/README.md)
+- [Receiver Flow valid reviewed draft](../examples/receiver-flow-review/valid-ready/README.md)
+- [Receiver Flow rejected candidate draft](../examples/receiver-flow-review/rejected-candidate/README.md)
+- [Receiver Flow rejected empty draft](../examples/receiver-flow-review/rejected-empty/README.md)

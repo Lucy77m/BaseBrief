@@ -109,6 +109,8 @@ BaseBrief is not a chat client, agent runtime, hosted platform, secret manager, 
 - [Receiver Flow guided dogfooding](docs/dogfooding/receiver-flow-guided-dogfooding.md)
 - [Receiver Flow review-draft dogfooding](docs/dogfooding/receiver-flow-review-draft-dogfooding.md)
 - [Receiver Flow extract dogfooding](docs/dogfooding/receiver-flow-extract-dogfooding.md)
+- [Receiver Flow v0.5.x closure dogfooding](docs/dogfooding/receiver-flow-v0.5.x-closure.md)
+- [v0.5.3 Receiver Flow Review Closure](docs/releases/v0.5.3.md)
 - [v0.5.2 Receiver Flow Extract Candidate](docs/releases/v0.5.2.md)
 - [v0.5.1 Review Draft Gate Candidate](docs/releases/v0.5.1.md)
 - [v0.5.0 Guided Receiver Flow Candidate](docs/releases/v0.5.0.md)

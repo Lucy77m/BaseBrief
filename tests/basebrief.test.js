@@ -638,6 +638,50 @@ test("v0.5.2 receiver flow extract documents candidate-only boundaries", () => {
   }
 });
 
+test("v0.5.3 receiver flow review closure documents accepted and rejected examples", () => {
+  const readme = readText("README.md");
+  const englishReadme = readText("README.en.md");
+  const docsIndex = readText("docs/index.md");
+  const testing = readText("docs/testing.md");
+  const dogfooding = readText("docs/dogfooding/receiver-flow-v0.5.x-closure.md");
+  const release = readText("docs/releases/v0.5.3.md");
+  const validReady = readText("examples/receiver-flow-review/valid-ready/receiver-ready.md");
+  const rejectedCandidate = readText("examples/receiver-flow-review/rejected-candidate/draft-context.md");
+  const rejectedEmpty = readText("examples/receiver-flow-review/rejected-empty/draft-context.md");
+
+  assert.match(readme, /docs\/releases\/v0\.5\.3\.md/);
+  assert.match(englishReadme, /docs\/releases\/v0\.5\.3\.md/);
+  assert.match(docsIndex, /releases\/v0\.5\.3\.md/);
+  assert.match(docsIndex, /dogfooding\/receiver-flow-v0\.5\.x-closure\.md/);
+  assert.match(docsIndex, /examples\/receiver-flow-review\/valid-ready\/README\.md/);
+  assert.match(docsIndex, /examples\/receiver-flow-review\/rejected-candidate\/README\.md/);
+  assert.match(docsIndex, /examples\/receiver-flow-review\/rejected-empty\/README\.md/);
+  assert.match(testing, /v0\.5\.3 Receiver Flow Review Closure/);
+  assert.match(dogfooding, /v0\.5\.x-review-closure/);
+  assert.match(dogfooding, /\[CANDIDATE\]/);
+  assert.match(dogfooding, /\[EMPTY\]/);
+  assert.match(release, /Receiver Flow Review Closure/);
+  assert.match(release, /No new CLI command/);
+  assert.match(release, /No `.basebrief\/`/);
+  assert.match(release, /provider_probe_status=skipped/);
+  assert.match(validReady, /handoff_status: ready_for_receiver/);
+  assert.match(rejectedCandidate, /\[CANDIDATE\]/);
+  assert.match(rejectedEmpty, /\[EMPTY\]/);
+
+  for (const relativePath of [
+    "docs/dogfooding/receiver-flow-v0.5.x-closure.md",
+    "docs/releases/v0.5.3.md",
+    "examples/receiver-flow-review/valid-ready",
+    "examples/receiver-flow-review/rejected-candidate",
+    "examples/receiver-flow-review/rejected-empty",
+  ]) {
+    const result = checkArtifacts({ inputPath: path.join(repoRoot, relativePath) });
+    assert.equal(result.status, "passed", relativePath);
+    assert.equal(result.errorCount, 0, relativePath);
+    assert.equal(result.warningCount, 0, relativePath);
+  }
+});
+
 test("public quickstart and minimal examples provide a clean first-use path", () => {
   const quickstart = readText("docs/quickstart-5min.md");
   const minimalBrief = readText("examples/minimal/output-basebrief-lite.md");

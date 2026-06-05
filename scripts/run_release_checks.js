@@ -79,6 +79,8 @@ function checkRequiredFiles() {
     "docs/dogfooding/receiver-flow-guided-dogfooding.md",
     "docs/dogfooding/receiver-flow-review-draft-dogfooding.md",
     "docs/dogfooding/receiver-flow-extract-dogfooding.md",
+    "docs/dogfooding/receiver-flow-v0.5.x-closure.md",
+    "docs/dogfooding/receiver-flow-v0.5.x-closure.md",
     "docs/integrations.md",
     "docs/adapters.md",
     "docs/walkthrough.md",
@@ -97,6 +99,8 @@ function checkRequiredFiles() {
     "docs/releases/v0.5.0.md",
     "docs/releases/v0.5.1.md",
     "docs/releases/v0.5.2.md",
+    "docs/releases/v0.5.3.md",
+    "docs/releases/v0.5.3.md",
     "docs/testing-v0.4.x-test-matrix.md",
     "docs/cli-lite.md",
     "docs/seal-diff.md",
@@ -179,6 +183,13 @@ function checkRequiredFiles() {
     "examples/receiver-flow/visible-output/flow-summary.json",
     "examples/receiver-flow/visible-output/receiver-check.json",
     "examples/receiver-flow/visible-output/draft-context.md",
+    "examples/receiver-flow-review/valid-ready/README.md",
+    "examples/receiver-flow-review/valid-ready/draft-context.md",
+    "examples/receiver-flow-review/valid-ready/receiver-ready.md",
+    "examples/receiver-flow-review/rejected-candidate/README.md",
+    "examples/receiver-flow-review/rejected-candidate/draft-context.md",
+    "examples/receiver-flow-review/rejected-empty/README.md",
+    "examples/receiver-flow-review/rejected-empty/draft-context.md",
     "examples/agent-task-example.md",
     "examples/minimal/README.md",
     "examples/minimal/input-project-notes.md",
@@ -207,6 +218,7 @@ function checkContentContracts() {
   const receiverFlowGuidedDogfoodingDoc = readText("docs/dogfooding/receiver-flow-guided-dogfooding.md");
   const receiverFlowReviewDraftDogfoodingDoc = readText("docs/dogfooding/receiver-flow-review-draft-dogfooding.md");
   const receiverFlowExtractDogfoodingDoc = readText("docs/dogfooding/receiver-flow-extract-dogfooding.md");
+  const receiverFlowClosureDogfoodingDoc = readText("docs/dogfooding/receiver-flow-v0.5.x-closure.md");
   const testingDoc = readText("docs/testing.md");
   const usabilityFeedbackTemplate = readText(".github/ISSUE_TEMPLATE/usability_feedback.md");
   const adaptersDoc = readText("docs/adapters.md");
@@ -225,6 +237,7 @@ function checkContentContracts() {
   const guidedReceiverFlowReleaseDoc = readText("docs/releases/v0.5.0.md");
   const reviewDraftReleaseDoc = readText("docs/releases/v0.5.1.md");
   const extractReceiverFlowReleaseDoc = readText("docs/releases/v0.5.2.md");
+  const receiverFlowClosureReleaseDoc = readText("docs/releases/v0.5.3.md");
   const postReleaseBaselineDoc = readText("docs/baselines/v0.4.0-post-release-baseline.md");
   const testMatrixDoc = readText("docs/testing-v0.4.x-test-matrix.md");
   const cliLiteDoc = readText("docs/cli-lite.md");
@@ -278,6 +291,8 @@ function checkContentContracts() {
   assert(readme.includes("docs/dogfooding/receiver-flow-guided-dogfooding.md"), "README.md should link to guided receiver-flow dogfooding evidence");
   assert(readme.includes("docs/dogfooding/receiver-flow-review-draft-dogfooding.md"), "README.md should link to review-draft dogfooding evidence");
   assert(readme.includes("docs/dogfooding/receiver-flow-extract-dogfooding.md"), "README.md should link to extract dogfooding evidence");
+  assert(readme.includes("docs/dogfooding/receiver-flow-v0.5.x-closure.md"), "README.md should link to v0.5.x closure dogfooding evidence");
+  assert(readme.includes("docs/releases/v0.5.3.md"), "README.md should link to v0.5.3 review closure");
   assert(readme.includes("docs/releases/v0.5.2.md"), "README.md should link to v0.5.2 extract candidate");
   assert(readme.includes("docs/releases/v0.5.1.md"), "README.md should link to v0.5.1 review draft gate candidate");
   assert(readme.includes("docs/releases/v0.5.0.md"), "README.md should link to v0.5.0 guided receiver flow candidate");
@@ -308,6 +323,8 @@ function checkContentContracts() {
   assert(englishReadme.includes("docs/dogfooding/receiver-flow-guided-dogfooding.md"), "README.en.md should link to guided receiver-flow dogfooding evidence");
   assert(englishReadme.includes("docs/dogfooding/receiver-flow-review-draft-dogfooding.md"), "README.en.md should link to review-draft dogfooding evidence");
   assert(englishReadme.includes("docs/dogfooding/receiver-flow-extract-dogfooding.md"), "README.en.md should link to extract dogfooding evidence");
+  assert(englishReadme.includes("docs/dogfooding/receiver-flow-v0.5.x-closure.md"), "README.en.md should link to v0.5.x closure dogfooding evidence");
+  assert(englishReadme.includes("docs/releases/v0.5.3.md"), "README.en.md should link to v0.5.3 review closure");
   assert(englishReadme.includes("docs/releases/v0.5.2.md"), "README.en.md should link to v0.5.2 extract candidate");
   assert(englishReadme.includes("docs/releases/v0.5.1.md"), "README.en.md should link to v0.5.1 review draft gate candidate");
   assert(englishReadme.includes("docs/releases/v0.5.0.md"), "README.en.md should link to v0.5.0 guided receiver flow candidate");
@@ -350,6 +367,7 @@ function checkContentContracts() {
   assert(docsIndex.includes("dogfooding/receiver-flow-guided-dogfooding.md"), "Docs index must link guided receiver-flow dogfooding evidence");
   assert(docsIndex.includes("dogfooding/receiver-flow-review-draft-dogfooding.md"), "Docs index must link review-draft dogfooding evidence");
   assert(docsIndex.includes("dogfooding/receiver-flow-extract-dogfooding.md"), "Docs index must link extract dogfooding evidence");
+  assert(docsIndex.includes("dogfooding/receiver-flow-v0.5.x-closure.md"), "Docs index must link v0.5.x closure dogfooding evidence");
   assert(docsIndex.includes("receiver-flow.md"), "Docs index must link Receiver Flow Draft docs");
   assert(docsIndex.includes("../examples/receiver/difference-found/README.md"), "Docs index should link receiver difference example");
   assert(docsIndex.includes("../examples/receiver/blocked/README.md"), "Docs index should link receiver blocked example");
@@ -357,8 +375,12 @@ function checkContentContracts() {
   assert(docsIndex.includes("../examples/receiver-flow/clean-repo/README.md"), "Docs index should link receiver-flow clean repo example");
   assert(docsIndex.includes("../examples/receiver-flow/dirty-repo/README.md"), "Docs index should link receiver-flow dirty repo example");
   assert(docsIndex.includes("../examples/receiver-flow/visible-output/README.md"), "Docs index should link receiver-flow visible output example");
+  assert(docsIndex.includes("../examples/receiver-flow-review/valid-ready/README.md"), "Docs index should link valid reviewed draft example");
+  assert(docsIndex.includes("../examples/receiver-flow-review/rejected-candidate/README.md"), "Docs index should link rejected candidate draft example");
+  assert(docsIndex.includes("../examples/receiver-flow-review/rejected-empty/README.md"), "Docs index should link rejected empty draft example");
   assert(docsIndex.includes("releases/v0.5.1.md"), "Docs index must link v0.5.1 review draft gate candidate");
   assert(docsIndex.includes("releases/v0.5.2.md"), "Docs index must link v0.5.2 extract candidate");
+  assert(docsIndex.includes("releases/v0.5.3.md"), "Docs index must link v0.5.3 review closure");
   assert(docsIndex.includes("releases/v0.5.0.md"), "Docs index must link v0.5.0 guided receiver flow candidate");
   assert(docsIndex.includes("releases/v0.4.1.md"), "Docs index must link v0.4.1 stabilization candidate");
   assert(docsIndex.includes("baselines/v0.4.0-post-release-baseline.md"), "Docs index must link v0.4.0 post-release baseline");
@@ -401,6 +423,12 @@ function checkContentContracts() {
   assert(receiverFlowExtractDogfoodingDoc.includes("[NEEDS_REVIEW]"), "Extract dogfooding doc must document missing field markers");
   assert(receiverFlowExtractDogfoodingDoc.includes("provider_request_performed`: false"), "Extract dogfooding doc must state no provider request");
   assert(receiverFlowExtractDogfoodingDoc.includes("No Auto Flow"), "Extract dogfooding doc must reject Auto Flow");
+  assert(receiverFlowClosureDogfoodingDoc.includes("v0.5.x-review-closure"), "v0.5.x closure dogfooding doc must include closure case");
+  assert(receiverFlowClosureDogfoodingDoc.includes("ready_shape"), "v0.5.x closure dogfooding doc must document ready shape");
+  assert(receiverFlowClosureDogfoodingDoc.includes("[CANDIDATE]"), "v0.5.x closure dogfooding doc must document candidate marker");
+  assert(receiverFlowClosureDogfoodingDoc.includes("[EMPTY]"), "v0.5.x closure dogfooding doc must document empty marker");
+  assert(receiverFlowClosureDogfoodingDoc.includes("provider_request_performed`: false"), "v0.5.x closure dogfooding doc must state no provider request");
+  assert(receiverFlowClosureDogfoodingDoc.includes("No `.basebrief/` project state directory in `v0.5.x`"), "v0.5.x closure dogfooding doc must keep .basebrief out of v0.5.x");
   assert(receiverFlowDoc.includes("receiver-flow --repo <target-repo> --output-dir <dir>"), "Receiver Flow docs must document the command");
   assert(receiverFlowDoc.includes("receiver-flow --repo <target-repo> --output-dir <dir> --guided"), "Receiver Flow docs must document guided mode");
   assert(receiverFlowDoc.includes("receiver-flow --repo <target-repo> --output-dir <dir> --extract --source <draft-or-context.md>"), "Receiver Flow docs must document extract mode");
@@ -428,6 +456,7 @@ function checkContentContracts() {
   assert(testingDoc.includes("v0.5.0 Guided Receiver Flow Candidate"), "Testing docs must document v0.5.0 guided receiver flow candidate");
   assert(testingDoc.includes("v0.5.1 Review Draft Gate Candidate"), "Testing docs must document v0.5.1 review draft gate candidate");
   assert(testingDoc.includes("v0.5.2 Receiver Flow Extract Candidate"), "Testing docs must document v0.5.2 extract candidate");
+  assert(testingDoc.includes("v0.5.3 Receiver Flow Review Closure"), "Testing docs must document v0.5.3 review closure");
   assert(testingDoc.includes("provider_probe_status=skipped"), "Testing docs must preserve skipped provider probe wording");
   assert(usabilityFeedbackTemplate.includes("Do not include secrets"), "Usability feedback template must include a safety warning");
   assert(usabilityFeedbackTemplate.includes("Expected Result"), "Usability feedback template must collect expected results");
@@ -714,6 +743,20 @@ function checkContentContracts() {
   assert(extractReceiverFlowReleaseDoc.includes("No Auto Flow"), "v0.5.2 candidate must state no Auto Flow");
   assert(extractReceiverFlowReleaseDoc.includes("No `.basebrief/`"), "v0.5.2 candidate must state no .basebrief directory");
   assert(extractReceiverFlowReleaseDoc.includes("No push, tag, or formal release"), "v0.5.2 candidate must keep release actions pending");
+  assert(receiverFlowClosureReleaseDoc.includes("Receiver Flow Review Closure"), "v0.5.3 candidate must describe review closure");
+  assert(receiverFlowClosureReleaseDoc.includes("does not add new CLI commands"), "v0.5.3 candidate must avoid new command scope");
+  assert(receiverFlowClosureReleaseDoc.includes("rejected-candidate"), "v0.5.3 candidate must document rejected candidate example");
+  assert(receiverFlowClosureReleaseDoc.includes("rejected-empty"), "v0.5.3 candidate must document rejected empty example");
+  assert(receiverFlowClosureReleaseDoc.includes("receiver-flow --extract --source <file>` behavior remains unchanged"), "v0.5.3 candidate must protect extract behavior");
+  assert(receiverFlowClosureReleaseDoc.includes("review-draft` behavior remains unchanged"), "v0.5.3 candidate must protect review-draft behavior");
+  assert(receiverFlowClosureReleaseDoc.includes("BB9 handoff schema is unchanged"), "v0.5.3 candidate must protect BB9 schema");
+  assert(receiverFlowClosureReleaseDoc.includes("Receiver Safe Check config and result schemas are unchanged"), "v0.5.3 candidate must protect receiver schemas");
+  assert(receiverFlowClosureReleaseDoc.includes("provider_probe_status=skipped"), "v0.5.3 candidate must preserve skipped provider probe gate");
+  assert(receiverFlowClosureReleaseDoc.includes("No provider request"), "v0.5.3 candidate must state no provider request");
+  assert(receiverFlowClosureReleaseDoc.includes("No new CLI command"), "v0.5.3 candidate must state no new CLI command");
+  assert(receiverFlowClosureReleaseDoc.includes("No Auto Flow"), "v0.5.3 candidate must state no Auto Flow");
+  assert(receiverFlowClosureReleaseDoc.includes("No `.basebrief/`"), "v0.5.3 candidate must state no .basebrief directory");
+  assert(receiverFlowClosureReleaseDoc.includes("No push, tag, or formal release"), "v0.5.3 candidate must keep release actions pending");
   assert(receiverCheckSchema.properties.schemaVersion.const === "basebrief-receiver-check-v1", "Receiver Safe Check config schema version mismatch");
   assert(receiverCheckResultSchema.properties.schemaVersion.const === "basebrief-receiver-check-result-v1", "Receiver Safe Check result schema version mismatch");
   assert(receiverCheckConfigExample.schemaVersion === "basebrief-receiver-check-v1", "Receiver Safe Check example schema version mismatch");
@@ -885,6 +928,13 @@ function checkExamples() {
     "examples/receiver-flow/visible-output/flow-summary.json",
     "examples/receiver-flow/visible-output/receiver-check.json",
     "examples/receiver-flow/visible-output/draft-context.md",
+    "examples/receiver-flow-review/valid-ready/README.md",
+    "examples/receiver-flow-review/valid-ready/draft-context.md",
+    "examples/receiver-flow-review/valid-ready/receiver-ready.md",
+    "examples/receiver-flow-review/rejected-candidate/README.md",
+    "examples/receiver-flow-review/rejected-candidate/draft-context.md",
+    "examples/receiver-flow-review/rejected-empty/README.md",
+    "examples/receiver-flow-review/rejected-empty/draft-context.md",
     "examples/agent-task-example.md",
     "examples/minimal/README.md",
     "examples/minimal/input-project-notes.md",
@@ -932,6 +982,9 @@ function checkArtifactChecker() {
     "examples/receiver-flow/clean-repo",
     "examples/receiver-flow/dirty-repo",
     "examples/receiver-flow/visible-output",
+    "examples/receiver-flow-review/valid-ready",
+    "examples/receiver-flow-review/rejected-candidate",
+    "examples/receiver-flow-review/rejected-empty",
     ".github/ISSUE_TEMPLATE/usability_feedback.md",
   ];
   inputs.forEach((relativePath) => {

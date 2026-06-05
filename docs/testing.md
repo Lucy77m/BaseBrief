@@ -80,6 +80,20 @@ Expected release-check output without provider env remains:
 provider_probe_status=skipped
 ```
 
+## v0.5.3 Receiver Flow Review Closure
+
+`v0.5.3` closes the `v0.5.x` receiver-flow review line with examples for a
+valid reviewed draft, a rejected extracted candidate draft, and a rejected empty
+guided draft. It does not add a new CLI command, `.basebrief/`, Auto Flow, Web
+UI, adapter expansion, provider requests, npm publishing, push, tag, or formal
+release.
+
+Expected release-check output without provider env remains:
+
+```text
+provider_probe_status=skipped
+```
+
 ## Receiver 测试额度
 
 Receiver-ready 验证默认采用低额度策略：
@@ -165,7 +179,7 @@ npm run check
 - 安全扫描文件数：`136`
 - 相对链接检查：`122` 条有效
 - 公开示例文件：`28` 个存在
-- artifact checker 输入：`12` 个通过
+- artifact checker 输入：`37` 个通过
 - CLI Lite 命令：`11` 条通过
 - 首次使用闭环命令：`6` 条通过
 - Seal/Diff 命令：`3` 条通过
