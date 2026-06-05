@@ -24,6 +24,7 @@ const HELP_TEXT = [
   "  node scripts/basebrief.js receiver-init --repo <target-repo> --output <receiver-check.json> [--json]",
   "  node scripts/basebrief.js receiver-check --config <json> --repo <target-repo> [--json]",
   "  node scripts/basebrief.js receiver-flow --repo <target-repo> --output-dir <dir> [--guided] [--json]",
+  "  node scripts/basebrief.js receiver-flow --repo <target-repo> --output-dir <dir> --extract --source <draft-or-context.md> [--json]",
   "  node scripts/basebrief.js review-draft --draft <draft-context.md> --output <receiver-ready.md> [--json]",
   "  node scripts/basebrief.js seal --input <markdown-or-json> --output <file>",
   "  node scripts/basebrief.js diff --before <file> --after <file>",
@@ -41,7 +42,7 @@ function parseOptions(args) {
       continue;
     }
     const key = arg.slice(2);
-    if (key === "json" || key === "check" || key === "guided") {
+    if (key === "json" || key === "check" || key === "guided" || key === "extract") {
       options[key] = true;
       continue;
     }
@@ -237,6 +238,8 @@ function commandReceiverFlow(options) {
     outputDir: options["output-dir"],
     guided: Boolean(options.guided),
     guidedAnswers: options.guidedAnswers,
+    extract: Boolean(options.extract),
+    sourcePath: options.source,
   });
 }
 
@@ -325,6 +328,7 @@ function toPublicResult(result) {
       ...result,
       outputDir: publicPath(result.outputDir, cwd),
       outputFiles: toRelativeMap(result.outputFiles, cwd),
+      extract_source: result.extract_source ? publicPath(result.extract_source, cwd) : undefined,
     };
   }
   if (result.command === "review-draft") {
@@ -398,6 +402,7 @@ function formatHuman(result) {
       `handoff_status=${result.handoff_status}`,
       `expected_changed_files=${result.receiver_check_config.expected_changed_files.length}`,
       `guided=${result.guided}`,
+      `extract=${result.extract}`,
       "review_required=true",
       "",
     ].join(os.EOL);

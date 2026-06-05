@@ -595,6 +595,49 @@ test("v0.5.1 review draft gate documents receiver-ready promotion boundaries", (
   }
 });
 
+test("v0.5.2 receiver flow extract documents candidate-only boundaries", () => {
+  const readme = readText("README.md");
+  const englishReadme = readText("README.en.md");
+  const cliLite = readText("docs/cli-lite.md");
+  const docsIndex = readText("docs/index.md");
+  const testing = readText("docs/testing.md");
+  const receiverFlow = readText("docs/receiver-flow.md");
+  const dogfooding = readText("docs/dogfooding/receiver-flow-extract-dogfooding.md");
+  const release = readText("docs/releases/v0.5.2.md");
+
+  assert.match(readme, /docs\/releases\/v0\.5\.2\.md/);
+  assert.match(englishReadme, /docs\/releases\/v0\.5\.2\.md/);
+  assert.match(docsIndex, /releases\/v0\.5\.2\.md/);
+  assert.match(docsIndex, /dogfooding\/receiver-flow-extract-dogfooding\.md/);
+  assert.match(cliLite, /receiver-flow --repo <target-repo> --output-dir <dir> --extract --source <draft-or-context\.md>/);
+  assert.match(receiverFlow, /receiver-flow --repo <target-repo> --output-dir <dir> --extract --source <draft-or-context\.md>/);
+  assert.match(receiverFlow, /\[CANDIDATE\]/);
+  assert.match(receiverFlow, /\[NEEDS_REVIEW\]/);
+  assert.match(testing, /v0\.5\.2 Receiver Flow Extract Candidate/);
+  assert.match(dogfooding, /extract-self-smoke/);
+  assert.match(dogfooding, /provider_request_performed`: false/);
+  assert.match(release, /Receiver Flow Extract Candidate/);
+  assert.match(release, /\[CANDIDATE\]/);
+  assert.match(release, /\[NEEDS_REVIEW\]/);
+  assert.match(release, /handoff_status: draft_needs_review/);
+  assert.match(release, /No provider request/);
+  assert.match(release, /No automatic promotion to `ready_for_receiver`/);
+  assert.match(release, /No Auto Flow/);
+  assert.match(release, /No `.basebrief\/`/);
+  assert.match(release, /provider_probe_status=skipped/);
+  assert.match(release, /No push, tag, or formal release/);
+
+  for (const relativePath of [
+    "docs/dogfooding/receiver-flow-extract-dogfooding.md",
+    "docs/releases/v0.5.2.md",
+  ]) {
+    const result = checkArtifacts({ inputPath: path.join(repoRoot, relativePath) });
+    assert.equal(result.status, "passed", relativePath);
+    assert.equal(result.errorCount, 0, relativePath);
+    assert.equal(result.warningCount, 0, relativePath);
+  }
+});
+
 test("public quickstart and minimal examples provide a clean first-use path", () => {
   const quickstart = readText("docs/quickstart-5min.md");
   const minimalBrief = readText("examples/minimal/output-basebrief-lite.md");
@@ -1800,6 +1843,160 @@ test("CLI Lite exposes Receiver flow draft with public-safe json paths", () => w
     assert.equal(result.outputFiles.draftContext.includes("draft-context.md"), true);
   } finally {
     fs.rmSync(cliOutputDir, { recursive: true, force: true });
+  }
+}));
+
+test("Receiver flow extract writes candidate-only draft artifacts from an explicit source", () => withTempDir((tempDir) => {
+  const repoDir = createReceiverCheckRepo(tempDir);
+  const sourcePath = path.join(tempDir, "source-context.md");
+  fs.writeFileSync(sourcePath, [
+    "# Reviewed Source Context",
+    "",
+    "## current_goal",
+    "",
+    "Prepare the next receiver task.",
+    "",
+    "## verified_facts",
+    "",
+    "The source file is a local Markdown fixture.",
+    "",
+    "## confirmed_decisions",
+    "",
+    "Keep extracted content candidate-only.",
+    "",
+    "## risk_boundaries",
+    "",
+    "Do not read env files.",
+    "",
+    "## receiver_entry_task",
+    "",
+    "Review extracted candidates before sharing.",
+    "",
+    "## open_questions",
+    "",
+    "No open questions in this fixture.",
+    "",
+  ].join("\n"), "utf8");
+  const outputDir = path.join(tempDir, "extract-flow");
+  const result = runReceiverFlow({ repoPath: repoDir, outputDir, extract: true, sourcePath });
+  const draft = fs.readFileSync(path.join(outputDir, "draft-context.md"), "utf8");
+  const candidates = JSON.parse(fs.readFileSync(path.join(outputDir, "extract-candidates.json"), "utf8"));
+
+  assert.equal(result.command, "receiver-flow");
+  assert.equal(result.handoff_status, "draft_needs_review");
+  assert.equal(result.extract, true);
+  assert.equal(result.guided, false);
+  assert.equal(result.candidate_fields.length, 6);
+  assert(fs.existsSync(path.join(outputDir, "extract-candidates.json")));
+  assert.equal(candidates.schemaVersion, "basebrief-receiver-flow-extract-v1");
+  assert.equal(candidates.handoff_status, "draft_needs_review");
+  assert.equal(candidates.source_file, "source-context.md");
+  assert(candidates.candidate_fields.every((candidate) => candidate.value.startsWith("[CANDIDATE]")));
+  assert.match(draft, /## Extracted Candidate Fields/);
+  assert.match(draft, /source: receiver-flow --extract/);
+  assert.match(draft, /\[CANDIDATE\] Prepare the next receiver task/);
+  assert.match(draft, /- \[ \] current_goal reviewed \[CANDIDATE\]/);
+  assert.throws(
+    () => runReviewDraft({ draftPath: path.join(outputDir, "draft-context.md"), outputPath: path.join(tempDir, "ready.md") }),
+    /blocked review markers/,
+  );
+  assert.equal(checkArtifacts({ inputPath: outputDir }).status, "passed");
+}));
+
+test("Receiver flow extract marks missing fields and rejects unsafe source inputs", () => withTempDir((tempDir) => {
+  const repoDir = createReceiverCheckRepo(tempDir);
+  const sourcePath = path.join(tempDir, "partial-source.md");
+  fs.writeFileSync(sourcePath, [
+    "# Partial Source Context",
+    "",
+    "## current_goal",
+    "",
+    "Only one field is present.",
+    "",
+  ].join("\n"), "utf8");
+  const outputDir = path.join(tempDir, "partial-extract");
+  const result = runReceiverFlow({ repoPath: repoDir, outputDir, extract: true, sourcePath });
+  const candidates = JSON.parse(fs.readFileSync(path.join(outputDir, "extract-candidates.json"), "utf8"));
+  assert.equal(candidates.candidate_fields.find((candidate) => candidate.field === "current_goal").status, "candidate");
+  assert.equal(candidates.candidate_fields.find((candidate) => candidate.field === "verified_facts").value, "[NEEDS_REVIEW]");
+
+  assert.throws(
+    () => runReceiverFlow({ repoPath: repoDir, outputDir: path.join(tempDir, "missing-source"), extract: true }),
+    /requires --source/,
+  );
+  assert.throws(
+    () => runReceiverFlow({ repoPath: repoDir, outputDir: path.join(tempDir, "env-source"), extract: true, sourcePath: path.join(tempDir, ".env.context.md") }),
+    /must not be read from an \.env path/,
+  );
+  assert.throws(
+    () => runReceiverFlow({ repoPath: repoDir, outputDir: path.join(tempDir, "git-source"), extract: true, sourcePath: path.join(repoDir, ".git", "config.md") }),
+    /must not be read from \.git/,
+  );
+  assert.throws(
+    () => runReceiverFlow({ repoPath: repoDir, outputDir: path.join(tempDir, "combined"), guided: true, extract: true, sourcePath }),
+    /must be run separately/,
+  );
+}));
+
+test("CLI Lite exposes receiver-flow extract with public-safe json paths", () => withTempDir((tempDir) => {
+  const repoDir = createReceiverCheckRepo(tempDir);
+  const sourceDir = path.join(repoRoot, "tests", "outputs", "private", `extract-source-${Date.now()}`);
+  const sourcePath = path.join(sourceDir, "source-context.md");
+  const outputDir = path.join(repoRoot, "tests", "outputs", "private", `receiver-flow-extract-${Date.now()}`);
+  try {
+    fs.mkdirSync(sourceDir, { recursive: true });
+    fs.writeFileSync(sourcePath, [
+      "# Source Context",
+      "",
+      "## current_goal",
+      "",
+      "Extract candidate fields through CLI.",
+      "",
+      "## verified_facts",
+      "",
+      "The source path is inside ignored test output.",
+      "",
+      "## confirmed_decisions",
+      "",
+      "Keep candidates blocked until review.",
+      "",
+      "## risk_boundaries",
+      "",
+      "No provider request.",
+      "",
+      "## receiver_entry_task",
+      "",
+      "Inspect extract-candidates.json.",
+      "",
+      "## open_questions",
+      "",
+      "No open questions recorded.",
+      "",
+    ].join("\n"), "utf8");
+    assert.match(HELP_TEXT, /receiver-flow --repo <target-repo> --output-dir <dir> --extract --source <draft-or-context\.md>/);
+    const cli = spawnSync(process.execPath, [
+      "scripts/basebrief.js",
+      "receiver-flow",
+      "--repo",
+      repoDir,
+      "--output-dir",
+      outputDir,
+      "--extract",
+      "--source",
+      sourcePath,
+      "--json",
+    ], { cwd: repoRoot, encoding: "utf8" });
+    assert.equal(cli.status, 0, cli.stderr);
+    const result = JSON.parse(cli.stdout);
+    assert.equal(result.command, "receiver-flow");
+    assert.equal(result.extract, true);
+    assert.equal(result.handoff_status, "draft_needs_review");
+    assert.equal(result.outputDir.startsWith("tests"), true);
+    assert.equal(result.extract_source.startsWith("tests"), true);
+    assert.equal(result.outputFiles.extractCandidates.includes("extract-candidates.json"), true);
+  } finally {
+    fs.rmSync(sourceDir, { recursive: true, force: true });
+    fs.rmSync(outputDir, { recursive: true, force: true });
   }
 }));
 

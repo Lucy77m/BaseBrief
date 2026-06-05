@@ -16,6 +16,7 @@ node scripts/basebrief.js check --input examples/adapter-codex-task.md --json
 node scripts/basebrief.js receiver-init --repo . --output tests/outputs/private/receiver-check.json --json
 node scripts/basebrief.js receiver-check --config examples/receiver-check-config.json --repo . --json
 node scripts/basebrief.js receiver-flow --repo . --output-dir tests/outputs/private/receiver-flow --json
+node scripts/basebrief.js receiver-flow --repo . --output-dir tests/outputs/private/receiver-flow-extract --extract --source tests/outputs/private/source-context.md --json
 node scripts/basebrief.js review-draft --draft tests/outputs/private/receiver-flow/draft-context.md --output tests/outputs/private/receiver-ready.md --json
 node scripts/basebrief.js seal --input examples/seal-before-input.json --output tests/outputs/private/seal-before.json
 node scripts/basebrief.js diff --before examples/seal-before-input.json --after examples/seal-after-input.json --json
@@ -103,6 +104,7 @@ Review the generated config before adding any optional declared checks, then run
 ```text
 node scripts/basebrief.js receiver-flow --repo <target-repo> --output-dir <dir> [--json]
 node scripts/basebrief.js receiver-flow --repo <target-repo> --output-dir <dir> --guided [--json]
+node scripts/basebrief.js receiver-flow --repo <target-repo> --output-dir <dir> --extract --source <draft-or-context.md> [--json]
 ```
 
 This command writes a review-only receiver flow draft:
@@ -117,9 +119,15 @@ The draft always uses `handoff_status: draft_needs_review`. It is not Auto Flow,
 draft, writes empty answers as `[EMPTY]`, and adds a review checklist. It is not
 Auto Flow and does not produce `ready_for_receiver`.
 
+`--extract` is an explicit candidate-extraction mode. It reads only the local
+Markdown file passed through `--source`, writes `extract-candidates.json`, marks
+extracted values as `[CANDIDATE]`, and marks missing fields as `[NEEDS_REVIEW]`.
+Extracted drafts remain blocked until a human reviews and rewrites them.
+
 See [Receiver Flow Draft](receiver-flow.md) for boundaries and review requirements.
 The v0.3.2 release-candidate boundary is documented in [v0.3.2 Release Candidate](releases/v0.3.2.md).
 The v0.3.3 dogfooding evidence keeps this command draft-only and is documented in [v0.3.3 Release Candidate](releases/v0.3.3.md).
+The v0.5.2 extract candidate boundary is documented in [v0.5.2 Receiver Flow Extract Candidate](releases/v0.5.2.md).
 
 ### review-draft
 

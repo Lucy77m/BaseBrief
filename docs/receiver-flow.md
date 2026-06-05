@@ -9,18 +9,25 @@ It is not Auto Flow, not an agent runtime, not a provider call, and not a replac
 ```text
 node scripts/basebrief.js receiver-flow --repo <target-repo> --output-dir <dir> --json
 node scripts/basebrief.js receiver-flow --repo <target-repo> --output-dir <dir> --guided --json
+node scripts/basebrief.js receiver-flow --repo <target-repo> --output-dir <dir> --extract --source <draft-or-context.md> --json
 ```
 
-The command writes three files:
+The command writes three default files:
 
 - `flow-summary.json`
 - `receiver-check.json`
 - `draft-context.md`
+- `extract-candidates.json` only when `--extract` is used
 
 With `--guided`, the command also records six human-provided draft fields:
 `current_goal`, `verified_facts`, `confirmed_decisions`, `risk_boundaries`,
 `receiver_entry_task`, and `open_questions`. Empty guided answers are written as
 `[EMPTY]`.
+
+With `--extract`, the command reads only the explicit local Markdown file passed
+with `--source`. It copies recognized sections into candidate fields marked
+`[CANDIDATE]`, writes missing fields as `[NEEDS_REVIEW]`, and keeps the draft
+blocked until a human review rewrites those markers.
 
 The draft always uses:
 
@@ -49,6 +56,7 @@ whose blocked markers are gone.
 - state-only Receiver Safe Check config
 - draft receiver context for review
 - optional human-provided fields when `--guided` is used
+- optional extracted candidate fields when `--extract --source <file>` is used
 
 If the output directory is inside the target repository and visible to Git, the generated draft files are added to `expected_changed_files`. Ignored output directories stay out of the manifest.
 
@@ -58,8 +66,9 @@ If the output directory is inside the target repository and visible to Git, the 
 - Does not read `.env`, `.env.*`, `.git`, tokens, credentials, or provider keys.
 - Does not make provider requests.
 - Does not create receiver threads.
-- Does not promote guided answers to `ready_for_receiver`.
-- Does not run `receiver-flow --extract`.
+- Does not promote guided or extracted content to `ready_for_receiver`.
+- Does not run extract mode unless `--extract --source <file>` is explicit.
+- Does not infer extracted fields without an explicit `--source` file.
 - Does not overwrite existing output files.
 - Does not write tracked target-repository files.
 - Does not set `handoff_status: ready_for_receiver`.

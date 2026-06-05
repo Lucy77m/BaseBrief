@@ -17,6 +17,7 @@ const {
 
 const FLOW_SCHEMA_VERSION = "basebrief-receiver-flow-draft-v1";
 const FLOW_OUTPUT_FILES = ["flow-summary.json", "receiver-check.json", "draft-context.md"];
+const EXTRACT_OUTPUT_FILES = ["flow-summary.json", "receiver-check.json", "draft-context.md", "extract-candidates.json"];
 const GUIDED_FIELDS = [
   {
     key: "current_goal",
@@ -67,7 +68,27 @@ function assertNonSensitiveOutputDir(outputDir) {
   }
 }
 
-function resolveOutputDir(repoRoot, outputDir) {
+function assertNonSensitiveInputPath(inputPath, label) {
+  const segments = normalizeSlash(inputPath).split("/").filter(Boolean).map((segment) => segment.toLowerCase());
+  if (segments.includes(".git")) throw new Error(`${label} must not be read from .git`);
+  if (segments.some((segment) => segment === ".env" || segment.startsWith(".env."))) {
+    throw new Error(`${label} must not be read from an .env path`);
+  }
+}
+
+function resolveExtractSource(sourcePath) {
+  if (!sourcePath) throw new Error("receiver-flow --extract requires --source <draft-or-context.md>");
+  const resolved = path.resolve(sourcePath);
+  assertNonSensitiveInputPath(resolved, "receiver-flow extract source");
+  if (!fs.existsSync(resolved)) throw new Error(`receiver-flow extract source does not exist: ${resolved}`);
+  if (!fs.statSync(resolved).isFile()) throw new Error("receiver-flow extract source must be a file");
+  if (path.extname(resolved).toLowerCase() !== ".md") {
+    throw new Error("receiver-flow extract source must be a Markdown file");
+  }
+  return fs.realpathSync(resolved);
+}
+
+function resolveOutputDir(repoRoot, outputDir, outputFileNames = FLOW_OUTPUT_FILES) {
   if (!outputDir) throw new Error("Missing --output-dir <dir>");
   const resolved = path.resolve(outputDir);
   assertNonSensitiveOutputDir(resolved);
@@ -84,7 +105,7 @@ function resolveOutputDir(repoRoot, outputDir) {
   assertNonSensitiveOutputDir(realOutputDir);
 
   const outputFiles = Object.fromEntries(
-    FLOW_OUTPUT_FILES.map((fileName) => [fileName, path.join(realOutputDir, fileName)]),
+    outputFileNames.map((fileName) => [fileName, path.join(realOutputDir, fileName)]),
   );
   for (const filePath of Object.values(outputFiles)) {
     if (fs.existsSync(filePath)) throw new Error(`Receiver flow output already exists: ${filePath}`);
@@ -105,7 +126,7 @@ function resolveOutputDir(repoRoot, outputDir) {
     "receiver flow output",
   );
   const gitVisibleFiles = [];
-  for (const fileName of FLOW_OUTPUT_FILES) {
+  for (const fileName of outputFileNames) {
     const repoRelativeFile = normalizeSlash(path.join(outputRepoRelative, fileName));
     if (isTracked(repoRoot, repoRelativeFile)) {
       throw new Error("Receiver flow must not write a tracked target-repository file");
@@ -121,6 +142,63 @@ function resolveOutputDir(repoRoot, outputDir) {
     outputInsideRepo: true,
     outputRepoRelative,
     gitVisibleFiles: gitVisibleFiles.sort(),
+  };
+}
+
+function escapeRegExp(value) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+function extractMarkdownSection(content, heading) {
+  const pattern = new RegExp(`^#{2,3}\\s+${escapeRegExp(heading)}\\s*$`, "im");
+  const match = pattern.exec(content);
+  if (!match) return "";
+  const start = match.index + match[0].length;
+  const rest = content.slice(start);
+  const nextHeading = /\n#{2,3}\s+/m.exec(rest);
+  const body = nextHeading ? rest.slice(0, nextHeading.index) : rest;
+  return body.trim();
+}
+
+function normalizeCandidateValue(value) {
+  const trimmed = String(value || "").trim();
+  if (!trimmed) return "[NEEDS_REVIEW]";
+  return `[CANDIDATE] ${trimmed}`;
+}
+
+function extractCandidateFields({ sourcePath, content }) {
+  const sourceFile = path.basename(sourcePath);
+  return GUIDED_FIELDS.map((field) => {
+    const extracted = extractMarkdownSection(content, field.key);
+    return {
+      field: field.key,
+      status: extracted ? "candidate" : "needs_review",
+      value: normalizeCandidateValue(extracted),
+      source: {
+        file: sourceFile,
+        heading: extracted ? field.key : "not_found",
+      },
+      review_required: true,
+    };
+  });
+}
+
+function buildExtractCandidateSummary({ generatedAt, sourcePath, candidates }) {
+  return {
+    schemaVersion: "basebrief-receiver-flow-extract-v1",
+    command: "receiver-flow",
+    mode: "extract",
+    handoff_status: "draft_needs_review",
+    generated_at: generatedAt,
+    source_file: path.basename(sourcePath),
+    candidate_fields: candidates,
+    review_required: true,
+    non_goals: [
+      "no_provider_request",
+      "no_receiver_thread",
+      "no_auto_ready_for_receiver",
+      "no_auto_flow",
+    ],
   };
 }
 
@@ -169,7 +247,49 @@ function buildGuidedSections(guidedAnswers) {
   return lines;
 }
 
-function buildDraftContext({ generatedAt, state, receiverConfigPath, receiverConfig, guidedAnswers = null }) {
+function buildExtractSections({ sourcePath, candidates }) {
+  if (!candidates) return [];
+  const lines = [
+    "## Extracted Candidate Fields",
+    "",
+    "source: receiver-flow --extract",
+    `source_file: ${path.basename(sourcePath)}`,
+    "",
+  ];
+  for (const candidate of candidates) {
+    lines.push(
+      `### ${candidate.field}`,
+      "",
+      candidate.value,
+      "",
+      `source_heading: ${candidate.source.heading}`,
+      "",
+    );
+  }
+  lines.push("## Review Checklist", "");
+  for (const candidate of candidates) {
+    lines.push(`- [ ] ${candidate.field} reviewed [CANDIDATE]`);
+  }
+  lines.push(
+    "",
+    "## Extract Safety Notes",
+    "",
+    "- Extracted fields are candidates only.",
+    "- This extracted draft is not receiver-ready.",
+    "- Review and replace candidate markers before `review-draft` can pass.",
+    "",
+  );
+  return lines;
+}
+
+function buildDraftContext({
+  generatedAt,
+  state,
+  receiverConfigPath,
+  receiverConfig,
+  guidedAnswers = null,
+  extract = null,
+}) {
   const changedFiles = state.changedFiles.length
     ? state.changedFiles.map((filePath) => `- ${filePath}`).join(os.EOL)
     : "- none";
@@ -203,6 +323,7 @@ function buildDraftContext({ generatedAt, state, receiverConfigPath, receiverCon
     receiverConfigPath,
     "",
     ...buildGuidedSections(guidedAnswers),
+    ...buildExtractSections(extract || {}),
     "## receiver_entry_task_draft",
     "",
     "- Confirm the current working directory and target repository relationship.",
@@ -226,18 +347,28 @@ function writeJson(filePath, value) {
 
 function runReceiverFlow(options) {
   if (!options.repoPath) throw new Error("Missing --repo <target-repo>");
+  if (options.guided && options.extract) throw new Error("receiver-flow --guided and --extract must be run separately");
   const repoRoot = resolveRepository(options.repoPath);
   const before = readRepositoryState(repoRoot);
-  const output = resolveOutputDir(repoRoot, options.outputDir);
+  const extractSourcePath = options.extract ? resolveExtractSource(options.sourcePath) : "";
+  const extractSourceContent = extractSourcePath ? fs.readFileSync(extractSourcePath, "utf8") : "";
+  const outputFileNames = options.extract ? EXTRACT_OUTPUT_FILES : FLOW_OUTPUT_FILES;
+  const output = resolveOutputDir(repoRoot, options.outputDir, outputFileNames);
   const receiverConfig = buildReceiverCheckConfig(before, output.gitVisibleFiles[0] ? output.gitVisibleFiles : "");
   const generatedAt = new Date().toISOString();
   const guidedAnswers = options.guided ? normalizeGuidedAnswers(options.guidedAnswers) : null;
+  const extractCandidates = options.extract
+    ? extractCandidateFields({ sourcePath: extractSourcePath, content: extractSourceContent })
+    : null;
   const reviewChecklist = guidedAnswers ? buildReviewChecklist(guidedAnswers) : [];
   const outputFilesPublic = {
     flowSummary: output.outputFiles["flow-summary.json"],
     receiverCheckConfig: output.outputFiles["receiver-check.json"],
     draftContext: output.outputFiles["draft-context.md"],
   };
+  if (options.extract) {
+    outputFilesPublic.extractCandidates = output.outputFiles["extract-candidates.json"];
+  }
   const receiverConfigPath = output.outputInsideRepo
     ? normalizeSlash(path.join(output.outputRepoRelative, "receiver-check.json"))
     : "receiver-check.json";
@@ -259,9 +390,13 @@ function runReceiverFlow(options) {
       flowSummary: "flow-summary.json",
       receiverCheckConfig: "receiver-check.json",
       draftContext: "draft-context.md",
+      extractCandidates: options.extract ? "extract-candidates.json" : undefined,
     },
     guided: Boolean(guidedAnswers),
+    extract: Boolean(extractCandidates),
+    extract_source_file: extractSourcePath ? path.basename(extractSourcePath) : undefined,
     human_fields: guidedAnswers || undefined,
+    candidate_fields: extractCandidates || undefined,
     review_checklist: reviewChecklist,
     non_goals: [
       "no_provider_request",
@@ -275,9 +410,22 @@ function runReceiverFlow(options) {
   try {
     writeJson(outputFilesPublic.flowSummary, summary);
     writeJson(outputFilesPublic.receiverCheckConfig, receiverConfig);
+    if (options.extract) {
+      writeJson(
+        outputFilesPublic.extractCandidates,
+        buildExtractCandidateSummary({ generatedAt, sourcePath: extractSourcePath, candidates: extractCandidates }),
+      );
+    }
     fs.writeFileSync(
       outputFilesPublic.draftContext,
-      buildDraftContext({ generatedAt, state: before, receiverConfigPath, receiverConfig, guidedAnswers }),
+      buildDraftContext({
+        generatedAt,
+        state: before,
+        receiverConfigPath,
+        receiverConfig,
+        guidedAnswers,
+        extract: extractCandidates ? { sourcePath: extractSourcePath, candidates: extractCandidates } : null,
+      }),
       { encoding: "utf8", flag: "wx" },
     );
   } catch (error) {
@@ -309,7 +457,10 @@ function runReceiverFlow(options) {
     output_repo_relative: output.outputRepoRelative,
     output_git_visible_files: output.gitVisibleFiles,
     guided: Boolean(guidedAnswers),
+    extract: Boolean(extractCandidates),
+    extract_source: extractSourcePath || undefined,
     human_fields: guidedAnswers || undefined,
+    candidate_fields: extractCandidates || undefined,
     review_checklist: reviewChecklist,
     summary,
     receiver_check_config: receiverConfig,
@@ -320,11 +471,14 @@ function parseArgs(argv) {
   const args = argv.slice(2);
   const repoIndex = args.indexOf("--repo");
   const outputDirIndex = args.indexOf("--output-dir");
+  const sourceIndex = args.indexOf("--source");
   return {
     repoPath: repoIndex >= 0 ? args[repoIndex + 1] : "",
     outputDir: outputDirIndex >= 0 ? args[outputDirIndex + 1] : "",
+    sourcePath: sourceIndex >= 0 ? args[sourceIndex + 1] : "",
     jsonMode: args.includes("--json"),
     guided: args.includes("--guided"),
+    extract: args.includes("--extract"),
   };
 }
 
@@ -334,8 +488,9 @@ function formatHuman(result) {
     `handoff_status=${result.handoff_status}`,
     `expected_changed_files=${result.receiver_check_config.expected_changed_files.length}`,
     "review_required=true",
+    result.extract ? "extract=true" : "",
     "",
-  ].join(os.EOL);
+  ].filter((line, index, lines) => line || index === lines.length - 1).join(os.EOL);
 }
 
 function collectGuidedAnswersFromStdin(inputText) {
@@ -373,15 +528,21 @@ function cli() {
 if (require.main === module) cli();
 
 module.exports = {
+  EXTRACT_OUTPUT_FILES,
   FLOW_OUTPUT_FILES,
   FLOW_SCHEMA_VERSION,
   GUIDED_FIELDS,
+  buildExtractCandidateSummary,
+  buildExtractSections,
   buildDraftContext,
   buildReviewChecklist,
   collectGuidedAnswersFromStdin,
+  extractCandidateFields,
+  extractMarkdownSection,
   formatHuman,
   normalizeGuidedAnswers,
   parseArgs,
+  resolveExtractSource,
   resolveOutputDir,
   runReceiverFlow,
 };

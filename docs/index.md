@@ -20,6 +20,7 @@
 
 ## 方向与验证
 
+- [v0.5.2 receiver flow extract candidate](releases/v0.5.2.md)
 - [v0.5.1 review draft gate candidate](releases/v0.5.1.md)
 - [v0.5.0 guided receiver flow candidate](releases/v0.5.0.md)
 - [v0.4.1 stabilization candidate](releases/v0.4.1.md)
@@ -40,6 +41,7 @@
 - [Receiver Flow dogfooding evidence](dogfooding/receiver-flow-dogfooding.md)
 - [Receiver Flow guided dogfooding](dogfooding/receiver-flow-guided-dogfooding.md)
 - [Receiver Flow review-draft dogfooding](dogfooding/receiver-flow-review-draft-dogfooding.md)
+- [Receiver Flow extract dogfooding](dogfooding/receiver-flow-extract-dogfooding.md)
 - [Usability feedback template](../.github/ISSUE_TEMPLATE/usability_feedback.md)
 
 ## Cache-ready 实验历史
