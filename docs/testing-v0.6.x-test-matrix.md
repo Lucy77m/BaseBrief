@@ -59,6 +59,20 @@ Exception evidence:
 These cases are evidence for `v0.6.x` stabilization only. They do not add Auto
 Flow, lifecycle commands, schema changes, sidecar adapters, or provider calls.
 
+## v0.6.3 Lifecycle Readiness Gate
+
+Readiness evidence:
+
+- duplicate state, missing state, and review-gate friction are lifecycle design
+  signals
+- unsafe paths, missing fields, duplicate state, and missing state are testable
+- reviewed-input requirements and non-automatic repair are documentable
+- draft promotion, state advancement, state history, state status inference, and
+  Auto Flow are not automated yet
+
+`v0.6.3` does not add state lifecycle commands, does not change
+`basebrief-project-state-v1`, and does not run provider requests.
+
 ## Path And Runner Coverage
 
 - PowerShell local path smoke

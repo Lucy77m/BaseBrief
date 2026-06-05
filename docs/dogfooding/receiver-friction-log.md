@@ -65,6 +65,34 @@ Lifecycle automation remains deferred. The `v0.6.2` evidence supports stronger
 docs and tests, not automatic `ready_for_receiver` promotion, Auto Flow, or
 state lifecycle commands.
 
+## v0.6.3 Lifecycle Readiness Classification
+
+```text
+actual_handoff_friction:
+- cwd_match: yes
+- receiver_check_result: not_applicable
+- changed_files_match: yes
+- source_vs_receiver_verification_clear: yes
+- language_match: yes
+- scope_drift: no
+- overreach_or_unwanted_automation: no
+- notes: duplicate state, missing state, and review-gate friction are lifecycle design signals. They are testable and documentable, but not enough to automate state advancement or status inference.
+
+automation_decision:
+- should_become_automated_test: yes
+- test_case_id_if_added: lifecycle-readiness-v0.6.3
+- resolved_in_commit: same v0.6.3 commit
+- resolved_in_version: v0.6.3
+- still_open: yes
+```
+
+Friction classification:
+
+- testable: unsafe paths, missing fields, duplicate state, missing state
+- documentable: when and why state requires reviewed input
+- not_automated_yet: draft promotion, state advancement, state history, state
+  status inference, Auto Flow
+
 ## Stabilization Decisions
 
 - Keep `difference_found` as a completed receiver task, not an agent failure.

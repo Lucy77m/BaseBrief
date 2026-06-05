@@ -828,6 +828,65 @@ test("v0.6.2 self-dogfooding documents exception evidence without new lifecycle 
   }
 });
 
+test("v0.6.3 lifecycle readiness gate documents criteria without lifecycle commands", () => {
+  const readme = readText("README.md");
+  const englishReadme = readText("README.en.md");
+  const docsIndex = readText("docs/index.md");
+  const frictionLog = readText("docs/dogfooding/receiver-friction-log.md");
+  const readinessDoc = readText("docs/design/project-state-lifecycle-readiness.md");
+  const dogfooding = readText("docs/dogfooding/project-state-lifecycle-readiness-v0.6.3.md");
+  const v06xMatrix = readText("docs/testing-v0.6.x-test-matrix.md");
+  const release = readText("docs/releases/v0.6.3.md");
+  const schema = readJson("schemas/basebrief-project-state.schema.json");
+
+  assert.match(readme, /docs\/design\/project-state-lifecycle-readiness\.md/);
+  assert.match(readme, /docs\/dogfooding\/project-state-lifecycle-readiness-v0\.6\.3\.md/);
+  assert.match(readme, /docs\/releases\/v0\.6\.3\.md/);
+  assert.match(englishReadme, /docs\/design\/project-state-lifecycle-readiness\.md/);
+  assert.match(englishReadme, /docs\/dogfooding\/project-state-lifecycle-readiness-v0\.6\.3\.md/);
+  assert.match(englishReadme, /docs\/releases\/v0\.6\.3\.md/);
+  assert.match(docsIndex, /design\/project-state-lifecycle-readiness\.md/);
+  assert.match(docsIndex, /dogfooding\/project-state-lifecycle-readiness-v0\.6\.3\.md/);
+  assert.match(docsIndex, /releases\/v0\.6\.3\.md/);
+
+  for (const doc of [readinessDoc, dogfooding, v06xMatrix, release]) {
+    assert.match(doc, /No state lifecycle commands|does not add state lifecycle commands/);
+    assert.match(doc, /No Auto Flow|Auto Flow are not automated yet/);
+    assert.match(doc, /No provider request|does not run provider requests/);
+    assert.match(doc, /No schema change|does not change/);
+    assert.match(doc, /provider_probe_status=skipped/);
+  }
+
+  assert.match(readinessDoc, /Readiness Criteria/);
+  assert.match(readinessDoc, /basebrief-project-state-v1/);
+  assert.match(readinessDoc, /BASEBRIEF_PROVIDER_BASE_URL/);
+  assert.match(readinessDoc, /BASEBRIEF_PROVIDER_API_KEY/);
+  assert.match(readinessDoc, /BASEBRIEF_PROVIDER_MODEL/);
+  assert.match(dogfooding, /state-init-duplicate-rejected/);
+  assert.match(dogfooding, /state-read-missing-state/);
+  assert.match(dogfooding, /review-draft-unchecked/);
+  assert.match(dogfooding, /state-advance/);
+  assert.match(dogfooding, /state-status/);
+  assert.match(dogfooding, /state-validate/);
+  assert.match(dogfooding, /state-history/);
+  assert.match(frictionLog, /v0\.6\.3 Lifecycle Readiness Classification/);
+  assert.match(frictionLog, /lifecycle-readiness-v0\.6\.3/);
+  assert.match(frictionLog, /not_automated_yet/);
+  assert.match(release, /Lifecycle Readiness Gate Candidate/);
+  assert.match(release, /not a lifecycle release/);
+  assert.equal(schema.properties.schemaVersion.const, PROJECT_STATE_SCHEMA_VERSION);
+
+  for (const relativePath of [
+    "docs/design/project-state-lifecycle-readiness.md",
+    "docs/dogfooding/project-state-lifecycle-readiness-v0.6.3.md",
+    "docs/releases/v0.6.3.md",
+  ]) {
+    const result = checkArtifacts({ inputPath: path.join(repoRoot, relativePath) });
+    assert.equal(result.status, "passed", relativePath);
+    assert.equal(result.errorCount, 0, relativePath);
+  }
+});
+
 test("public quickstart and minimal examples provide a clean first-use path", () => {
   const quickstart = readText("docs/quickstart-5min.md");
   const minimalBrief = readText("examples/minimal/output-basebrief-lite.md");
