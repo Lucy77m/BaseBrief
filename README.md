@@ -106,6 +106,8 @@ BaseBrief 不是聊天客户端、Agent runtime、托管平台、密钥管理器
 - [Receiver Flow Draft](docs/receiver-flow.md)
 - [Receiver friction log](docs/dogfooding/receiver-friction-log.md)
 - [Receiver Flow dogfooding evidence](docs/dogfooding/receiver-flow-dogfooding.md)
+- [Receiver Flow guided dogfooding](docs/dogfooding/receiver-flow-guided-dogfooding.md)
+- [v0.5.0 Guided Receiver Flow Candidate](docs/releases/v0.5.0.md)
 - [v0.4.1 Stabilization Candidate](docs/releases/v0.4.1.md)
 - [v0.4.0 Release Candidate](docs/releases/v0.4.0.md)
 - [v0.3.3 Release Candidate](docs/releases/v0.3.3.md)

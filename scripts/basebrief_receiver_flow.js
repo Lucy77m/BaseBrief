@@ -17,6 +17,38 @@ const {
 
 const FLOW_SCHEMA_VERSION = "basebrief-receiver-flow-draft-v1";
 const FLOW_OUTPUT_FILES = ["flow-summary.json", "receiver-check.json", "draft-context.md"];
+const GUIDED_FIELDS = [
+  {
+    key: "current_goal",
+    label: "current_goal",
+    prompt: "[1/6] Current goal, in one or two sentences:",
+  },
+  {
+    key: "verified_facts",
+    label: "verified_facts",
+    prompt: "[2/6] Verified facts from this phase:",
+  },
+  {
+    key: "confirmed_decisions",
+    label: "confirmed_decisions",
+    prompt: "[3/6] Confirmed decisions from this phase:",
+  },
+  {
+    key: "risk_boundaries",
+    label: "risk_boundaries",
+    prompt: "[4/6] Risk boundaries or forbidden actions:",
+  },
+  {
+    key: "receiver_entry_task",
+    label: "receiver_entry_task",
+    prompt: "[5/6] First task the receiver should start with:",
+  },
+  {
+    key: "open_questions",
+    label: "open_questions",
+    prompt: "[6/6] Open questions not yet resolved:",
+  },
+];
 
 function normalizeSlash(value) {
   return value.replace(/\\/g, "/");
@@ -92,7 +124,52 @@ function resolveOutputDir(repoRoot, outputDir) {
   };
 }
 
-function buildDraftContext({ generatedAt, state, receiverConfigPath, receiverConfig }) {
+function normalizeGuidedAnswers(answers = {}) {
+  return Object.fromEntries(
+    GUIDED_FIELDS.map((field) => {
+      const value = String(answers[field.key] || "").trim();
+      return [field.key, value || "[EMPTY]"];
+    }),
+  );
+}
+
+function buildReviewChecklist(guidedAnswers) {
+  return GUIDED_FIELDS.map((field) => ({
+    field: field.key,
+    status: "needs_review",
+    empty: guidedAnswers[field.key] === "[EMPTY]",
+  }));
+}
+
+function buildGuidedSections(guidedAnswers) {
+  if (!guidedAnswers) return [];
+  const checklist = buildReviewChecklist(guidedAnswers);
+  const lines = [
+    "## Human-Provided Fields",
+    "",
+    "source: receiver-flow --guided",
+    "",
+  ];
+  for (const field of GUIDED_FIELDS) {
+    lines.push(`### ${field.label}`, "", guidedAnswers[field.key], "");
+  }
+  lines.push("## Review Checklist", "");
+  for (const item of checklist) {
+    lines.push(`- [ ] ${item.field} reviewed${item.empty ? " [EMPTY]" : ""}`);
+  }
+  lines.push(
+    "",
+    "## Guided Safety Notes",
+    "",
+    "- Human-provided fields still require review.",
+    "- This guided draft is not receiver-ready.",
+    "- Do not promote this draft to `ready_for_receiver` without a separate review step.",
+    "",
+  );
+  return lines;
+}
+
+function buildDraftContext({ generatedAt, state, receiverConfigPath, receiverConfig, guidedAnswers = null }) {
   const changedFiles = state.changedFiles.length
     ? state.changedFiles.map((filePath) => `- ${filePath}`).join(os.EOL)
     : "- none";
@@ -125,6 +202,7 @@ function buildDraftContext({ generatedAt, state, receiverConfigPath, receiverCon
     "",
     receiverConfigPath,
     "",
+    ...buildGuidedSections(guidedAnswers),
     "## receiver_entry_task_draft",
     "",
     "- Confirm the current working directory and target repository relationship.",
@@ -153,6 +231,8 @@ function runReceiverFlow(options) {
   const output = resolveOutputDir(repoRoot, options.outputDir);
   const receiverConfig = buildReceiverCheckConfig(before, output.gitVisibleFiles[0] ? output.gitVisibleFiles : "");
   const generatedAt = new Date().toISOString();
+  const guidedAnswers = options.guided ? normalizeGuidedAnswers(options.guidedAnswers) : null;
+  const reviewChecklist = guidedAnswers ? buildReviewChecklist(guidedAnswers) : [];
   const outputFilesPublic = {
     flowSummary: output.outputFiles["flow-summary.json"],
     receiverCheckConfig: output.outputFiles["receiver-check.json"],
@@ -180,6 +260,9 @@ function runReceiverFlow(options) {
       receiverCheckConfig: "receiver-check.json",
       draftContext: "draft-context.md",
     },
+    guided: Boolean(guidedAnswers),
+    human_fields: guidedAnswers || undefined,
+    review_checklist: reviewChecklist,
     non_goals: [
       "no_provider_request",
       "no_receiver_thread",
@@ -194,7 +277,7 @@ function runReceiverFlow(options) {
     writeJson(outputFilesPublic.receiverCheckConfig, receiverConfig);
     fs.writeFileSync(
       outputFilesPublic.draftContext,
-      buildDraftContext({ generatedAt, state: before, receiverConfigPath, receiverConfig }),
+      buildDraftContext({ generatedAt, state: before, receiverConfigPath, receiverConfig, guidedAnswers }),
       { encoding: "utf8", flag: "wx" },
     );
   } catch (error) {
@@ -225,6 +308,9 @@ function runReceiverFlow(options) {
     output_inside_repo: output.outputInsideRepo,
     output_repo_relative: output.outputRepoRelative,
     output_git_visible_files: output.gitVisibleFiles,
+    guided: Boolean(guidedAnswers),
+    human_fields: guidedAnswers || undefined,
+    review_checklist: reviewChecklist,
     summary,
     receiver_check_config: receiverConfig,
   };
@@ -238,6 +324,7 @@ function parseArgs(argv) {
     repoPath: repoIndex >= 0 ? args[repoIndex + 1] : "",
     outputDir: outputDirIndex >= 0 ? args[outputDirIndex + 1] : "",
     jsonMode: args.includes("--json"),
+    guided: args.includes("--guided"),
   };
 }
 
@@ -251,9 +338,30 @@ function formatHuman(result) {
   ].join(os.EOL);
 }
 
+function collectGuidedAnswersFromStdin(inputText) {
+  const lines = inputText.split(/\r?\n/);
+  if (lines.length < GUIDED_FIELDS.length || GUIDED_FIELDS.some((field, index) => lines[index] === undefined)) {
+    throw new Error("receiver-flow --guided requires one input line for each guided field");
+  }
+  return Object.fromEntries(GUIDED_FIELDS.map((field, index) => [field.key, lines[index] || ""]));
+}
+
+function readGuidedInputSync() {
+  if (process.stdin.isTTY) {
+    process.stderr.write([
+      "receiver-flow --guided expects six input lines in this order:",
+      ...GUIDED_FIELDS.map((field) => field.prompt),
+      "Submit EOF after the final line.",
+      "",
+    ].join(os.EOL));
+  }
+  return collectGuidedAnswersFromStdin(fs.readFileSync(0, "utf8"));
+}
+
 function cli() {
   try {
     const options = parseArgs(process.argv);
+    if (options.guided) options.guidedAnswers = readGuidedInputSync();
     const result = runReceiverFlow(options);
     process.stdout.write(options.jsonMode ? `${JSON.stringify(result, null, 2)}\n` : formatHuman(result));
   } catch (error) {
@@ -267,8 +375,12 @@ if (require.main === module) cli();
 module.exports = {
   FLOW_OUTPUT_FILES,
   FLOW_SCHEMA_VERSION,
+  GUIDED_FIELDS,
   buildDraftContext,
+  buildReviewChecklist,
+  collectGuidedAnswersFromStdin,
   formatHuman,
+  normalizeGuidedAnswers,
   parseArgs,
   resolveOutputDir,
   runReceiverFlow,

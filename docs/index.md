@@ -20,6 +20,7 @@
 
 ## 方向与验证
 
+- [v0.5.0 guided receiver flow candidate](releases/v0.5.0.md)
 - [v0.4.1 stabilization candidate](releases/v0.4.1.md)
 - [v0.4.0 post-release baseline](baselines/v0.4.0-post-release-baseline.md)
 - [v0.4.x test matrix](testing-v0.4.x-test-matrix.md)
@@ -36,6 +37,7 @@
 - [Receiver-ready v1 evidence closure](dogfooding/receiver-ready-v1-evidence.md)
 - [Receiver friction log](dogfooding/receiver-friction-log.md)
 - [Receiver Flow dogfooding evidence](dogfooding/receiver-flow-dogfooding.md)
+- [Receiver Flow guided dogfooding](dogfooding/receiver-flow-guided-dogfooding.md)
 - [Usability feedback template](../.github/ISSUE_TEMPLATE/usability_feedback.md)
 
 ## Cache-ready 实验历史

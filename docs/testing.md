@@ -42,6 +42,14 @@ Expected release-check output without provider env remains:
 provider_probe_status=skipped
 ```
 
+## v0.5.0 Guided Receiver Flow Candidate
+
+`v0.5.0` adds `receiver-flow --guided` as an explicit human-input mode. It keeps
+`handoff_status: draft_needs_review`, writes empty answers as `[EMPTY]`, and adds a
+review checklist. It does not add `review-draft`, `receiver-flow --extract`,
+`.basebrief/`, Auto Flow, Web UI, adapter expansion, provider requests, npm
+publishing, push, tag, or formal release.
+
 ## Receiver 测试额度
 
 Receiver-ready 验证默认采用低额度策略：

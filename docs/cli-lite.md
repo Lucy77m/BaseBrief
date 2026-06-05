@@ -101,6 +101,7 @@ Review the generated config before adding any optional declared checks, then run
 
 ```text
 node scripts/basebrief.js receiver-flow --repo <target-repo> --output-dir <dir> [--json]
+node scripts/basebrief.js receiver-flow --repo <target-repo> --output-dir <dir> --guided [--json]
 ```
 
 This command writes a review-only receiver flow draft:
@@ -110,6 +111,10 @@ This command writes a review-only receiver flow draft:
 - `draft-context.md`
 
 The draft always uses `handoff_status: draft_needs_review`. It is not Auto Flow, does not create receiver threads, does not call providers, and does not promote the draft to `ready_for_receiver`.
+
+`--guided` is an explicit human-input mode. It records six handoff fields in the
+draft, writes empty answers as `[EMPTY]`, and adds a review checklist. It is not
+Auto Flow and does not produce `ready_for_receiver`.
 
 See [Receiver Flow Draft](receiver-flow.md) for boundaries and review requirements.
 The v0.3.2 release-candidate boundary is documented in [v0.3.2 Release Candidate](releases/v0.3.2.md).

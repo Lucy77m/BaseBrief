@@ -8,7 +8,7 @@ const { buildAdapterArtifacts, normalizeTargets } = require("./basebrief_build_a
 const { buildHandoffArtifacts, validateHandoffInput } = require("./basebrief_build_handoff");
 const { checkArtifacts } = require("./basebrief_check_artifacts");
 const { runReceiverCheck } = require("./basebrief_receiver_check");
-const { runReceiverFlow } = require("./basebrief_receiver_flow");
+const { collectGuidedAnswersFromStdin, runReceiverFlow } = require("./basebrief_receiver_flow");
 const { runReceiverInit } = require("./basebrief_receiver_init");
 const { commandDiff: commandSealDiff, commandSeal: commandCreateSeal } = require("./basebrief_seal");
 
@@ -22,7 +22,7 @@ const HELP_TEXT = [
   "  node scripts/basebrief.js check --input <file-or-dir>",
   "  node scripts/basebrief.js receiver-init --repo <target-repo> --output <receiver-check.json> [--json]",
   "  node scripts/basebrief.js receiver-check --config <json> --repo <target-repo> [--json]",
-  "  node scripts/basebrief.js receiver-flow --repo <target-repo> --output-dir <dir> [--json]",
+  "  node scripts/basebrief.js receiver-flow --repo <target-repo> --output-dir <dir> [--guided] [--json]",
   "  node scripts/basebrief.js seal --input <markdown-or-json> --output <file>",
   "  node scripts/basebrief.js diff --before <file> --after <file>",
   "",
@@ -39,7 +39,7 @@ function parseOptions(args) {
       continue;
     }
     const key = arg.slice(2);
-    if (key === "json" || key === "check") {
+    if (key === "json" || key === "check" || key === "guided") {
       options[key] = true;
       continue;
     }
@@ -233,6 +233,8 @@ function commandReceiverFlow(options) {
   return runReceiverFlow({
     repoPath: options.repo,
     outputDir: options["output-dir"],
+    guided: Boolean(options.guided),
+    guidedAnswers: options.guidedAnswers,
   });
 }
 
@@ -378,6 +380,7 @@ function formatHuman(result) {
       `BaseBrief receiver flow draft written to ${result.outputDir}`,
       `handoff_status=${result.handoff_status}`,
       `expected_changed_files=${result.receiver_check_config.expected_changed_files.length}`,
+      `guided=${result.guided}`,
       "review_required=true",
       "",
     ].join(os.EOL);
@@ -403,7 +406,14 @@ function formatFindingLines(findings = []) {
 }
 
 function cli() {
-  const result = run(process.argv);
+  let result;
+  if (process.argv[2] === "receiver-flow" && process.argv.includes("--guided")) {
+    const options = parseOptions(process.argv.slice(3));
+    options.guidedAnswers = collectGuidedAnswersFromStdin(fs.readFileSync(0, "utf8"));
+    result = commandReceiverFlow(options);
+  } else {
+    result = run(process.argv);
+  }
   const publicResult = toPublicResult(result);
   const jsonMode = process.argv.includes("--json");
   if (jsonMode) {

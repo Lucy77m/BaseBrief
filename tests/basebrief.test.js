@@ -482,6 +482,51 @@ test("v0.4.1 stabilization candidate documents scale testing without expanding f
   }
 });
 
+test("v0.5.0 guided receiver flow documents human-input draft boundaries", () => {
+  const readme = readText("README.md");
+  const englishReadme = readText("README.en.md");
+  const cliLite = readText("docs/cli-lite.md");
+  const docsIndex = readText("docs/index.md");
+  const testing = readText("docs/testing.md");
+  const receiverFlow = readText("docs/receiver-flow.md");
+  const dogfooding = readText("docs/dogfooding/receiver-flow-guided-dogfooding.md");
+  const release = readText("docs/releases/v0.5.0.md");
+
+  assert.match(readme, /docs\/releases\/v0\.5\.0\.md/);
+  assert.match(englishReadme, /docs\/releases\/v0\.5\.0\.md/);
+  assert.match(docsIndex, /releases\/v0\.5\.0\.md/);
+  assert.match(docsIndex, /dogfooding\/receiver-flow-guided-dogfooding\.md/);
+  assert.match(cliLite, /receiver-flow --repo <target-repo> --output-dir <dir> --guided/);
+  assert.match(receiverFlow, /receiver-flow --repo <target-repo> --output-dir <dir> --guided/);
+  assert.match(receiverFlow, /Empty guided answers are written as\s+`\[EMPTY\]`/);
+  assert.match(testing, /v0\.5\.0 Guided Receiver Flow Candidate/);
+  assert.match(testing, /handoff_status: draft_needs_review/);
+  assert.match(dogfooding, /guided-self-smoke/);
+  assert.match(dogfooding, /provider_request_performed`: false/);
+  assert.match(release, /Guided Receiver Flow Candidate/);
+  assert.match(release, /Default `receiver-flow` behavior remains unchanged/);
+  assert.match(release, /Empty guided answers are written as `\[EMPTY\]`/);
+  assert.match(release, /review_checklist/);
+  assert.match(release, /handoff_status: draft_needs_review/);
+  assert.match(release, /No provider request/);
+  assert.match(release, /No automatic promotion to `ready_for_receiver`/);
+  assert.match(release, /No `review-draft`/);
+  assert.match(release, /No `receiver-flow --extract`/);
+  assert.match(release, /No `.basebrief\/` project state directory/);
+  assert.match(release, /No Auto Flow/);
+  assert.match(release, /No push, tag, or formal release/);
+
+  for (const relativePath of [
+    "docs/dogfooding/receiver-flow-guided-dogfooding.md",
+    "docs/releases/v0.5.0.md",
+  ]) {
+    const result = checkArtifacts({ inputPath: path.join(repoRoot, relativePath) });
+    assert.equal(result.status, "passed", relativePath);
+    assert.equal(result.errorCount, 0, relativePath);
+    assert.equal(result.warningCount, 0, relativePath);
+  }
+});
+
 test("public quickstart and minimal examples provide a clean first-use path", () => {
   const quickstart = readText("docs/quickstart-5min.md");
   const minimalBrief = readText("examples/minimal/output-basebrief-lite.md");
@@ -1497,8 +1542,45 @@ test("Receiver flow draft writes review-only artifacts for a clean repository", 
   assert.match(draft, /review before sharing/i);
   assert.match(draft, /expected_changed_files/);
   assert.match(draft, /receiver_check_config/);
+  assert.doesNotMatch(draft, /Human-Provided Fields/);
   assert.doesNotMatch(draft, /handoff_status:\s*ready_for_receiver/);
   assert.equal(after, before);
+}));
+
+test("Receiver flow guided draft writes human fields and review checklist", () => withTempDir((tempDir) => {
+  const repoDir = createReceiverCheckRepo(tempDir);
+  const outputDir = path.join(tempDir, "guided-flow");
+  const result = runReceiverFlow({
+    repoPath: repoDir,
+    outputDir,
+    guided: true,
+    guidedAnswers: {
+      current_goal: "Prepare the next receiver handoff.",
+      verified_facts: "Unit tests passed before handoff.",
+      confirmed_decisions: "Keep draft status until review.",
+      risk_boundaries: "Do not read env files.",
+      receiver_entry_task: "Inspect the generated draft first.",
+      open_questions: "",
+    },
+  });
+  const draft = fs.readFileSync(path.join(outputDir, "draft-context.md"), "utf8");
+  const summary = JSON.parse(fs.readFileSync(path.join(outputDir, "flow-summary.json"), "utf8"));
+
+  assert.equal(result.handoff_status, "draft_needs_review");
+  assert.equal(result.guided, true);
+  assert.equal(summary.guided, true);
+  assert.equal(summary.human_fields.open_questions, "[EMPTY]");
+  assert.equal(result.review_checklist.length, 6);
+  assert(result.review_checklist.find((item) => item.field === "open_questions").empty);
+  assert.match(draft, /## Human-Provided Fields/);
+  assert.match(draft, /### current_goal/);
+  assert.match(draft, /Prepare the next receiver handoff/);
+  assert.match(draft, /### open_questions/);
+  assert.match(draft, /\[EMPTY\]/);
+  assert.match(draft, /## Review Checklist/);
+  assert.match(draft, /open_questions reviewed \[EMPTY\]/);
+  assert.doesNotMatch(draft, /handoff_status:\s*ready_for_receiver/);
+  assert.equal(checkArtifacts({ inputPath: outputDir }).status, "passed");
 }));
 
 test("Receiver flow draft captures dirty state and visible generated files", () => withTempDir((tempDir) => {
@@ -1560,6 +1642,65 @@ test("Receiver flow draft handles Unicode and space paths and rejects no-git dir
     () => runReceiverFlow({ repoPath: noGitDir, outputDir: path.join(tempDir, "no-git-output") }),
     /not a git repository|rev-parse failed|fatal/i,
   );
+}));
+
+test("Receiver flow guided CLI reads stdin, rejects EOF, and lets checker catch fake secrets", () => withTempDir((tempDir) => {
+  const repoDir = createReceiverCheckRepo(tempDir);
+  const cliOutputDir = path.join(tempDir, "guided-cli");
+  const inputLines = [
+    "Continue guided receiver-flow implementation.",
+    "The repository is a local test fixture.",
+    "Keep draft status.",
+    "No env file access.",
+    "Review draft-context.md first.",
+    "No open questions recorded.",
+  ].join("\n");
+  const cli = spawnSync(process.execPath, [
+    "scripts/basebrief.js",
+    "receiver-flow",
+    "--repo",
+    repoDir,
+    "--output-dir",
+    cliOutputDir,
+    "--guided",
+    "--json",
+  ], { cwd: repoRoot, encoding: "utf8", input: inputLines });
+  assert.equal(cli.status, 0);
+  const parsed = JSON.parse(cli.stdout);
+  assert.equal(parsed.guided, true);
+  assert.equal(parsed.handoff_status, "draft_needs_review");
+  assert.equal(parsed.outputFiles.draftContext, "[outside-cwd]");
+
+  const eof = spawnSync(process.execPath, [
+    "scripts/basebrief.js",
+    "receiver-flow",
+    "--repo",
+    repoDir,
+    "--output-dir",
+    path.join(tempDir, "guided-eof"),
+    "--guided",
+    "--json",
+  ], { cwd: repoRoot, encoding: "utf8", input: "only one line\n" });
+  assert.notEqual(eof.status, 0);
+  assert.match(eof.stderr, /requires one input line for each guided field/);
+
+  const secretOutputDir = path.join(tempDir, "guided-secret");
+  runReceiverFlow({
+    repoPath: repoDir,
+    outputDir: secretOutputDir,
+    guided: true,
+    guidedAnswers: {
+      current_goal: `${"sk-"}fakeguidedsecret123456`,
+      verified_facts: "fixture fact",
+      confirmed_decisions: "fixture decision",
+      risk_boundaries: "fixture risk",
+      receiver_entry_task: "fixture task",
+      open_questions: "fixture question",
+    },
+  });
+  const check = checkArtifacts({ inputPath: secretOutputDir });
+  assert.equal(check.status, "failed");
+  assert(check.findings.some((finding) => finding.ruleId === "secret.sk"));
 }));
 
 test("CLI Lite exposes Receiver flow draft with public-safe json paths", () => withTempDir((tempDir) => {
