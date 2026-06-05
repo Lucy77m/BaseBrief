@@ -298,6 +298,13 @@ Current v0.3.3 evidence target:
 - keep `handoff_status: draft_needs_review` as the only receiver-flow handoff status
 - avoid new CLI commands, new npm scripts, schema changes, provider requests, receiver thread creation, and Auto Flow
 
+Current v0.4.0 release-candidate target:
+
+- integrate BB9 handoff, CLI Lite, Artifact Checker, Receiver Safe Check, Receiver Flow Draft, Seal/Diff, local npm validation scripts, and public-safe evidence into one release-candidate line
+- keep BaseBrief local-first and file-based
+- keep `cache-ready` experimental and provider-specific
+- keep Auto Flow, Web UI, Cursor adapter, hosted service, installed CLI, published npm package, CI matrix, and `.basebrief/` project state out of scope
+
 ### Phase 9: ContextOps Vision
 
 Goal: keep the long-term direction visible without prematurely turning it into implementation scope.
@@ -327,11 +334,11 @@ A new BB experiment is allowed only when all of the following are true:
 
 ## Near-term Priority Order
 
-1. Complete and publish the `v0.3.0` receiver workflow after explicit user approval.
-2. Observe whether `receiver-init -> review config -> receiver-check` prevents real handoff mistakes.
-3. Collect public-safe evidence from real Full/Lite receiver-ready workflows.
+1. Prepare the `v0.4.0` local release candidate for explicit user review.
+2. Keep push, tag, and formal release pending until the user separately approves them.
+3. Observe whether the integrated local toolchain prevents real handoff mistakes.
 4. Keep installed CLI, plugins, provider experiments, ContextOps expansion, and speculative features frozen unless measured usage creates a concrete blocker.
-5. Choose the next version only from repeated, measured usage evidence.
+5. Choose later versions only from repeated, measured usage evidence.
 
 ## Success Metrics
 

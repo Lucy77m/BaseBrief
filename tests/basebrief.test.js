@@ -381,6 +381,58 @@ test("v0.3.3 receiver flow dogfooding evidence stays draft-only and public-safe"
   }
 });
 
+test("v0.4.0 release candidate integrates local toolchain without expanding product scope", () => {
+  const readme = readText("README.md");
+  const englishReadme = readText("README.en.md");
+  const cliLite = readText("docs/cli-lite.md");
+  const docsIndex = readText("docs/index.md");
+  const testing = readText("docs/testing.md");
+  const roadmap = readText("docs/roadmap/basebrief-long-term-baseline.md");
+  const release = readText("docs/releases/v0.4.0.md");
+  const packageJson = readJson("package.json");
+
+  assert.match(readme, /docs\/releases\/v0\.4\.0\.md/);
+  assert.match(englishReadme, /docs\/releases\/v0\.4\.0\.md/);
+  assert.match(cliLite, /v0\.4\.0/);
+  assert.match(cliLite, /not a published npm package/);
+  assert.match(docsIndex, /releases\/v0\.4\.0\.md/);
+  assert.match(testing, /v0\.4\.0 Integrated Local Toolchain Release Candidate/);
+  assert.match(testing, /provider_probe_status=skipped/);
+  assert.match(roadmap, /Current v0\.4\.0 release-candidate target/);
+  assert.match(release, /integrated local toolchain/);
+  assert.match(release, /one public skill entry/);
+  assert.match(release, /BB9 structured handoff contract/);
+  assert.match(release, /CLI Lite/);
+  assert.match(release, /Artifact Checker/);
+  assert.match(release, /Receiver Safe Check/);
+  assert.match(release, /Receiver Flow Draft/);
+  assert.match(release, /Seal\/Diff/);
+  assert.match(release, /npm run check/);
+  assert.match(release, /BB9 handoff schema is unchanged/);
+  assert.match(release, /Receiver Safe Check config and result schemas are unchanged/);
+  assert.match(release, /CLI Lite command behavior is unchanged/);
+  assert.match(release, /provider_probe_status=skipped/);
+  assert.match(release, /No provider request/);
+  assert.match(release, /No broad provider savings claim/);
+  assert.match(release, /No receiver thread creation/);
+  assert.match(release, /No Auto Flow/);
+  assert.match(release, /No Web UI/);
+  assert.match(release, /No Cursor adapter/);
+  assert.match(release, /No hosted service/);
+  assert.match(release, /No installed or global CLI/);
+  assert.match(release, /No published npm package/);
+  assert.match(release, /No `\.basebrief\/` project state directory/);
+  assert.match(release, /No CI matrix/);
+  assert.match(release, /No push, tag, or formal release/);
+  assert.equal(packageJson.private, true);
+  assert.deepEqual(Object.keys(packageJson.scripts).sort(), ["check", "release-check", "test"]);
+
+  const result = checkArtifacts({ inputPath: path.join(repoRoot, "docs/releases/v0.4.0.md") });
+  assert.equal(result.status, "passed");
+  assert.equal(result.errorCount, 0);
+  assert.equal(result.warningCount, 0);
+});
+
 test("public quickstart and minimal examples provide a clean first-use path", () => {
   const quickstart = readText("docs/quickstart-5min.md");
   const minimalBrief = readText("examples/minimal/output-basebrief-lite.md");

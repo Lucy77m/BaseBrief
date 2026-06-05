@@ -608,3 +608,18 @@ npm run check
 This closure is evidence-only. It does not require provider requests, receiver thread creation, external receiver matrices, OpenCode smoke, Claude Code smoke, Auto Flow runs, Web UI checks, Cursor adapter tests, or provider benchmarks. When provider environment variables are absent, release checks must keep `provider_probe_status=skipped`.
 
 Receiver-flow examples must pass Artifact Checker with zero errors and warnings. Examples may show `handoff_status: draft_needs_review`; they must not present a draft as `handoff_status: ready_for_receiver`.
+
+## v0.4.0 Integrated Local Toolchain Release Candidate
+
+`v0.4.0` release-candidate closure should use:
+
+```text
+git diff --check
+node --test tests/basebrief.test.js
+node scripts/run_release_checks.js
+npm run check
+```
+
+This closure integrates the existing local toolchain: BB9 handoff, CLI Lite, Artifact Checker, Receiver Safe Check, Receiver Flow Draft, Seal/Diff, local npm validation scripts, and public-safe evidence. It does not require provider requests, receiver thread creation, external receiver matrices, OpenCode smoke, Claude Code smoke, Auto Flow runs, Web UI checks, Cursor adapter tests, CI matrix, internationalization work, or provider benchmarks.
+
+When provider environment variables are absent, release checks must keep `provider_probe_status=skipped`. v0.4.0 must not be described as a hosted platform, provider gateway, published npm package, installed CLI, or Auto Flow release.

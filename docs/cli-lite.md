@@ -4,6 +4,8 @@ CLI Lite is an optional local script wrapper around the existing BaseBrief hando
 
 It is not a published npm package, not a globally installed `basebrief` command, not a plugin, and not a provider integration. It does not read `.env` files or manage credentials.
 
+In v0.4.0, CLI Lite remains part of the local integrated toolchain. It is still run through `node scripts/basebrief.js` and does not become a published package or installed command.
+
 Run it through Node:
 
 ```text

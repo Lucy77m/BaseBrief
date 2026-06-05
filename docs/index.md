@@ -20,6 +20,7 @@
 
 ## 方向与验证
 
+- [v0.4.0 integrated local toolchain release candidate](releases/v0.4.0.md)
 - [v0.3.3 receiver-flow dogfooding evidence](releases/v0.3.3.md)
 - [v0.3.2 receiver-flow draft skeleton](releases/v0.3.2.md)
 - [v0.3.1 receiver stabilization](releases/v0.3.1.md)
