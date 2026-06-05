@@ -433,6 +433,55 @@ test("v0.4.0 release candidate integrates local toolchain without expanding prod
   assert.equal(result.warningCount, 0);
 });
 
+test("v0.4.1 stabilization candidate documents scale testing without expanding features", () => {
+  const readme = readText("README.md");
+  const englishReadme = readText("README.en.md");
+  const docsIndex = readText("docs/index.md");
+  const testing = readText("docs/testing.md");
+  const baseline = readText("docs/baselines/v0.4.0-post-release-baseline.md");
+  const matrix = readText("docs/testing-v0.4.x-test-matrix.md");
+  const release = readText("docs/releases/v0.4.1.md");
+
+  assert.match(readme, /docs\/releases\/v0\.4\.1\.md/);
+  assert.match(englishReadme, /docs\/releases\/v0\.4\.1\.md/);
+  assert.match(docsIndex, /releases\/v0\.4\.1\.md/);
+  assert.match(docsIndex, /baselines\/v0\.4\.0-post-release-baseline\.md/);
+  assert.match(docsIndex, /testing-v0\.4\.x-test-matrix\.md/);
+  assert.match(testing, /v0\.4\.1 Stabilization Candidate/);
+  assert.match(testing, /testing-v0\.4\.x-test-matrix\.md/);
+  assert.match(testing, /provider_probe_status=skipped/);
+  assert.match(baseline, /release tag: `v0\.4\.0`/);
+  assert.match(baseline, /release commit: `4de7342`/);
+  assert.match(baseline, /provider_probe_status=skipped/);
+  assert.match(matrix, /BaseBrief v0\.4\.x Test Matrix/);
+  assert.match(matrix, /OpenCode availability/);
+  assert.match(matrix, /Claude Code availability/);
+  assert.match(release, /Stabilization Candidate/);
+  assert.match(release, /BB9 handoff schema is unchanged/);
+  assert.match(release, /Receiver Safe Check config and result schemas are unchanged/);
+  assert.match(release, /Receiver Flow Draft schema and default behavior are unchanged/);
+  assert.match(release, /CLI Lite command behavior is unchanged/);
+  assert.match(release, /provider_probe_status=skipped/);
+  assert.match(release, /No provider request/);
+  assert.match(release, /No Auto Flow/);
+  assert.match(release, /No `receiver-flow --guided`/);
+  assert.match(release, /No `receiver-flow --extract`/);
+  assert.match(release, /No `review-draft`/);
+  assert.match(release, /No `.basebrief\/` project state directory/);
+  assert.match(release, /No push, tag, or formal release/);
+
+  for (const relativePath of [
+    "docs/baselines/v0.4.0-post-release-baseline.md",
+    "docs/testing-v0.4.x-test-matrix.md",
+    "docs/releases/v0.4.1.md",
+  ]) {
+    const result = checkArtifacts({ inputPath: path.join(repoRoot, relativePath) });
+    assert.equal(result.status, "passed", relativePath);
+    assert.equal(result.errorCount, 0, relativePath);
+    assert.equal(result.warningCount, 0, relativePath);
+  }
+});
+
 test("public quickstart and minimal examples provide a clean first-use path", () => {
   const quickstart = readText("docs/quickstart-5min.md");
   const minimalBrief = readText("examples/minimal/output-basebrief-lite.md");
@@ -752,6 +801,57 @@ test("artifact checker reports errors for secrets, bearer tokens, and private pa
   assert(result.findings.some((finding) => finding.ruleId === "secret.sk"));
   assert(result.findings.some((finding) => finding.ruleId === "secret.bearer"));
   assert(result.findings.some((finding) => finding.ruleId === "private.absolute-path"));
+}));
+
+test("artifact checker blocks common fake secret formats without echoing values", () => withTempDir((tempDir) => {
+  const fakeSecrets = {
+    "secret.github-token": `gh${"p_"}fakegithubtoken1234567890`,
+    "secret.aws-access-key": `${"AKIA"}IOSFODNN7EXAMPLE`,
+    "secret.slack-token": `xox${"b-"}fake-slack-token-1234567890`,
+    "secret.google-api-key": `${"AIza"}SyFakeGoogleApiKey1234567890`,
+    "secret.private-key-block": `-----BEGIN ${"PRIVATE"} KEY-----`,
+  };
+  const filePath = path.join(tempDir, "secrets.md");
+  fs.writeFileSync(filePath, [
+    "# Fake Secrets",
+    "",
+    ...Object.values(fakeSecrets),
+    "",
+  ].join("\n"), "utf8");
+
+  const result = checkArtifacts({ inputPath: filePath });
+  const serialized = JSON.stringify(result);
+  assert.equal(result.status, "failed");
+  for (const ruleId of Object.keys(fakeSecrets)) {
+    assert(result.findings.some((finding) => finding.ruleId === ruleId), ruleId);
+  }
+  for (const value of Object.values(fakeSecrets)) {
+    assert.equal(serialized.includes(value), false, value);
+  }
+}));
+
+test("artifact checker handles broken markdown and skips noisy directories", () => withTempDir((tempDir) => {
+  fs.writeFileSync(path.join(tempDir, "broken.md"), [
+    "# Broken Markdown",
+    "",
+    "```js",
+    "console.log('unterminated fence')",
+    "",
+    "- L1",
+    "  - L2",
+    "    - L3",
+    "中文 and zero width marker stay public-safe.",
+    "",
+  ].join("\n"), "utf8");
+  for (const dirName of ["node_modules", "dist", ".cache", "coverage", "private"]) {
+    fs.mkdirSync(path.join(tempDir, dirName), { recursive: true });
+    fs.writeFileSync(path.join(tempDir, dirName, "secret.md"), `${"sk-"}testsecretvalue123456\n`, "utf8");
+  }
+
+  const result = checkArtifacts({ inputPath: tempDir });
+  assert.equal(result.status, "passed");
+  assert.equal(result.errorCount, 0);
+  assert.equal(result.warningCount, 0);
 }));
 
 test("artifact checker rejects provider sidecar content in adapter outputs", () => withTempDir((tempDir) => {
@@ -1440,6 +1540,26 @@ test("Receiver flow draft rejects unsafe outputs, overwrite, tracked writes, and
   git(repoDir, ["add", "tracked-flow/flow-summary.json"]);
   git(repoDir, ["commit", "-m", "track flow output"]);
   assert.throws(() => runReceiverFlow({ repoPath: repoDir, outputDir: path.join(repoDir, "tracked-flow") }), /already exists|tracked target-repository file/);
+}));
+
+test("Receiver flow draft handles Unicode and space paths and rejects no-git directories", () => withTempDir((tempDir) => {
+  const repoDir = createReceiverCheckRepo(tempDir);
+  const renamedRepo = path.join(tempDir, "中文 path repo");
+  fs.renameSync(repoDir, renamedRepo);
+  const outputDir = path.join(tempDir, "output with spaces", "flow");
+  const result = runReceiverFlow({ repoPath: renamedRepo, outputDir });
+
+  assert.equal(result.command, "receiver-flow");
+  assert.equal(result.handoff_status, "draft_needs_review");
+  assert(fs.existsSync(path.join(outputDir, "draft-context.md")));
+  assert.equal(checkArtifacts({ inputPath: outputDir }).status, "passed");
+
+  const noGitDir = path.join(tempDir, "plain folder");
+  fs.mkdirSync(noGitDir, { recursive: true });
+  assert.throws(
+    () => runReceiverFlow({ repoPath: noGitDir, outputDir: path.join(tempDir, "no-git-output") }),
+    /not a git repository|rev-parse failed|fatal/i,
+  );
 }));
 
 test("CLI Lite exposes Receiver flow draft with public-safe json paths", () => withTempDir((tempDir) => {

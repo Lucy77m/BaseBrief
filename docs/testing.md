@@ -24,6 +24,24 @@ npm run check
 
 这些 npm scripts 只包装上面的本地 Node 命令；它们不表示 BaseBrief 已成为发布 npm package 或安装式 CLI。
 
+## v0.4.1 Stabilization Candidate
+
+`v0.4.1` is a stabilization-only cycle after the `v0.4.0` public release. It uses
+[the v0.4.x test matrix](testing-v0.4.x-test-matrix.md) and
+[the v0.4.0 post-release baseline](baselines/v0.4.0-post-release-baseline.md)
+to keep scale testing public-safe.
+
+This cycle may add checker rules, edge tests, local sandbox summaries, and docs fixes.
+It does not add `receiver-flow --guided`, `receiver-flow --extract`, `review-draft`,
+`.basebrief/`, Auto Flow, Web UI, adapter expansion, provider requests, provider
+benchmark claims, npm publishing, push, tag, or formal release.
+
+Expected release-check output without provider env remains:
+
+```text
+provider_probe_status=skipped
+```
+
 ## Receiver 测试额度
 
 Receiver-ready 验证默认采用低额度策略：

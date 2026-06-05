@@ -84,11 +84,14 @@ function checkRequiredFiles() {
     "docs/checks.md",
     "docs/receiver-check.md",
     "docs/receiver-flow.md",
+    "docs/baselines/v0.4.0-post-release-baseline.md",
     "docs/releases/v0.3.0.md",
     "docs/releases/v0.3.1.md",
     "docs/releases/v0.3.2.md",
     "docs/releases/v0.3.3.md",
     "docs/releases/v0.4.0.md",
+    "docs/releases/v0.4.1.md",
+    "docs/testing-v0.4.x-test-matrix.md",
     "docs/cli-lite.md",
     "docs/seal-diff.md",
     "docs/contextops.md",
@@ -208,6 +211,9 @@ function checkContentContracts() {
   const receiverFlowReleaseDoc = readText("docs/releases/v0.3.2.md");
   const receiverFlowDogfoodingReleaseDoc = readText("docs/releases/v0.3.3.md");
   const integratedToolchainReleaseDoc = readText("docs/releases/v0.4.0.md");
+  const stabilizationCandidateDoc = readText("docs/releases/v0.4.1.md");
+  const postReleaseBaselineDoc = readText("docs/baselines/v0.4.0-post-release-baseline.md");
+  const testMatrixDoc = readText("docs/testing-v0.4.x-test-matrix.md");
   const cliLiteDoc = readText("docs/cli-lite.md");
   const sealDiffDoc = readText("docs/seal-diff.md");
   const contextOpsDoc = readText("docs/contextops.md");
@@ -256,6 +262,7 @@ function checkContentContracts() {
   assert(readme.includes("receiver-flow"), "README.md should mention receiver-flow command");
   assert(readme.includes("docs/dogfooding/receiver-friction-log.md"), "README.md should link to receiver friction log");
   assert(readme.includes("docs/dogfooding/receiver-flow-dogfooding.md"), "README.md should link to receiver-flow dogfooding evidence");
+  assert(readme.includes("docs/releases/v0.4.1.md"), "README.md should link to v0.4.1 stabilization candidate");
   assert(readme.includes("docs/releases/v0.4.0.md"), "README.md should link to v0.4.0 release candidate");
   assert(readme.includes("docs/releases/v0.3.3.md"), "README.md should link to v0.3.3 release candidate");
   assert(readme.includes("docs/releases/v0.3.2.md"), "README.md should link to v0.3.2 release candidate");
@@ -279,6 +286,7 @@ function checkContentContracts() {
   assert(englishReadme.includes("receiver-flow"), "README.en.md should mention receiver-flow command");
   assert(englishReadme.includes("docs/dogfooding/receiver-friction-log.md"), "README.en.md should link to receiver friction log");
   assert(englishReadme.includes("docs/dogfooding/receiver-flow-dogfooding.md"), "README.en.md should link to receiver-flow dogfooding evidence");
+  assert(englishReadme.includes("docs/releases/v0.4.1.md"), "README.en.md should link to v0.4.1 stabilization candidate");
   assert(englishReadme.includes("docs/releases/v0.4.0.md"), "README.en.md should link to v0.4.0 release candidate");
   assert(englishReadme.includes("docs/releases/v0.3.3.md"), "README.en.md should link to v0.3.3 release candidate");
   assert(englishReadme.includes("docs/releases/v0.3.2.md"), "README.en.md should link to v0.3.2 release candidate");
@@ -321,6 +329,9 @@ function checkContentContracts() {
   assert(docsIndex.includes("../examples/receiver-flow/clean-repo/README.md"), "Docs index should link receiver-flow clean repo example");
   assert(docsIndex.includes("../examples/receiver-flow/dirty-repo/README.md"), "Docs index should link receiver-flow dirty repo example");
   assert(docsIndex.includes("../examples/receiver-flow/visible-output/README.md"), "Docs index should link receiver-flow visible output example");
+  assert(docsIndex.includes("releases/v0.4.1.md"), "Docs index must link v0.4.1 stabilization candidate");
+  assert(docsIndex.includes("baselines/v0.4.0-post-release-baseline.md"), "Docs index must link v0.4.0 post-release baseline");
+  assert(docsIndex.includes("testing-v0.4.x-test-matrix.md"), "Docs index must link v0.4.x test matrix");
   assert(docsIndex.includes("releases/v0.4.0.md"), "Docs index must link v0.4.0 release candidate");
   assert(docsIndex.includes("releases/v0.3.3.md"), "Docs index must link v0.3.3 release candidate");
   assert(docsIndex.includes("releases/v0.3.2.md"), "Docs index must link v0.3.2 release candidate");
@@ -358,6 +369,8 @@ function checkContentContracts() {
   assert(testingDoc.includes("v0.3.2 Receiver Flow Draft Skeleton"), "Testing docs must document v0.3.2 receiver flow closure");
   assert(testingDoc.includes("v0.3.3 Receiver Flow Dogfooding Evidence"), "Testing docs must document v0.3.3 receiver flow dogfooding closure");
   assert(testingDoc.includes("v0.4.0 Integrated Local Toolchain Release Candidate"), "Testing docs must document v0.4.0 release-candidate closure");
+  assert(testingDoc.includes("v0.4.1 Stabilization Candidate"), "Testing docs must document v0.4.1 stabilization candidate");
+  assert(testingDoc.includes("testing-v0.4.x-test-matrix.md"), "Testing docs must link v0.4.x test matrix");
   assert(testingDoc.includes("provider_probe_status=skipped"), "Testing docs must preserve skipped provider probe wording");
   assert(usabilityFeedbackTemplate.includes("Do not include secrets"), "Usability feedback template must include a safety warning");
   assert(usabilityFeedbackTemplate.includes("Expected Result"), "Usability feedback template must collect expected results");
@@ -580,6 +593,25 @@ function checkContentContracts() {
   assert(integratedToolchainReleaseDoc.includes("No `.basebrief/` project state directory"), "v0.4.0 release candidate must state no .basebrief directory");
   assert(integratedToolchainReleaseDoc.includes("No CI matrix"), "v0.4.0 release candidate must state no CI matrix");
   assert(integratedToolchainReleaseDoc.includes("No push, tag, or formal release"), "v0.4.0 release candidate must keep release actions pending");
+  assert(stabilizationCandidateDoc.includes("Stabilization Candidate"), "v0.4.1 candidate must describe stabilization");
+  assert(stabilizationCandidateDoc.includes("BB9 handoff schema is unchanged"), "v0.4.1 candidate must protect BB9 schema");
+  assert(stabilizationCandidateDoc.includes("Receiver Safe Check config and result schemas are unchanged"), "v0.4.1 candidate must protect receiver schemas");
+  assert(stabilizationCandidateDoc.includes("Receiver Flow Draft schema and default behavior are unchanged"), "v0.4.1 candidate must protect receiver-flow behavior");
+  assert(stabilizationCandidateDoc.includes("CLI Lite command behavior is unchanged"), "v0.4.1 candidate must protect CLI behavior");
+  assert(stabilizationCandidateDoc.includes("provider_probe_status=skipped"), "v0.4.1 candidate must preserve skipped provider probe gate");
+  assert(stabilizationCandidateDoc.includes("No provider request"), "v0.4.1 candidate must state no provider request");
+  assert(stabilizationCandidateDoc.includes("No Auto Flow"), "v0.4.1 candidate must state no Auto Flow");
+  assert(stabilizationCandidateDoc.includes("No `receiver-flow --guided`"), "v0.4.1 candidate must state no guided mode");
+  assert(stabilizationCandidateDoc.includes("No `receiver-flow --extract`"), "v0.4.1 candidate must state no extract mode");
+  assert(stabilizationCandidateDoc.includes("No `review-draft`"), "v0.4.1 candidate must state no review-draft");
+  assert(stabilizationCandidateDoc.includes("No `.basebrief/` project state directory"), "v0.4.1 candidate must state no .basebrief directory");
+  assert(stabilizationCandidateDoc.includes("No push, tag, or formal release"), "v0.4.1 candidate must keep release actions pending");
+  assert(postReleaseBaselineDoc.includes("release tag: `v0.4.0`"), "post-release baseline must record v0.4.0 tag");
+  assert(postReleaseBaselineDoc.includes("release commit: `4de7342`"), "post-release baseline must record release commit");
+  assert(postReleaseBaselineDoc.includes("provider_probe_status=skipped"), "post-release baseline must preserve skipped provider wording");
+  assert(testMatrixDoc.includes("BaseBrief v0.4.x Test Matrix"), "v0.4.x test matrix must have a stable title");
+  assert(testMatrixDoc.includes("OpenCode availability"), "v0.4.x test matrix must include OpenCode runner probe");
+  assert(testMatrixDoc.includes("Claude Code availability"), "v0.4.x test matrix must include Claude Code runner probe");
   assert(receiverCheckSchema.properties.schemaVersion.const === "basebrief-receiver-check-v1", "Receiver Safe Check config schema version mismatch");
   assert(receiverCheckResultSchema.properties.schemaVersion.const === "basebrief-receiver-check-result-v1", "Receiver Safe Check result schema version mismatch");
   assert(receiverCheckConfigExample.schemaVersion === "basebrief-receiver-check-v1", "Receiver Safe Check example schema version mismatch");
@@ -775,6 +807,8 @@ function checkArtifactChecker() {
     "docs/dogfooding/receiver-ready-v1-evidence.md",
     "docs/dogfooding/receiver-friction-log.md",
     "docs/dogfooding/receiver-flow-dogfooding.md",
+    "docs/baselines/v0.4.0-post-release-baseline.md",
+    "docs/testing-v0.4.x-test-matrix.md",
     "docs/receiver-check.md",
     "docs/receiver-flow.md",
     "docs/releases/v0.3.0.md",
@@ -782,6 +816,7 @@ function checkArtifactChecker() {
     "docs/releases/v0.3.2.md",
     "docs/releases/v0.3.3.md",
     "docs/releases/v0.4.0.md",
+    "docs/releases/v0.4.1.md",
     "examples/receiver-check-config.json",
     "examples/receiver/difference-found",
     "examples/receiver/blocked",

@@ -20,6 +20,9 @@
 
 ## 方向与验证
 
+- [v0.4.1 stabilization candidate](releases/v0.4.1.md)
+- [v0.4.0 post-release baseline](baselines/v0.4.0-post-release-baseline.md)
+- [v0.4.x test matrix](testing-v0.4.x-test-matrix.md)
 - [v0.4.0 integrated local toolchain release candidate](releases/v0.4.0.md)
 - [v0.3.3 receiver-flow dogfooding evidence](releases/v0.3.3.md)
 - [v0.3.2 receiver-flow draft skeleton](releases/v0.3.2.md)

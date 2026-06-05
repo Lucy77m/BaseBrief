@@ -10,6 +10,11 @@ const SKIPPED_DIRS = new Set([".git", "node_modules", "dist", ".cache", "coverag
 const SECRET_PATTERNS = [
   { ruleId: "secret.sk", pattern: /sk-[A-Za-z0-9]{10,}/ },
   { ruleId: "secret.bearer", pattern: /Bearer\s+[A-Za-z0-9._-]{10,}/i },
+  { ruleId: "secret.github-token", pattern: /\bgh[opusr]_[A-Za-z0-9_]{10,}/ },
+  { ruleId: "secret.aws-access-key", pattern: /\b(?:AKIA|ASIA)[A-Z0-9]{16}\b/ },
+  { ruleId: "secret.slack-token", pattern: /\bxox[abprs]-[A-Za-z0-9-]{10,}/ },
+  { ruleId: "secret.google-api-key", pattern: /\bAIza[A-Za-z0-9_-]{20,}/ },
+  { ruleId: "secret.private-key-block", pattern: /-----BEGIN [A-Z ]*PRIVATE KEY-----/ },
   { ruleId: "secret.assignment", pattern: /\b(?:api[_-]?key|token|secret)\s*[:=]\s*["']?[A-Za-z0-9._-]{10,}/i },
   { ruleId: "secret.env-key", pattern: /\b[A-Z0-9_]*(?:API_KEY|TOKEN|SECRET)\s*=\s*["']?[A-Za-z0-9._-]{10,}/ },
 ];
