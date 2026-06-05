@@ -16,7 +16,7 @@ const {
 } = require("../scripts/basebrief_build_handoff");
 const { buildAdapterArtifacts, normalizeTargets } = require("../scripts/basebrief_build_adapters");
 const { checkArtifacts } = require("../scripts/basebrief_check_artifacts");
-const { HELP_TEXT, commandBuild, commandCheck, commandDiff, commandInit, commandReceiverCheck, commandReceiverFlow, commandReceiverInit, commandReviewDraft, commandSidecarBuild, commandStateAdvance, commandStateHistory, commandStateInit, commandStateRead, commandStateStatus, commandStateValidate, commandSeal, formatHuman, run, starterInput } = require("../scripts/basebrief");
+const { HELP_TEXT, commandBuild, commandCheck, commandDiff, commandInit, commandReceiverCheck, commandReceiverFlow, commandReceiverInit, commandReviewDraft, commandSidecarBuild, commandSidecarCheck, commandStateAdvance, commandStateHistory, commandStateInit, commandStateRead, commandStateStatus, commandStateValidate, commandSeal, formatHuman, run, starterInput } = require("../scripts/basebrief");
 const {
   CONFIG_SCHEMA_VERSION: RECEIVER_CHECK_SCHEMA_VERSION,
   RESULT_SCHEMA_VERSION: RECEIVER_CHECK_RESULT_SCHEMA_VERSION,
@@ -28,7 +28,7 @@ const { buildReceiverCheckConfig, runReceiverInit } = require("../scripts/basebr
 const { FLOW_SCHEMA_VERSION, runReceiverFlow } = require("../scripts/basebrief_receiver_flow");
 const { REVIEW_DRAFT_SCHEMA_VERSION, runReviewDraft } = require("../scripts/basebrief_review_draft");
 const { PROJECT_STATE_SCHEMA_VERSION, runStateAdvance, runStateHistory, runStateInit, runStateRead, runStateStatus, runStateValidate } = require("../scripts/basebrief_project_state");
-const { SIDECAR_SCHEMA_VERSION, buildSidecarBundle } = require("../scripts/basebrief_sidecar");
+const { SIDECAR_SCHEMA_VERSION, buildSidecarBundle, checkSidecarBundle } = require("../scripts/basebrief_sidecar");
 const { createSealFromInput, diffSeals, readSealOrInput, SEAL_SCHEMA_VERSION } = require("../scripts/basebrief_seal");
 const { buildSummary, getPromptForVariant, SCENARIOS, PROVIDER_PROFILES } = require("../scripts/provider_cache_benchmark");
 const { classifyRelayUsage } = require("../scripts/provider_relay_usage_audit");
@@ -987,6 +987,43 @@ test("v0.8.0 sidecar handoff bundle documents local-only project-state consumpti
     "docs/cli-lite.md",
     "docs/project-state.md",
     "docs/releases/v0.8.0.md",
+  ]) {
+    const result = checkArtifacts({ inputPath: path.join(repoRoot, relativePath) });
+    assert.equal(result.status, "passed", relativePath);
+    assert.equal(result.errorCount, 0, relativePath);
+  }
+});
+
+test("v0.8.1 sidecar check documents read-only bundle acceptance", () => {
+  const docsIndex = readText("docs/index.md");
+  const cliLite = readText("docs/cli-lite.md");
+  const projectState = readText("docs/project-state.md");
+  const release = readText("docs/releases/v0.8.1.md");
+
+  assert.match(docsIndex, /releases\/v0\.8\.1\.md/);
+  assert.match(cliLite, /sidecar-check --input <sidecar-dir>/);
+  assert.match(projectState, /sidecar-check --input <sidecar-dir>/);
+  assert.match(release, /Sidecar Check Hardening Candidate/);
+  assert.match(release, /basebrief-sidecar-v1/);
+  assert.match(release, /basebrief-project-state-v1/);
+  assert.match(release, /current_goal/);
+  assert.match(release, /receiver_entry_task/);
+  assert.match(release, /risk_boundaries/);
+
+  for (const doc of [cliLite, projectState, release]) {
+    assert.match(doc, /No provider request/);
+    assert.match(doc, /No raw private output/);
+    assert.match(doc, /No runtime integration|No runtime/);
+    assert.match(doc, /No schema change/);
+  }
+
+  assert.match(release, /provider_probe_status=skipped/);
+  assert.match(release, /profile\/config\/memory\/workspace/);
+
+  for (const relativePath of [
+    "docs/cli-lite.md",
+    "docs/project-state.md",
+    "docs/releases/v0.8.1.md",
   ]) {
     const result = checkArtifacts({ inputPath: path.join(repoRoot, relativePath) });
     assert.equal(result.status, "passed", relativePath);
@@ -2627,6 +2664,24 @@ test("Project state lifecycle rejects unsafe or unreviewed advance", () => withT
   assert.throws(() => runStateAdvance({ repoPath: repoDir, sourcePath: readyPath }), /validation failed before advance/);
 }));
 
+function createSidecarFixture(tempDir, target = "generic") {
+  const repoDir = createReceiverCheckRepo(tempDir);
+  const { draftPath } = createGuidedDraft(tempDir, {
+    guidedAnswers: {
+      risk_boundaries: [
+        "Do not call providers.",
+        "Do not write secrets or raw private output.",
+      ].join("\n"),
+    },
+  });
+  const readyPath = path.join(tempDir, `${target}-receiver-ready.md`);
+  runReviewDraft({ draftPath, outputPath: readyPath });
+  runStateInit({ repoPath: repoDir, sourcePath: readyPath });
+  const outputDir = path.join(tempDir, `${target}-sidecar`);
+  buildSidecarBundle({ repoPath: repoDir, target, outputDir });
+  return { repoDir, outputDir };
+}
+
 test("Sidecar build writes generic bundle from valid project state", () => withTempDir((tempDir) => {
   const repoDir = createReceiverCheckRepo(tempDir);
   const { draftPath } = createGuidedDraft(tempDir, {
@@ -2714,6 +2769,99 @@ test("Sidecar build rejects missing state, invalid state, unsupported target, an
 
   fs.writeFileSync(path.join(repoDir, ".basebrief", "state.json"), `${JSON.stringify({ schemaVersion: "wrong" }, null, 2)}\n`, "utf8");
   assert.throws(() => buildSidecarBundle({ repoPath: repoDir, outputDir: path.join(tempDir, "invalid-sidecar") }), /project-state validation failed/);
+}));
+
+test("Sidecar check passes valid generic and openclaw bundles", () => withTempDir((tempDir) => {
+  const generic = createSidecarFixture(path.join(tempDir, "generic"), "generic");
+  const openclaw = createSidecarFixture(path.join(tempDir, "openclaw"), "openclaw");
+
+  const genericCheck = checkSidecarBundle({ inputPath: generic.outputDir });
+  const openclawCheck = commandSidecarCheck({ input: openclaw.outputDir });
+
+  assert.equal(genericCheck.command, "sidecar-check");
+  assert.equal(genericCheck.check_status, "passed");
+  assert.equal(genericCheck.target, "generic");
+  assert.equal(genericCheck.schemaVersion, SIDECAR_SCHEMA_VERSION);
+  assert.equal(genericCheck.projectStateSchemaVersion, PROJECT_STATE_SCHEMA_VERSION);
+  assert.equal(openclawCheck.check_status, "passed");
+  assert.equal(openclawCheck.target, "openclaw");
+  assert.equal(openclawCheck.artifact_check.status, "passed");
+}));
+
+test("Sidecar check rejects malformed or incomplete bundles", () => withTempDir((tempDir) => {
+  const { outputDir } = createSidecarFixture(tempDir, "generic");
+
+  fs.rmSync(path.join(outputDir, "handoff.md"));
+  let result = checkSidecarBundle({ inputPath: outputDir });
+  assert.equal(result.check_status, "failed");
+  assert(result.errors.some((error) => error.includes("Missing required sidecar file: handoff.md")));
+
+  fs.writeFileSync(path.join(outputDir, "handoff.md"), "# restored\n\n## Risk Boundaries\n- No provider request.\n\n## Open Questions\nNone.\n", "utf8");
+  fs.writeFileSync(path.join(outputDir, "manifest.json"), "{\n", "utf8");
+  result = checkSidecarBundle({ inputPath: outputDir });
+  assert.equal(result.check_status, "failed");
+  assert(result.errors.some((error) => error.includes("manifest.json must be parseable JSON")));
+
+  const { outputDir: invalidTargetDir } = createSidecarFixture(path.join(tempDir, "invalid-target"), "generic");
+  const manifest = JSON.parse(fs.readFileSync(path.join(invalidTargetDir, "manifest.json"), "utf8"));
+  manifest.target = "runtime";
+  fs.writeFileSync(path.join(invalidTargetDir, "manifest.json"), `${JSON.stringify(manifest, null, 2)}\n`, "utf8");
+  result = checkSidecarBundle({ inputPath: invalidTargetDir });
+  assert.equal(result.check_status, "failed");
+  assert(result.errors.some((error) => error.includes("manifest.json.target must be generic or openclaw")));
+}));
+
+test("Sidecar check rejects weak state summary and prompt contracts", () => withTempDir((tempDir) => {
+  const { outputDir } = createSidecarFixture(tempDir, "generic");
+  const summaryPath = path.join(outputDir, "state-summary.json");
+  const promptPath = path.join(outputDir, "next-chat-prompt.md");
+
+  const emptyGoal = JSON.parse(fs.readFileSync(summaryPath, "utf8"));
+  emptyGoal.current_goal = "";
+  fs.writeFileSync(summaryPath, `${JSON.stringify(emptyGoal, null, 2)}\n`, "utf8");
+  let result = checkSidecarBundle({ inputPath: outputDir });
+  assert.equal(result.check_status, "failed");
+  assert(result.errors.some((error) => error.includes("current_goal")));
+
+  emptyGoal.current_goal = "Prepare a reviewed receiver handoff for testing.";
+  emptyGoal.risk_boundaries = ["Only one boundary."];
+  fs.writeFileSync(summaryPath, `${JSON.stringify(emptyGoal, null, 2)}\n`, "utf8");
+  result = checkSidecarBundle({ inputPath: outputDir });
+  assert.equal(result.check_status, "failed");
+  assert(result.errors.some((error) => error.includes("at least two")));
+
+  const { outputDir: promptDir } = createSidecarFixture(path.join(tempDir, "prompt"), "generic");
+  const prompt = fs.readFileSync(path.join(promptDir, "next-chat-prompt.md"), "utf8")
+    .replace(/Wait for user confirmation/gi, "Continue after review")
+    .replace(/No provider request/gi, "Provider requests are not covered")
+    .replace(/No runtime integration/gi, "Runtime details are not covered");
+  fs.writeFileSync(path.join(promptDir, "next-chat-prompt.md"), prompt, "utf8");
+  result = checkSidecarBundle({ inputPath: promptDir });
+  assert.equal(result.check_status, "failed");
+  assert(result.errors.some((error) => error.includes("waiting for user confirmation")));
+  assert(result.errors.some((error) => error.includes("No provider request")));
+  assert(result.errors.some((error) => error.includes("No runtime integration")));
+}));
+
+test("Sidecar check enforces OpenClaw/Hermes wording for openclaw target", () => withTempDir((tempDir) => {
+  const { outputDir } = createSidecarFixture(tempDir, "openclaw");
+  const promptPath = path.join(outputDir, "next-chat-prompt.md");
+  const riskPath = path.join(outputDir, "risk-boundaries.md");
+  const handoffPath = path.join(outputDir, "handoff.md");
+
+  for (const filePath of [promptPath, riskPath, handoffPath]) {
+    const content = fs.readFileSync(filePath, "utf8")
+      .replace(/OpenClaw\/Hermes runtime/g, "local runtime")
+      .replace(/OpenClaw or Hermes runtime/g, "local runtime")
+      .replace(/profile\/config\/memory\/workspace/g, "local files")
+      .replace(/profile, config, memory, or workspace/g, "local files");
+    fs.writeFileSync(filePath, content, "utf8");
+  }
+
+  const result = checkSidecarBundle({ inputPath: outputDir });
+  assert.equal(result.check_status, "failed");
+  assert(result.errors.some((error) => error.includes("OpenClaw/Hermes runtime")));
+  assert(result.errors.some((error) => error.includes("profile/config/memory/workspace")));
 }));
 
 test("CLI Lite exposes project state commands with public-safe json paths", () => withTempDir((tempDir) => {
@@ -2868,6 +3016,22 @@ test("CLI Lite exposes project state commands with public-safe json paths", () =
     assert.equal(sidecarResult.outputDir.startsWith("tests"), true);
     assert.equal(sidecarResult.outputFiles.handoff.startsWith("tests"), true);
     assert.match(HELP_TEXT, /sidecar-build --repo <target-repo>/);
+
+    const sidecarCheckCli = spawnSync(process.execPath, [
+      "scripts/basebrief.js",
+      "sidecar-check",
+      "--input",
+      sidecarDir,
+      "--json",
+    ], { cwd: repoRoot, encoding: "utf8" });
+    assert.equal(sidecarCheckCli.status, 0, sidecarCheckCli.stderr);
+    const sidecarCheckResult = JSON.parse(sidecarCheckCli.stdout);
+    assert.equal(sidecarCheckResult.command, "sidecar-check");
+    assert.equal(sidecarCheckResult.check_status, "passed");
+    assert.equal(sidecarCheckResult.target, "generic");
+    assert.equal(sidecarCheckResult.input.startsWith("tests"), true);
+    assert.equal(sidecarCheckResult.artifact_check.status, "passed");
+    assert.match(HELP_TEXT, /sidecar-check --input <sidecar-dir>/);
   } finally {
     fs.rmSync(repoDir, { recursive: true, force: true });
     fs.rmSync(sourceDir, { recursive: true, force: true });

@@ -4,6 +4,7 @@ const fs = require("fs");
 const os = require("os");
 const path = require("path");
 
+const { checkArtifacts } = require("./basebrief_check_artifacts");
 const { PROJECT_STATE_SCHEMA_VERSION, runStateRead } = require("./basebrief_project_state");
 
 const SIDECAR_SCHEMA_VERSION = "basebrief-sidecar-v1";
@@ -267,6 +268,155 @@ function writeJson(filePath, value) {
   fs.writeFileSync(filePath, `${JSON.stringify(value, null, 2)}\n`, { encoding: "utf8", flag: "wx" });
 }
 
+function readJsonForCheck(filePath, errors, label) {
+  try {
+    return JSON.parse(fs.readFileSync(filePath, "utf8"));
+  } catch (error) {
+    errors.push(`${label} must be parseable JSON: ${error.message}`);
+    return null;
+  }
+}
+
+function normalizedText(value) {
+  return String(value || "").replace(/\s+/g, " ").trim().toLowerCase();
+}
+
+function textIncludes(haystack, needle) {
+  const normalizedNeedle = normalizedText(needle);
+  if (!normalizedNeedle) return false;
+  return normalizedText(haystack).includes(normalizedNeedle);
+}
+
+function validateSidecarJsonShape(value, label, errors) {
+  if (!value || typeof value !== "object" || Array.isArray(value)) {
+    errors.push(`${label} must be a JSON object`);
+    return;
+  }
+  if (value.schemaVersion !== SIDECAR_SCHEMA_VERSION) {
+    errors.push(`${label}.schemaVersion must be ${SIDECAR_SCHEMA_VERSION}`);
+  }
+  if (value.projectStateSchemaVersion !== PROJECT_STATE_SCHEMA_VERSION) {
+    errors.push(`${label}.projectStateSchemaVersion must be ${PROJECT_STATE_SCHEMA_VERSION}`);
+  }
+  if (!SUPPORTED_TARGETS.has(value.target)) {
+    errors.push(`${label}.target must be generic or openclaw`);
+  }
+}
+
+function checkRequiredFiles(inputDir, errors) {
+  const files = Object.values(OUTPUT_FILES);
+  for (const fileName of files) {
+    const filePath = path.join(inputDir, fileName);
+    if (!fs.existsSync(filePath)) {
+      errors.push(`Missing required sidecar file: ${fileName}`);
+      continue;
+    }
+    if (!fs.statSync(filePath).isFile()) {
+      errors.push(`Required sidecar path must be a file: ${fileName}`);
+    }
+  }
+  return files;
+}
+
+function checkPromptContract({ nextChatPrompt, stateSummary, target, errors }) {
+  const currentGoal = String((stateSummary && stateSummary.current_goal) || "");
+  const receiverEntryTask = String((stateSummary && stateSummary.receiver_entry_task) || "");
+  const riskBoundaries = Array.isArray(stateSummary && stateSummary.risk_boundaries)
+    ? stateSummary.risk_boundaries.filter((item) => String(item || "").trim())
+    : [];
+
+  if (!currentGoal.trim()) errors.push("state-summary.current_goal must be non-empty");
+  if (!receiverEntryTask.trim()) errors.push("state-summary.receiver_entry_task must be non-empty");
+  if (riskBoundaries.length < 2) errors.push("state-summary.risk_boundaries must contain at least two items");
+
+  if (currentGoal.trim() && !textIncludes(nextChatPrompt, currentGoal)) {
+    errors.push("next-chat-prompt.md must include current_goal content");
+  }
+  if (receiverEntryTask.trim() && !textIncludes(nextChatPrompt, receiverEntryTask)) {
+    errors.push("next-chat-prompt.md must include receiver_entry_task content");
+  }
+  for (const risk of riskBoundaries.slice(0, 2)) {
+    if (!textIncludes(nextChatPrompt, risk)) {
+      errors.push("next-chat-prompt.md must include at least two risk boundary items");
+      break;
+    }
+  }
+  if (!/wait for user confirmation/i.test(nextChatPrompt)) {
+    errors.push("next-chat-prompt.md must require waiting for user confirmation");
+  }
+  if (!/No provider request/i.test(nextChatPrompt)) {
+    errors.push("next-chat-prompt.md must include No provider request");
+  }
+  if (!/No raw private output/i.test(nextChatPrompt)) {
+    errors.push("next-chat-prompt.md must include No raw private output");
+  }
+  if (!/No runtime(?: integration)?/i.test(nextChatPrompt)) {
+    errors.push("next-chat-prompt.md must include No runtime integration");
+  }
+  if (!/No auto-advance/i.test(nextChatPrompt)) {
+    errors.push("next-chat-prompt.md must include No auto-advance");
+  }
+  if (target === "openclaw") {
+    if (!/(OpenClaw\/Hermes runtime|OpenClaw or Hermes runtime)/i.test(nextChatPrompt)) {
+      errors.push("openclaw next-chat-prompt.md must prohibit OpenClaw/Hermes runtime integration");
+    }
+    if (!/(profile\/config\/memory\/workspace|profile[\s\S]*config[\s\S]*memory[\s\S]*workspace)/i.test(nextChatPrompt)) {
+      errors.push("openclaw next-chat-prompt.md must prohibit profile/config/memory/workspace writes");
+    }
+  }
+}
+
+function checkSidecarBundle(options) {
+  if (!options.inputPath) throw new Error("Missing --input <sidecar-dir>");
+  const inputDir = path.resolve(options.inputPath);
+  assertNonSensitivePath(inputDir, "sidecar input");
+  if (!fs.existsSync(inputDir)) throw new Error(`sidecar input does not exist: ${inputDir}`);
+  if (!fs.statSync(inputDir).isDirectory()) throw new Error(`sidecar input must be a directory: ${inputDir}`);
+
+  const errors = [];
+  const requiredFiles = checkRequiredFiles(inputDir, errors);
+  const manifestPath = path.join(inputDir, OUTPUT_FILES.manifest);
+  const stateSummaryPath = path.join(inputDir, OUTPUT_FILES.stateSummary);
+  const nextChatPromptPath = path.join(inputDir, OUTPUT_FILES.nextChatPrompt);
+
+  const manifest = fs.existsSync(manifestPath) && fs.statSync(manifestPath).isFile()
+    ? readJsonForCheck(manifestPath, errors, "manifest.json")
+    : null;
+  const stateSummary = fs.existsSync(stateSummaryPath) && fs.statSync(stateSummaryPath).isFile()
+    ? readJsonForCheck(stateSummaryPath, errors, "state-summary.json")
+    : null;
+  validateSidecarJsonShape(manifest, "manifest.json", errors);
+  validateSidecarJsonShape(stateSummary, "state-summary.json", errors);
+
+  const manifestTarget = manifest && manifest.target;
+  const summaryTarget = stateSummary && stateSummary.target;
+  const target = SUPPORTED_TARGETS.has(manifestTarget) ? manifestTarget : summaryTarget;
+  if (manifestTarget && summaryTarget && manifestTarget !== summaryTarget) {
+    errors.push("manifest.json target must match state-summary.json target");
+  }
+
+  const nextChatPrompt = fs.existsSync(nextChatPromptPath) && fs.statSync(nextChatPromptPath).isFile()
+    ? fs.readFileSync(nextChatPromptPath, "utf8")
+    : "";
+  if (stateSummary) {
+    checkPromptContract({ nextChatPrompt, stateSummary, target, errors });
+  }
+
+  const artifactCheck = checkArtifacts({ inputPath: inputDir });
+  const passed = errors.length === 0 && artifactCheck.status === "passed";
+  return {
+    command: "sidecar-check",
+    schemaVersion: SIDECAR_SCHEMA_VERSION,
+    projectStateSchemaVersion: PROJECT_STATE_SCHEMA_VERSION,
+    input: inputDir,
+    check_status: passed ? "passed" : "failed",
+    target: SUPPORTED_TARGETS.has(target) ? target : "unknown",
+    required_files: requiredFiles,
+    errors,
+    artifact_check: artifactCheck,
+  };
+}
+
 function buildSidecarBundle(options) {
   if (!options.repoPath) throw new Error("Missing --repo <target-repo>");
   const target = options.target || "generic";
@@ -350,7 +500,9 @@ if (require.main === module) cli();
 module.exports = {
   SIDECAR_SCHEMA_VERSION,
   SUPPORTED_TARGETS,
+  OUTPUT_FILES,
   buildSidecarBundle,
+  checkSidecarBundle,
   formatHuman,
   riskBoundariesForTarget,
 };

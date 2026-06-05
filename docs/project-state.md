@@ -13,6 +13,7 @@ node scripts/basebrief.js state-validate --repo <target-repo> --json
 node scripts/basebrief.js state-history --repo <target-repo> --json
 node scripts/basebrief.js state-advance --repo <target-repo> --source <receiver-ready.md> --json
 node scripts/basebrief.js sidecar-build --repo <target-repo> --target generic --json
+node scripts/basebrief.js sidecar-check --input <sidecar-dir> --json
 ```
 
 `state-init` writes `<target-repo>/.basebrief/state.json` from an explicit
@@ -70,6 +71,15 @@ writes, and no schema change.
 Default output is `.basebrief/sidecar/<target>/`. Public dogfooding records
 should summarize the result only; raw sidecar output belongs in ignored private
 directories.
+
+`sidecar-check` is the v0.8.1 acceptance layer for the generated bundle. It is
+a read-only consumer of sidecar output, not a Project State writer. It requires
+the six bundle files, validates `basebrief-sidecar-v1` and
+`basebrief-project-state-v1` metadata, checks that `current_goal`,
+`receiver_entry_task`, and at least two `risk_boundaries` are understandable in
+`next-chat-prompt.md`, and reuses the artifact checker for public-safe output.
+It does not change `.basebrief/state.json`, does not change schema, does not
+call providers, and does not connect runtime systems.
 
 ## Boundaries
 

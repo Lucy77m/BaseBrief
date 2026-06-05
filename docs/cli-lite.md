@@ -25,6 +25,7 @@ node scripts/basebrief.js state-validate --repo . --json
 node scripts/basebrief.js state-history --repo . --json
 node scripts/basebrief.js state-advance --repo . --source tests/outputs/private/receiver-ready.md --json
 node scripts/basebrief.js sidecar-build --repo . --target generic --output-dir tests/outputs/private/sidecar-generic --json
+node scripts/basebrief.js sidecar-check --input tests/outputs/private/sidecar-generic --json
 node scripts/basebrief.js seal --input examples/seal-before-input.json --output tests/outputs/private/seal-before.json
 node scripts/basebrief.js diff --before examples/seal-before-input.json --after examples/seal-after-input.json --json
 ```
@@ -230,6 +231,30 @@ integration, No schema change, No Auto Flow, wait for user confirmation.
 
 The v0.8.0 sidecar boundary is documented in
 [v0.8.0 Sidecar Handoff Bundle Candidate](releases/v0.8.0.md).
+
+### sidecar-check
+
+```text
+node scripts/basebrief.js sidecar-check --input <sidecar-dir> [--json]
+```
+
+`sidecar-check` is the v0.8.1 read-only acceptance gate for generated sidecar
+bundles. It validates the six required files, parses `manifest.json` and
+`state-summary.json`, checks the `basebrief-sidecar-v1` and
+`basebrief-project-state-v1` markers, and verifies that `next-chat-prompt.md`
+contains the current goal, receiver task, at least two risk boundaries, wait
+for user confirmation, No provider request, No raw private output, No runtime
+integration, and No auto-advance.
+
+For `openclaw` bundles it also requires explicit wording that OpenClaw/Hermes
+runtime, profile, config, memory, and workspace integration are out of scope.
+The command reuses the artifact checker and fails on secret-like strings,
+private absolute paths, or raw provider output. It does not create files, does
+not mutate `.basebrief/state.json`, does not change schema, does not call
+providers, and does not connect any runtime.
+
+The v0.8.1 hardening boundary is documented in
+[v0.8.1 Sidecar Check Hardening Candidate](releases/v0.8.1.md).
 
 ### seal
 

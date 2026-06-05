@@ -115,6 +115,7 @@ function checkRequiredFiles() {
     "docs/releases/v0.6.3.md",
     "docs/releases/v0.7.0.md",
     "docs/releases/v0.8.0.md",
+    "docs/releases/v0.8.1.md",
     "docs/testing-v0.4.x-test-matrix.md",
     "docs/testing-v0.6.x-test-matrix.md",
     "docs/testing-v0.7.x-test-matrix.md",
@@ -272,6 +273,7 @@ function checkContentContracts() {
   const projectStateV063ReleaseDoc = readText("docs/releases/v0.6.3.md");
   const projectStateV070ReleaseDoc = readText("docs/releases/v0.7.0.md");
   const sidecarV080ReleaseDoc = readText("docs/releases/v0.8.0.md");
+  const sidecarV081ReleaseDoc = readText("docs/releases/v0.8.1.md");
   const postReleaseBaselineDoc = readText("docs/baselines/v0.4.0-post-release-baseline.md");
   const v060PostReleaseBaselineDoc = readText("docs/baselines/v0.6.0-post-release-baseline.md");
   const projectStateModelDoc = readText("docs/design/project-state-model.md");
@@ -470,6 +472,7 @@ function checkContentContracts() {
   assert(docsIndex.includes("../examples/project-state/README.md"), "Docs index should link project-state example");
   assert(docsIndex.includes("releases/v0.6.0.md"), "Docs index must link v0.6.0 project-state release");
   assert(docsIndex.includes("releases/v0.8.0.md"), "Docs index must link v0.8.0 sidecar release candidate");
+  assert(docsIndex.includes("releases/v0.8.1.md"), "Docs index must link v0.8.1 sidecar check hardening candidate");
   assert(docsIndex.includes("releases/v0.7.0.md"), "Docs index must link v0.7.0 lifecycle release candidate");
   assert(docsIndex.includes("releases/v0.6.3.md"), "Docs index must link v0.6.3 lifecycle readiness candidate");
   assert(docsIndex.includes("releases/v0.6.2.md"), "Docs index must link v0.6.2 self-dogfooding evidence candidate");
@@ -553,6 +556,7 @@ function checkContentContracts() {
   assert(projectStateDoc.includes("state-history --repo <target-repo>"), "Project State docs must document state-history");
   assert(projectStateDoc.includes("state-advance --repo <target-repo> --source <receiver-ready.md>"), "Project State docs must document state-advance");
   assert(projectStateDoc.includes("sidecar-build --repo <target-repo>"), "Project State docs must document sidecar-build");
+  assert(projectStateDoc.includes("sidecar-check --input <sidecar-dir>"), "Project State docs must document sidecar-check");
   assert(projectStateDoc.includes(".basebrief/state.json"), "Project State docs must document output file");
   assert(projectStateDoc.includes(".basebrief/history/"), "Project State docs must document history output");
   assert(projectStateDoc.includes(".basebrief/sidecar/<target>/"), "Project State docs must document sidecar output directory");
@@ -641,6 +645,7 @@ function checkContentContracts() {
   assert(cliLiteDoc.includes("node scripts/basebrief.js state-history --repo <target-repo>"), "cli-lite.md must document state-history command");
   assert(cliLiteDoc.includes("node scripts/basebrief.js state-advance --repo <target-repo> --source <receiver-ready.md>"), "cli-lite.md must document state-advance command");
   assert(cliLiteDoc.includes("node scripts/basebrief.js sidecar-build --repo <target-repo>"), "cli-lite.md must document sidecar-build command");
+  assert(cliLiteDoc.includes("node scripts/basebrief.js sidecar-check --input <sidecar-dir>"), "cli-lite.md must document sidecar-check command");
   assert(cliLiteDoc.includes("--target generic|openclaw"), "cli-lite.md must document sidecar target option");
   assert(cliLiteDoc.includes("basebrief-project-state-v1"), "cli-lite.md must document project-state schema version");
   assert(cliLiteDoc.includes(".basebrief/history/"), "cli-lite.md must document project-state history directory");
@@ -649,6 +654,7 @@ function checkContentContracts() {
   assert(cliLiteDoc.includes("No runtime"), "cli-lite.md must document sidecar runtime boundary");
   assert(cliLiteDoc.includes("wait for user confirmation"), "cli-lite.md must document receiver confirmation boundary");
   assert(cliLiteDoc.includes("releases/v0.8.0.md"), "cli-lite.md must link v0.8.0 sidecar release candidate");
+  assert(cliLiteDoc.includes("releases/v0.8.1.md"), "cli-lite.md must link v0.8.1 sidecar check hardening candidate");
   assert(cliLiteDoc.includes("releases/v0.7.0.md"), "cli-lite.md must link v0.7.0 lifecycle release candidate");
   assert(cliLiteDoc.includes("releases/v0.6.0.md"), "cli-lite.md must link v0.6.0 project-state release");
   assert(cliLiteDoc.includes("releases/v0.3.2.md"), "cli-lite.md must link v0.3.2 release candidate");
@@ -1076,6 +1082,17 @@ function checkContentContracts() {
   assert(sidecarV080ReleaseDoc.includes("No Auto Flow"), "v0.8.0 release doc must state no Auto Flow");
   assert(sidecarV080ReleaseDoc.includes("Wait for user confirmation"), "v0.8.0 release doc must state user-confirmation boundary");
   assert(sidecarV080ReleaseDoc.includes("provider_probe_status=skipped"), "v0.8.0 release doc must preserve skipped provider gate");
+  assert(sidecarV081ReleaseDoc.includes("Sidecar Check Hardening Candidate"), "v0.8.1 release doc must describe sidecar check candidate");
+  assert(sidecarV081ReleaseDoc.includes("sidecar-check --input <sidecar-dir>"), "v0.8.1 release doc must document sidecar-check");
+  assert(sidecarV081ReleaseDoc.includes("basebrief-sidecar-v1"), "v0.8.1 release doc must preserve sidecar schema");
+  assert(sidecarV081ReleaseDoc.includes("basebrief-project-state-v1"), "v0.8.1 release doc must preserve project-state schema");
+  assert(sidecarV081ReleaseDoc.includes("No provider request"), "v0.8.1 release doc must state no provider request");
+  assert(sidecarV081ReleaseDoc.includes("No raw private output"), "v0.8.1 release doc must state no raw private output");
+  assert(sidecarV081ReleaseDoc.includes("No runtime integration"), "v0.8.1 release doc must state no runtime integration");
+  assert(sidecarV081ReleaseDoc.includes("No schema change"), "v0.8.1 release doc must state no schema change");
+  assert(sidecarV081ReleaseDoc.includes("No Auto Flow"), "v0.8.1 release doc must state no Auto Flow");
+  assert(sidecarV081ReleaseDoc.includes("wait for user confirmation"), "v0.8.1 release doc must state user-confirmation boundary");
+  assert(sidecarV081ReleaseDoc.includes("provider_probe_status=skipped"), "v0.8.1 release doc must preserve skipped provider gate");
   assert(projectStateSchema.properties.schemaVersion.const === "basebrief-project-state-v1", "Project State schema version mismatch");
   assert(projectStateExample.schemaVersion === "basebrief-project-state-v1", "Project State example schema version mismatch");
   assert(projectStateExample.source.handoff_status === "ready_for_receiver", "Project State example must use ready source status");
@@ -1318,6 +1335,8 @@ function checkArtifactChecker() {
     "docs/releases/v0.6.2.md",
     "docs/releases/v0.6.3.md",
     "docs/releases/v0.7.0.md",
+    "docs/releases/v0.8.0.md",
+    "docs/releases/v0.8.1.md",
     "examples/receiver-check-config.json",
     "examples/receiver/difference-found",
     "examples/receiver/blocked",
@@ -1390,6 +1409,7 @@ function checkCliLite() {
     assert(helpStdout.includes("state-history --repo <target-repo>"), "CLI help must expose Project State history");
     assert(helpStdout.includes("state-advance --repo <target-repo> --source <receiver-ready.md>"), "CLI help must expose Project State advance");
     assert(helpStdout.includes("sidecar-build --repo <target-repo>"), "CLI help must expose Sidecar build");
+    assert(helpStdout.includes("sidecar-check --input <sidecar-dir>"), "CLI help must expose Sidecar check");
 
     const noCommandStdout = execFileSync(process.execPath, [
       "scripts/basebrief.js",
@@ -1766,6 +1786,42 @@ function checkCliLite() {
     assert(stateHistoryAfterResult.entries.length === 1, "CLI state-history must report one archived entry");
     assert(stateHistoryAfterResult.entries[0].validation_status === "passed", "CLI state-history archived entry must validate");
 
+    const sidecarDir = path.join(tempRoot, "sidecar-generic");
+    const sidecarBuildStdout = execFileSync(process.execPath, [
+      "scripts/basebrief.js",
+      "sidecar-build",
+      "--repo",
+      receiverRepo,
+      "--output-dir",
+      sidecarDir,
+      "--json",
+    ], {
+      cwd: repoRoot,
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "pipe"],
+      env: process.env,
+    });
+    const sidecarBuildResult = JSON.parse(sidecarBuildStdout);
+    assert(sidecarBuildResult.command === "sidecar-build", "CLI sidecar-build must return command metadata");
+    assert(sidecarBuildResult.outputDir.startsWith("tests"), "CLI sidecar-build must return a public-safe output path");
+
+    const sidecarCheckStdout = execFileSync(process.execPath, [
+      "scripts/basebrief.js",
+      "sidecar-check",
+      "--input",
+      sidecarDir,
+      "--json",
+    ], {
+      cwd: repoRoot,
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "pipe"],
+      env: process.env,
+    });
+    const sidecarCheckResult = JSON.parse(sidecarCheckStdout);
+    assert(sidecarCheckResult.command === "sidecar-check", "CLI sidecar-check must return command metadata");
+    assert(sidecarCheckResult.check_status === "passed", "CLI sidecar-check must pass valid generated sidecar");
+    assert(sidecarCheckResult.input.startsWith("tests"), "CLI sidecar-check must return a public-safe input path");
+
     const warningPath = path.join(tempRoot, "codex-task.md");
     fs.writeFileSync(warningPath, [
       "# BaseBrief Codex Task",
@@ -1789,7 +1845,7 @@ function checkCliLite() {
   } finally {
     fs.rmSync(tempRoot, { recursive: true, force: true });
   }
-  return 17;
+  return 19;
 }
 
 function checkFirstRunWorkflow() {
