@@ -91,7 +91,7 @@ node scripts/basebrief.js diff --before tests/outputs/private/quickstart/before.
 - Handoff Builder 与 Codex / Claude 文件型 Adapter
 - Artifact Checker
 - 可选、只读的 Receiver Safe Check v1
-- 零依赖 CLI Lite：`init`、`build`、`check`、`receiver-init`、`receiver-check`、`seal`、`diff`
+- 零依赖 CLI Lite：`init`、`build`、`check`、`receiver-init`、`receiver-check`、`receiver-flow`、`seal`、`diff`
 - 本地、文件型 Seal/Diff v1
 
 BaseBrief 不是聊天客户端、Agent runtime、托管平台、密钥管理器、项目管理系统或 provider gateway。
@@ -103,6 +103,7 @@ BaseBrief 不是聊天客户端、Agent runtime、托管平台、密钥管理器
 - [模式选择](docs/mode-selection.md)
 - [CLI Lite](docs/cli-lite.md)
 - [Receiver Safe Check](docs/receiver-check.md)
+- [Receiver Flow Draft](docs/receiver-flow.md)
 - [Receiver friction log](docs/dogfooding/receiver-friction-log.md)
 - [v0.3.1 Release Candidate](docs/releases/v0.3.1.md)
 - [v0.3.0 Receiver workflow baseline](docs/releases/v0.3.0.md)

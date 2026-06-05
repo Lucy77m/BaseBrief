@@ -82,6 +82,7 @@ function checkRequiredFiles() {
     "docs/handoff.md",
     "docs/checks.md",
     "docs/receiver-check.md",
+    "docs/receiver-flow.md",
     "docs/releases/v0.3.0.md",
     "docs/releases/v0.3.1.md",
     "docs/cli-lite.md",
@@ -115,6 +116,7 @@ function checkRequiredFiles() {
     "scripts/basebrief_check_artifacts.js",
     "scripts/basebrief_receiver_init.js",
     "scripts/basebrief_receiver_check.js",
+    "scripts/basebrief_receiver_flow.js",
     "scripts/basebrief_seal.js",
     "scripts/bb9_provider_profiles.json",
     "schemas/bb9-handoff.schema.json",
@@ -183,6 +185,7 @@ function checkContentContracts() {
   const handoffDoc = readText("docs/handoff.md");
   const checksDoc = readText("docs/checks.md");
   const receiverCheckDoc = readText("docs/receiver-check.md");
+  const receiverFlowDoc = readText("docs/receiver-flow.md");
   const releaseCandidateDoc = readText("docs/releases/v0.3.0.md");
   const receiverStabilizationReleaseDoc = readText("docs/releases/v0.3.1.md");
   const cliLiteDoc = readText("docs/cli-lite.md");
@@ -229,6 +232,8 @@ function checkContentContracts() {
   assert(readme.includes("docs/handoff.md"), "README.md should link to handoff contract docs");
   assert(readme.includes("docs/cli-lite.md"), "README.md should link to CLI Lite docs");
   assert(readme.includes("docs/receiver-check.md"), "README.md should link to Receiver Safe Check docs");
+  assert(readme.includes("docs/receiver-flow.md"), "README.md should link to Receiver Flow Draft docs");
+  assert(readme.includes("receiver-flow"), "README.md should mention receiver-flow command");
   assert(readme.includes("docs/dogfooding/receiver-friction-log.md"), "README.md should link to receiver friction log");
   assert(readme.includes("docs/releases/v0.3.1.md"), "README.md should link to v0.3.1 release candidate");
   assert(readme.includes("docs/releases/v0.3.0.md"), "README.md should link to v0.3.0 release candidate");
@@ -246,6 +251,8 @@ function checkContentContracts() {
   assert(englishReadme.includes("docs/handoff.md"), "README.en.md should link to handoff docs");
   assert(englishReadme.includes("docs/cli-lite.md"), "README.en.md should link to CLI Lite docs");
   assert(englishReadme.includes("docs/receiver-check.md"), "README.en.md should link to Receiver Safe Check docs");
+  assert(englishReadme.includes("docs/receiver-flow.md"), "README.en.md should link to Receiver Flow Draft docs");
+  assert(englishReadme.includes("receiver-flow"), "README.en.md should mention receiver-flow command");
   assert(englishReadme.includes("docs/dogfooding/receiver-friction-log.md"), "README.en.md should link to receiver friction log");
   assert(englishReadme.includes("docs/releases/v0.3.1.md"), "README.en.md should link to v0.3.1 release candidate");
   assert(englishReadme.includes("docs/releases/v0.3.0.md"), "README.en.md should link to v0.3.0 release candidate");
@@ -278,6 +285,7 @@ function checkContentContracts() {
   assert(dogfoodingDoc.includes("Remaining Friction"), "Dogfooding record must document remaining friction");
   assert(docsIndex.includes("dogfooding/receiver-ready-v1-evidence.md"), "Docs index must link receiver-ready v1 evidence");
   assert(docsIndex.includes("dogfooding/receiver-friction-log.md"), "Docs index must link receiver friction log");
+  assert(docsIndex.includes("receiver-flow.md"), "Docs index must link Receiver Flow Draft docs");
   assert(docsIndex.includes("../examples/receiver/difference-found/README.md"), "Docs index should link receiver difference example");
   assert(docsIndex.includes("../examples/receiver/blocked/README.md"), "Docs index should link receiver blocked example");
   assert(docsIndex.includes("../examples/receiver/language-routing/README.md"), "Docs index should link receiver language routing example");
@@ -290,6 +298,12 @@ function checkContentContracts() {
   assert(receiverFrictionDoc.includes("difference_found"), "Receiver friction log must document difference_found");
   assert(receiverFrictionDoc.includes("blocked"), "Receiver friction log must document blocked");
   assert(receiverFrictionDoc.includes("v0.3.1"), "Receiver friction log must name v0.3.1 stabilization");
+  assert(receiverFlowDoc.includes("receiver-flow --repo <target-repo> --output-dir <dir>"), "Receiver Flow docs must document the command");
+  assert(receiverFlowDoc.includes("handoff_status: draft_needs_review"), "Receiver Flow docs must keep draft status explicit");
+  assert(receiverFlowDoc.includes("not Auto Flow"), "Receiver Flow docs must reject Auto Flow scope");
+  assert(receiverFlowDoc.includes("Does not make provider requests"), "Receiver Flow docs must reject provider requests");
+  assert(receiverFlowDoc.includes("Does not overwrite existing output files"), "Receiver Flow docs must reject overwrites");
+  assert(receiverFlowDoc.includes("Does not write tracked target-repository files"), "Receiver Flow docs must reject tracked target writes");
   assert(knownLimitationsDoc.includes("does not automatically decide when a handoff is stale"), "Known Limitations must document generated_at boundary");
   assert(knownLimitationsDoc.includes("does not add file-content hashes"), "Known Limitations must document deferred receiver integrity work");
   assert(knownLimitationsDoc.includes("not a general test runner"), "Known Limitations must scope Receiver Safe Check");
@@ -338,6 +352,8 @@ function checkContentContracts() {
   assert(cliLiteDoc.includes("node scripts/basebrief.js build"), "cli-lite.md must document build command");
   assert(cliLiteDoc.includes("node scripts/basebrief.js seal"), "cli-lite.md must document seal command");
   assert(cliLiteDoc.includes("node scripts/basebrief.js diff"), "cli-lite.md must document diff command");
+  assert(cliLiteDoc.includes("node scripts/basebrief.js receiver-flow"), "cli-lite.md must document receiver-flow command");
+  assert(cliLiteDoc.includes("draft_needs_review"), "cli-lite.md must keep receiver-flow in draft status");
   assert(sealDiffDoc.includes("scripts/basebrief_seal.js"), "seal-diff.md must document seal script");
   assert(sealDiffDoc.includes("basebrief-seal-v1"), "seal-diff.md must document seal schema version");
   assert(sealDiffDoc.includes("not a project-management system"), "seal-diff.md must state product boundary");
@@ -656,6 +672,7 @@ function checkArtifactChecker() {
     "docs/dogfooding/receiver-ready-v1-evidence.md",
     "docs/dogfooding/receiver-friction-log.md",
     "docs/receiver-check.md",
+    "docs/receiver-flow.md",
     "docs/releases/v0.3.0.md",
     "docs/releases/v0.3.1.md",
     "examples/receiver-check-config.json",
@@ -713,6 +730,7 @@ function checkCliLite() {
     assert(helpStdout.includes("docs/quickstart-5min.md"), "CLI help must link to the quickstart");
     assert(helpStdout.includes("receiver-init --repo <target-repo> --output <receiver-check.json>"), "CLI help must expose Receiver init");
     assert(helpStdout.includes("receiver-check --config <json> --repo <target-repo>"), "CLI help must expose Receiver Safe Check");
+    assert(helpStdout.includes("receiver-flow --repo <target-repo> --output-dir <dir>"), "CLI help must expose Receiver Flow Draft");
 
     const noCommandStdout = execFileSync(process.execPath, [
       "scripts/basebrief.js",
@@ -835,6 +853,32 @@ function checkCliLite() {
     assert(receiverResult.command === "receiver-check", "CLI receiver-check must return command metadata");
     assert(receiverResult.result.handoff_acceptance === "pass", "CLI receiver-check must pass for matching fixture");
 
+    const receiverFlowDir = path.join(tempRoot, "receiver-flow");
+    const receiverFlowStdout = execFileSync(process.execPath, [
+      "scripts/basebrief.js",
+      "receiver-flow",
+      "--repo",
+      receiverRepo,
+      "--output-dir",
+      receiverFlowDir,
+      "--json",
+    ], {
+      cwd: repoRoot,
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "pipe"],
+      env: process.env,
+    });
+    const receiverFlowResult = JSON.parse(receiverFlowStdout);
+    assert(receiverFlowResult.command === "receiver-flow", "CLI receiver-flow must return command metadata");
+    assert(receiverFlowResult.handoff_status === "draft_needs_review", "CLI receiver-flow must return draft status");
+    assert(receiverFlowResult.outputDir.startsWith("tests"), "CLI receiver-flow must return a public-safe relative output dir");
+    assert(receiverFlowResult.outputFiles.flowSummary.endsWith("flow-summary.json"), "CLI receiver-flow must report flow summary path");
+    assert(receiverFlowResult.outputFiles.receiverCheckConfig.endsWith("receiver-check.json"), "CLI receiver-flow must report receiver-check path");
+    assert(receiverFlowResult.outputFiles.draftContext.endsWith("draft-context.md"), "CLI receiver-flow must report draft context path");
+    assert(fs.existsSync(path.join(receiverFlowDir, "flow-summary.json")), "CLI receiver-flow must write flow summary");
+    assert(fs.existsSync(path.join(receiverFlowDir, "receiver-check.json")), "CLI receiver-flow must write receiver check config");
+    assert(fs.existsSync(path.join(receiverFlowDir, "draft-context.md")), "CLI receiver-flow must write draft context");
+
     const warningPath = path.join(tempRoot, "codex-task.md");
     fs.writeFileSync(warningPath, [
       "# BaseBrief Codex Task",
@@ -858,7 +902,7 @@ function checkCliLite() {
   } finally {
     fs.rmSync(tempRoot, { recursive: true, force: true });
   }
-  return 8;
+  return 9;
 }
 
 function checkFirstRunWorkflow() {

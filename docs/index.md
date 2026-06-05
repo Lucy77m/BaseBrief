@@ -14,6 +14,7 @@
 - [Adapter 输出](adapters.md)
 - [Artifact checks](checks.md)
 - [Receiver Safe Check](receiver-check.md)
+- [Receiver Flow Draft](receiver-flow.md)
 - [Seal/Diff](seal-diff.md)
 - [Known Limitations](known-limitations.md)
 

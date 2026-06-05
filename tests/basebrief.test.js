@@ -16,7 +16,7 @@ const {
 } = require("../scripts/basebrief_build_handoff");
 const { buildAdapterArtifacts, normalizeTargets } = require("../scripts/basebrief_build_adapters");
 const { checkArtifacts } = require("../scripts/basebrief_check_artifacts");
-const { HELP_TEXT, commandBuild, commandCheck, commandDiff, commandInit, commandReceiverCheck, commandReceiverInit, commandSeal, formatHuman, run, starterInput } = require("../scripts/basebrief");
+const { HELP_TEXT, commandBuild, commandCheck, commandDiff, commandInit, commandReceiverCheck, commandReceiverFlow, commandReceiverInit, commandSeal, formatHuman, run, starterInput } = require("../scripts/basebrief");
 const {
   CONFIG_SCHEMA_VERSION: RECEIVER_CHECK_SCHEMA_VERSION,
   RESULT_SCHEMA_VERSION: RECEIVER_CHECK_RESULT_SCHEMA_VERSION,
@@ -25,6 +25,7 @@ const {
   validateReceiverCheckConfig,
 } = require("../scripts/basebrief_receiver_check");
 const { buildReceiverCheckConfig, runReceiverInit } = require("../scripts/basebrief_receiver_init");
+const { FLOW_SCHEMA_VERSION, runReceiverFlow } = require("../scripts/basebrief_receiver_flow");
 const { createSealFromInput, diffSeals, readSealOrInput, SEAL_SCHEMA_VERSION } = require("../scripts/basebrief_seal");
 const { buildSummary, getPromptForVariant, SCENARIOS, PROVIDER_PROFILES } = require("../scripts/provider_cache_benchmark");
 const { classifyRelayUsage } = require("../scripts/provider_relay_usage_audit");
@@ -1207,6 +1208,105 @@ test("CLI Lite and standalone script expose Receiver init", () => withTempDir((t
   ], { cwd: repoRoot, encoding: "utf8" });
   assert.notEqual(blocked.status, 0);
   assert.match(blocked.stderr, /already exists/);
+}));
+
+test("Receiver flow draft writes review-only artifacts for a clean repository", () => withTempDir((tempDir) => {
+  const repoDir = createReceiverCheckRepo(tempDir);
+  const outputDir = path.join(tempDir, "receiver-flow");
+  const before = git(repoDir, ["status", "--porcelain=v1", "--untracked-files=all"]);
+  const result = runReceiverFlow({ repoPath: repoDir, outputDir });
+  const after = git(repoDir, ["status", "--porcelain=v1", "--untracked-files=all"]);
+
+  assert.equal(result.command, "receiver-flow");
+  assert.equal(result.schemaVersion, FLOW_SCHEMA_VERSION);
+  assert.equal(result.handoff_status, "draft_needs_review");
+  assert.equal(result.summary.handoff_status, "draft_needs_review");
+  assert.deepEqual(result.receiver_check_config.expected_changed_files, []);
+  assert(fs.existsSync(path.join(outputDir, "flow-summary.json")));
+  assert(fs.existsSync(path.join(outputDir, "receiver-check.json")));
+  assert(fs.existsSync(path.join(outputDir, "draft-context.md")));
+  assert.equal(JSON.parse(fs.readFileSync(path.join(outputDir, "flow-summary.json"), "utf8")).schemaVersion, FLOW_SCHEMA_VERSION);
+  assert.equal(JSON.parse(fs.readFileSync(path.join(outputDir, "receiver-check.json"), "utf8")).schemaVersion, RECEIVER_CHECK_SCHEMA_VERSION);
+  const draft = fs.readFileSync(path.join(outputDir, "draft-context.md"), "utf8");
+  assert.match(draft, /handoff_status: draft_needs_review/);
+  assert.match(draft, /review before sharing/i);
+  assert.match(draft, /expected_changed_files/);
+  assert.match(draft, /receiver_check_config/);
+  assert.doesNotMatch(draft, /handoff_status:\s*ready_for_receiver/);
+  assert.equal(after, before);
+}));
+
+test("Receiver flow draft captures dirty state and visible generated files", () => withTempDir((tempDir) => {
+  const repoDir = createReceiverCheckRepo(tempDir);
+  fs.writeFileSync(path.join(repoDir, "docs", "safe.md"), "# changed\n", "utf8");
+  fs.writeFileSync(path.join(repoDir, "new.txt"), "new\n", "utf8");
+  const outputDir = path.join(repoDir, "flow");
+  const result = runReceiverFlow({ repoPath: repoDir, outputDir });
+
+  assert.equal(result.output_inside_repo, true);
+  assert.equal(result.output_repo_relative, "flow");
+  assert.deepEqual(result.receiver_check_config.expected_changed_files, [
+    "docs/safe.md",
+    "flow/draft-context.md",
+    "flow/flow-summary.json",
+    "flow/receiver-check.json",
+    "new.txt",
+  ]);
+  assert.deepEqual(result.output_git_visible_files, [
+    "flow/flow-summary.json",
+    "flow/receiver-check.json",
+    "flow/draft-context.md",
+  ].sort());
+}));
+
+test("Receiver flow draft rejects unsafe outputs, overwrite, tracked writes, and nested repos", () => withTempDir((tempDir) => {
+  const repoDir = createReceiverCheckRepo(tempDir);
+  const existingDir = path.join(tempDir, "existing-flow");
+  fs.mkdirSync(existingDir);
+  fs.writeFileSync(path.join(existingDir, "flow-summary.json"), "{}\n", "utf8");
+
+  assert.throws(() => runReceiverFlow({ repoPath: repoDir, outputDir: existingDir }), /already exists/);
+  assert.throws(() => runReceiverFlow({ repoPath: repoDir, outputDir: path.join(tempDir, ".env.flow") }), /must not be written inside an \.env path/);
+  assert.throws(() => runReceiverFlow({ repoPath: repoDir, outputDir: path.join(repoDir, ".git", "flow") }), /must not be written inside \.git/);
+  assert.throws(() => runReceiverFlow({ repoPath: path.join(repoDir, "docs"), outputDir: path.join(tempDir, "nested-flow") }), /must point to the target repository root/);
+
+  fs.mkdirSync(path.join(repoDir, "tracked-flow"));
+  fs.writeFileSync(path.join(repoDir, "tracked-flow", "flow-summary.json"), "{}\n", "utf8");
+  git(repoDir, ["add", "tracked-flow/flow-summary.json"]);
+  git(repoDir, ["commit", "-m", "track flow output"]);
+  assert.throws(() => runReceiverFlow({ repoPath: repoDir, outputDir: path.join(repoDir, "tracked-flow") }), /already exists|tracked target-repository file/);
+}));
+
+test("CLI Lite exposes Receiver flow draft with public-safe json paths", () => withTempDir((tempDir) => {
+  const repoDir = createReceiverCheckRepo(tempDir);
+  const directDir = path.join(tempDir, "direct-flow");
+  const direct = commandReceiverFlow({ repo: repoDir, "output-dir": directDir });
+  assert.equal(direct.command, "receiver-flow");
+  assert.equal(direct.handoff_status, "draft_needs_review");
+
+  const cliOutputDir = path.join(repoRoot, "tests", "outputs", "private", `receiver-flow-${Date.now()}`);
+  try {
+    assert.match(HELP_TEXT, /receiver-flow --repo <target-repo> --output-dir <dir>/);
+    const cli = spawnSync(process.execPath, [
+      "scripts/basebrief.js",
+      "receiver-flow",
+      "--repo",
+      repoDir,
+      "--output-dir",
+      cliOutputDir,
+      "--json",
+    ], { cwd: repoRoot, encoding: "utf8" });
+    assert.equal(cli.status, 0);
+    const result = JSON.parse(cli.stdout);
+    assert.equal(result.command, "receiver-flow");
+    assert.equal(result.handoff_status, "draft_needs_review");
+    assert.equal(result.outputDir.startsWith("tests"), true);
+    assert.equal(result.outputFiles.flowSummary.includes("flow-summary.json"), true);
+    assert.equal(result.outputFiles.receiverCheckConfig.includes("receiver-check.json"), true);
+    assert.equal(result.outputFiles.draftContext.includes("draft-context.md"), true);
+  } finally {
+    fs.rmSync(cliOutputDir, { recursive: true, force: true });
+  }
 }));
 
 test("Seal/Diff v1 creates stable seal snapshots from BB9 input", () => {

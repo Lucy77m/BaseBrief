@@ -89,10 +89,15 @@ function resolveOutput(repoRoot, outputPath) {
 
 function buildReceiverCheckConfig(state, repoRelativeOutput = "") {
   const expectedChangedFiles = [...state.changedFiles];
-  if (repoRelativeOutput && !expectedChangedFiles.includes(repoRelativeOutput)) {
-    expectedChangedFiles.push(repoRelativeOutput);
-    expectedChangedFiles.sort();
+  const outputFiles = Array.isArray(repoRelativeOutput)
+    ? repoRelativeOutput
+    : repoRelativeOutput ? [repoRelativeOutput] : [];
+  for (const outputFile of outputFiles) {
+    if (outputFile && !expectedChangedFiles.includes(outputFile)) {
+      expectedChangedFiles.push(outputFile);
+    }
   }
+  expectedChangedFiles.sort();
   const config = {
     schemaVersion: CONFIG_SCHEMA_VERSION,
     expected_branch: state.branch,

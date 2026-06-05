@@ -13,6 +13,7 @@ node scripts/basebrief.js build --input examples/structured-handoff-full.md --ou
 node scripts/basebrief.js check --input examples/adapter-codex-task.md --json
 node scripts/basebrief.js receiver-init --repo . --output tests/outputs/private/receiver-check.json --json
 node scripts/basebrief.js receiver-check --config examples/receiver-check-config.json --repo . --json
+node scripts/basebrief.js receiver-flow --repo . --output-dir tests/outputs/private/receiver-flow --json
 node scripts/basebrief.js seal --input examples/seal-before-input.json --output tests/outputs/private/seal-before.json
 node scripts/basebrief.js diff --before examples/seal-before-input.json --after examples/seal-after-input.json --json
 ```
@@ -93,6 +94,22 @@ This command generates a state-only `basebrief-receiver-check-v1` config from th
 The explicit non-sensitive `.json` output directory is created when needed. The command never overwrites a file or writes a tracked target-repository file. When the output is inside the target repository and visible to Git status, its relative path is included in `expected_changed_files`; ignored output stays out of the manifest. Detached HEAD is represented as `(detached)`.
 
 Review the generated config before adding any optional declared checks, then run `receiver-check`.
+
+### receiver-flow
+
+```text
+node scripts/basebrief.js receiver-flow --repo <target-repo> --output-dir <dir> [--json]
+```
+
+This command writes a review-only receiver flow draft:
+
+- `flow-summary.json`
+- `receiver-check.json`
+- `draft-context.md`
+
+The draft always uses `handoff_status: draft_needs_review`. It is not Auto Flow, does not create receiver threads, does not call providers, and does not promote the draft to `ready_for_receiver`.
+
+See [Receiver Flow Draft](receiver-flow.md) for boundaries and review requirements.
 
 ### seal
 

@@ -8,6 +8,7 @@ const { buildAdapterArtifacts, normalizeTargets } = require("./basebrief_build_a
 const { buildHandoffArtifacts, validateHandoffInput } = require("./basebrief_build_handoff");
 const { checkArtifacts } = require("./basebrief_check_artifacts");
 const { runReceiverCheck } = require("./basebrief_receiver_check");
+const { runReceiverFlow } = require("./basebrief_receiver_flow");
 const { runReceiverInit } = require("./basebrief_receiver_init");
 const { commandDiff: commandSealDiff, commandSeal: commandCreateSeal } = require("./basebrief_seal");
 
@@ -21,6 +22,7 @@ const HELP_TEXT = [
   "  node scripts/basebrief.js check --input <file-or-dir>",
   "  node scripts/basebrief.js receiver-init --repo <target-repo> --output <receiver-check.json> [--json]",
   "  node scripts/basebrief.js receiver-check --config <json> --repo <target-repo> [--json]",
+  "  node scripts/basebrief.js receiver-flow --repo <target-repo> --output-dir <dir> [--json]",
   "  node scripts/basebrief.js seal --input <markdown-or-json> --output <file>",
   "  node scripts/basebrief.js diff --before <file> --after <file>",
   "",
@@ -227,6 +229,13 @@ function commandReceiverInit(options) {
   });
 }
 
+function commandReceiverFlow(options) {
+  return runReceiverFlow({
+    repoPath: options.repo,
+    outputDir: options["output-dir"],
+  });
+}
+
 function commandSeal(options) {
   return {
     ...commandCreateSeal({
@@ -255,6 +264,7 @@ function run(argv) {
   if (command === "check") return commandCheck(options);
   if (command === "receiver-init") return commandReceiverInit(options);
   if (command === "receiver-check") return commandReceiverCheck(options);
+  if (command === "receiver-flow") return commandReceiverFlow(options);
   if (command === "seal") return commandSeal(options);
   if (command === "diff") return commandDiff(options);
   throw new Error(`Unknown command: ${command}`);
@@ -296,6 +306,13 @@ function toPublicResult(result) {
     return {
       ...result,
       output: publicPath(result.output, cwd),
+    };
+  }
+  if (result.command === "receiver-flow") {
+    return {
+      ...result,
+      outputDir: publicPath(result.outputDir, cwd),
+      outputFiles: toRelativeMap(result.outputFiles, cwd),
     };
   }
   if (result.command === "seal") {
@@ -356,6 +373,15 @@ function formatHuman(result) {
       "",
     ].join(os.EOL);
   }
+  if (result.command === "receiver-flow") {
+    return [
+      `BaseBrief receiver flow draft written to ${result.outputDir}`,
+      `handoff_status=${result.handoff_status}`,
+      `expected_changed_files=${result.receiver_check_config.expected_changed_files.length}`,
+      "review_required=true",
+      "",
+    ].join(os.EOL);
+  }
   if (result.command === "seal") {
     return `BaseBrief seal written to ${result.output}${os.EOL}checksum=${result.checksum}${os.EOL}`;
   }
@@ -410,6 +436,7 @@ module.exports = {
   commandInit,
   commandReceiverInit,
   commandReceiverCheck,
+  commandReceiverFlow,
   commandSeal,
   formatFindingLines,
   formatHuman,
