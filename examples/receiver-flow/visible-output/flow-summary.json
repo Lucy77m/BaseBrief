@@ -1,0 +1,26 @@
+{
+  "schemaVersion": "basebrief-receiver-flow-draft-v1",
+  "command": "receiver-flow",
+  "handoff_status": "draft_needs_review",
+  "generated_at": "2026-06-05T00:00:00.000Z",
+  "review_required": true,
+  "repository": {
+    "branch": "main",
+    "head": "3333333333333333333333333333333333333333"
+  },
+  "changed_files": {
+    "actual": []
+  },
+  "receiver_check_config": "flow/receiver-check.json",
+  "output_files": {
+    "flowSummary": "flow-summary.json",
+    "receiverCheckConfig": "receiver-check.json",
+    "draftContext": "draft-context.md"
+  },
+  "non_goals": [
+    "no_provider_request",
+    "no_receiver_thread",
+    "no_final_handoff",
+    "no_auto_ready_for_receiver"
+  ]
+}

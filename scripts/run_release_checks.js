@@ -75,6 +75,7 @@ function checkRequiredFiles() {
     "docs/dogfooding/v0.2.2-first-run-workflow.md",
     "docs/dogfooding/receiver-ready-v1-evidence.md",
     "docs/dogfooding/receiver-friction-log.md",
+    "docs/dogfooding/receiver-flow-dogfooding.md",
     "docs/integrations.md",
     "docs/adapters.md",
     "docs/walkthrough.md",
@@ -86,6 +87,7 @@ function checkRequiredFiles() {
     "docs/releases/v0.3.0.md",
     "docs/releases/v0.3.1.md",
     "docs/releases/v0.3.2.md",
+    "docs/releases/v0.3.3.md",
     "docs/cli-lite.md",
     "docs/seal-diff.md",
     "docs/contextops.md",
@@ -154,6 +156,18 @@ function checkRequiredFiles() {
     "examples/receiver/blocked/blocked-result.json",
     "examples/receiver/language-routing/README.md",
     "examples/receiver/language-routing/receiver-report.md",
+    "examples/receiver-flow/clean-repo/README.md",
+    "examples/receiver-flow/clean-repo/flow-summary.json",
+    "examples/receiver-flow/clean-repo/receiver-check.json",
+    "examples/receiver-flow/clean-repo/draft-context.md",
+    "examples/receiver-flow/dirty-repo/README.md",
+    "examples/receiver-flow/dirty-repo/flow-summary.json",
+    "examples/receiver-flow/dirty-repo/receiver-check.json",
+    "examples/receiver-flow/dirty-repo/draft-context.md",
+    "examples/receiver-flow/visible-output/README.md",
+    "examples/receiver-flow/visible-output/flow-summary.json",
+    "examples/receiver-flow/visible-output/receiver-check.json",
+    "examples/receiver-flow/visible-output/draft-context.md",
     "examples/agent-task-example.md",
     "examples/minimal/README.md",
     "examples/minimal/input-project-notes.md",
@@ -178,6 +192,7 @@ function checkContentContracts() {
   const dogfoodingDoc = readText("docs/dogfooding/v0.2.2-first-run-workflow.md");
   const receiverReadyDogfoodingDoc = readText("docs/dogfooding/receiver-ready-v1-evidence.md");
   const receiverFrictionDoc = readText("docs/dogfooding/receiver-friction-log.md");
+  const receiverFlowDogfoodingDoc = readText("docs/dogfooding/receiver-flow-dogfooding.md");
   const testingDoc = readText("docs/testing.md");
   const usabilityFeedbackTemplate = readText(".github/ISSUE_TEMPLATE/usability_feedback.md");
   const adaptersDoc = readText("docs/adapters.md");
@@ -190,6 +205,7 @@ function checkContentContracts() {
   const releaseCandidateDoc = readText("docs/releases/v0.3.0.md");
   const receiverStabilizationReleaseDoc = readText("docs/releases/v0.3.1.md");
   const receiverFlowReleaseDoc = readText("docs/releases/v0.3.2.md");
+  const receiverFlowDogfoodingReleaseDoc = readText("docs/releases/v0.3.3.md");
   const cliLiteDoc = readText("docs/cli-lite.md");
   const sealDiffDoc = readText("docs/seal-diff.md");
   const contextOpsDoc = readText("docs/contextops.md");
@@ -237,6 +253,8 @@ function checkContentContracts() {
   assert(readme.includes("docs/receiver-flow.md"), "README.md should link to Receiver Flow Draft docs");
   assert(readme.includes("receiver-flow"), "README.md should mention receiver-flow command");
   assert(readme.includes("docs/dogfooding/receiver-friction-log.md"), "README.md should link to receiver friction log");
+  assert(readme.includes("docs/dogfooding/receiver-flow-dogfooding.md"), "README.md should link to receiver-flow dogfooding evidence");
+  assert(readme.includes("docs/releases/v0.3.3.md"), "README.md should link to v0.3.3 release candidate");
   assert(readme.includes("docs/releases/v0.3.2.md"), "README.md should link to v0.3.2 release candidate");
   assert(readme.includes("docs/releases/v0.3.1.md"), "README.md should link to v0.3.1 release candidate");
   assert(readme.includes("docs/releases/v0.3.0.md"), "README.md should link to v0.3.0 release candidate");
@@ -257,6 +275,8 @@ function checkContentContracts() {
   assert(englishReadme.includes("docs/receiver-flow.md"), "README.en.md should link to Receiver Flow Draft docs");
   assert(englishReadme.includes("receiver-flow"), "README.en.md should mention receiver-flow command");
   assert(englishReadme.includes("docs/dogfooding/receiver-friction-log.md"), "README.en.md should link to receiver friction log");
+  assert(englishReadme.includes("docs/dogfooding/receiver-flow-dogfooding.md"), "README.en.md should link to receiver-flow dogfooding evidence");
+  assert(englishReadme.includes("docs/releases/v0.3.3.md"), "README.en.md should link to v0.3.3 release candidate");
   assert(englishReadme.includes("docs/releases/v0.3.2.md"), "README.en.md should link to v0.3.2 release candidate");
   assert(englishReadme.includes("docs/releases/v0.3.1.md"), "README.en.md should link to v0.3.1 release candidate");
   assert(englishReadme.includes("docs/releases/v0.3.0.md"), "README.en.md should link to v0.3.0 release candidate");
@@ -289,10 +309,15 @@ function checkContentContracts() {
   assert(dogfoodingDoc.includes("Remaining Friction"), "Dogfooding record must document remaining friction");
   assert(docsIndex.includes("dogfooding/receiver-ready-v1-evidence.md"), "Docs index must link receiver-ready v1 evidence");
   assert(docsIndex.includes("dogfooding/receiver-friction-log.md"), "Docs index must link receiver friction log");
+  assert(docsIndex.includes("dogfooding/receiver-flow-dogfooding.md"), "Docs index must link receiver-flow dogfooding evidence");
   assert(docsIndex.includes("receiver-flow.md"), "Docs index must link Receiver Flow Draft docs");
   assert(docsIndex.includes("../examples/receiver/difference-found/README.md"), "Docs index should link receiver difference example");
   assert(docsIndex.includes("../examples/receiver/blocked/README.md"), "Docs index should link receiver blocked example");
   assert(docsIndex.includes("../examples/receiver/language-routing/README.md"), "Docs index should link receiver language routing example");
+  assert(docsIndex.includes("../examples/receiver-flow/clean-repo/README.md"), "Docs index should link receiver-flow clean repo example");
+  assert(docsIndex.includes("../examples/receiver-flow/dirty-repo/README.md"), "Docs index should link receiver-flow dirty repo example");
+  assert(docsIndex.includes("../examples/receiver-flow/visible-output/README.md"), "Docs index should link receiver-flow visible output example");
+  assert(docsIndex.includes("releases/v0.3.3.md"), "Docs index must link v0.3.3 release candidate");
   assert(docsIndex.includes("releases/v0.3.2.md"), "Docs index must link v0.3.2 release candidate");
   assert(docsIndex.includes("releases/v0.3.1.md"), "Docs index must link v0.3.1 release candidate");
   assert(docsIndex.includes("releases/v0.3.0.md"), "Docs index must link v0.3.0 release candidate");
@@ -303,6 +328,15 @@ function checkContentContracts() {
   assert(receiverFrictionDoc.includes("difference_found"), "Receiver friction log must document difference_found");
   assert(receiverFrictionDoc.includes("blocked"), "Receiver friction log must document blocked");
   assert(receiverFrictionDoc.includes("v0.3.1"), "Receiver friction log must name v0.3.1 stabilization");
+  assert(receiverFlowDogfoodingDoc.includes("receiver_flow_dogfooding"), "Receiver flow dogfooding doc must define the record shape");
+  assert(receiverFlowDogfoodingDoc.includes("command_shape"), "Receiver flow dogfooding doc must record command shape");
+  assert(receiverFlowDogfoodingDoc.includes("output_shape"), "Receiver flow dogfooding doc must record output shape");
+  assert(receiverFlowDogfoodingDoc.includes("review_checkpoints"), "Receiver flow dogfooding doc must record review checkpoints");
+  assert(receiverFlowDogfoodingDoc.includes("observed_friction"), "Receiver flow dogfooding doc must record observed friction");
+  assert(receiverFlowDogfoodingDoc.includes("next_fix_candidate"), "Receiver flow dogfooding doc must record next fix candidate");
+  assert(receiverFlowDogfoodingDoc.includes("No provider request"), "Receiver flow dogfooding doc must reject provider requests");
+  assert(receiverFlowDogfoodingDoc.includes("No receiver thread creation"), "Receiver flow dogfooding doc must reject receiver thread creation");
+  assert(receiverFlowDogfoodingDoc.includes("No Auto Flow"), "Receiver flow dogfooding doc must reject Auto Flow");
   assert(receiverFlowDoc.includes("receiver-flow --repo <target-repo> --output-dir <dir>"), "Receiver Flow docs must document the command");
   assert(receiverFlowDoc.includes("handoff_status: draft_needs_review"), "Receiver Flow docs must keep draft status explicit");
   assert(receiverFlowDoc.includes("not Auto Flow"), "Receiver Flow docs must reject Auto Flow scope");
@@ -317,6 +351,7 @@ function checkContentContracts() {
   assert(testingDoc.includes("npm run check"), "Testing docs must document npm validation shortcut");
   assert(testingDoc.includes("v0.3.1 receiver stabilization"), "Testing docs must document v0.3.1 receiver stabilization budget");
   assert(testingDoc.includes("v0.3.2 Receiver Flow Draft Skeleton"), "Testing docs must document v0.3.2 receiver flow closure");
+  assert(testingDoc.includes("v0.3.3 Receiver Flow Dogfooding Evidence"), "Testing docs must document v0.3.3 receiver flow dogfooding closure");
   assert(testingDoc.includes("provider_probe_status=skipped"), "Testing docs must preserve skipped provider probe wording");
   assert(usabilityFeedbackTemplate.includes("Do not include secrets"), "Usability feedback template must include a safety warning");
   assert(usabilityFeedbackTemplate.includes("Expected Result"), "Usability feedback template must collect expected results");
@@ -361,6 +396,7 @@ function checkContentContracts() {
   assert(cliLiteDoc.includes("node scripts/basebrief.js receiver-flow"), "cli-lite.md must document receiver-flow command");
   assert(cliLiteDoc.includes("draft_needs_review"), "cli-lite.md must keep receiver-flow in draft status");
   assert(cliLiteDoc.includes("releases/v0.3.2.md"), "cli-lite.md must link v0.3.2 release candidate");
+  assert(cliLiteDoc.includes("releases/v0.3.3.md"), "cli-lite.md must link v0.3.3 release candidate");
   assert(sealDiffDoc.includes("scripts/basebrief_seal.js"), "seal-diff.md must document seal script");
   assert(sealDiffDoc.includes("basebrief-seal-v1"), "seal-diff.md must document seal schema version");
   assert(sealDiffDoc.includes("not a project-management system"), "seal-diff.md must state product boundary");
@@ -508,6 +544,16 @@ function checkContentContracts() {
   assert(receiverFlowReleaseDoc.includes("provider_probe_status=skipped"), "v0.3.2 release candidate must preserve skipped provider probe gate");
   assert(receiverFlowReleaseDoc.includes("BB9 handoff schema is unchanged"), "v0.3.2 release candidate must protect BB9 schema");
   assert(receiverFlowReleaseDoc.includes("Receiver Safe Check config and result schemas are unchanged"), "v0.3.2 release candidate must protect receiver schemas");
+  assert(receiverFlowDogfoodingReleaseDoc.includes("Receiver Flow Dogfooding"), "v0.3.3 release candidate must describe receiver flow dogfooding");
+  assert(receiverFlowDogfoodingReleaseDoc.includes("evidence-only stabilization"), "v0.3.3 release candidate must stay evidence-only");
+  assert(receiverFlowDogfoodingReleaseDoc.includes("handoff_status: draft_needs_review"), "v0.3.3 release candidate must keep draft status explicit");
+  assert(receiverFlowDogfoodingReleaseDoc.includes("No provider request"), "v0.3.3 release candidate must state no provider request");
+  assert(receiverFlowDogfoodingReleaseDoc.includes("No receiver thread creation"), "v0.3.3 release candidate must state no receiver thread creation");
+  assert(receiverFlowDogfoodingReleaseDoc.includes("No Auto Flow"), "v0.3.3 release candidate must state no Auto Flow");
+  assert(receiverFlowDogfoodingReleaseDoc.includes("provider_probe_status=skipped"), "v0.3.3 release candidate must preserve skipped provider probe gate");
+  assert(receiverFlowDogfoodingReleaseDoc.includes("No push, tag, or formal release"), "v0.3.3 release candidate must keep release actions pending");
+  assert(receiverFlowDogfoodingReleaseDoc.includes("BB9 handoff schema is unchanged"), "v0.3.3 release candidate must protect BB9 schema");
+  assert(receiverFlowDogfoodingReleaseDoc.includes("Receiver Safe Check config and result schemas are unchanged"), "v0.3.3 release candidate must protect receiver schemas");
   assert(receiverCheckSchema.properties.schemaVersion.const === "basebrief-receiver-check-v1", "Receiver Safe Check config schema version mismatch");
   assert(receiverCheckResultSchema.properties.schemaVersion.const === "basebrief-receiver-check-result-v1", "Receiver Safe Check result schema version mismatch");
   assert(receiverCheckConfigExample.schemaVersion === "basebrief-receiver-check-v1", "Receiver Safe Check example schema version mismatch");
@@ -667,6 +713,18 @@ function checkExamples() {
     "examples/receiver/blocked/blocked-result.json",
     "examples/receiver/language-routing/README.md",
     "examples/receiver/language-routing/receiver-report.md",
+    "examples/receiver-flow/clean-repo/README.md",
+    "examples/receiver-flow/clean-repo/flow-summary.json",
+    "examples/receiver-flow/clean-repo/receiver-check.json",
+    "examples/receiver-flow/clean-repo/draft-context.md",
+    "examples/receiver-flow/dirty-repo/README.md",
+    "examples/receiver-flow/dirty-repo/flow-summary.json",
+    "examples/receiver-flow/dirty-repo/receiver-check.json",
+    "examples/receiver-flow/dirty-repo/draft-context.md",
+    "examples/receiver-flow/visible-output/README.md",
+    "examples/receiver-flow/visible-output/flow-summary.json",
+    "examples/receiver-flow/visible-output/receiver-check.json",
+    "examples/receiver-flow/visible-output/draft-context.md",
     "examples/agent-task-example.md",
     "examples/minimal/README.md",
     "examples/minimal/input-project-notes.md",
@@ -690,15 +748,20 @@ function checkArtifactChecker() {
     "docs/dogfooding/v0.2.2-first-run-workflow.md",
     "docs/dogfooding/receiver-ready-v1-evidence.md",
     "docs/dogfooding/receiver-friction-log.md",
+    "docs/dogfooding/receiver-flow-dogfooding.md",
     "docs/receiver-check.md",
     "docs/receiver-flow.md",
     "docs/releases/v0.3.0.md",
     "docs/releases/v0.3.1.md",
     "docs/releases/v0.3.2.md",
+    "docs/releases/v0.3.3.md",
     "examples/receiver-check-config.json",
     "examples/receiver/difference-found",
     "examples/receiver/blocked",
     "examples/receiver/language-routing",
+    "examples/receiver-flow/clean-repo",
+    "examples/receiver-flow/dirty-repo",
+    "examples/receiver-flow/visible-output",
     ".github/ISSUE_TEMPLATE/usability_feedback.md",
   ];
   inputs.forEach((relativePath) => {

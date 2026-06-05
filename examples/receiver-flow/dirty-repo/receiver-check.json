@@ -1,0 +1,10 @@
+{
+  "schemaVersion": "basebrief-receiver-check-v1",
+  "expected_branch": "main",
+  "expected_head": "2222222222222222222222222222222222222222",
+  "expected_changed_files": [
+    "docs/safe.md",
+    "new.txt"
+  ],
+  "declared_checks": []
+}

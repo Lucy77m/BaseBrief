@@ -312,6 +312,75 @@ test("v0.3.2 receiver flow draft skeleton documents release boundaries", () => {
   }
 });
 
+test("v0.3.3 receiver flow dogfooding evidence stays draft-only and public-safe", () => {
+  const readme = readText("README.md");
+  const englishReadme = readText("README.en.md");
+  const cliLite = readText("docs/cli-lite.md");
+  const docsIndex = readText("docs/index.md");
+  const testing = readText("docs/testing.md");
+  const roadmap = readText("docs/roadmap/basebrief-long-term-baseline.md");
+  const release = readText("docs/releases/v0.3.3.md");
+  const dogfooding = readText("docs/dogfooding/receiver-flow-dogfooding.md");
+  const cleanConfig = readJson("examples/receiver-flow/clean-repo/receiver-check.json");
+  const dirtyConfig = readJson("examples/receiver-flow/dirty-repo/receiver-check.json");
+  const visibleConfig = readJson("examples/receiver-flow/visible-output/receiver-check.json");
+  const cleanSummary = readJson("examples/receiver-flow/clean-repo/flow-summary.json");
+  const dirtySummary = readJson("examples/receiver-flow/dirty-repo/flow-summary.json");
+  const visibleSummary = readJson("examples/receiver-flow/visible-output/flow-summary.json");
+
+  assert.match(readme, /docs\/dogfooding\/receiver-flow-dogfooding\.md/);
+  assert.match(readme, /docs\/releases\/v0\.3\.3\.md/);
+  assert.match(englishReadme, /docs\/dogfooding\/receiver-flow-dogfooding\.md/);
+  assert.match(englishReadme, /docs\/releases\/v0\.3\.3\.md/);
+  assert.match(cliLite, /releases\/v0\.3\.3\.md/);
+  assert.match(docsIndex, /dogfooding\/receiver-flow-dogfooding\.md/);
+  assert.match(docsIndex, /releases\/v0\.3\.3\.md/);
+  assert.match(docsIndex, /examples\/receiver-flow\/clean-repo\/README\.md/);
+  assert.match(docsIndex, /examples\/receiver-flow\/dirty-repo\/README\.md/);
+  assert.match(docsIndex, /examples\/receiver-flow\/visible-output\/README\.md/);
+  assert.match(testing, /v0\.3\.3 Receiver Flow Dogfooding Evidence/);
+  assert.match(testing, /provider_probe_status=skipped/);
+  assert.match(roadmap, /Current v0\.3\.3 evidence target/);
+  assert.match(release, /evidence-only stabilization/);
+  assert.match(release, /handoff_status: draft_needs_review/);
+  assert.match(release, /No provider request/);
+  assert.match(release, /No receiver thread creation/);
+  assert.match(release, /No Auto Flow/);
+  assert.match(release, /provider_probe_status=skipped/);
+  assert.match(release, /No push, tag, or formal release/);
+  assert.match(dogfooding, /receiver_flow_dogfooding/);
+  assert.match(dogfooding, /command_shape/);
+  assert.match(dogfooding, /output_shape/);
+  assert.match(dogfooding, /review_checkpoints/);
+  assert.match(dogfooding, /observed_friction/);
+  assert.match(dogfooding, /next_fix_candidate/);
+  assert.doesNotMatch(release, /handoff_status:\s*ready_for_receiver/);
+
+  assert.equal(cleanSummary.handoff_status, "draft_needs_review");
+  assert.deepEqual(cleanConfig.expected_changed_files, []);
+  assert.equal(dirtySummary.handoff_status, "draft_needs_review");
+  assert.deepEqual(dirtyConfig.expected_changed_files, ["docs/safe.md", "new.txt"]);
+  assert.equal(visibleSummary.handoff_status, "draft_needs_review");
+  assert.deepEqual(visibleConfig.expected_changed_files, [
+    "flow/draft-context.md",
+    "flow/flow-summary.json",
+    "flow/receiver-check.json",
+  ]);
+
+  for (const relativePath of [
+    "docs/releases/v0.3.3.md",
+    "docs/dogfooding/receiver-flow-dogfooding.md",
+    "examples/receiver-flow/clean-repo",
+    "examples/receiver-flow/dirty-repo",
+    "examples/receiver-flow/visible-output",
+  ]) {
+    const result = checkArtifacts({ inputPath: path.join(repoRoot, relativePath) });
+    assert.equal(result.status, "passed", relativePath);
+    assert.equal(result.errorCount, 0, relativePath);
+    assert.equal(result.warningCount, 0, relativePath);
+  }
+});
+
 test("public quickstart and minimal examples provide a clean first-use path", () => {
   const quickstart = readText("docs/quickstart-5min.md");
   const minimalBrief = readText("examples/minimal/output-basebrief-lite.md");

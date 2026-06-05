@@ -1,0 +1,11 @@
+{
+  "schemaVersion": "basebrief-receiver-check-v1",
+  "expected_branch": "main",
+  "expected_head": "3333333333333333333333333333333333333333",
+  "expected_changed_files": [
+    "flow/draft-context.md",
+    "flow/flow-summary.json",
+    "flow/receiver-check.json"
+  ],
+  "declared_checks": []
+}

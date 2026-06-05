@@ -291,6 +291,13 @@ Completed v0.3.2 draft skeleton:
 - avoid receiver thread creation, provider requests, Auto Flow completion, and automatic promotion to `ready_for_receiver`
 - document the v0.3.2 local release-candidate gate before any push, tag, or release
 
+Current v0.3.3 evidence target:
+
+- record public-safe receiver-flow dogfooding evidence
+- add examples for clean, dirty, and Git-visible output drafts
+- keep `handoff_status: draft_needs_review` as the only receiver-flow handoff status
+- avoid new CLI commands, new npm scripts, schema changes, provider requests, receiver thread creation, and Auto Flow
+
 ### Phase 9: ContextOps Vision
 
 Goal: keep the long-term direction visible without prematurely turning it into implementation scope.

@@ -593,3 +593,18 @@ npm run check
 This closure does not require provider requests, external receiver matrices, OpenCode smoke, Claude Code smoke, Auto Flow runs, Web UI checks, Cursor adapter tests, or provider benchmarks. When provider environment variables are absent, release checks must keep `provider_probe_status=skipped`.
 
 `receiver-flow` generates draft-only output: `handoff_status: draft_needs_review`. The generated `flow-summary.json`, `receiver-check.json`, and `draft-context.md` must be reviewed before they are shared or rewritten into a `ready_for_receiver` handoff.
+
+## v0.3.3 Receiver Flow Dogfooding Evidence
+
+`v0.3.3` receiver-flow dogfooding evidence closure should use:
+
+```text
+git diff --check
+node --test tests/basebrief.test.js
+node scripts/run_release_checks.js
+npm run check
+```
+
+This closure is evidence-only. It does not require provider requests, receiver thread creation, external receiver matrices, OpenCode smoke, Claude Code smoke, Auto Flow runs, Web UI checks, Cursor adapter tests, or provider benchmarks. When provider environment variables are absent, release checks must keep `provider_probe_status=skipped`.
+
+Receiver-flow examples must pass Artifact Checker with zero errors and warnings. Examples may show `handoff_status: draft_needs_review`; they must not present a draft as `handoff_status: ready_for_receiver`.

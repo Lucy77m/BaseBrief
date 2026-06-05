@@ -111,6 +111,7 @@ The draft always uses `handoff_status: draft_needs_review`. It is not Auto Flow,
 
 See [Receiver Flow Draft](receiver-flow.md) for boundaries and review requirements.
 The v0.3.2 release-candidate boundary is documented in [v0.3.2 Release Candidate](releases/v0.3.2.md).
+The v0.3.3 dogfooding evidence keeps this command draft-only and is documented in [v0.3.3 Release Candidate](releases/v0.3.3.md).
 
 ### seal
 

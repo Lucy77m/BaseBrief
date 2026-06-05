@@ -20,7 +20,8 @@
 
 ## 方向与验证
 
-- [v0.3.2 release candidate](releases/v0.3.2.md)
+- [v0.3.3 receiver-flow dogfooding evidence](releases/v0.3.3.md)
+- [v0.3.2 receiver-flow draft skeleton](releases/v0.3.2.md)
 - [v0.3.1 receiver stabilization](releases/v0.3.1.md)
 - [v0.3.0 receiver workflow baseline](releases/v0.3.0.md)
 - [测试与验证记录](testing.md)
@@ -30,6 +31,7 @@
 - [v0.2.2 first-run dogfooding](dogfooding/v0.2.2-first-run-workflow.md)
 - [Receiver-ready v1 evidence closure](dogfooding/receiver-ready-v1-evidence.md)
 - [Receiver friction log](dogfooding/receiver-friction-log.md)
+- [Receiver Flow dogfooding evidence](dogfooding/receiver-flow-dogfooding.md)
 - [Usability feedback template](../.github/ISSUE_TEMPLATE/usability_feedback.md)
 
 ## Cache-ready 实验历史
@@ -60,3 +62,6 @@
 - [Receiver difference_found 示例](../examples/receiver/difference-found/README.md)
 - [Receiver blocked 示例](../examples/receiver/blocked/README.md)
 - [Receiver language-routing 示例](../examples/receiver/language-routing/README.md)
+- [Receiver Flow clean repo draft](../examples/receiver-flow/clean-repo/README.md)
+- [Receiver Flow dirty repo draft](../examples/receiver-flow/dirty-repo/README.md)
+- [Receiver Flow visible output draft](../examples/receiver-flow/visible-output/README.md)
