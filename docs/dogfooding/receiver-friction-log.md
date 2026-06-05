@@ -16,7 +16,15 @@ actual_handoff_friction:
 - source_vs_receiver_verification_clear:
 - language_match:
 - scope_drift:
+- overreach_or_unwanted_automation:
 - notes:
+
+automation_decision:
+- should_become_automated_test: yes / no / unsure
+- test_case_id_if_added:
+- resolved_in_commit:
+- resolved_in_version:
+- still_open: yes / no
 ```
 
 Use short status words such as `yes`, `no`, `partial`, `not_applicable`, `pass`, `difference_found`, or `blocked`. Put details in `notes` only when they are public-safe and useful for improving the workflow.
@@ -29,6 +37,8 @@ Use short status words such as `yes`, `no`, `partial`, `not_applicable`, `pass`,
 - `source_vs_receiver_verification_clear`: receiver reports are clearer when inherited source-window facts are separated from current-window rechecks.
 - `language_match`: `response_language: match_latest_user_message` works best when code, paths, commands, and field names are explicitly excluded from language detection.
 - `scope_drift`: receivers should stop after acceptance unless the user explicitly asks for implementation work.
+- `overreach_or_unwanted_automation`: automation should be recorded as friction when it confirms, edits, or publishes beyond the reviewed handoff.
+- `automation_decision`: a `yes` recommendation is not the same as an added automated test; keep test IDs and resolution fields explicit.
 
 ## Stabilization Decisions
 

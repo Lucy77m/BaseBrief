@@ -16,12 +16,16 @@
 - [Receiver Safe Check](receiver-check.md)
 - [Receiver Flow Draft](receiver-flow.md)
 - [Project State](project-state.md)
+- [Project State model](design/project-state-model.md)
+- [Project State validation rules](design/project-state-validation-rules.md)
 - [Seal/Diff](seal-diff.md)
 - [Known Limitations](known-limitations.md)
 
 ## 方向与验证
 
-- [v0.6.0 project state directory candidate](releases/v0.6.0.md)
+- [v0.6.0 project state directory release](releases/v0.6.0.md)
+- [v0.6.0 post-release baseline](baselines/v0.6.0-post-release-baseline.md)
+- [v0.6.x test matrix](testing-v0.6.x-test-matrix.md)
 - [v0.5.3 receiver flow review closure](releases/v0.5.3.md)
 - [v0.5.2 receiver flow extract candidate](releases/v0.5.2.md)
 - [v0.5.1 review draft gate candidate](releases/v0.5.1.md)
@@ -47,6 +51,7 @@
 - [Receiver Flow extract dogfooding](dogfooding/receiver-flow-extract-dogfooding.md)
 - [Receiver Flow v0.5.x closure dogfooding](dogfooding/receiver-flow-v0.5.x-closure.md)
 - [Project State dogfooding](dogfooding/project-state-dogfooding.md)
+- [Project State self-dogfooding v0.6.x](dogfooding/project-state-self-dogfooding-v0.6.x.md)
 - [Usability feedback template](../.github/ISSUE_TEMPLATE/usability_feedback.md)
 
 ## Cache-ready 实验历史

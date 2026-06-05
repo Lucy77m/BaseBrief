@@ -81,6 +81,7 @@ function checkRequiredFiles() {
     "docs/dogfooding/receiver-flow-extract-dogfooding.md",
     "docs/dogfooding/receiver-flow-v0.5.x-closure.md",
     "docs/dogfooding/project-state-dogfooding.md",
+    "docs/dogfooding/project-state-self-dogfooding-v0.6.x.md",
     "docs/integrations.md",
     "docs/adapters.md",
     "docs/walkthrough.md",
@@ -91,6 +92,9 @@ function checkRequiredFiles() {
     "docs/receiver-flow.md",
     "docs/project-state.md",
     "docs/baselines/v0.4.0-post-release-baseline.md",
+    "docs/baselines/v0.6.0-post-release-baseline.md",
+    "docs/design/project-state-model.md",
+    "docs/design/project-state-validation-rules.md",
     "docs/releases/v0.3.0.md",
     "docs/releases/v0.3.1.md",
     "docs/releases/v0.3.2.md",
@@ -103,6 +107,7 @@ function checkRequiredFiles() {
     "docs/releases/v0.5.3.md",
     "docs/releases/v0.6.0.md",
     "docs/testing-v0.4.x-test-matrix.md",
+    "docs/testing-v0.6.x-test-matrix.md",
     "docs/cli-lite.md",
     "docs/seal-diff.md",
     "docs/contextops.md",
@@ -225,6 +230,7 @@ function checkContentContracts() {
   const receiverFlowExtractDogfoodingDoc = readText("docs/dogfooding/receiver-flow-extract-dogfooding.md");
   const receiverFlowClosureDogfoodingDoc = readText("docs/dogfooding/receiver-flow-v0.5.x-closure.md");
   const projectStateDogfoodingDoc = readText("docs/dogfooding/project-state-dogfooding.md");
+  const projectStateSelfDogfoodingDoc = readText("docs/dogfooding/project-state-self-dogfooding-v0.6.x.md");
   const testingDoc = readText("docs/testing.md");
   const usabilityFeedbackTemplate = readText(".github/ISSUE_TEMPLATE/usability_feedback.md");
   const adaptersDoc = readText("docs/adapters.md");
@@ -247,7 +253,11 @@ function checkContentContracts() {
   const receiverFlowClosureReleaseDoc = readText("docs/releases/v0.5.3.md");
   const projectStateReleaseDoc = readText("docs/releases/v0.6.0.md");
   const postReleaseBaselineDoc = readText("docs/baselines/v0.4.0-post-release-baseline.md");
+  const v060PostReleaseBaselineDoc = readText("docs/baselines/v0.6.0-post-release-baseline.md");
+  const projectStateModelDoc = readText("docs/design/project-state-model.md");
+  const projectStateValidationRulesDoc = readText("docs/design/project-state-validation-rules.md");
   const testMatrixDoc = readText("docs/testing-v0.4.x-test-matrix.md");
+  const v06xTestMatrixDoc = readText("docs/testing-v0.6.x-test-matrix.md");
   const cliLiteDoc = readText("docs/cli-lite.md");
   const sealDiffDoc = readText("docs/seal-diff.md");
   const contextOpsDoc = readText("docs/contextops.md");
@@ -304,7 +314,12 @@ function checkContentContracts() {
   assert(readme.includes("docs/dogfooding/receiver-flow-extract-dogfooding.md"), "README.md should link to extract dogfooding evidence");
   assert(readme.includes("docs/dogfooding/receiver-flow-v0.5.x-closure.md"), "README.md should link to v0.5.x closure dogfooding evidence");
   assert(readme.includes("docs/dogfooding/project-state-dogfooding.md"), "README.md should link to project-state dogfooding evidence");
-  assert(readme.includes("docs/releases/v0.6.0.md"), "README.md should link to v0.6.0 project-state candidate");
+  assert(readme.includes("docs/dogfooding/project-state-self-dogfooding-v0.6.x.md"), "README.md should link to project-state self-dogfooding evidence");
+  assert(readme.includes("docs/design/project-state-model.md"), "README.md should link to project-state model docs");
+  assert(readme.includes("docs/design/project-state-validation-rules.md"), "README.md should link to project-state validation docs");
+  assert(readme.includes("docs/baselines/v0.6.0-post-release-baseline.md"), "README.md should link to v0.6.0 post-release baseline");
+  assert(readme.includes("docs/testing-v0.6.x-test-matrix.md"), "README.md should link to v0.6.x test matrix");
+  assert(readme.includes("docs/releases/v0.6.0.md"), "README.md should link to v0.6.0 project-state release");
   assert(readme.includes("docs/releases/v0.5.3.md"), "README.md should link to v0.5.3 review closure");
   assert(readme.includes("docs/releases/v0.5.2.md"), "README.md should link to v0.5.2 extract candidate");
   assert(readme.includes("docs/releases/v0.5.1.md"), "README.md should link to v0.5.1 review draft gate candidate");
@@ -341,7 +356,12 @@ function checkContentContracts() {
   assert(englishReadme.includes("docs/dogfooding/receiver-flow-extract-dogfooding.md"), "README.en.md should link to extract dogfooding evidence");
   assert(englishReadme.includes("docs/dogfooding/receiver-flow-v0.5.x-closure.md"), "README.en.md should link to v0.5.x closure dogfooding evidence");
   assert(englishReadme.includes("docs/dogfooding/project-state-dogfooding.md"), "README.en.md should link to project-state dogfooding evidence");
-  assert(englishReadme.includes("docs/releases/v0.6.0.md"), "README.en.md should link to v0.6.0 project-state candidate");
+  assert(englishReadme.includes("docs/dogfooding/project-state-self-dogfooding-v0.6.x.md"), "README.en.md should link to project-state self-dogfooding evidence");
+  assert(englishReadme.includes("docs/design/project-state-model.md"), "README.en.md should link to project-state model docs");
+  assert(englishReadme.includes("docs/design/project-state-validation-rules.md"), "README.en.md should link to project-state validation docs");
+  assert(englishReadme.includes("docs/baselines/v0.6.0-post-release-baseline.md"), "README.en.md should link to v0.6.0 post-release baseline");
+  assert(englishReadme.includes("docs/testing-v0.6.x-test-matrix.md"), "README.en.md should link to v0.6.x test matrix");
+  assert(englishReadme.includes("docs/releases/v0.6.0.md"), "README.en.md should link to v0.6.0 project-state release");
   assert(englishReadme.includes("docs/releases/v0.5.3.md"), "README.en.md should link to v0.5.3 review closure");
   assert(englishReadme.includes("docs/releases/v0.5.2.md"), "README.en.md should link to v0.5.2 extract candidate");
   assert(englishReadme.includes("docs/releases/v0.5.1.md"), "README.en.md should link to v0.5.1 review draft gate candidate");
@@ -387,8 +407,11 @@ function checkContentContracts() {
   assert(docsIndex.includes("dogfooding/receiver-flow-extract-dogfooding.md"), "Docs index must link extract dogfooding evidence");
   assert(docsIndex.includes("dogfooding/receiver-flow-v0.5.x-closure.md"), "Docs index must link v0.5.x closure dogfooding evidence");
   assert(docsIndex.includes("dogfooding/project-state-dogfooding.md"), "Docs index must link project-state dogfooding evidence");
+  assert(docsIndex.includes("dogfooding/project-state-self-dogfooding-v0.6.x.md"), "Docs index must link project-state self-dogfooding evidence");
   assert(docsIndex.includes("receiver-flow.md"), "Docs index must link Receiver Flow Draft docs");
   assert(docsIndex.includes("project-state.md"), "Docs index must link Project State docs");
+  assert(docsIndex.includes("design/project-state-model.md"), "Docs index must link project-state model docs");
+  assert(docsIndex.includes("design/project-state-validation-rules.md"), "Docs index must link project-state validation docs");
   assert(docsIndex.includes("../examples/receiver/difference-found/README.md"), "Docs index should link receiver difference example");
   assert(docsIndex.includes("../examples/receiver/blocked/README.md"), "Docs index should link receiver blocked example");
   assert(docsIndex.includes("../examples/receiver/language-routing/README.md"), "Docs index should link receiver language routing example");
@@ -399,7 +422,9 @@ function checkContentContracts() {
   assert(docsIndex.includes("../examples/receiver-flow-review/rejected-candidate/README.md"), "Docs index should link rejected candidate draft example");
   assert(docsIndex.includes("../examples/receiver-flow-review/rejected-empty/README.md"), "Docs index should link rejected empty draft example");
   assert(docsIndex.includes("../examples/project-state/README.md"), "Docs index should link project-state example");
-  assert(docsIndex.includes("releases/v0.6.0.md"), "Docs index must link v0.6.0 project-state candidate");
+  assert(docsIndex.includes("releases/v0.6.0.md"), "Docs index must link v0.6.0 project-state release");
+  assert(docsIndex.includes("baselines/v0.6.0-post-release-baseline.md"), "Docs index must link v0.6.0 post-release baseline");
+  assert(docsIndex.includes("testing-v0.6.x-test-matrix.md"), "Docs index must link v0.6.x test matrix");
   assert(docsIndex.includes("releases/v0.5.1.md"), "Docs index must link v0.5.1 review draft gate candidate");
   assert(docsIndex.includes("releases/v0.5.2.md"), "Docs index must link v0.5.2 extract candidate");
   assert(docsIndex.includes("releases/v0.5.3.md"), "Docs index must link v0.5.3 review closure");
@@ -495,7 +520,9 @@ function checkContentContracts() {
   assert(testingDoc.includes("v0.5.1 Review Draft Gate Candidate"), "Testing docs must document v0.5.1 review draft gate candidate");
   assert(testingDoc.includes("v0.5.2 Receiver Flow Extract Candidate"), "Testing docs must document v0.5.2 extract candidate");
   assert(testingDoc.includes("v0.5.3 Receiver Flow Review Closure"), "Testing docs must document v0.5.3 review closure");
-  assert(testingDoc.includes("v0.6.0 Project State Directory Candidate"), "Testing docs must document v0.6.0 project-state candidate");
+  assert(testingDoc.includes("v0.6.0 Project State Directory Release"), "Testing docs must document v0.6.0 project-state release");
+  assert(testingDoc.includes("v0.6.1 Stability And Self-Dogfooding"), "Testing docs must document v0.6.1 stabilization");
+  assert(testingDoc.includes("testing-v0.6.x-test-matrix.md"), "Testing docs must link v0.6.x test matrix");
   assert(testingDoc.includes("provider_probe_status=skipped"), "Testing docs must preserve skipped provider probe wording");
   assert(usabilityFeedbackTemplate.includes("Do not include secrets"), "Usability feedback template must include a safety warning");
   assert(usabilityFeedbackTemplate.includes("Expected Result"), "Usability feedback template must collect expected results");
@@ -547,7 +574,7 @@ function checkContentContracts() {
   assert(cliLiteDoc.includes("node scripts/basebrief.js state-init --repo <target-repo> --source <receiver-ready.md>"), "cli-lite.md must document state-init command");
   assert(cliLiteDoc.includes("node scripts/basebrief.js state-read --repo <target-repo>"), "cli-lite.md must document state-read command");
   assert(cliLiteDoc.includes("basebrief-project-state-v1"), "cli-lite.md must document project-state schema version");
-  assert(cliLiteDoc.includes("releases/v0.6.0.md"), "cli-lite.md must link v0.6.0 project-state candidate");
+  assert(cliLiteDoc.includes("releases/v0.6.0.md"), "cli-lite.md must link v0.6.0 project-state release");
   assert(cliLiteDoc.includes("releases/v0.3.2.md"), "cli-lite.md must link v0.3.2 release candidate");
   assert(cliLiteDoc.includes("releases/v0.3.3.md"), "cli-lite.md must link v0.3.3 release candidate");
   assert(sealDiffDoc.includes("scripts/basebrief_seal.js"), "seal-diff.md must document seal script");
@@ -802,19 +829,34 @@ function checkContentContracts() {
   assert(receiverFlowClosureReleaseDoc.includes("No Auto Flow"), "v0.5.3 candidate must state no Auto Flow");
   assert(receiverFlowClosureReleaseDoc.includes("No `.basebrief/`"), "v0.5.3 candidate must state no .basebrief directory");
   assert(receiverFlowClosureReleaseDoc.includes("No push, tag, or formal release"), "v0.5.3 candidate must keep release actions pending");
-  assert(projectStateReleaseDoc.includes("Project State Directory Candidate"), "v0.6.0 candidate must describe project state");
-  assert(projectStateReleaseDoc.includes(".basebrief/state.json"), "v0.6.0 candidate must document state output");
-  assert(projectStateReleaseDoc.includes("basebrief-project-state-v1"), "v0.6.0 candidate must document schema version");
-  assert(projectStateReleaseDoc.includes("state-init"), "v0.6.0 candidate must document state-init");
-  assert(projectStateReleaseDoc.includes("state-read"), "v0.6.0 candidate must document state-read");
-  assert(projectStateReleaseDoc.includes("handoff_status: ready_for_receiver"), "v0.6.0 candidate must require receiver-ready source");
-  assert(projectStateReleaseDoc.includes("No provider request"), "v0.6.0 candidate must state no provider request");
-  assert(projectStateReleaseDoc.includes("No Auto Flow"), "v0.6.0 candidate must state no Auto Flow");
-  assert(projectStateReleaseDoc.includes("No receiver thread creation"), "v0.6.0 candidate must state no receiver thread creation");
-  assert(projectStateReleaseDoc.includes("No push, tag, or formal release"), "v0.6.0 candidate must keep release actions pending");
-  assert(projectStateReleaseDoc.includes("provider_probe_status=skipped"), "v0.6.0 candidate must preserve skipped provider probe gate");
-  assert(projectStateReleaseDoc.includes("BB9 handoff schema is unchanged"), "v0.6.0 candidate must protect BB9 schema");
-  assert(projectStateReleaseDoc.includes("Receiver Safe Check config and result schemas are unchanged"), "v0.6.0 candidate must protect receiver schemas");
+  assert(projectStateReleaseDoc.includes("Project State Directory Release"), "v0.6.0 release must describe project state");
+  assert(projectStateReleaseDoc.includes(".basebrief/state.json"), "v0.6.0 release must document state output");
+  assert(projectStateReleaseDoc.includes("basebrief-project-state-v1"), "v0.6.0 release must document schema version");
+  assert(projectStateReleaseDoc.includes("state-init"), "v0.6.0 release must document state-init");
+  assert(projectStateReleaseDoc.includes("state-read"), "v0.6.0 release must document state-read");
+  assert(projectStateReleaseDoc.includes("handoff_status: ready_for_receiver"), "v0.6.0 release must require receiver-ready source");
+  assert(projectStateReleaseDoc.includes("No provider request"), "v0.6.0 release must state no provider request");
+  assert(projectStateReleaseDoc.includes("No Auto Flow"), "v0.6.0 release must state no Auto Flow");
+  assert(projectStateReleaseDoc.includes("No receiver thread creation"), "v0.6.0 release must state no receiver thread creation");
+  assert(projectStateReleaseDoc.includes("No provider gateway"), "v0.6.0 release must state no provider gateway");
+  assert(projectStateReleaseDoc.includes("No published npm package"), "v0.6.0 release must state no published npm package");
+  assert(projectStateReleaseDoc.includes("No global CLI installation"), "v0.6.0 release must state no global CLI");
+  assert(projectStateReleaseDoc.includes("provider_probe_status=skipped"), "v0.6.0 release must preserve skipped provider probe gate");
+  assert(projectStateReleaseDoc.includes("BB9 handoff schema is unchanged"), "v0.6.0 release must protect BB9 schema");
+  assert(projectStateReleaseDoc.includes("Receiver Safe Check config and result schemas are unchanged"), "v0.6.0 release must protect receiver schemas");
+  assert(v060PostReleaseBaselineDoc.includes("release tag: `v0.6.0`"), "v0.6.0 post-release baseline must record tag");
+  assert(v060PostReleaseBaselineDoc.includes("provider_probe_status=skipped"), "v0.6.0 post-release baseline must preserve skipped provider wording");
+  assert(v060PostReleaseBaselineDoc.includes("No Auto Flow implementation"), "v0.6.0 post-release baseline must keep Auto Flow deferred");
+  assert(projectStateModelDoc.includes("not a memory store"), "project-state model doc must define non-goals");
+  assert(projectStateModelDoc.includes("basebrief-project-state-v1"), "project-state model doc must name schema");
+  assert(projectStateValidationRulesDoc.includes("handoff_status: ready_for_receiver"), "project-state validation doc must require ready source");
+  assert(projectStateValidationRulesDoc.includes("BASEBRIEF_PROVIDER_API_KEY"), "project-state validation doc must document provider env shape only");
+  assert(v06xTestMatrixDoc.includes("BaseBrief v0.6.x Test Matrix"), "v0.6.x test matrix must have a stable title");
+  assert(v06xTestMatrixDoc.includes("provider_probe_status=skipped"), "v0.6.x test matrix must preserve skipped provider wording");
+  assert(v06xTestMatrixDoc.includes("BASEBRIEF_PROVIDER_BASE_URL"), "v0.6.x test matrix must document provider env shape only");
+  assert(projectStateSelfDogfoodingDoc.includes("receiver-flow --guided"), "project-state self-dogfooding must document guided step");
+  assert(projectStateSelfDogfoodingDoc.includes("state-read --json"), "project-state self-dogfooding must document state-read step");
+  assert(projectStateSelfDogfoodingDoc.includes("No provider request"), "project-state self-dogfooding must state no provider request");
   assert(projectStateSchema.properties.schemaVersion.const === "basebrief-project-state-v1", "Project State schema version mismatch");
   assert(projectStateExample.schemaVersion === "basebrief-project-state-v1", "Project State example schema version mismatch");
   assert(projectStateExample.source.handoff_status === "ready_for_receiver", "Project State example must use ready source status");
@@ -1027,8 +1069,13 @@ function checkArtifactChecker() {
     "docs/dogfooding/receiver-flow-review-draft-dogfooding.md",
     "docs/dogfooding/receiver-flow-extract-dogfooding.md",
     "docs/dogfooding/project-state-dogfooding.md",
+    "docs/dogfooding/project-state-self-dogfooding-v0.6.x.md",
     "docs/baselines/v0.4.0-post-release-baseline.md",
+    "docs/baselines/v0.6.0-post-release-baseline.md",
+    "docs/design/project-state-model.md",
+    "docs/design/project-state-validation-rules.md",
     "docs/testing-v0.4.x-test-matrix.md",
+    "docs/testing-v0.6.x-test-matrix.md",
     "docs/receiver-check.md",
     "docs/receiver-flow.md",
     "docs/project-state.md",

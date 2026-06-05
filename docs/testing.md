@@ -88,14 +88,27 @@ guided draft. It does not add a new CLI command, `.basebrief/`, Auto Flow, Web
 UI, adapter expansion, provider requests, npm publishing, push, tag, or formal
 release.
 
-## v0.6.0 Project State Directory Candidate
+## v0.6.0 Project State Directory Release
 
 `v0.6.0` adds `state-init` and `state-read` for local `.basebrief/state.json`
 continuity state. `state-init` requires a reviewed source with
 `handoff_status: ready_for_receiver`; it does not accept draft output and does
 not promote receiver-flow content automatically. It does not add Auto Flow, Web
-UI, adapter expansion, provider requests, npm publishing, push, tag, or formal
-release.
+UI, adapter expansion, provider requests, npm publishing, hosted service,
+provider gateway, or global CLI.
+
+## v0.6.1 Stability And Self-Dogfooding
+
+`v0.6.1` is a stabilization target after the `v0.6.0` release. It tightens
+public release wording, the project-state model and validation docs, the
+v0.6.x test matrix, and BaseBrief self-dogfooding evidence. It does not change
+`basebrief-project-state-v1`, add lifecycle commands, run provider requests, or
+start Auto Flow.
+
+The v0.6.x matrix is tracked in
+[testing-v0.6.x-test-matrix.md](testing-v0.6.x-test-matrix.md). Provider smoke
+is a private matrix item only; public docs may name the env var shapes but must
+not record their values.
 
 Expected release-check output without provider env remains:
 

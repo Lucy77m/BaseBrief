@@ -91,7 +91,7 @@ node scripts/basebrief.js diff --before tests/outputs/private/quickstart/before.
 - Handoff Builder 与 Codex / Claude 文件型 Adapter
 - Artifact Checker
 - 可选、只读的 Receiver Safe Check v1
-- 零依赖 CLI Lite：`init`、`build`、`check`、`receiver-init`、`receiver-check`、`receiver-flow`、`review-draft`、`seal`、`diff`
+- 零依赖 CLI Lite：`init`、`build`、`check`、`receiver-init`、`receiver-check`、`receiver-flow`、`review-draft`、`state-init`、`state-read`、`seal`、`diff`
 - 本地、文件型 Seal/Diff v1
 
 BaseBrief 不是聊天客户端、Agent runtime、托管平台、密钥管理器、项目管理系统或 provider gateway。
@@ -105,6 +105,8 @@ BaseBrief 不是聊天客户端、Agent runtime、托管平台、密钥管理器
 - [Receiver Safe Check](docs/receiver-check.md)
 - [Receiver Flow Draft](docs/receiver-flow.md)
 - [Project State](docs/project-state.md)
+- [Project State model](docs/design/project-state-model.md)
+- [Project State validation rules](docs/design/project-state-validation-rules.md)
 - [Receiver friction log](docs/dogfooding/receiver-friction-log.md)
 - [Receiver Flow dogfooding evidence](docs/dogfooding/receiver-flow-dogfooding.md)
 - [Receiver Flow guided dogfooding](docs/dogfooding/receiver-flow-guided-dogfooding.md)
@@ -112,7 +114,10 @@ BaseBrief 不是聊天客户端、Agent runtime、托管平台、密钥管理器
 - [Receiver Flow extract dogfooding](docs/dogfooding/receiver-flow-extract-dogfooding.md)
 - [Receiver Flow v0.5.x closure dogfooding](docs/dogfooding/receiver-flow-v0.5.x-closure.md)
 - [Project State dogfooding](docs/dogfooding/project-state-dogfooding.md)
-- [v0.6.0 Project State Directory Candidate](docs/releases/v0.6.0.md)
+- [Project State self-dogfooding v0.6.x](docs/dogfooding/project-state-self-dogfooding-v0.6.x.md)
+- [v0.6.0 post-release baseline](docs/baselines/v0.6.0-post-release-baseline.md)
+- [v0.6.x test matrix](docs/testing-v0.6.x-test-matrix.md)
+- [v0.6.0 Project State Directory Release](docs/releases/v0.6.0.md)
 - [v0.5.3 Receiver Flow Review Closure](docs/releases/v0.5.3.md)
 - [v0.5.2 Receiver Flow Extract Candidate](docs/releases/v0.5.2.md)
 - [v0.5.1 Review Draft Gate Candidate](docs/releases/v0.5.1.md)

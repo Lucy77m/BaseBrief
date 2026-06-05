@@ -693,6 +693,11 @@ test("v0.6.0 project state documents local state boundaries", () => {
   const roadmap = readText("docs/roadmap/basebrief-long-term-baseline.md");
   const projectState = readText("docs/project-state.md");
   const dogfooding = readText("docs/dogfooding/project-state-dogfooding.md");
+  const selfDogfooding = readText("docs/dogfooding/project-state-self-dogfooding-v0.6.x.md");
+  const postReleaseBaseline = readText("docs/baselines/v0.6.0-post-release-baseline.md");
+  const modelDoc = readText("docs/design/project-state-model.md");
+  const validationRules = readText("docs/design/project-state-validation-rules.md");
+  const v06xMatrix = readText("docs/testing-v0.6.x-test-matrix.md");
   const release = readText("docs/releases/v0.6.0.md");
   const schema = readJson("schemas/basebrief-project-state.schema.json");
   const exampleState = readJson("examples/project-state/state.json");
@@ -702,13 +707,19 @@ test("v0.6.0 project state documents local state boundaries", () => {
   assert.match(englishReadme, /state-init/);
   assert.match(englishReadme, /docs\/project-state\.md/);
   assert.match(docsIndex, /project-state\.md/);
+  assert.match(docsIndex, /design\/project-state-model\.md/);
+  assert.match(docsIndex, /design\/project-state-validation-rules\.md/);
   assert.match(docsIndex, /releases\/v0\.6\.0\.md/);
+  assert.match(docsIndex, /baselines\/v0\.6\.0-post-release-baseline\.md/);
+  assert.match(docsIndex, /testing-v0\.6\.x-test-matrix\.md/);
   assert.match(docsIndex, /dogfooding\/project-state-dogfooding\.md/);
+  assert.match(docsIndex, /dogfooding\/project-state-self-dogfooding-v0\.6\.x\.md/);
   assert.match(docsIndex, /examples\/project-state\/README\.md/);
   assert.match(cliLite, /state-init --repo <target-repo> --source <receiver-ready\.md>/);
   assert.match(cliLite, /state-read --repo <target-repo>/);
   assert.match(receiverFlow, /\.basebrief\/state\.json/);
-  assert.match(testing, /v0\.6\.0 Project State Directory Candidate/);
+  assert.match(testing, /v0\.6\.0 Project State Directory Release/);
+  assert.match(testing, /v0\.6\.1 Stability And Self-Dogfooding/);
   assert.match(roadmap, /v0\.6\.0/);
   assert.match(projectState, /basebrief-project-state-v1/);
   assert.match(projectState, /No provider request/);
@@ -716,7 +727,18 @@ test("v0.6.0 project state documents local state boundaries", () => {
   assert.match(projectState, /Receiver Safe Check config and result schemas are unchanged/);
   assert.match(dogfooding, /state-init --repo <target-repo> --source <receiver-ready\.md>/);
   assert.match(dogfooding, /No provider request/);
-  assert.match(release, /Project State Directory Candidate/);
+  assert.match(selfDogfooding, /receiver-flow --guided/);
+  assert.match(selfDogfooding, /state-read --json/);
+  assert.match(selfDogfooding, /No provider request/);
+  assert.match(postReleaseBaseline, /release tag: `v0\.6\.0`/);
+  assert.match(postReleaseBaseline, /provider_probe_status=skipped/);
+  assert.match(modelDoc, /not a memory store/);
+  assert.match(modelDoc, /basebrief-project-state-v1/);
+  assert.match(validationRules, /handoff_status: ready_for_receiver/);
+  assert.match(validationRules, /BASEBRIEF_PROVIDER_API_KEY/);
+  assert.match(v06xMatrix, /BaseBrief v0\.6\.x Test Matrix/);
+  assert.match(v06xMatrix, /BASEBRIEF_PROVIDER_BASE_URL/);
+  assert.match(release, /Project State Directory Release/);
   assert.match(release, /\.basebrief\/state\.json/);
   assert.match(release, /basebrief-project-state-v1/);
   assert.match(release, /state-init/);
@@ -724,7 +746,9 @@ test("v0.6.0 project state documents local state boundaries", () => {
   assert.match(release, /No provider request/);
   assert.match(release, /No Auto Flow/);
   assert.match(release, /No receiver thread creation/);
-  assert.match(release, /No push, tag, or formal release/);
+  assert.match(release, /No provider gateway/);
+  assert.match(release, /No published npm package/);
+  assert.match(release, /No global CLI installation/);
   assert.match(release, /provider_probe_status=skipped/);
   assert.match(release, /BB9 handoff schema is unchanged/);
   assert.match(release, /Receiver Safe Check config and result schemas are unchanged/);
@@ -735,7 +759,12 @@ test("v0.6.0 project state documents local state boundaries", () => {
   for (const relativePath of [
     "docs/project-state.md",
     "docs/dogfooding/project-state-dogfooding.md",
+    "docs/dogfooding/project-state-self-dogfooding-v0.6.x.md",
+    "docs/baselines/v0.6.0-post-release-baseline.md",
+    "docs/design/project-state-model.md",
+    "docs/design/project-state-validation-rules.md",
     "docs/releases/v0.6.0.md",
+    "docs/testing-v0.6.x-test-matrix.md",
     "examples/project-state",
   ]) {
     const result = checkArtifacts({ inputPath: path.join(repoRoot, relativePath) });
