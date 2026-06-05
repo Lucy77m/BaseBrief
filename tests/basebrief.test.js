@@ -1031,6 +1031,50 @@ test("v0.8.1 sidecar check documents read-only bundle acceptance", () => {
   }
 });
 
+test("v0.8.2 sidecar receiver acceptance evidence stays public-safe", () => {
+  const docsIndex = readText("docs/index.md");
+  const testing = readText("docs/testing.md");
+  const matrix = readText("docs/testing-v0.8.x-test-matrix.md");
+  const dogfooding = readText("docs/dogfooding/sidecar-receiver-acceptance-v0.8.2.md");
+  const release = readText("docs/releases/v0.8.2.md");
+
+  assert.match(docsIndex, /releases\/v0\.8\.2\.md/);
+  assert.match(docsIndex, /testing-v0\.8\.x-test-matrix\.md/);
+  assert.match(docsIndex, /dogfooding\/sidecar-receiver-acceptance-v0\.8\.2\.md/);
+  assert.match(testing, /v0\.8\.2 Sidecar Receiver Acceptance Evidence/);
+  assert.match(testing, /testing-v0\.8\.x-test-matrix\.md/);
+
+  for (const doc of [matrix, dogfooding, release]) {
+    assert.match(doc, /sidecar-build/);
+    assert.match(doc, /sidecar-check/);
+    assert.match(doc, /generic/);
+    assert.match(doc, /openclaw/);
+    assert.match(doc, /No provider request/);
+    assert.match(doc, /No raw private output/);
+    assert.match(doc, /No runtime integration/);
+    assert.match(doc, /No schema change/);
+    assert.match(doc, /provider_probe_status=skipped/);
+  }
+
+  assert.match(matrix, /basebrief-project-state-v1/);
+  assert.match(release, /basebrief-project-state-v1/);
+  assert.match(release, /basebrief-sidecar-v1/);
+  assert.match(dogfooding, /0 errors, 0 warnings/);
+  assert.match(dogfooding, /wait for user confirmation/i);
+  assert.match(release, /Wait for user confirmation/);
+  assert.match(release, /profile\/config\/memory\/workspace/);
+
+  for (const relativePath of [
+    "docs/testing-v0.8.x-test-matrix.md",
+    "docs/dogfooding/sidecar-receiver-acceptance-v0.8.2.md",
+    "docs/releases/v0.8.2.md",
+  ]) {
+    const result = checkArtifacts({ inputPath: path.join(repoRoot, relativePath) });
+    assert.equal(result.status, "passed", relativePath);
+    assert.equal(result.errorCount, 0, relativePath);
+  }
+});
+
 test("public quickstart and minimal examples provide a clean first-use path", () => {
   const quickstart = readText("docs/quickstart-5min.md");
   const minimalBrief = readText("examples/minimal/output-basebrief-lite.md");

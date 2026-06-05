@@ -85,6 +85,7 @@ function checkRequiredFiles() {
     "docs/dogfooding/project-state-self-dogfooding-v0.6.2.md",
     "docs/dogfooding/project-state-lifecycle-readiness-v0.6.3.md",
     "docs/dogfooding/project-state-lifecycle-v0.7.0.md",
+    "docs/dogfooding/sidecar-receiver-acceptance-v0.8.2.md",
     "docs/integrations.md",
     "docs/adapters.md",
     "docs/walkthrough.md",
@@ -116,9 +117,11 @@ function checkRequiredFiles() {
     "docs/releases/v0.7.0.md",
     "docs/releases/v0.8.0.md",
     "docs/releases/v0.8.1.md",
+    "docs/releases/v0.8.2.md",
     "docs/testing-v0.4.x-test-matrix.md",
     "docs/testing-v0.6.x-test-matrix.md",
     "docs/testing-v0.7.x-test-matrix.md",
+    "docs/testing-v0.8.x-test-matrix.md",
     "docs/cli-lite.md",
     "docs/seal-diff.md",
     "docs/contextops.md",
@@ -248,6 +251,7 @@ function checkContentContracts() {
   const projectStateLifecycleDogfoodingV070Doc = readText("docs/dogfooding/project-state-lifecycle-v0.7.0.md");
   const basebriefSelfValidationPreV08Doc = readText("docs/dogfooding/basebrief-self-validation-pre-v0.8.md");
   const preV08FrictionLogDoc = readText("docs/dogfooding/pre-v0.8-friction-log.md");
+  const sidecarReceiverAcceptanceV082Doc = readText("docs/dogfooding/sidecar-receiver-acceptance-v0.8.2.md");
   const testingDoc = readText("docs/testing.md");
   const usabilityFeedbackTemplate = readText(".github/ISSUE_TEMPLATE/usability_feedback.md");
   const adaptersDoc = readText("docs/adapters.md");
@@ -274,6 +278,7 @@ function checkContentContracts() {
   const projectStateV070ReleaseDoc = readText("docs/releases/v0.7.0.md");
   const sidecarV080ReleaseDoc = readText("docs/releases/v0.8.0.md");
   const sidecarV081ReleaseDoc = readText("docs/releases/v0.8.1.md");
+  const sidecarV082ReleaseDoc = readText("docs/releases/v0.8.2.md");
   const postReleaseBaselineDoc = readText("docs/baselines/v0.4.0-post-release-baseline.md");
   const v060PostReleaseBaselineDoc = readText("docs/baselines/v0.6.0-post-release-baseline.md");
   const projectStateModelDoc = readText("docs/design/project-state-model.md");
@@ -283,6 +288,7 @@ function checkContentContracts() {
   const testMatrixDoc = readText("docs/testing-v0.4.x-test-matrix.md");
   const v06xTestMatrixDoc = readText("docs/testing-v0.6.x-test-matrix.md");
   const v07xTestMatrixDoc = readText("docs/testing-v0.7.x-test-matrix.md");
+  const v08xTestMatrixDoc = readText("docs/testing-v0.8.x-test-matrix.md");
   const cliLiteDoc = readText("docs/cli-lite.md");
   const sealDiffDoc = readText("docs/seal-diff.md");
   const contextOpsDoc = readText("docs/contextops.md");
@@ -473,12 +479,14 @@ function checkContentContracts() {
   assert(docsIndex.includes("releases/v0.6.0.md"), "Docs index must link v0.6.0 project-state release");
   assert(docsIndex.includes("releases/v0.8.0.md"), "Docs index must link v0.8.0 sidecar release candidate");
   assert(docsIndex.includes("releases/v0.8.1.md"), "Docs index must link v0.8.1 sidecar check hardening candidate");
+  assert(docsIndex.includes("releases/v0.8.2.md"), "Docs index must link v0.8.2 sidecar receiver acceptance evidence candidate");
   assert(docsIndex.includes("releases/v0.7.0.md"), "Docs index must link v0.7.0 lifecycle release candidate");
   assert(docsIndex.includes("releases/v0.6.3.md"), "Docs index must link v0.6.3 lifecycle readiness candidate");
   assert(docsIndex.includes("releases/v0.6.2.md"), "Docs index must link v0.6.2 self-dogfooding evidence candidate");
   assert(docsIndex.includes("baselines/v0.6.0-post-release-baseline.md"), "Docs index must link v0.6.0 post-release baseline");
   assert(docsIndex.includes("testing-v0.6.x-test-matrix.md"), "Docs index must link v0.6.x test matrix");
   assert(docsIndex.includes("testing-v0.7.x-test-matrix.md"), "Docs index must link v0.7.x test matrix");
+  assert(docsIndex.includes("testing-v0.8.x-test-matrix.md"), "Docs index must link v0.8.x test matrix");
   assert(docsIndex.includes("releases/v0.5.1.md"), "Docs index must link v0.5.1 review draft gate candidate");
   assert(docsIndex.includes("releases/v0.5.2.md"), "Docs index must link v0.5.2 extract candidate");
   assert(docsIndex.includes("releases/v0.5.3.md"), "Docs index must link v0.5.3 review closure");
@@ -590,6 +598,8 @@ function checkContentContracts() {
   assert(testingDoc.includes("testing-v0.6.x-test-matrix.md"), "Testing docs must link v0.6.x test matrix");
   assert(testingDoc.includes("v0.7.0 Project State Lifecycle Candidate"), "Testing docs must document v0.7.0 lifecycle candidate");
   assert(testingDoc.includes("testing-v0.7.x-test-matrix.md"), "Testing docs must link v0.7.x test matrix");
+  assert(testingDoc.includes("v0.8.2 Sidecar Receiver Acceptance Evidence"), "Testing docs must document v0.8.2 sidecar receiver acceptance evidence");
+  assert(testingDoc.includes("testing-v0.8.x-test-matrix.md"), "Testing docs must link v0.8.x test matrix");
   assert(testingDoc.includes("provider_probe_status=skipped"), "Testing docs must preserve skipped provider probe wording");
   assert(usabilityFeedbackTemplate.includes("Do not include secrets"), "Usability feedback template must include a safety warning");
   assert(usabilityFeedbackTemplate.includes("Expected Result"), "Usability feedback template must collect expected results");
@@ -1053,6 +1063,7 @@ function checkContentContracts() {
   assert(preV08FrictionLogDoc.includes("provider_probe_status=skipped"), "Pre-v0.8 friction log must preserve skipped provider gate");
   assert(docsIndex.includes("dogfooding/basebrief-self-validation-pre-v0.8.md"), "Docs index must link Pre-v0.8 self-validation evidence");
   assert(docsIndex.includes("dogfooding/pre-v0.8-friction-log.md"), "Docs index must link Pre-v0.8 friction log");
+  assert(docsIndex.includes("dogfooding/sidecar-receiver-acceptance-v0.8.2.md"), "Docs index must link v0.8.2 sidecar receiver acceptance evidence");
   assert(projectStateV063ReleaseDoc.includes("Lifecycle Readiness Gate Candidate"), "v0.6.3 release doc must describe readiness candidate");
   assert(projectStateV063ReleaseDoc.includes("not a lifecycle release"), "v0.6.3 release doc must reject lifecycle release status");
   assert(projectStateV063ReleaseDoc.includes("No state lifecycle commands"), "v0.6.3 release doc must state no lifecycle commands");
@@ -1093,6 +1104,42 @@ function checkContentContracts() {
   assert(sidecarV081ReleaseDoc.includes("No Auto Flow"), "v0.8.1 release doc must state no Auto Flow");
   assert(sidecarV081ReleaseDoc.includes("wait for user confirmation"), "v0.8.1 release doc must state user-confirmation boundary");
   assert(sidecarV081ReleaseDoc.includes("provider_probe_status=skipped"), "v0.8.1 release doc must preserve skipped provider gate");
+  assert(sidecarV082ReleaseDoc.includes("Sidecar Receiver Acceptance Evidence Candidate"), "v0.8.2 release doc must describe sidecar receiver acceptance evidence");
+  assert(sidecarV082ReleaseDoc.includes("sidecar-build"), "v0.8.2 release doc must document sidecar-build evidence");
+  assert(sidecarV082ReleaseDoc.includes("sidecar-check"), "v0.8.2 release doc must document sidecar-check evidence");
+  assert(sidecarV082ReleaseDoc.includes("generic"), "v0.8.2 release doc must document generic target");
+  assert(sidecarV082ReleaseDoc.includes("openclaw"), "v0.8.2 release doc must document openclaw target");
+  assert(sidecarV082ReleaseDoc.includes("basebrief-project-state-v1"), "v0.8.2 release doc must preserve project-state schema");
+  assert(sidecarV082ReleaseDoc.includes("basebrief-sidecar-v1"), "v0.8.2 release doc must preserve sidecar schema");
+  assert(sidecarV082ReleaseDoc.includes("No provider request"), "v0.8.2 release doc must state no provider request");
+  assert(sidecarV082ReleaseDoc.includes("No raw private output"), "v0.8.2 release doc must state no raw private output");
+  assert(sidecarV082ReleaseDoc.includes("No runtime integration"), "v0.8.2 release doc must state no runtime integration");
+  assert(sidecarV082ReleaseDoc.includes("No schema change"), "v0.8.2 release doc must state no schema change");
+  assert(sidecarV082ReleaseDoc.includes("No Auto Flow"), "v0.8.2 release doc must state no Auto Flow");
+  assert(sidecarV082ReleaseDoc.includes("Wait for user confirmation"), "v0.8.2 release doc must state user-confirmation boundary");
+  assert(sidecarV082ReleaseDoc.includes("provider_probe_status=skipped"), "v0.8.2 release doc must preserve skipped provider gate");
+  assert(sidecarReceiverAcceptanceV082Doc.includes("Sidecar Receiver Acceptance v0.8.2"), "v0.8.2 dogfooding doc must have stable title");
+  assert(sidecarReceiverAcceptanceV082Doc.includes("sidecar-build"), "v0.8.2 dogfooding doc must document sidecar-build");
+  assert(sidecarReceiverAcceptanceV082Doc.includes("sidecar-check"), "v0.8.2 dogfooding doc must document sidecar-check");
+  assert(sidecarReceiverAcceptanceV082Doc.includes("generic bundle | passed"), "v0.8.2 dogfooding doc must record generic pass");
+  assert(sidecarReceiverAcceptanceV082Doc.includes("openclaw bundle | passed"), "v0.8.2 dogfooding doc must record openclaw pass");
+  assert(sidecarReceiverAcceptanceV082Doc.includes("0 errors, 0 warnings"), "v0.8.2 dogfooding doc must record artifact checker result");
+  assert(sidecarReceiverAcceptanceV082Doc.includes("No provider request"), "v0.8.2 dogfooding doc must state no provider request");
+  assert(sidecarReceiverAcceptanceV082Doc.includes("No raw private output"), "v0.8.2 dogfooding doc must state no raw private output");
+  assert(sidecarReceiverAcceptanceV082Doc.includes("No runtime integration"), "v0.8.2 dogfooding doc must state no runtime integration");
+  assert(sidecarReceiverAcceptanceV082Doc.includes("No schema change"), "v0.8.2 dogfooding doc must state no schema change");
+  assert(sidecarReceiverAcceptanceV082Doc.includes("provider_probe_status=skipped"), "v0.8.2 dogfooding doc must preserve skipped provider gate");
+  assert(v08xTestMatrixDoc.includes("v0.8.x Sidecar Test Matrix"), "v0.8.x matrix must have stable title");
+  assert(v08xTestMatrixDoc.includes("sidecar-build"), "v0.8.x matrix must document sidecar-build");
+  assert(v08xTestMatrixDoc.includes("sidecar-check"), "v0.8.x matrix must document sidecar-check");
+  assert(v08xTestMatrixDoc.includes("generic"), "v0.8.x matrix must document generic target");
+  assert(v08xTestMatrixDoc.includes("openclaw"), "v0.8.x matrix must document openclaw target");
+  assert(v08xTestMatrixDoc.includes("basebrief-project-state-v1"), "v0.8.x matrix must preserve project-state schema");
+  assert(v08xTestMatrixDoc.includes("No provider request"), "v0.8.x matrix must state no provider request");
+  assert(v08xTestMatrixDoc.includes("No raw private output"), "v0.8.x matrix must state no raw private output");
+  assert(v08xTestMatrixDoc.includes("No runtime integration"), "v0.8.x matrix must state no runtime integration");
+  assert(v08xTestMatrixDoc.includes("No schema change"), "v0.8.x matrix must state no schema change");
+  assert(v08xTestMatrixDoc.includes("provider_probe_status=skipped"), "v0.8.x matrix must preserve skipped provider gate");
   assert(projectStateSchema.properties.schemaVersion.const === "basebrief-project-state-v1", "Project State schema version mismatch");
   assert(projectStateExample.schemaVersion === "basebrief-project-state-v1", "Project State example schema version mismatch");
   assert(projectStateExample.source.handoff_status === "ready_for_receiver", "Project State example must use ready source status");
@@ -1337,6 +1384,7 @@ function checkArtifactChecker() {
     "docs/releases/v0.7.0.md",
     "docs/releases/v0.8.0.md",
     "docs/releases/v0.8.1.md",
+    "docs/releases/v0.8.2.md",
     "examples/receiver-check-config.json",
     "examples/receiver/difference-found",
     "examples/receiver/blocked",

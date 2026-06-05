@@ -731,3 +731,21 @@ npm run check
 This closure integrates the existing local toolchain: BB9 handoff, CLI Lite, Artifact Checker, Receiver Safe Check, Receiver Flow Draft, Seal/Diff, local npm validation scripts, and public-safe evidence. It does not require provider requests, receiver thread creation, external receiver matrices, OpenCode smoke, Claude Code smoke, Auto Flow runs, Web UI checks, Cursor adapter tests, CI matrix, internationalization work, or provider benchmarks.
 
 When provider environment variables are absent, release checks must keep `provider_probe_status=skipped`. v0.4.0 must not be described as a hosted platform, provider gateway, published npm package, installed CLI, or Auto Flow release.
+
+## v0.8.2 Sidecar Receiver Acceptance Evidence
+
+`v0.8.2` closes a local sidecar receiver-acceptance evidence pass. It uses the
+existing `sidecar-build` and `sidecar-check` commands for both `generic` and
+`openclaw` targets, then verifies both generated bundles with Artifact Checker.
+
+The v0.8.x matrix is tracked in
+[testing-v0.8.x-test-matrix.md](testing-v0.8.x-test-matrix.md). This closure
+does not require provider smoke, receiver thread creation, external receiver
+matrices, OpenCode smoke, Claude Code smoke, Auto Flow runs, runtime
+integration, or provider benchmarks.
+
+Expected release-check output without provider env remains:
+
+```text
+provider_probe_status=skipped
+```

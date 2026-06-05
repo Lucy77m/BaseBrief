@@ -22,6 +22,7 @@
 - [Project State lifecycle model](design/project-state-lifecycle-model.md)
 - [v0.8.0 Sidecar Handoff Bundle](releases/v0.8.0.md)
 - [v0.8.1 Sidecar Check Hardening](releases/v0.8.1.md)
+- [v0.8.2 Sidecar Receiver Acceptance Evidence](releases/v0.8.2.md)
 - [Seal/Diff](seal-diff.md)
 - [Known Limitations](known-limitations.md)
 
@@ -30,12 +31,14 @@
 - [v0.6.0 project state directory release](releases/v0.6.0.md)
 - [v0.8.0 sidecar handoff bundle candidate](releases/v0.8.0.md)
 - [v0.8.1 sidecar check hardening candidate](releases/v0.8.1.md)
+- [v0.8.2 sidecar receiver acceptance evidence candidate](releases/v0.8.2.md)
 - [v0.7.0 project state lifecycle candidate](releases/v0.7.0.md)
 - [v0.6.3 lifecycle readiness gate candidate](releases/v0.6.3.md)
 - [v0.6.2 self-dogfooding evidence candidate](releases/v0.6.2.md)
 - [v0.6.0 post-release baseline](baselines/v0.6.0-post-release-baseline.md)
 - [v0.6.x test matrix](testing-v0.6.x-test-matrix.md)
 - [v0.7.x test matrix](testing-v0.7.x-test-matrix.md)
+- [v0.8.x sidecar test matrix](testing-v0.8.x-test-matrix.md)
 - [v0.5.3 receiver flow review closure](releases/v0.5.3.md)
 - [v0.5.2 receiver flow extract candidate](releases/v0.5.2.md)
 - [v0.5.1 review draft gate candidate](releases/v0.5.1.md)
@@ -67,6 +70,7 @@
 - [Project State lifecycle v0.7.0](dogfooding/project-state-lifecycle-v0.7.0.md)
 - [BaseBrief self-validation Pre-v0.8](dogfooding/basebrief-self-validation-pre-v0.8.md)
 - [Pre-v0.8 friction log](dogfooding/pre-v0.8-friction-log.md)
+- [Sidecar receiver acceptance v0.8.2](dogfooding/sidecar-receiver-acceptance-v0.8.2.md)
 - [Usability feedback template](../.github/ISSUE_TEMPLATE/usability_feedback.md)
 
 ## Cache-ready 实验历史
