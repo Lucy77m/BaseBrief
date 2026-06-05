@@ -42,6 +42,30 @@ Expected release-check output without provider env remains:
 provider_probe_status=skipped
 ```
 
+## v0.8.5 Manual Receiver Smoke Result Intake
+
+`v0.8.5` adds a public-safe result intake layer for manual OpenCode and Claude
+Code receiver smoke summaries. It does not run external receiver prompts from
+Codex and does not change CLI/API/schema behavior.
+
+The initial intake status is `not_run` for OpenCode and Claude Code. A future
+manual result may only be marked `passed` after the user supplies a public-safe
+acceptance summary that covers BaseBrief, v0.8.x, current commit,
+`current_goal`, receiver entry task, at least two risk boundaries, wait for
+user confirmation, no auto-advance, no provider, and no runtime.
+
+The v0.8.x matrix is tracked in
+[testing-v0.8.x-test-matrix.md](testing-v0.8.x-test-matrix.md). This closure
+does not require provider smoke, receiver thread creation, Auto Flow runs,
+runtime integration, OpenClaw/Hermes runtime connection, or provider
+benchmarks. No raw private output is copied into public docs.
+
+Expected release-check output without provider env remains:
+
+```text
+provider_probe_status=skipped
+```
+
 ## v0.5.0 Guided Receiver Flow Candidate
 
 `v0.5.0` adds `receiver-flow --guided` as an explicit human-input mode. It keeps

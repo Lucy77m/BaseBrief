@@ -1172,6 +1172,68 @@ test("v0.8.4 external receiver smoke evidence stays manual and public-safe", () 
   }
 });
 
+test("v0.8.5 manual receiver smoke intake stays not-run until public-safe evidence", () => {
+  const docsIndex = readText("docs/index.md");
+  const testing = readText("docs/testing.md");
+  const matrix = readText("docs/testing-v0.8.x-test-matrix.md");
+  const dogfooding = readText("docs/dogfooding/sidecar-manual-receiver-smoke-v0.8.5.md");
+  const release = readText("docs/releases/v0.8.5.md");
+
+  assert.match(docsIndex, /releases\/v0\.8\.5\.md/);
+  assert.match(docsIndex, /dogfooding\/sidecar-manual-receiver-smoke-v0\.8\.5\.md/);
+  assert.match(testing, /v0\.8\.5 Manual Receiver Smoke Result Intake/);
+  assert.match(testing, /not_run/);
+  assert.match(testing, /manual_required/);
+  assert.match(matrix, /v0\.8\.5 Manual Receiver Smoke Result Intake/);
+
+  for (const doc of [matrix, dogfooding, release]) {
+    assert.match(doc, /not_run/);
+    assert.match(doc, /manual_required/);
+    assert.match(doc, /No provider request/);
+    assert.match(doc, /No raw private output/);
+    assert.match(doc, /No runtime integration/);
+    assert.match(doc, /No schema change/);
+    assert.match(doc, /provider_probe_status=skipped/);
+  }
+
+  assert.match(dogfooding, /tool: opencode \| claude-code/);
+  assert.match(dogfooding, /target: generic \| openclaw/);
+  assert.match(dogfooding, /status: passed \| failed \| timed_out \| unavailable \| not_run/);
+  assert.match(dogfooding, /basebrief_identified/);
+  assert.match(dogfooding, /v08x_identified/);
+  assert.match(dogfooding, /current_commit_identified/);
+  assert.match(dogfooding, /current_goal_repeated/);
+  assert.match(dogfooding, /receiver_entry_task_repeated/);
+  assert.match(dogfooding, /risk_boundaries_count/);
+  assert.match(dogfooding, /wait_for_user_confirmation/);
+  assert.match(dogfooding, /no_auto_advance/);
+  assert.match(dogfooding, /no_provider/);
+  assert.match(dogfooding, /no_runtime/);
+  assert.match(dogfooding, /opencode \| generic \| not_run \| manual_required/);
+  assert.match(dogfooding, /claude-code \| generic \| not_run \| manual_required/);
+  assert.doesNotMatch(dogfooding, /opencode \| generic \| passed/);
+  assert.doesNotMatch(dogfooding, /claude-code \| generic \| passed/);
+  assert.match(release, /Manual Receiver Smoke Result Intake Candidate/);
+  assert.match(release, /OpenCode generic receiver smoke: not_run, manual_required/);
+  assert.match(release, /Claude Code generic receiver smoke: not_run, manual_required/);
+  assert.match(release, /No external receiver prompt was invoked from Codex/);
+  assert.match(release, /Wait for user confirmation/);
+  assert.match(release, /basebrief-project-state-v1/);
+  assert.match(release, /basebrief-sidecar-v1/);
+  assert.doesNotMatch(release, /OpenCode generic receiver smoke: passed/);
+  assert.doesNotMatch(release, /Claude Code generic receiver smoke: passed/);
+
+  for (const relativePath of [
+    "docs/testing-v0.8.x-test-matrix.md",
+    "docs/dogfooding/sidecar-manual-receiver-smoke-v0.8.5.md",
+    "docs/releases/v0.8.5.md",
+  ]) {
+    const result = checkArtifacts({ inputPath: path.join(repoRoot, relativePath) });
+    assert.equal(result.status, "passed", relativePath);
+    assert.equal(result.errorCount, 0, relativePath);
+  }
+});
+
 test("public quickstart and minimal examples provide a clean first-use path", () => {
   const quickstart = readText("docs/quickstart-5min.md");
   const minimalBrief = readText("examples/minimal/output-basebrief-lite.md");

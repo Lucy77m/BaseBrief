@@ -46,6 +46,19 @@ This matrix covers the local v0.8 sidecar handoff work.
   user-approved external runner smoke returns public-safe acceptance evidence.
 - Preserve `basebrief-project-state-v1` and `basebrief-sidecar-v1`.
 
+## v0.8.5 Manual Receiver Smoke Result Intake
+
+- Define the public-safe intake format for user-supplied OpenCode and Claude
+  Code receiver smoke summaries.
+- Keep all receiver smoke rows `not_run` until a user-approved external run
+  provides a complete public-safe acceptance summary.
+- Require acceptance fields for BaseBrief, v0.8.x, current commit,
+  `current_goal`, receiver entry task, at least two risk boundaries, wait for
+  user confirmation, no auto-advance, no provider, and no runtime.
+- Do not copy raw output, private paths, secrets, provider endpoints, model
+  values, token output, or API keys into tracked docs.
+- Preserve `basebrief-project-state-v1` and `basebrief-sidecar-v1`.
+
 ## Standard Local Commands
 
 ```text
