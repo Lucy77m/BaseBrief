@@ -131,10 +131,12 @@ function checkRequiredFiles() {
     "docs/releases/v0.9.0.md",
     "docs/releases/v0.9.1.md",
     "docs/releases/v0.9.2.md",
+    "docs/releases/v0.9.3.md",
     "docs/testing-v0.4.x-test-matrix.md",
     "docs/testing-v0.6.x-test-matrix.md",
     "docs/testing-v0.7.x-test-matrix.md",
     "docs/testing-v0.8.x-test-matrix.md",
+    "docs/testing-v0.9.x-test-matrix.md",
     "docs/cli-lite.md",
     "docs/golden-path.md",
     "docs/seal-diff.md",
@@ -317,6 +319,7 @@ function checkContentContracts() {
   const readinessV090ReleaseDoc = readText("docs/releases/v0.9.0.md");
   const goldenPathV091ReleaseDoc = readText("docs/releases/v0.9.1.md");
   const goldenPathExampleV092ReleaseDoc = readText("docs/releases/v0.9.2.md");
+  const closureV093ReleaseDoc = readText("docs/releases/v0.9.3.md");
   const postReleaseBaselineDoc = readText("docs/baselines/v0.4.0-post-release-baseline.md");
   const v060PostReleaseBaselineDoc = readText("docs/baselines/v0.6.0-post-release-baseline.md");
   const projectStateModelDoc = readText("docs/design/project-state-model.md");
@@ -327,6 +330,7 @@ function checkContentContracts() {
   const v06xTestMatrixDoc = readText("docs/testing-v0.6.x-test-matrix.md");
   const v07xTestMatrixDoc = readText("docs/testing-v0.7.x-test-matrix.md");
   const v08xTestMatrixDoc = readText("docs/testing-v0.8.x-test-matrix.md");
+  const v09xTestMatrixDoc = readText("docs/testing-v0.9.x-test-matrix.md");
   const cliLiteDoc = readText("docs/cli-lite.md");
   const sealDiffDoc = readText("docs/seal-diff.md");
   const contextOpsDoc = readText("docs/contextops.md");
@@ -421,6 +425,8 @@ function checkContentContracts() {
   assert(readme.includes("docs/releases/v0.9.0.md"), "README.md should link to v0.9.0 readiness candidate");
   assert(readme.includes("docs/releases/v0.9.1.md"), "README.md should link to v0.9.1 golden-path candidate");
   assert(readme.includes("docs/releases/v0.9.2.md"), "README.md should link to v0.9.2 golden-path example candidate");
+  assert(readme.includes("docs/releases/v0.9.3.md"), "README.md should link to v0.9.3 closure candidate");
+  assert(readme.includes("docs/testing-v0.9.x-test-matrix.md"), "README.md should link to v0.9.x closure matrix");
   assert(readme.includes("Integrated Handoff Readiness"), "README.md should define v0.9.0 readiness");
   assert(readme.includes("Integrated Handoff Golden Path"), "README.md should mention the golden-path guide");
   assert(readme.includes("examples/golden-path/README.md"), "README.md should link to the golden-path example kit");
@@ -500,6 +506,8 @@ function checkContentContracts() {
   assert(englishReadme.includes("docs/releases/v0.9.0.md"), "README.en.md should link to v0.9.0 readiness candidate");
   assert(englishReadme.includes("docs/releases/v0.9.1.md"), "README.en.md should link to v0.9.1 golden-path candidate");
   assert(englishReadme.includes("docs/releases/v0.9.2.md"), "README.en.md should link to v0.9.2 golden-path example candidate");
+  assert(englishReadme.includes("docs/releases/v0.9.3.md"), "README.en.md should link to v0.9.3 closure candidate");
+  assert(englishReadme.includes("docs/testing-v0.9.x-test-matrix.md"), "README.en.md should link to v0.9.x closure matrix");
   assert(englishReadme.includes("Integrated Handoff Readiness"), "README.en.md should define v0.9.0 readiness");
   assert(englishReadme.includes("Integrated Handoff Golden Path"), "README.en.md should mention the golden-path guide");
   assert(englishReadme.includes("examples/golden-path/README.md"), "README.en.md should link to the golden-path example kit");
@@ -599,6 +607,8 @@ function checkContentContracts() {
   assert(docsIndex.includes("releases/v0.9.0.md"), "Docs index must link v0.9.0 readiness candidate");
   assert(docsIndex.includes("releases/v0.9.1.md"), "Docs index must link v0.9.1 golden-path candidate");
   assert(docsIndex.includes("releases/v0.9.2.md"), "Docs index must link v0.9.2 golden-path example candidate");
+  assert(docsIndex.includes("releases/v0.9.3.md"), "Docs index must link v0.9.3 closure candidate");
+  assert(docsIndex.includes("testing-v0.9.x-test-matrix.md"), "Docs index must link v0.9.x closure matrix");
   assert(docsIndex.includes("releases/v0.7.0.md"), "Docs index must link v0.7.0 lifecycle release candidate");
   assert(docsIndex.includes("releases/v0.6.3.md"), "Docs index must link v0.6.3 lifecycle readiness candidate");
   assert(docsIndex.includes("releases/v0.6.2.md"), "Docs index must link v0.6.2 self-dogfooding evidence candidate");
@@ -749,6 +759,8 @@ function checkContentContracts() {
   assert(testingDoc.includes("v0.9.0 Integrated Handoff Readiness Candidate"), "Testing docs must document v0.9.0 readiness candidate");
   assert(testingDoc.includes("v0.9.1 Golden Path Closure Candidate"), "Testing docs must document v0.9.1 golden-path closure candidate");
   assert(testingDoc.includes("v0.9.2 Golden Path Example Closure Candidate"), "Testing docs must document v0.9.2 golden-path example closure candidate");
+  assert(testingDoc.includes("v0.9.3 Final Closure / Freeze Candidate"), "Testing docs must document v0.9.3 closure candidate");
+  assert(testingDoc.includes("testing-v0.9.x-test-matrix.md"), "Testing docs must link v0.9.x closure matrix");
   assert(testingDoc.includes("new-window-starter.md"), "Testing docs must document Sidecar starter");
   assert(testingDoc.includes("pass/fail"), "Testing docs must document Sidecar receiver pass/fail reporting");
   assert(testingDoc.includes("manual_required"), "Testing docs must preserve manual-required receiver execution status");
@@ -844,9 +856,10 @@ function checkContentContracts() {
   assert(structuredLiteExample.includes("BASEBRIEF_HANDOFF_JSON_BEGIN"), "structured lite example must include handoff JSON begin marker");
   assert(structuredLiteExample.includes("BASEBRIEF_HANDOFF_JSON_END"), "structured lite example must include handoff JSON end marker");
   assert(structuredLiteExample.includes('"open_questions"'), "structured lite example must include open questions");
-  assert(roadmapDoc.includes("Current v0.9.0 readiness target"), "Roadmap must name the current v0.9.0 readiness target");
-  assert(roadmapDoc.includes("Integrated Handoff Readiness"), "Roadmap must define Integrated Handoff Readiness");
-  assert(roadmapDoc.includes("provider requests, runtime integration, schema changes"), "Roadmap must keep v0.9.0 out of runtime/provider/schema scope");
+  assert(roadmapDoc.includes("Current v0.9.x closure line"), "Roadmap must name the current v0.9.x closure line");
+  assert(roadmapDoc.includes("v0.9.3 Final Closure / Freeze"), "Roadmap must include the v0.9.3 closure stage");
+  assert(roadmapDoc.includes("v0.9.x closure/freeze line"), "Roadmap must define the current closure/freeze line");
+  assert(roadmapDoc.includes("provider requests, runtime integration, schema changes"), "Roadmap must keep v0.9.x out of runtime/provider/schema scope");
   assert(goldenPathDoc.includes("Integrated Handoff Golden Path"), "golden-path.md must have a stable title");
   assert(goldenPathDoc.includes("receiver-ready.md -> state-init/state-advance -> sidecar-build -> sidecar-check -> new-window-starter.md -> receiver first response"), "golden-path.md must define the integrated path");
   assert(goldenPathDoc.includes("state-init --repo <target-repo> --source <receiver-ready.md>"), "golden-path.md must document state-init");
@@ -911,6 +924,29 @@ function checkContentContracts() {
   assert(goldenPathExampleBoundary.includes("No runtime integration"), "golden-path boundary note must reject runtime integration");
   assert(goldenPathExampleBoundary.includes("No schema change"), "golden-path boundary note must reject schema changes");
   assert(goldenPathExampleBoundary.includes("No Auto Flow"), "golden-path boundary note must reject Auto Flow");
+  assert(closureV093ReleaseDoc.includes("Final Closure / Freeze Candidate"), "v0.9.3 release doc must define closure/freeze candidate");
+  assert(closureV093ReleaseDoc.includes("v0.9.0` defines it, `v0.9.1` explains it, `v0.9.2` gives"), "v0.9.3 release doc must summarize define/guide/example progression");
+  assert(closureV093ReleaseDoc.includes("v0.9.3` closes and freezes"), "v0.9.3 release doc must define the close/freeze role");
+  assert(closureV093ReleaseDoc.includes("No provider request"), "v0.9.3 release doc must reject provider requests");
+  assert(closureV093ReleaseDoc.includes("No raw private output"), "v0.9.3 release doc must reject raw private output");
+  assert(closureV093ReleaseDoc.includes("No runtime integration"), "v0.9.3 release doc must reject runtime integration");
+  assert(closureV093ReleaseDoc.includes("No schema change"), "v0.9.3 release doc must reject schema changes");
+  assert(closureV093ReleaseDoc.includes("No Auto Flow"), "v0.9.3 release doc must reject Auto Flow");
+  assert(closureV093ReleaseDoc.includes("No v1.0 work"), "v0.9.3 release doc must keep v1.0 out of scope");
+  assert(closureV093ReleaseDoc.includes("provider_probe_status=skipped"), "v0.9.3 release doc must preserve skipped provider gate");
+  assert(v09xTestMatrixDoc.includes("v0.9.x Integrated Handoff Closure Matrix"), "v0.9.x matrix must have a stable title");
+  assert(v09xTestMatrixDoc.includes("receiver-ready.md -> state-init/state-advance -> sidecar-build -> sidecar-check -> new-window-starter.md -> receiver first response"), "v0.9.x matrix must define the shared path");
+  assert(v09xTestMatrixDoc.includes("v0.9.0 Integrated Handoff Readiness"), "v0.9.x matrix must include v0.9.0");
+  assert(v09xTestMatrixDoc.includes("v0.9.1 Golden Path Closure"), "v0.9.x matrix must include v0.9.1");
+  assert(v09xTestMatrixDoc.includes("v0.9.2 Golden Path Example Closure"), "v0.9.x matrix must include v0.9.2");
+  assert(v09xTestMatrixDoc.includes("v0.9.3 Final Closure / Freeze"), "v0.9.x matrix must include v0.9.3");
+  assert(v09xTestMatrixDoc.includes("provider_probe_status=skipped"), "v0.9.x matrix must preserve skipped provider gate");
+  assert(v09xTestMatrixDoc.includes("No provider request"), "v0.9.x matrix must reject provider requests");
+  assert(v09xTestMatrixDoc.includes("No raw private output"), "v0.9.x matrix must reject raw private output");
+  assert(v09xTestMatrixDoc.includes("No runtime integration"), "v0.9.x matrix must reject runtime integration");
+  assert(v09xTestMatrixDoc.includes("No schema change"), "v0.9.x matrix must reject schema changes");
+  assert(v09xTestMatrixDoc.includes("No Auto Flow"), "v0.9.x matrix must reject Auto Flow");
+  assert(v09xTestMatrixDoc.includes("No v1.0 work"), "v0.9.x matrix must keep v1.0 out of scope");
   assert(roadmapDoc.includes(".basebrief/state.json"), "roadmap baseline must describe project-state direction");
   assert(roadmapDoc.includes("Do not add BB13"), "roadmap baseline must include experiment freeze rule");
   ["mimo", "deepseek", "relay-openai-gpt55-codex-oauth"].forEach((profileId) => {
@@ -1848,7 +1884,9 @@ function checkArtifactChecker() {
     "docs/releases/v0.8.7.md",
     "docs/releases/v0.9.1.md",
     "docs/releases/v0.9.2.md",
+    "docs/releases/v0.9.3.md",
     "docs/releases/v0.9.0.md",
+    "docs/testing-v0.9.x-test-matrix.md",
     "docs/dogfooding/sidecar-external-receiver-smoke-v0.8.4.md",
     "docs/dogfooding/sidecar-manual-receiver-smoke-v0.8.5.md",
     "docs/dogfooding/sidecar-manual-receiver-smoke-v0.8.6.md",

@@ -77,6 +77,22 @@ Expected release-check output without provider env remains:
 provider_probe_status=skipped
 ```
 
+## v0.9.3 Final Closure / Freeze Candidate
+
+`v0.9.3` closes the public `v0.9.x` line without adding a new command,
+schema, provider request, runtime line, or Auto Flow behavior.
+
+This patch treats the release line as one closed summary:
+`v0.9.0` define, `v0.9.1` guide, `v0.9.2` example, `v0.9.3` close/freeze.
+It adds [the v0.9.x Integrated Handoff Closure Matrix](testing-v0.9.x-test-matrix.md)
+and aligns the roadmap/current-cycle wording with that closed line.
+
+Expected release-check output without provider env remains:
+
+```text
+provider_probe_status=skipped
+```
+
 ## v0.4.1 Stabilization Candidate
 
 `v0.4.1` is a stabilization-only cycle after the `v0.4.0` public release. It uses

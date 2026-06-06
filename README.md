@@ -73,6 +73,7 @@ node scripts/basebrief.js sidecar-check --input tests/outputs/private/sidecar-ge
 `v0.9.0` 是 Integrated Handoff Readiness / public hardening candidate：它把 receiver-ready handoff、Project State、Sidecar bundle 和 receiver 首条回复整理成一条本地 readiness 线，不是 provider、runtime、schema、Auto Flow、插件、平台化或 v1.0 工作。见 [v0.9.0 Integrated Handoff Readiness](docs/releases/v0.9.0.md)。
 `v0.9.1` 则把这条 readiness 线收敛成更好跟走的 public golden path：`receiver-ready.md -> state-init/state-advance -> sidecar-build -> sidecar-check -> new-window-starter.md -> receiver first response`。它只做 docs/usability hardening，不新增命令、不改 schema。入口见 [Integrated Handoff Golden Path](docs/golden-path.md) 与 [v0.9.1 Golden Path Closure Candidate](docs/releases/v0.9.1.md)。
 `v0.9.2` 再补上一套 public-safe 的 [Golden Path example kit](examples/golden-path/README.md)，让用户不只知道该走哪条路径，也拿得到 first-pass / follow-up 的公开样例闭环。见 [v0.9.2 Golden Path Example Closure Candidate](docs/releases/v0.9.2.md)。
+`v0.9.3` 最后把 `v0.9.x` 收成一条可发布前审看的 local closure/freeze line：`v0.9.0` 定义，`v0.9.1` 指路，`v0.9.2` 给样例，`v0.9.3` 收口冻结。它只补聚合测试矩阵、路线文案和最终 release doc，不新增命令、不改 schema，也不引入 runtime/provider 行为。见 [v0.9.x Integrated Handoff Closure Matrix](docs/testing-v0.9.x-test-matrix.md) 与 [v0.9.3 Final Closure / Freeze Candidate](docs/releases/v0.9.3.md)。
 
 ## Seal/Diff
 
@@ -131,6 +132,8 @@ BaseBrief 不是聊天客户端、Agent runtime、托管平台、密钥管理器
 - [v0.9.0 Integrated Handoff Readiness](docs/releases/v0.9.0.md)
 - [v0.9.1 Golden Path Closure Candidate](docs/releases/v0.9.1.md)
 - [v0.9.2 Golden Path Example Closure Candidate](docs/releases/v0.9.2.md)
+- [v0.9.3 Final Closure / Freeze Candidate](docs/releases/v0.9.3.md)
+- [v0.9.x Integrated Handoff Closure Matrix](docs/testing-v0.9.x-test-matrix.md)
 - [v0.8.x sidecar test matrix](docs/testing-v0.8.x-test-matrix.md)
 - [v0.8.7 Copyable New-Window Starter](docs/releases/v0.8.7.md)
 - [v0.8.6 Manual Receiver Smoke Result Intake Evidence](docs/releases/v0.8.6.md)

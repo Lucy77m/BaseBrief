@@ -124,3 +124,5 @@ the Receiver Safe Check contract, existing CLI command names, and the
 - [v0.9.0 Integrated Handoff Readiness](releases/v0.9.0.md)
 - [v0.9.1 Golden Path Closure Candidate](releases/v0.9.1.md)
 - [v0.9.2 Golden Path Example Closure Candidate](releases/v0.9.2.md)
+- [v0.9.3 Final Closure / Freeze Candidate](releases/v0.9.3.md)
+- [v0.9.x Integrated Handoff Closure Matrix](testing-v0.9.x-test-matrix.md)

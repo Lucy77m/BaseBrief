@@ -73,6 +73,7 @@ node scripts/basebrief.js sidecar-check --input tests/outputs/private/sidecar-ge
 `v0.9.0` is an Integrated Handoff Readiness / public hardening candidate. It aligns receiver-ready handoff, Project State, Sidecar bundle, and the receiver first response as one local readiness line; it is not provider, runtime, schema, Auto Flow, plugin, platform, or v1.0 work. See [v0.9.0 Integrated Handoff Readiness](docs/releases/v0.9.0.md).
 `v0.9.1` turns that readiness line into a clearer public golden path: `receiver-ready.md -> state-init/state-advance -> sidecar-build -> sidecar-check -> new-window-starter.md -> receiver first response`. It is docs/usability hardening only, with no new command and no schema change. Entry points: [Integrated Handoff Golden Path](docs/golden-path.md) and [v0.9.1 Golden Path Closure Candidate](docs/releases/v0.9.1.md).
 `v0.9.2` adds a public-safe [Golden Path example kit](examples/golden-path/README.md) so users can follow the same line with concrete first-pass and follow-up examples in hand. See [v0.9.2 Golden Path Example Closure Candidate](docs/releases/v0.9.2.md).
+`v0.9.3` closes the `v0.9.x` line as one local closure/freeze candidate for release review: `v0.9.0` defines it, `v0.9.1` explains it, `v0.9.2` adds examples, and `v0.9.3` closes and freezes it. This patch only adds the aggregate matrix, roadmap/control alignment, and the final release doc; it adds no new command, schema, runtime, or provider behavior. See [v0.9.x Integrated Handoff Closure Matrix](docs/testing-v0.9.x-test-matrix.md) and [v0.9.3 Final Closure / Freeze Candidate](docs/releases/v0.9.3.md).
 
 ## Seal/Diff
 
@@ -131,6 +132,8 @@ BaseBrief is not a chat client, agent runtime, hosted platform, secret manager, 
 - [v0.9.0 Integrated Handoff Readiness](docs/releases/v0.9.0.md)
 - [v0.9.1 Golden Path Closure Candidate](docs/releases/v0.9.1.md)
 - [v0.9.2 Golden Path Example Closure Candidate](docs/releases/v0.9.2.md)
+- [v0.9.3 Final Closure / Freeze Candidate](docs/releases/v0.9.3.md)
+- [v0.9.x Integrated Handoff Closure Matrix](docs/testing-v0.9.x-test-matrix.md)
 - [v0.8.x sidecar test matrix](docs/testing-v0.8.x-test-matrix.md)
 - [v0.8.7 Copyable New-Window Starter](docs/releases/v0.8.7.md)
 - [v0.8.6 Manual Receiver Smoke Result Intake Evidence](docs/releases/v0.8.6.md)

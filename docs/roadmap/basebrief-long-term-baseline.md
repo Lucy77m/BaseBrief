@@ -8,7 +8,7 @@ This document is the planning baseline for the next stages of BaseBrief. It is n
 
 BaseBrief should continue as one public skill entry with internal modes and supporting tools.
 
-Version `v0.2.0` completed the first local toolchain: structured handoff, provider profile metadata, file-based adapters, artifact checks, CLI Lite, and Seal/Diff v1. The receiver line then added Receiver Safe Check, Receiver Flow Draft, review-draft gates, and public receiver examples. The Project State line added local `.basebrief/state.json`, lifecycle inspection, and reviewed-state advancement; `v0.6.0` established that local Project State directory without changing `basebrief-project-state-v1`. The `v0.8.x` Sidecar line now consumes Project State into `generic` / `openclaw` bundles, validates `basebrief-sidecar-v1`, writes `new-window-starter.md`, preserves `pass/fail` receiver acceptance, and closes the public-safe OpenClaw/Hermes manual first-response gap. The current `v0.9.0` candidate is Integrated Handoff Readiness: a public hardening line for receiver-ready handoff -> Project State -> Sidecar bundle -> receiver first response, still without provider requests, runtime integration, schema changes, Auto Flow, plugins, platform work, or v1.0 claims.
+Version `v0.2.0` completed the first local toolchain: structured handoff, provider profile metadata, file-based adapters, artifact checks, CLI Lite, and Seal/Diff v1. The receiver line then added Receiver Safe Check, Receiver Flow Draft, review-draft gates, and public receiver examples. The Project State line added local `.basebrief/state.json`, lifecycle inspection, and reviewed-state advancement; `v0.6.0` established that local Project State directory without changing `basebrief-project-state-v1`. The `v0.8.x` Sidecar line now consumes Project State into `generic` / `openclaw` bundles, validates `basebrief-sidecar-v1`, writes `new-window-starter.md`, preserves `pass/fail` receiver acceptance, and closes the public-safe OpenClaw/Hermes manual first-response gap. The current `v0.9.x` closure line is: v0.9.0 Integrated Handoff Readiness defines the local line, v0.9.1 Golden Path Closure explains it, v0.9.2 Golden Path Example Closure adds public-safe examples, and v0.9.3 Final Closure / Freeze closes the line without provider requests, runtime integration, schema changes, Auto Flow, plugins, platform work, or v1.0 work.
 
 The useful product shape is no longer "choose a cache-ready mode for normal work." The stronger direction is:
 
@@ -305,13 +305,17 @@ Current v0.4.0 release-candidate target (historical, now completed):
 - keep `cache-ready` experimental and provider-specific
 - keep Auto Flow, Web UI, Cursor adapter, hosted service, installed CLI, published npm package, CI matrix, and `.basebrief/` project state out of scope
 
-Current v0.9.0 readiness target:
+Current v0.9.x closure line:
 
-- define Integrated Handoff Readiness as a public hardening candidate
-- connect receiver-ready handoff, Project State, Sidecar bundle, and receiver first response in docs and release checks
+- v0.9.0 Integrated Handoff Readiness defines the local public hardening line
+- v0.9.1 Golden Path Closure turns that line into one public golden path
+- v0.9.2 Golden Path Example Closure adds the public-safe example kit for
+  first-pass and follow-up usage
+- v0.9.3 Final Closure / Freeze closes and freezes the line with aggregate
+  matrix and final closure docs
 - keep `basebrief-project-state-v1`, `basebrief-sidecar-v1`, BB9, and Receiver Safe Check schemas unchanged
 - keep `provider_probe_status=skipped` as the correct no-provider gate
-- avoid provider requests, runtime integration, Auto Flow, Web UI, plugins, platform work, npm publishing, global CLI, v1.0 claims, and cross-provider cache claims
+- avoid provider requests, runtime integration, Auto Flow, Web UI, plugins, platform work, npm publishing, global CLI, `v1.0` work, and cross-provider cache claims
 
 ### Phase 9: ContextOps Vision
 
@@ -342,7 +346,7 @@ A new BB experiment is allowed only when all of the following are true:
 
 ## Near-term Priority Order
 
-1. Prepare the `v0.9.0` Integrated Handoff Readiness candidate for explicit user review.
+1. Prepare the `v0.9.x` closure/freeze line for explicit user review.
 2. Keep push, tag, and formal release pending until the user separately approves them.
 3. Observe whether the integrated Project State -> Sidecar -> receiver first-response line prevents real handoff mistakes.
 4. Keep installed CLI, plugins, provider experiments, ContextOps expansion, and speculative features frozen unless measured usage creates a concrete blocker.
@@ -371,6 +375,9 @@ BaseBrief is off track if:
 
 ## Current Strategic Decision
 
-The current development cycle should complete the `v0.9.0` Integrated Handoff Readiness line without chasing a new benchmark variant, installed CLI, plugin, runtime integration, provider request, schema change, or platform surface.
+The current development cycle should complete the v0.9.x closure/freeze line:
+v0.9.0 define, v0.9.1 guide, v0.9.2 example, v0.9.3 Final Closure / Freeze,
+without chasing a new benchmark variant, installed CLI, plugin,
+runtime integration, provider request, schema change, or platform surface.
 
 After release, the next development cycle should gather adoption evidence and make only evidence-driven fixes. BB12 remains a MiMo-specific optimization candidate, while new experiments, speculative features, and broader platform work remain frozen.

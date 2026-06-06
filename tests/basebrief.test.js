@@ -1382,7 +1382,8 @@ test("v0.9.0 readiness line defines integrated handoff hardening without expandi
   assert.match(release, /No cross-provider cache claim/);
   assert.match(release, /No claim based on audited billing records/);
   assert.match(release, /provider_probe_status=skipped/);
-  assert.match(roadmap, /Current v0\.9\.0 readiness target/);
+  assert.match(roadmap, /Current v0\.9\.x closure line/);
+  assert.match(roadmap, /v0\.9\.0 Integrated Handoff Readiness/);
   assert.match(roadmap, /basebrief-project-state-v1/);
   assert.match(roadmap, /basebrief-sidecar-v1/);
   assert.match(roadmap, /provider requests, runtime integration, schema changes/);
@@ -1549,6 +1550,73 @@ test("v0.9.2 golden path example closure provides a public-safe first-pass and f
     const checked = checkArtifacts({ inputPath: path.join(repoRoot, relativePath) });
     assert.equal(checked.status, "passed", relativePath);
     assert.equal(checked.errorCount, 0, relativePath);
+  }
+});
+
+test("v0.9.3 final closure freeze aligns the whole v0.9.x line for release review", () => {
+  const readme = readText("README.md");
+  const englishReadme = readText("README.en.md");
+  const docsIndex = readText("docs/index.md");
+  const testing = readText("docs/testing.md");
+  const roadmap = readText("docs/roadmap/basebrief-long-term-baseline.md");
+  const goldenPath = readText("docs/golden-path.md");
+  const release = readText("docs/releases/v0.9.3.md");
+  const matrix = readText("docs/testing-v0.9.x-test-matrix.md");
+
+  assert.match(readme, /docs\/releases\/v0\.9\.3\.md/);
+  assert.match(readme, /docs\/testing-v0\.9\.x-test-matrix\.md/);
+  assert.match(englishReadme, /docs\/releases\/v0\.9\.3\.md/);
+  assert.match(englishReadme, /docs\/testing-v0\.9\.x-test-matrix\.md/);
+  assert.match(docsIndex, /releases\/v0\.9\.3\.md/);
+  assert.match(docsIndex, /testing-v0\.9\.x-test-matrix\.md/);
+  assert.match(testing, /v0\.9\.3 Final Closure \/ Freeze Candidate/);
+  assert.match(testing, /testing-v0\.9\.x-test-matrix\.md/);
+  assert.match(goldenPath, /releases\/v0\.9\.3\.md/);
+  assert.match(goldenPath, /testing-v0\.9\.x-test-matrix\.md/);
+
+  assert.match(release, /Final Closure \/ Freeze Candidate/);
+  assert.match(release, /v0\.9\.0` defines it, `v0\.9\.1` explains it, `v0\.9\.2` gives/);
+  assert.match(release, /v0\.9\.3` closes and freezes/);
+  assert.match(release, /No provider request/);
+  assert.match(release, /No raw private output/);
+  assert.match(release, /No runtime integration/);
+  assert.match(release, /No schema change/);
+  assert.match(release, /No Auto Flow/);
+  assert.match(release, /No v1\.0 work/);
+  assert.match(release, /provider_probe_status=skipped/);
+
+  assert.match(matrix, /v0\.9\.x Integrated Handoff Closure Matrix/);
+  assert.match(matrix, /receiver-ready\.md -> state-init\/state-advance -> sidecar-build -> sidecar-check -> new-window-starter\.md -> receiver first response/);
+  assert.match(matrix, /v0\.9\.0 Integrated Handoff Readiness/);
+  assert.match(matrix, /v0\.9\.1 Golden Path Closure/);
+  assert.match(matrix, /v0\.9\.2 Golden Path Example Closure/);
+  assert.match(matrix, /v0\.9\.3 Final Closure \/ Freeze/);
+  assert.match(matrix, /provider_probe_status=skipped/);
+  assert.match(matrix, /No provider request/);
+  assert.match(matrix, /No raw private output/);
+  assert.match(matrix, /No runtime integration/);
+  assert.match(matrix, /No schema change/);
+  assert.match(matrix, /No Auto Flow/);
+  assert.match(matrix, /No v1\.0 work/);
+
+  assert.match(roadmap, /Current v0\.9\.x closure line/);
+  assert.match(roadmap, /v0\.9\.3 Final Closure \/ Freeze/);
+  assert.match(roadmap, /v0\.9\.x closure\/freeze line/);
+  assert.doesNotMatch(roadmap, /Current v0\.9\.0 readiness target/);
+
+  for (const relativePath of [
+    "README.md",
+    "README.en.md",
+    "docs/index.md",
+    "docs/testing.md",
+    "docs/golden-path.md",
+    "docs/roadmap/basebrief-long-term-baseline.md",
+    "docs/releases/v0.9.3.md",
+    "docs/testing-v0.9.x-test-matrix.md",
+  ]) {
+    const result = checkArtifacts({ inputPath: path.join(repoRoot, relativePath) });
+    assert.equal(result.status, "passed", relativePath);
+    assert.equal(result.errorCount, 0, relativePath);
   }
 });
 
