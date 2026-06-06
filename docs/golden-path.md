@@ -87,6 +87,22 @@ response must:
 This keeps the public handoff line human-auditable. It does not create a
 receiver thread automatically and does not auto-advance the workflow.
 
+## Example Kit
+
+If you want a public-safe walkthrough you can read like a kit instead of
+reconstructing the path yourself, use
+[examples/golden-path/README.md](../examples/golden-path/README.md).
+
+The kit includes:
+
+- a reviewed `receiver-ready.md` sample
+- a first-pass receiver first response sample for `state-init`
+- a follow-up receiver first response sample for `state-advance`
+- a Project State shape reference that points back to the existing public-safe
+  state example
+- a boundary note explaining why raw Sidecar output stays in ignored private
+  directories
+
 ## Boundaries
 
 - No provider request.
@@ -104,5 +120,7 @@ the Receiver Safe Check contract, existing CLI command names, and the
 - [Project State](project-state.md)
 - [CLI Lite](cli-lite.md)
 - [5-minute quickstart](quickstart-5min.md)
+- [Golden Path example kit](../examples/golden-path/README.md)
 - [v0.9.0 Integrated Handoff Readiness](releases/v0.9.0.md)
 - [v0.9.1 Golden Path Closure Candidate](releases/v0.9.1.md)
+- [v0.9.2 Golden Path Example Closure Candidate](releases/v0.9.2.md)

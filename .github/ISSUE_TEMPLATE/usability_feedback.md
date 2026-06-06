@@ -20,6 +20,7 @@ Which path did you use?
 
 - Skill-first Full or Lite
 - Quickstart build and check
+- Integrated Handoff Golden Path
 - Adapter export
 - Seal/Diff
 - Other public BaseBrief workflow

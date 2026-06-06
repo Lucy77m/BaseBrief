@@ -72,6 +72,7 @@ node scripts/basebrief.js sidecar-check --input tests/outputs/private/sidecar-ge
 
 `v0.9.0` is an Integrated Handoff Readiness / public hardening candidate. It aligns receiver-ready handoff, Project State, Sidecar bundle, and the receiver first response as one local readiness line; it is not provider, runtime, schema, Auto Flow, plugin, platform, or v1.0 work. See [v0.9.0 Integrated Handoff Readiness](docs/releases/v0.9.0.md).
 `v0.9.1` turns that readiness line into a clearer public golden path: `receiver-ready.md -> state-init/state-advance -> sidecar-build -> sidecar-check -> new-window-starter.md -> receiver first response`. It is docs/usability hardening only, with no new command and no schema change. Entry points: [Integrated Handoff Golden Path](docs/golden-path.md) and [v0.9.1 Golden Path Closure Candidate](docs/releases/v0.9.1.md).
+`v0.9.2` adds a public-safe [Golden Path example kit](examples/golden-path/README.md) so users can follow the same line with concrete first-pass and follow-up examples in hand. See [v0.9.2 Golden Path Example Closure Candidate](docs/releases/v0.9.2.md).
 
 ## Seal/Diff
 
@@ -118,6 +119,7 @@ BaseBrief is not a chat client, agent runtime, hosted platform, secret manager, 
 - [Integrations](docs/integrations.md)
 - [Mode selection](docs/mode-selection.md)
 - [Integrated Handoff Golden Path](docs/golden-path.md)
+- [Golden Path example kit](examples/golden-path/README.md)
 - [CLI Lite](docs/cli-lite.md)
 - [Receiver Safe Check](docs/receiver-check.md)
 - [Receiver Flow Draft](docs/receiver-flow.md)
@@ -128,6 +130,7 @@ BaseBrief is not a chat client, agent runtime, hosted platform, secret manager, 
 - [Project State lifecycle model](docs/design/project-state-lifecycle-model.md)
 - [v0.9.0 Integrated Handoff Readiness](docs/releases/v0.9.0.md)
 - [v0.9.1 Golden Path Closure Candidate](docs/releases/v0.9.1.md)
+- [v0.9.2 Golden Path Example Closure Candidate](docs/releases/v0.9.2.md)
 - [v0.8.x sidecar test matrix](docs/testing-v0.8.x-test-matrix.md)
 - [v0.8.7 Copyable New-Window Starter](docs/releases/v0.8.7.md)
 - [v0.8.6 Manual Receiver Smoke Result Intake Evidence](docs/releases/v0.8.6.md)

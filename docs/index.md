@@ -38,6 +38,7 @@
 
 - [v0.9.0 integrated handoff readiness candidate](releases/v0.9.0.md)
 - [v0.9.1 golden path closure candidate](releases/v0.9.1.md)
+- [v0.9.2 golden path example closure candidate](releases/v0.9.2.md)
 - [v0.6.0 project state directory release](releases/v0.6.0.md)
 - [v0.8.0 sidecar handoff bundle candidate](releases/v0.8.0.md)
 - [v0.8.1 sidecar check hardening candidate](releases/v0.8.1.md)
@@ -112,6 +113,7 @@
 ## 公开示例
 
 - [最小首次使用示例](../examples/minimal/README.md)
+- [Golden Path example kit](../examples/golden-path/README.md)
 - [Full 示例](../examples/full-example.md)
 - [Lite 示例](../examples/lite-example.md)
 - [Structured Full Handoff](../examples/structured-handoff-full.md)

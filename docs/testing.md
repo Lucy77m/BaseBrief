@@ -58,6 +58,25 @@ Expected release-check output without provider env remains:
 provider_probe_status=skipped
 ```
 
+## v0.9.2 Golden Path Example Closure Candidate
+
+`v0.9.2` is an example-driven usability patch on top of the `v0.9.1` golden
+path line. It keeps the same integrated local path:
+receiver-ready.md -> state-init/state-advance -> sidecar-build ->
+sidecar-check -> new-window-starter.md -> receiver first response.
+
+This patch adds a public-safe example kit for first-pass and follow-up usage:
+reviewed handoff shape, Project State shape reference, receiver first response
+examples, and an explicit boundary note that raw Sidecar output still belongs
+in ignored private directories. It adds no new command, no provider request,
+no runtime integration, no schema change, and no Auto Flow behavior.
+
+Expected release-check output without provider env remains:
+
+```text
+provider_probe_status=skipped
+```
+
 ## v0.4.1 Stabilization Candidate
 
 `v0.4.1` is a stabilization-only cycle after the `v0.4.0` public release. It uses

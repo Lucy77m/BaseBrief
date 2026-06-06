@@ -130,6 +130,7 @@ function checkRequiredFiles() {
     "docs/releases/v0.8.8.md",
     "docs/releases/v0.9.0.md",
     "docs/releases/v0.9.1.md",
+    "docs/releases/v0.9.2.md",
     "docs/testing-v0.4.x-test-matrix.md",
     "docs/testing-v0.6.x-test-matrix.md",
     "docs/testing-v0.7.x-test-matrix.md",
@@ -229,6 +230,12 @@ function checkRequiredFiles() {
     "examples/project-state/README.md",
     "examples/project-state/state.json",
     "examples/agent-task-example.md",
+    "examples/golden-path/README.md",
+    "examples/golden-path/receiver-ready.md",
+    "examples/golden-path/state-reference.md",
+    "examples/golden-path/first-pass-receiver-report.md",
+    "examples/golden-path/follow-up-receiver-report.md",
+    "examples/golden-path/sidecar-output-boundary.md",
     "examples/minimal/README.md",
     "examples/minimal/input-project-notes.md",
     "examples/minimal/output-basebrief-lite.md",
@@ -309,6 +316,7 @@ function checkContentContracts() {
   const sidecarV088ReleaseDoc = readText("docs/releases/v0.8.8.md");
   const readinessV090ReleaseDoc = readText("docs/releases/v0.9.0.md");
   const goldenPathV091ReleaseDoc = readText("docs/releases/v0.9.1.md");
+  const goldenPathExampleV092ReleaseDoc = readText("docs/releases/v0.9.2.md");
   const postReleaseBaselineDoc = readText("docs/baselines/v0.4.0-post-release-baseline.md");
   const v060PostReleaseBaselineDoc = readText("docs/baselines/v0.6.0-post-release-baseline.md");
   const projectStateModelDoc = readText("docs/design/project-state-model.md");
@@ -333,6 +341,12 @@ function checkContentContracts() {
   const providerProfiles = readJson("scripts/bb9_provider_profiles.json");
   const structuredFullExample = readText("examples/structured-handoff-full.md");
   const structuredLiteExample = readText("examples/structured-handoff-lite.md");
+  const goldenPathExampleReadme = readText("examples/golden-path/README.md");
+  const goldenPathExampleReady = readText("examples/golden-path/receiver-ready.md");
+  const goldenPathExampleStateReference = readText("examples/golden-path/state-reference.md");
+  const goldenPathExampleFirstPass = readText("examples/golden-path/first-pass-receiver-report.md");
+  const goldenPathExampleFollowUp = readText("examples/golden-path/follow-up-receiver-report.md");
+  const goldenPathExampleBoundary = readText("examples/golden-path/sidecar-output-boundary.md");
   const fullTemplate = readText("templates/zh-CN/BASEBRIEF.md");
   const liteTemplate = readText("templates/zh-CN/BASEBRIEF_LITE.md");
   const nextChatTemplate = readText("templates/zh-CN/NEXT_CHAT_PROMPT.md");
@@ -406,8 +420,10 @@ function checkContentContracts() {
   assert(readme.includes("docs/releases/v0.8.8.md"), "README.md should link to v0.8.8 starter language routing");
   assert(readme.includes("docs/releases/v0.9.0.md"), "README.md should link to v0.9.0 readiness candidate");
   assert(readme.includes("docs/releases/v0.9.1.md"), "README.md should link to v0.9.1 golden-path candidate");
+  assert(readme.includes("docs/releases/v0.9.2.md"), "README.md should link to v0.9.2 golden-path example candidate");
   assert(readme.includes("Integrated Handoff Readiness"), "README.md should define v0.9.0 readiness");
   assert(readme.includes("Integrated Handoff Golden Path"), "README.md should mention the golden-path guide");
+  assert(readme.includes("examples/golden-path/README.md"), "README.md should link to the golden-path example kit");
   assert(readme.includes("docs/releases/v0.8.3.md"), "README.md should link to v0.8.3 sidecar discoverability polish");
   assert(readme.includes("docs/releases/v0.8.2.md"), "README.md should link to v0.8.2 sidecar receiver acceptance evidence");
   assert(readme.includes("docs/releases/v0.8.1.md"), "README.md should link to v0.8.1 sidecar check hardening");
@@ -483,8 +499,10 @@ function checkContentContracts() {
   assert(englishReadme.includes("docs/releases/v0.8.8.md"), "README.en.md should link to v0.8.8 starter language routing");
   assert(englishReadme.includes("docs/releases/v0.9.0.md"), "README.en.md should link to v0.9.0 readiness candidate");
   assert(englishReadme.includes("docs/releases/v0.9.1.md"), "README.en.md should link to v0.9.1 golden-path candidate");
+  assert(englishReadme.includes("docs/releases/v0.9.2.md"), "README.en.md should link to v0.9.2 golden-path example candidate");
   assert(englishReadme.includes("Integrated Handoff Readiness"), "README.en.md should define v0.9.0 readiness");
   assert(englishReadme.includes("Integrated Handoff Golden Path"), "README.en.md should mention the golden-path guide");
+  assert(englishReadme.includes("examples/golden-path/README.md"), "README.en.md should link to the golden-path example kit");
   assert(englishReadme.includes("docs/releases/v0.8.3.md"), "README.en.md should link to v0.8.3 sidecar discoverability polish");
   assert(englishReadme.includes("docs/releases/v0.8.2.md"), "README.en.md should link to v0.8.2 sidecar receiver acceptance evidence");
   assert(englishReadme.includes("docs/releases/v0.8.1.md"), "README.en.md should link to v0.8.1 sidecar check hardening");
@@ -529,6 +547,7 @@ function checkContentContracts() {
   assert(quickstartDoc.includes("路径 C"), "quickstart must document the Seal/Diff path");
   assert(quickstartDoc.includes("路径 D"), "quickstart must document the Receiver Safe Check path");
   assert(quickstartDoc.includes("golden-path.md"), "quickstart must link to the golden path guide");
+  assert(quickstartDoc.includes("../examples/golden-path/README.md"), "quickstart must link to the golden-path example kit");
   assert(quickstartDoc.includes("state-init -> sidecar-build -> sidecar-check"), "quickstart must document first-pass golden path");
   assert(quickstartDoc.includes("state-advance -> sidecar-build -> sidecar-check"), "quickstart must document follow-up golden path");
   assert(quickstartDoc.includes("tests/outputs/private/quickstart/build"), "quickstart build must use the ignored private output directory");
@@ -566,6 +585,7 @@ function checkContentContracts() {
   assert(docsIndex.includes("../examples/receiver-flow-review/rejected-candidate/README.md"), "Docs index should link rejected candidate draft example");
   assert(docsIndex.includes("../examples/receiver-flow-review/rejected-empty/README.md"), "Docs index should link rejected empty draft example");
   assert(docsIndex.includes("../examples/project-state/README.md"), "Docs index should link project-state example");
+  assert(docsIndex.includes("../examples/golden-path/README.md"), "Docs index should link golden-path example kit");
   assert(docsIndex.includes("releases/v0.6.0.md"), "Docs index must link v0.6.0 project-state release");
   assert(docsIndex.includes("releases/v0.8.0.md"), "Docs index must link v0.8.0 sidecar release candidate");
   assert(docsIndex.includes("releases/v0.8.1.md"), "Docs index must link v0.8.1 sidecar check hardening candidate");
@@ -578,6 +598,7 @@ function checkContentContracts() {
   assert(docsIndex.includes("releases/v0.8.8.md"), "Docs index must link v0.8.8 starter language routing candidate");
   assert(docsIndex.includes("releases/v0.9.0.md"), "Docs index must link v0.9.0 readiness candidate");
   assert(docsIndex.includes("releases/v0.9.1.md"), "Docs index must link v0.9.1 golden-path candidate");
+  assert(docsIndex.includes("releases/v0.9.2.md"), "Docs index must link v0.9.2 golden-path example candidate");
   assert(docsIndex.includes("releases/v0.7.0.md"), "Docs index must link v0.7.0 lifecycle release candidate");
   assert(docsIndex.includes("releases/v0.6.3.md"), "Docs index must link v0.6.3 lifecycle readiness candidate");
   assert(docsIndex.includes("releases/v0.6.2.md"), "Docs index must link v0.6.2 self-dogfooding evidence candidate");
@@ -727,6 +748,7 @@ function checkContentContracts() {
   assert(testingDoc.includes("v0.8.8 Starter Language Routing"), "Testing docs must document v0.8.8 starter language routing");
   assert(testingDoc.includes("v0.9.0 Integrated Handoff Readiness Candidate"), "Testing docs must document v0.9.0 readiness candidate");
   assert(testingDoc.includes("v0.9.1 Golden Path Closure Candidate"), "Testing docs must document v0.9.1 golden-path closure candidate");
+  assert(testingDoc.includes("v0.9.2 Golden Path Example Closure Candidate"), "Testing docs must document v0.9.2 golden-path example closure candidate");
   assert(testingDoc.includes("new-window-starter.md"), "Testing docs must document Sidecar starter");
   assert(testingDoc.includes("pass/fail"), "Testing docs must document Sidecar receiver pass/fail reporting");
   assert(testingDoc.includes("manual_required"), "Testing docs must preserve manual-required receiver execution status");
@@ -734,6 +756,7 @@ function checkContentContracts() {
   assert(testingDoc.includes("testing-v0.8.x-test-matrix.md"), "Testing docs must link v0.8.x test matrix");
   assert(testingDoc.includes("provider_probe_status=skipped"), "Testing docs must preserve skipped provider probe wording");
   assert(usabilityFeedbackTemplate.includes("Do not include secrets"), "Usability feedback template must include a safety warning");
+  assert(usabilityFeedbackTemplate.includes("Integrated Handoff Golden Path"), "Usability feedback template must include golden-path entry point");
   assert(usabilityFeedbackTemplate.includes("Expected Result"), "Usability feedback template must collect expected results");
   [
     "docs/experiments/cache-ready-lite.md",
@@ -835,6 +858,9 @@ function checkContentContracts() {
   assert(goldenPathDoc.includes("state-history"), "golden-path.md must mention optional state-history inspection");
   assert(goldenPathDoc.includes("pass/fail"), "golden-path.md must preserve receiver pass/fail reporting");
   assert(goldenPathDoc.includes("wait for user confirmation"), "golden-path.md must preserve receiver confirmation");
+  assert(goldenPathDoc.includes("../examples/golden-path/README.md"), "golden-path.md must link to the example kit");
+  assert(goldenPathDoc.includes("first-pass receiver first response"), "golden-path.md must describe the first-pass example");
+  assert(goldenPathDoc.includes("follow-up receiver first response"), "golden-path.md must describe the follow-up example");
   assert(goldenPathDoc.includes("No provider request"), "golden-path.md must reject provider requests");
   assert(goldenPathDoc.includes("No raw private output"), "golden-path.md must reject raw private output");
   assert(goldenPathDoc.includes("No runtime integration"), "golden-path.md must reject runtime integration");
@@ -851,6 +877,40 @@ function checkContentContracts() {
   assert(goldenPathV091ReleaseDoc.includes("No schema change"), "v0.9.1 release doc must reject schema changes");
   assert(goldenPathV091ReleaseDoc.includes("No Auto Flow"), "v0.9.1 release doc must reject Auto Flow");
   assert(goldenPathV091ReleaseDoc.includes("provider_probe_status=skipped"), "v0.9.1 release doc must preserve skipped provider gate");
+  assert(goldenPathExampleV092ReleaseDoc.includes("Golden Path Example Closure Candidate"), "v0.9.2 release doc must define golden-path example closure candidate");
+  assert(goldenPathExampleV092ReleaseDoc.includes("receiver-ready.md -> state-init/state-advance -> sidecar-build -> sidecar-check -> new-window-starter.md -> receiver first response"), "v0.9.2 release doc must define the golden path");
+  assert(goldenPathExampleV092ReleaseDoc.includes("examples/golden-path/"), "v0.9.2 release doc must mention the example kit");
+  assert(goldenPathExampleV092ReleaseDoc.includes("No provider request"), "v0.9.2 release doc must reject provider requests");
+  assert(goldenPathExampleV092ReleaseDoc.includes("No raw private output"), "v0.9.2 release doc must reject raw private output");
+  assert(goldenPathExampleV092ReleaseDoc.includes("No runtime integration"), "v0.9.2 release doc must reject runtime integration");
+  assert(goldenPathExampleV092ReleaseDoc.includes("No schema change"), "v0.9.2 release doc must reject schema changes");
+  assert(goldenPathExampleV092ReleaseDoc.includes("No Auto Flow"), "v0.9.2 release doc must reject Auto Flow");
+  assert(goldenPathExampleV092ReleaseDoc.includes("provider_probe_status=skipped"), "v0.9.2 release doc must preserve skipped provider gate");
+  assert(goldenPathExampleReadme.includes("Golden Path Example Kit"), "golden-path example README must have a stable title");
+  assert(goldenPathExampleReadme.includes("state-init --repo <target-repo> --source <receiver-ready.md>"), "golden-path example README must document first-pass command");
+  assert(goldenPathExampleReadme.includes("state-advance --repo <target-repo> --source <receiver-ready.md>"), "golden-path example README must document follow-up command");
+  assert(goldenPathExampleReadme.includes("sidecar-build --repo <target-repo>"), "golden-path example README must document sidecar-build");
+  assert(goldenPathExampleReadme.includes("sidecar-check --input <sidecar-dir>"), "golden-path example README must document sidecar-check");
+  assert(goldenPathExampleReadme.includes("new-window-starter.md"), "golden-path example README must mention the copyable starter");
+  assert(goldenPathExampleReady.includes("handoff_status: ready_for_receiver"), "golden-path receiver-ready sample must stay reviewed");
+  assert(goldenPathExampleReady.includes("No provider request"), "golden-path receiver-ready sample must keep no-provider boundary");
+  assert(goldenPathExampleReady.includes("No raw private output"), "golden-path receiver-ready sample must keep no-raw-output boundary");
+  assert(goldenPathExampleReady.includes("No runtime integration"), "golden-path receiver-ready sample must keep no-runtime boundary");
+  assert(goldenPathExampleReady.includes("No schema change"), "golden-path receiver-ready sample must keep no-schema boundary");
+  assert(goldenPathExampleReady.includes("No Auto Flow"), "golden-path receiver-ready sample must keep no-auto-flow boundary");
+  assert(goldenPathExampleStateReference.includes("basebrief-project-state-v1"), "golden-path state reference must preserve project-state schema");
+  assert(goldenPathExampleStateReference.includes("../project-state/state.json"), "golden-path state reference must point to the public project-state example");
+  assert(goldenPathExampleFirstPass.includes("pass"), "first-pass receiver sample must report pass/fail outcome");
+  assert(goldenPathExampleFirstPass.includes("wait"), "first-pass receiver sample must wait for confirmation");
+  assert(goldenPathExampleFirstPass.includes("state-init"), "first-pass receiver sample must identify state-init branch");
+  assert(goldenPathExampleFollowUp.includes("pass"), "follow-up receiver sample must report pass/fail outcome");
+  assert(goldenPathExampleFollowUp.includes("wait"), "follow-up receiver sample must wait for confirmation");
+  assert(goldenPathExampleFollowUp.includes("state-advance"), "follow-up receiver sample must identify state-advance branch");
+  assert(goldenPathExampleBoundary.includes("No provider request"), "golden-path boundary note must reject provider requests");
+  assert(goldenPathExampleBoundary.includes("No raw private output"), "golden-path boundary note must reject raw private output");
+  assert(goldenPathExampleBoundary.includes("No runtime integration"), "golden-path boundary note must reject runtime integration");
+  assert(goldenPathExampleBoundary.includes("No schema change"), "golden-path boundary note must reject schema changes");
+  assert(goldenPathExampleBoundary.includes("No Auto Flow"), "golden-path boundary note must reject Auto Flow");
   assert(roadmapDoc.includes(".basebrief/state.json"), "roadmap baseline must describe project-state direction");
   assert(roadmapDoc.includes("Do not add BB13"), "roadmap baseline must include experiment freeze rule");
   ["mimo", "deepseek", "relay-openai-gpt55-codex-oauth"].forEach((profileId) => {
@@ -1714,6 +1774,12 @@ function checkExamples() {
     "examples/receiver-flow-review/rejected-empty/draft-context.md",
     "examples/project-state/README.md",
     "examples/project-state/state.json",
+    "examples/golden-path/README.md",
+    "examples/golden-path/receiver-ready.md",
+    "examples/golden-path/state-reference.md",
+    "examples/golden-path/first-pass-receiver-report.md",
+    "examples/golden-path/follow-up-receiver-report.md",
+    "examples/golden-path/sidecar-output-boundary.md",
     "examples/agent-task-example.md",
     "examples/minimal/README.md",
     "examples/minimal/input-project-notes.md",
@@ -1781,6 +1847,7 @@ function checkArtifactChecker() {
     "docs/releases/v0.8.6.md",
     "docs/releases/v0.8.7.md",
     "docs/releases/v0.9.1.md",
+    "docs/releases/v0.9.2.md",
     "docs/releases/v0.9.0.md",
     "docs/dogfooding/sidecar-external-receiver-smoke-v0.8.4.md",
     "docs/dogfooding/sidecar-manual-receiver-smoke-v0.8.5.md",
@@ -1797,6 +1864,7 @@ function checkArtifactChecker() {
     "examples/receiver-flow-review/rejected-candidate",
     "examples/receiver-flow-review/rejected-empty",
     "examples/project-state",
+    "examples/golden-path",
     ".github/ISSUE_TEMPLATE/usability_feedback.md",
   ];
   inputs.forEach((relativePath) => {

@@ -1462,6 +1462,96 @@ test("v0.9.1 golden path closure keeps the integrated local handoff line easy to
   }
 });
 
+test("v0.9.2 golden path example closure provides a public-safe first-pass and follow-up kit", () => {
+  const readme = readText("README.md");
+  const englishReadme = readText("README.en.md");
+  const docsIndex = readText("docs/index.md");
+  const quickstart = readText("docs/quickstart-5min.md");
+  const testing = readText("docs/testing.md");
+  const goldenPath = readText("docs/golden-path.md");
+  const release = readText("docs/releases/v0.9.2.md");
+  const usability = readText(".github/ISSUE_TEMPLATE/usability_feedback.md");
+  const kitReadme = readText("examples/golden-path/README.md");
+  const ready = readText("examples/golden-path/receiver-ready.md");
+  const stateReference = readText("examples/golden-path/state-reference.md");
+  const firstPass = readText("examples/golden-path/first-pass-receiver-report.md");
+  const followUp = readText("examples/golden-path/follow-up-receiver-report.md");
+  const boundary = readText("examples/golden-path/sidecar-output-boundary.md");
+
+  assert.match(readme, /examples\/golden-path\/README\.md/);
+  assert.match(readme, /docs\/releases\/v0\.9\.2\.md/);
+  assert.match(englishReadme, /examples\/golden-path\/README\.md/);
+  assert.match(englishReadme, /docs\/releases\/v0\.9\.2\.md/);
+  assert.match(docsIndex, /\.\.\/examples\/golden-path\/README\.md/);
+  assert.match(docsIndex, /releases\/v0\.9\.2\.md/);
+  assert.match(quickstart, /\.\.\/examples\/golden-path\/README\.md/);
+  assert.match(goldenPath, /\.\.\/examples\/golden-path\/README\.md/);
+  assert.match(testing, /v0\.9\.2 Golden Path Example Closure Candidate/);
+  assert.match(usability, /Integrated Handoff Golden Path/);
+
+  assert.match(release, /Golden Path Example Closure Candidate/);
+  assert.match(release, /examples\/golden-path\//);
+  assert.match(release, /No provider request/);
+  assert.match(release, /No raw private output/);
+  assert.match(release, /No runtime integration/);
+  assert.match(release, /No schema change/);
+  assert.match(release, /No Auto Flow/);
+  assert.match(release, /provider_probe_status=skipped/);
+
+  assert.match(kitReadme, /Golden Path Example Kit/);
+  assert.match(kitReadme, /state-init --repo <target-repo> --source <receiver-ready\.md>/);
+  assert.match(kitReadme, /state-advance --repo <target-repo> --source <receiver-ready\.md>/);
+  assert.match(kitReadme, /sidecar-build --repo <target-repo>/);
+  assert.match(kitReadme, /sidecar-check --input <sidecar-dir>/);
+  assert.match(kitReadme, /new-window-starter\.md/);
+
+  assert.match(ready, /handoff_status: ready_for_receiver/);
+  assert.match(ready, /No provider request/);
+  assert.match(ready, /No raw private output/);
+  assert.match(ready, /No runtime integration/);
+  assert.match(ready, /No schema change/);
+  assert.match(ready, /No Auto Flow/);
+
+  assert.match(stateReference, /basebrief-project-state-v1/);
+  assert.match(stateReference, /\.\.\/project-state\/state\.json/);
+
+  assert.match(firstPass, /pass/);
+  assert.match(firstPass, /wait/);
+  assert.match(firstPass, /state-init/);
+  assert.match(firstPass, /No provider request/);
+  assert.match(firstPass, /No raw private output/);
+  assert.match(firstPass, /No runtime integration/);
+
+  assert.match(followUp, /pass/);
+  assert.match(followUp, /wait/);
+  assert.match(followUp, /state-advance/);
+  assert.match(followUp, /No provider request/);
+  assert.match(followUp, /No raw private output/);
+  assert.match(followUp, /No runtime integration/);
+
+  assert.match(boundary, /No provider request/);
+  assert.match(boundary, /No raw private output/);
+  assert.match(boundary, /No runtime integration/);
+  assert.match(boundary, /No schema change/);
+  assert.match(boundary, /No Auto Flow/);
+
+  const result = checkArtifacts({ inputPath: path.join(repoRoot, "examples/golden-path") });
+  assert.equal(result.status, "passed");
+  assert.equal(result.errorCount, 0);
+
+  for (const relativePath of [
+    "docs/golden-path.md",
+    "docs/testing.md",
+    "docs/releases/v0.9.2.md",
+    "examples/golden-path",
+    ".github/ISSUE_TEMPLATE/usability_feedback.md",
+  ]) {
+    const checked = checkArtifacts({ inputPath: path.join(repoRoot, relativePath) });
+    assert.equal(checked.status, "passed", relativePath);
+    assert.equal(checked.errorCount, 0, relativePath);
+  }
+});
+
 test("public quickstart and minimal examples provide a clean first-use path", () => {
   const quickstart = readText("docs/quickstart-5min.md");
   const minimalBrief = readText("examples/minimal/output-basebrief-lite.md");

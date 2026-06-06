@@ -44,6 +44,7 @@ node scripts/basebrief.js check --input tests/outputs/private/quickstart/build
 - 已有有效 `.basebrief/state.json` 时更新连续性状态：`receiver-ready.md -> state-advance -> sidecar-build -> sidecar-check -> new-window-starter.md -> receiver first response`
 
 `state-status`、`state-validate` 和 `state-history` 仍然只是一组可选只读检查，不抬升为每次都必须走的主路径。
+想看一套能直接照着读的公开样例，可以去 [Golden Path example kit](../examples/golden-path/README.md)。
 
 ## 路径 C：用 Seal/Diff 对比阶段变化
 
