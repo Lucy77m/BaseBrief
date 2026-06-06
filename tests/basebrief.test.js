@@ -28,7 +28,7 @@ const { buildReceiverCheckConfig, runReceiverInit } = require("../scripts/basebr
 const { FLOW_SCHEMA_VERSION, runReceiverFlow } = require("../scripts/basebrief_receiver_flow");
 const { REVIEW_DRAFT_SCHEMA_VERSION, runReviewDraft } = require("../scripts/basebrief_review_draft");
 const { PROJECT_STATE_SCHEMA_VERSION, runStateAdvance, runStateHistory, runStateInit, runStateRead, runStateStatus, runStateValidate } = require("../scripts/basebrief_project_state");
-const { SIDECAR_SCHEMA_VERSION, buildSidecarBundle, checkSidecarBundle } = require("../scripts/basebrief_sidecar");
+const { SIDECAR_SCHEMA_VERSION, buildSidecarBundle, checkSidecarBundle, detectStarterLanguage } = require("../scripts/basebrief_sidecar");
 const { createSealFromInput, diffSeals, readSealOrInput, SEAL_SCHEMA_VERSION } = require("../scripts/basebrief_seal");
 const { buildSummary, getPromptForVariant, SCENARIOS, PROVIDER_PROFILES } = require("../scripts/provider_cache_benchmark");
 const { classifyRelayUsage } = require("../scripts/provider_relay_usage_audit");
@@ -2931,7 +2931,7 @@ test("Project state lifecycle rejects unsafe or unreviewed advance", () => withT
   assert.throws(() => runStateAdvance({ repoPath: repoDir, sourcePath: readyPath }), /validation failed before advance/);
 }));
 
-function createSidecarFixture(tempDir, target = "generic") {
+function createSidecarFixture(tempDir, target = "generic", options = {}) {
   const repoDir = createReceiverCheckRepo(tempDir);
   const { draftPath } = createGuidedDraft(tempDir, {
     guidedAnswers: {
@@ -2939,13 +2939,14 @@ function createSidecarFixture(tempDir, target = "generic") {
         "Do not call providers.",
         "Do not write secrets or raw private output.",
       ].join("\n"),
+      ...options.guidedAnswers,
     },
   });
   const readyPath = path.join(tempDir, `${target}-receiver-ready.md`);
   runReviewDraft({ draftPath, outputPath: readyPath });
   runStateInit({ repoPath: repoDir, sourcePath: readyPath });
   const outputDir = path.join(tempDir, `${target}-sidecar`);
-  buildSidecarBundle({ repoPath: repoDir, target, outputDir });
+  buildSidecarBundle({ repoPath: repoDir, target, outputDir, starterLanguage: options.starterLanguage });
   return { repoDir, outputDir };
 }
 
@@ -2974,6 +2975,7 @@ test("Sidecar build writes generic bundle from valid project state", () => withT
   assert.equal(result.schemaVersion, SIDECAR_SCHEMA_VERSION);
   assert.equal(result.projectStateSchemaVersion, PROJECT_STATE_SCHEMA_VERSION);
   assert.equal(result.target, "generic");
+  assert.equal(result.starterLanguage, "en");
   assert.equal(manifest.schemaVersion, SIDECAR_SCHEMA_VERSION);
   assert.equal(manifest.projectStateSchemaVersion, PROJECT_STATE_SCHEMA_VERSION);
   assert.equal(manifest.output_files.handoff, "handoff.md");
@@ -3005,6 +3007,74 @@ test("Sidecar build writes generic bundle from valid project state", () => withT
   assert.equal(checkArtifacts({ inputPath: outputDir }).status, "passed");
 }));
 
+test("Sidecar build localizes copyable new-window starter languages", () => withTempDir((tempDir) => {
+  const zh = createSidecarFixture(path.join(tempDir, "zh"), "generic", { starterLanguage: "zh-CN" });
+  const en = createSidecarFixture(path.join(tempDir, "en"), "generic", { starterLanguage: "en" });
+  const ja = createSidecarFixture(path.join(tempDir, "ja"), "generic", { starterLanguage: "ja" });
+
+  const zhStarter = fs.readFileSync(path.join(zh.outputDir, "new-window-starter.md"), "utf8");
+  const enStarter = fs.readFileSync(path.join(en.outputDir, "new-window-starter.md"), "utf8");
+  const jaStarter = fs.readFileSync(path.join(ja.outputDir, "new-window-starter.md"), "utf8");
+
+  assert.match(zhStarter, /# BaseBrief 新窗口开场白/);
+  assert.match(zhStarter, /目标仓库/);
+  assert.match(zhStarter, /Wait for user confirmation/);
+  assert.match(zhStarter, /No provider request/);
+  assert.match(zhStarter, /current_goal/);
+  assert.match(enStarter, /# BaseBrief New Window Starter/);
+  assert.match(enStarter, /Target repository/);
+  assert.match(jaStarter, /# BaseBrief 新規ウィンドウ開始文/);
+  assert.match(jaStarter, /対象リポジトリ/);
+  assert.match(jaStarter, /No raw private output/);
+  assert.match(jaStarter, /receiver_entry_task/);
+
+  assert.equal(checkSidecarBundle({ inputPath: zh.outputDir }).check_status, "passed");
+  assert.equal(checkSidecarBundle({ inputPath: en.outputDir }).check_status, "passed");
+  assert.equal(checkSidecarBundle({ inputPath: ja.outputDir }).check_status, "passed");
+}));
+
+test("Sidecar build auto-detects starter language with zh-CN fallback", () => withTempDir((tempDir) => {
+  assert.equal(detectStarterLanguage({
+    handoff: {
+      current_goal: "继续验证 BaseBrief 新窗口开场白。",
+      receiver_entry_task: "读取 sidecar bundle，然后等待用户确认。",
+      risk_boundaries: "不要调用 provider。",
+    },
+  }), "zh-CN");
+  assert.equal(detectStarterLanguage({
+    handoff: {
+      current_goal: "Validate the copyable sidecar starter in a fresh receiver window.",
+      receiver_entry_task: "Read the sidecar bundle and wait for user confirmation.",
+      risk_boundaries: "Do not call providers.",
+    },
+  }), "en");
+  assert.equal(detectStarterLanguage({
+    handoff: {
+      current_goal: "新しい受信ウィンドウで BaseBrief の開始文を確認する。",
+      receiver_entry_task: "sidecar bundle を読んで、ユーザー確認を待つ。",
+      risk_boundaries: "provider request を行わない。",
+    },
+  }), "ja");
+  assert.equal(detectStarterLanguage({
+    handoff: {
+      current_goal: "Fix BaseBrief 新窗口 starter language routing.",
+      receiver_entry_task: "Read sidecar bundle 然后等待确认。",
+      risk_boundaries: "No provider request.",
+    },
+  }), "zh-CN");
+
+  const autoZh = createSidecarFixture(path.join(tempDir, "auto-zh"), "generic", {
+    guidedAnswers: {
+      current_goal: "继续验证 BaseBrief 新窗口开场白。",
+      receiver_entry_task: "读取 sidecar bundle，然后等待用户确认。",
+      risk_boundaries: "不要调用 provider。\n不要暴露原始私有输出。",
+    },
+  });
+  const starter = fs.readFileSync(path.join(autoZh.outputDir, "new-window-starter.md"), "utf8");
+  assert.match(starter, /# BaseBrief 新窗口开场白/);
+  assert.equal(checkSidecarBundle({ inputPath: autoZh.outputDir }).check_status, "passed");
+}));
+
 test("Sidecar build writes OpenClaw-safe bundle without runtime integration", () => withTempDir((tempDir) => {
   const repoDir = createReceiverCheckRepo(tempDir);
   const { draftPath } = createGuidedDraft(tempDir, {
@@ -3026,6 +3096,7 @@ test("Sidecar build writes OpenClaw-safe bundle without runtime integration", ()
   const risks = fs.readFileSync(path.join(outputDir, "risk-boundaries.md"), "utf8");
 
   assert.equal(result.target, "openclaw");
+  assert.equal(result.starterLanguage, "en");
   assert.match(prompt, /OpenClaw\/Hermes runtime/);
   assert.match(prompt, /profile\/config\/memory\/workspace/);
   assert.match(starter, /OpenClaw\/Hermes runtime/);
@@ -3044,6 +3115,7 @@ test("Sidecar build rejects missing state, invalid state, unsupported target, an
   const readyPath = path.join(tempDir, "receiver-ready.md");
   runReviewDraft({ draftPath, outputPath: readyPath });
   runStateInit({ repoPath: repoDir, sourcePath: readyPath });
+  assert.throws(() => buildSidecarBundle({ repoPath: repoDir, starterLanguage: "fr" }), /Unsupported starter language/);
 
   const occupied = path.join(tempDir, "occupied-sidecar");
   fs.mkdirSync(occupied, { recursive: true });

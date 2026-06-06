@@ -24,7 +24,7 @@ node scripts/basebrief.js state-status --repo . --json
 node scripts/basebrief.js state-validate --repo . --json
 node scripts/basebrief.js state-history --repo . --json
 node scripts/basebrief.js state-advance --repo . --source tests/outputs/private/receiver-ready.md --json
-node scripts/basebrief.js sidecar-build --repo . --target generic --output-dir tests/outputs/private/sidecar-generic --json
+node scripts/basebrief.js sidecar-build --repo . --target generic --starter-language zh-CN --output-dir tests/outputs/private/sidecar-generic --json
 node scripts/basebrief.js sidecar-check --input tests/outputs/private/sidecar-generic --json
 node scripts/basebrief.js seal --input examples/seal-before-input.json --output tests/outputs/private/seal-before.json
 node scripts/basebrief.js diff --before examples/seal-before-input.json --after examples/seal-after-input.json --json
@@ -200,7 +200,7 @@ The v0.7.0 lifecycle boundary is documented in
 ### sidecar-build
 
 ```text
-node scripts/basebrief.js sidecar-build --repo <target-repo> [--target generic|openclaw] [--output-dir <dir>] [--json]
+node scripts/basebrief.js sidecar-build --repo <target-repo> [--target generic|openclaw] [--starter-language auto|zh-CN|en|ja] [--output-dir <dir>] [--json]
 ```
 
 `sidecar-build` reads the existing valid
@@ -226,6 +226,13 @@ Generated files:
 `new-window-starter.md` is the short copyable block for opening a new chat. It
 points the receiver to the sidecar bundle and keeps `next-chat-prompt.md` as
 the contract file the receiver must validate.
+
+`--starter-language` controls only the user-facing starter shell. `auto` is the
+default: it uses the natural-language body of the Project State handoff and
+falls back to `zh-CN` when mixed or unclear, matching BaseBrief's
+Chinese-first default. When the source window knows the user's language, pass
+`zh-CN`, `en`, or `ja` explicitly. Protocol fields, paths, file names, schema
+names, and the English hard-stop anchors remain literal.
 
 The `openclaw` target only adds stronger safety wording. It does not connect
 OpenClaw or Hermes runtime, does not write profile/config/memory/workspace

@@ -41,7 +41,7 @@ const HELP_TEXT = [
   "  node scripts/basebrief.js state-validate --repo <target-repo> [--json]",
   "  node scripts/basebrief.js state-history --repo <target-repo> [--json]",
   "  node scripts/basebrief.js state-advance --repo <target-repo> --source <receiver-ready.md> [--json]",
-  "  node scripts/basebrief.js sidecar-build --repo <target-repo> [--target generic|openclaw] [--output-dir <dir>] [--json]",
+  "  node scripts/basebrief.js sidecar-build --repo <target-repo> [--target generic|openclaw] [--starter-language auto|zh-CN|en|ja] [--output-dir <dir>] [--json]",
   "  node scripts/basebrief.js sidecar-check --input <sidecar-dir> [--json]",
   "  node scripts/basebrief.js seal --input <markdown-or-json> --output <file>",
   "  node scripts/basebrief.js diff --before <file> --after <file>",
@@ -310,6 +310,7 @@ function commandSidecarBuild(options) {
     repoPath: options.repo,
     target: options.target || "generic",
     outputDir: options["output-dir"] || "",
+    starterLanguage: options["starter-language"] || "auto",
   });
 }
 

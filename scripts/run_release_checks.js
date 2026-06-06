@@ -126,6 +126,7 @@ function checkRequiredFiles() {
     "docs/releases/v0.8.5.md",
     "docs/releases/v0.8.6.md",
     "docs/releases/v0.8.7.md",
+    "docs/releases/v0.8.8.md",
     "docs/testing-v0.4.x-test-matrix.md",
     "docs/testing-v0.6.x-test-matrix.md",
     "docs/testing-v0.7.x-test-matrix.md",
@@ -295,6 +296,7 @@ function checkContentContracts() {
   const sidecarV085ReleaseDoc = readText("docs/releases/v0.8.5.md");
   const sidecarV086ReleaseDoc = readText("docs/releases/v0.8.6.md");
   const sidecarV087ReleaseDoc = readText("docs/releases/v0.8.7.md");
+  const sidecarV088ReleaseDoc = readText("docs/releases/v0.8.8.md");
   const postReleaseBaselineDoc = readText("docs/baselines/v0.4.0-post-release-baseline.md");
   const v060PostReleaseBaselineDoc = readText("docs/baselines/v0.6.0-post-release-baseline.md");
   const projectStateModelDoc = readText("docs/design/project-state-model.md");
@@ -385,7 +387,9 @@ function checkContentContracts() {
   assert(readme.includes("docs/testing-v0.7.x-test-matrix.md"), "README.md should link to v0.7.x test matrix");
   assert(readme.includes("docs/testing-v0.8.x-test-matrix.md"), "README.md should link to v0.8.x sidecar test matrix");
   assert(readme.includes("new-window-starter.md"), "README.md should mention the copyable Sidecar starter");
+  assert(readme.includes("--starter-language auto|zh-CN|en|ja"), "README.md should mention starter language routing");
   assert(readme.includes("docs/releases/v0.8.7.md"), "README.md should link to v0.8.7 copyable starter");
+  assert(readme.includes("docs/releases/v0.8.8.md"), "README.md should link to v0.8.8 starter language routing");
   assert(readme.includes("docs/releases/v0.8.3.md"), "README.md should link to v0.8.3 sidecar discoverability polish");
   assert(readme.includes("docs/releases/v0.8.2.md"), "README.md should link to v0.8.2 sidecar receiver acceptance evidence");
   assert(readme.includes("docs/releases/v0.8.1.md"), "README.md should link to v0.8.1 sidecar check hardening");
@@ -454,7 +458,9 @@ function checkContentContracts() {
   assert(englishReadme.includes("docs/testing-v0.7.x-test-matrix.md"), "README.en.md should link to v0.7.x test matrix");
   assert(englishReadme.includes("docs/testing-v0.8.x-test-matrix.md"), "README.en.md should link to v0.8.x sidecar test matrix");
   assert(englishReadme.includes("new-window-starter.md"), "README.en.md should mention the copyable Sidecar starter");
+  assert(englishReadme.includes("--starter-language auto|zh-CN|en|ja"), "README.en.md should mention starter language routing");
   assert(englishReadme.includes("docs/releases/v0.8.7.md"), "README.en.md should link to v0.8.7 copyable starter");
+  assert(englishReadme.includes("docs/releases/v0.8.8.md"), "README.en.md should link to v0.8.8 starter language routing");
   assert(englishReadme.includes("docs/releases/v0.8.3.md"), "README.en.md should link to v0.8.3 sidecar discoverability polish");
   assert(englishReadme.includes("docs/releases/v0.8.2.md"), "README.en.md should link to v0.8.2 sidecar receiver acceptance evidence");
   assert(englishReadme.includes("docs/releases/v0.8.1.md"), "README.en.md should link to v0.8.1 sidecar check hardening");
@@ -486,6 +492,7 @@ function checkContentContracts() {
     "SKILL.md must keep cache-ready out of ordinary routing",
   );
   assert(skill.includes("新窗口开场白（可复制）"), "SKILL.md must require copyable new-window starter output");
+  assert(skill.includes("--starter-language auto|zh-CN|en|ja"), "SKILL.md must document starter language routing");
   assert(
     modeSelectionDoc.includes("`cache-ready` 是显式实验路线"),
     "mode-selection.md must mark cache-ready as explicit experiment route",
@@ -538,6 +545,7 @@ function checkContentContracts() {
   assert(docsIndex.includes("releases/v0.8.5.md"), "Docs index must link v0.8.5 sidecar manual receiver smoke intake candidate");
   assert(docsIndex.includes("releases/v0.8.6.md"), "Docs index must link v0.8.6 sidecar manual receiver smoke evidence candidate");
   assert(docsIndex.includes("releases/v0.8.7.md"), "Docs index must link v0.8.7 copyable starter candidate");
+  assert(docsIndex.includes("releases/v0.8.8.md"), "Docs index must link v0.8.8 starter language routing candidate");
   assert(docsIndex.includes("releases/v0.7.0.md"), "Docs index must link v0.7.0 lifecycle release candidate");
   assert(docsIndex.includes("releases/v0.6.3.md"), "Docs index must link v0.6.3 lifecycle readiness candidate");
   assert(docsIndex.includes("releases/v0.6.2.md"), "Docs index must link v0.6.2 self-dogfooding evidence candidate");
@@ -624,6 +632,7 @@ function checkContentContracts() {
   assert(projectStateDoc.includes("sidecar-build --repo <target-repo>"), "Project State docs must document sidecar-build");
   assert(projectStateDoc.includes("sidecar-check --input <sidecar-dir>"), "Project State docs must document sidecar-check");
   assert(projectStateDoc.includes("new-window-starter.md"), "Project State docs must document copyable sidecar starter");
+  assert(projectStateDoc.includes("--starter-language auto|zh-CN|en|ja"), "Project State docs must document starter language option");
   assert(projectStateDoc.includes("output_files.newWindowStarter"), "Project State docs must document starter manifest compatibility");
   assert(projectStateDoc.includes(".basebrief/state.json"), "Project State docs must document output file");
   assert(projectStateDoc.includes(".basebrief/history/"), "Project State docs must document history output");
@@ -722,6 +731,8 @@ function checkContentContracts() {
   assert(cliLiteDoc.includes("node scripts/basebrief.js sidecar-build --repo <target-repo>"), "cli-lite.md must document sidecar-build command");
   assert(cliLiteDoc.includes("node scripts/basebrief.js sidecar-check --input <sidecar-dir>"), "cli-lite.md must document sidecar-check command");
   assert(cliLiteDoc.includes("new-window-starter.md"), "cli-lite.md must document copyable sidecar starter");
+  assert(cliLiteDoc.includes("--starter-language auto|zh-CN|en|ja"), "cli-lite.md must document starter language option");
+  assert(cliLiteDoc.includes("Protocol fields, paths, file names, schema"), "cli-lite.md must document literal protocol fields for starter language routing");
   assert(cliLiteDoc.includes("output_files.newWindowStarter"), "cli-lite.md must document starter manifest key");
   assert(cliLiteDoc.includes("--target generic|openclaw"), "cli-lite.md must document sidecar target option");
   assert(cliLiteDoc.includes("basebrief-project-state-v1"), "cli-lite.md must document project-state schema version");
@@ -1272,6 +1283,19 @@ function checkContentContracts() {
   assert(sidecarV087ReleaseDoc.includes("basebrief-project-state-v1"), "v0.8.7 release doc must preserve project-state schema");
   assert(sidecarV087ReleaseDoc.includes("basebrief-sidecar-v1"), "v0.8.7 release doc must preserve sidecar schema");
   assert(sidecarV087ReleaseDoc.includes("provider_probe_status=skipped"), "v0.8.7 release doc must preserve skipped provider gate");
+  assert(sidecarV088ReleaseDoc.includes("Starter Language Routing Candidate"), "v0.8.8 release doc must describe starter language routing");
+  assert(sidecarV088ReleaseDoc.includes("--starter-language auto|zh-CN|en|ja"), "v0.8.8 release doc must document starter language option");
+  assert(sidecarV088ReleaseDoc.includes("buildSidecarBundle({ starterLanguage })"), "v0.8.8 release doc must document JS API option");
+  assert(sidecarV088ReleaseDoc.includes("falls back to `zh-CN`"), "v0.8.8 release doc must document zh-CN fallback");
+  assert(sidecarV088ReleaseDoc.includes("No automatic translation service"), "v0.8.8 release doc must reject translation-service scope");
+  assert(sidecarV088ReleaseDoc.includes("basebrief-project-state-v1"), "v0.8.8 release doc must preserve project-state schema");
+  assert(sidecarV088ReleaseDoc.includes("basebrief-sidecar-v1"), "v0.8.8 release doc must preserve sidecar schema");
+  assert(sidecarV088ReleaseDoc.includes("No provider request"), "v0.8.8 release doc must state no provider request");
+  assert(sidecarV088ReleaseDoc.includes("No raw private output"), "v0.8.8 release doc must state raw-output boundary");
+  assert(sidecarV088ReleaseDoc.includes("No runtime integration"), "v0.8.8 release doc must state runtime boundary");
+  assert(sidecarV088ReleaseDoc.includes("No schema change"), "v0.8.8 release doc must state schema boundary");
+  assert(sidecarV088ReleaseDoc.includes("No Auto Flow"), "v0.8.8 release doc must state Auto Flow boundary");
+  assert(sidecarV088ReleaseDoc.includes("provider_probe_status=skipped"), "v0.8.8 release doc must preserve skipped provider gate");
   assert(sidecarReceiverAcceptanceV082Doc.includes("Sidecar Receiver Acceptance v0.8.2"), "v0.8.2 dogfooding doc must have stable title");
   assert(sidecarReceiverAcceptanceV082Doc.includes("sidecar-build"), "v0.8.2 dogfooding doc must document sidecar-build");
   assert(sidecarReceiverAcceptanceV082Doc.includes("sidecar-check"), "v0.8.2 dogfooding doc must document sidecar-check");
@@ -1357,6 +1381,9 @@ function checkContentContracts() {
   assert(v08xTestMatrixDoc.includes("v0.8.5 Manual Receiver Smoke Result Intake"), "v0.8.x matrix must document v0.8.5 manual receiver smoke intake");
   assert(v08xTestMatrixDoc.includes("v0.8.6 Manual Receiver Smoke Result Intake Evidence"), "v0.8.x matrix must document v0.8.6 manual receiver smoke evidence");
   assert(v08xTestMatrixDoc.includes("v0.8.7 Copyable New-Window Starter"), "v0.8.x matrix must document v0.8.7 copyable starter");
+  assert(v08xTestMatrixDoc.includes("v0.8.8 Starter Language Routing"), "v0.8.x matrix must document v0.8.8 starter language routing");
+  assert(v08xTestMatrixDoc.includes("--starter-language auto|zh-CN|en|ja"), "v0.8.x matrix must document starter language option");
+  assert(v08xTestMatrixDoc.includes("falls back to `zh-CN`"), "v0.8.x matrix must document zh-CN starter fallback");
   assert(v08xTestMatrixDoc.includes("new-window-starter.md"), "v0.8.x matrix must document new-window-starter.md");
   assert(v08xTestMatrixDoc.includes("output_files.newWindowStarter"), "v0.8.x matrix must document starter manifest output key");
   assert(v08xTestMatrixDoc.includes("Old v0.8 bundles"), "v0.8.x matrix must document old bundle compatibility");
@@ -1691,6 +1718,7 @@ function checkCliLite() {
     assert(helpStdout.includes("state-history --repo <target-repo>"), "CLI help must expose Project State history");
     assert(helpStdout.includes("state-advance --repo <target-repo> --source <receiver-ready.md>"), "CLI help must expose Project State advance");
     assert(helpStdout.includes("sidecar-build --repo <target-repo>"), "CLI help must expose Sidecar build");
+    assert(helpStdout.includes("--starter-language auto|zh-CN|en|ja"), "CLI help must expose starter language option");
     assert(helpStdout.includes("sidecar-check --input <sidecar-dir>"), "CLI help must expose Sidecar check");
 
     const noCommandStdout = execFileSync(process.execPath, [
@@ -2074,6 +2102,8 @@ function checkCliLite() {
       "sidecar-build",
       "--repo",
       receiverRepo,
+      "--starter-language",
+      "zh-CN",
       "--output-dir",
       sidecarDir,
       "--json",
@@ -2085,6 +2115,7 @@ function checkCliLite() {
     });
     const sidecarBuildResult = JSON.parse(sidecarBuildStdout);
     assert(sidecarBuildResult.command === "sidecar-build", "CLI sidecar-build must return command metadata");
+    assert(sidecarBuildResult.starterLanguage === "zh-CN", "CLI sidecar-build must return requested starter language");
     assert(sidecarBuildResult.outputDir.startsWith("tests"), "CLI sidecar-build must return a public-safe output path");
     assert(sidecarBuildResult.outputFiles.newWindowStarter.startsWith("tests"), "CLI sidecar-build must return a public-safe starter path");
     assert(sidecarBuildResult.manifest.output_files.newWindowStarter === "new-window-starter.md", "CLI sidecar-build manifest must expose new-window-starter.md");

@@ -12,7 +12,7 @@ node scripts/basebrief.js state-status --repo <target-repo> --json
 node scripts/basebrief.js state-validate --repo <target-repo> --json
 node scripts/basebrief.js state-history --repo <target-repo> --json
 node scripts/basebrief.js state-advance --repo <target-repo> --source <receiver-ready.md> --json
-node scripts/basebrief.js sidecar-build --repo <target-repo> --target generic --json
+node scripts/basebrief.js sidecar-build --repo <target-repo> --target generic --starter-language zh-CN --json
 node scripts/basebrief.js sidecar-check --input <sidecar-dir> --json
 ```
 
@@ -70,7 +70,10 @@ writes, and no schema change.
 
 The generated bundle includes `new-window-starter.md`, a short copyable block
 for the user to paste into a new chat. It points the receiver to the Sidecar
-bundle while keeping `next-chat-prompt.md` as the receiver contract.
+bundle while keeping `next-chat-prompt.md` as the receiver contract. The
+optional `--starter-language auto|zh-CN|en|ja` flag localizes only that
+copyable starter shell; protocol fields, paths, file names, schema names, and
+English hard-stop anchors remain literal.
 
 Default output is `.basebrief/sidecar/<target>/`. Public dogfooding records
 should summarize the result only; raw sidecar output belongs in ignored private

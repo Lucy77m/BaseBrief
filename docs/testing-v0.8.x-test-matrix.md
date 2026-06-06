@@ -85,6 +85,22 @@ This matrix covers the local v0.8 sidecar handoff work.
 - Old v0.8 bundles without `output_files.newWindowStarter` remain compatible.
 - Preserve `basebrief-project-state-v1` and `basebrief-sidecar-v1`.
 
+## v0.8.8 Starter Language Routing
+
+- `sidecar-build --starter-language auto|zh-CN|en|ja` localizes only the
+  user-facing `new-window-starter.md` shell.
+- `auto` detects Chinese, English, and Japanese from the natural-language
+  handoff body; mixed or unclear input falls back to `zh-CN`.
+- Explicit `zh-CN`, `en`, and `ja` templates keep paths, file names, schema
+  names, and protocol fields such as `current_goal`, `receiver_entry_task`, and
+  `risk_boundaries` literal.
+- Localized hard stops preserve the English anchors: No provider request, No
+  raw private output, No runtime integration, No schema change, and No
+  auto-advance.
+- `sidecar-check` accepts localized starter shells while preserving the same
+  required content and old-bundle compatibility.
+- Preserve `basebrief-project-state-v1` and `basebrief-sidecar-v1`.
+
 ## Standard Local Commands
 
 ```text

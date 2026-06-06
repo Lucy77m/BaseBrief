@@ -9,6 +9,7 @@ const { PROJECT_STATE_SCHEMA_VERSION, runStateRead } = require("./basebrief_proj
 
 const SIDECAR_SCHEMA_VERSION = "basebrief-sidecar-v1";
 const SUPPORTED_TARGETS = new Set(["generic", "openclaw"]);
+const SUPPORTED_STARTER_LANGUAGES = new Set(["auto", "zh-CN", "en", "ja"]);
 const OUTPUT_FILES = {
   handoff: "handoff.md",
   nextChatPrompt: "next-chat-prompt.md",
@@ -131,6 +132,97 @@ function renderList(lines) {
   return lines.map((line) => `- ${line}`).join(os.EOL);
 }
 
+function stripTechnicalTokens(value) {
+  return String(value || "")
+    .replace(/`[^`]*`/g, " ")
+    .replace(/https?:\/\/\S+/gi, " ")
+    .replace(/[A-Za-z]:[\\/][^\s]+/g, " ")
+    .replace(/(?:^|\s)[./\\][^\s]+/g, " ")
+    .replace(/\b[A-Za-z0-9_.-]+\.(?:json|md|js|ts|txt|yml|yaml)\b/gi, " ")
+    .replace(/\b(?:current_goal|receiver_entry_task|risk_boundaries|manifest|schemaVersion|Sidecar|BaseBrief)\b/gi, " ");
+}
+
+function detectStarterLanguage(state) {
+  const text = stripTechnicalTokens([
+    state.handoff.current_goal,
+    state.handoff.receiver_entry_task,
+    state.handoff.risk_boundaries,
+  ].join(os.EOL));
+  const kanaCount = (text.match(/[\u3040-\u30ff]/g) || []).length;
+  const cjkCount = (text.match(/[\u3400-\u9fff]/g) || []).length;
+  const englishWordCount = (text.match(/\b[A-Za-z]{3,}\b/g) || []).length;
+
+  if (kanaCount >= 2) return "ja";
+  if (cjkCount >= 2) return "zh-CN";
+  if (englishWordCount >= 4) return "en";
+  return "zh-CN";
+}
+
+function resolveStarterLanguage(requestedLanguage, state) {
+  const language = requestedLanguage || "auto";
+  if (!SUPPORTED_STARTER_LANGUAGES.has(language)) {
+    throw new Error(`Unsupported starter language: ${language}`);
+  }
+  return language === "auto" ? detectStarterLanguage(state) : language;
+}
+
+const STARTER_COPY = {
+  en: {
+    title: "# BaseBrief New Window Starter",
+    intro: "Copy this block into a new chat. Start by accepting the BaseBrief receiver task; do not continue the project yet.",
+    targetRepo: "Target repository: open the repository that generated this Sidecar bundle.",
+    sidecarBundle: (bundleCue) => `Sidecar bundle: read ${bundleCue}, including \`manifest.json\`, \`state-summary.json\`, \`handoff.md\`, \`next-chat-prompt.md\`, \`receiver-entry-task.md\`, and \`risk-boundaries.md\`.`,
+    firstResponse: "First response: identify BaseBrief, restate `current_goal`, restate `receiver_entry_task`, restate at least two risk boundaries, and say whether the bundle is understandable enough to continue.",
+    wait: "Wait for user confirmation before continuing.",
+    currentGoal: "current_goal:",
+    receiverEntryTask: "receiver_entry_task:",
+    riskBoundaries: "risk_boundaries:",
+    hardStops: "Hard stops:",
+    noProvider: "No provider request.",
+    noRawPrivate: "No raw private output.",
+    noRuntime: "No runtime integration.",
+    noSchema: "No schema change.",
+    noAutoAdvance: "No auto-advance.",
+    clawBoundary: "Do not connect OpenClaw/Hermes runtime or write profile/config/memory/workspace files.",
+  },
+  "zh-CN": {
+    title: "# BaseBrief 新窗口开场白",
+    intro: "把这段复制到新聊天。先接收 BaseBrief receiver task；暂时不要继续推进项目。",
+    targetRepo: "目标仓库（Target repository）：打开生成此 Sidecar bundle 的仓库。",
+    sidecarBundle: (bundleCue) => `Sidecar bundle：读取 ${bundleCue}，包括 \`manifest.json\`、\`state-summary.json\`、\`handoff.md\`、\`next-chat-prompt.md\`、\`receiver-entry-task.md\` 和 \`risk-boundaries.md\`。`,
+    firstResponse: "首条回复：识别 BaseBrief，复述 `current_goal`，复述 `receiver_entry_task`，复述至少两个 risk boundaries，并说明这个 bundle 是否足够清楚、可以继续。",
+    wait: "等待用户确认后再继续。（Wait for user confirmation before continuing.）",
+    currentGoal: "current_goal:",
+    receiverEntryTask: "receiver_entry_task:",
+    riskBoundaries: "risk_boundaries:",
+    hardStops: "硬性停止项（Hard stops）:",
+    noProvider: "不得发起 provider 请求。（No provider request.）",
+    noRawPrivate: "不得暴露原始私有输出。（No raw private output.）",
+    noRuntime: "不得接入 runtime。（No runtime integration.）",
+    noSchema: "不得修改 schema。（No schema change.）",
+    noAutoAdvance: "不得自动推进。（No auto-advance.）",
+    clawBoundary: "不得连接 OpenClaw/Hermes runtime，也不得写入 profile/config/memory/workspace 文件。",
+  },
+  ja: {
+    title: "# BaseBrief 新規ウィンドウ開始文",
+    intro: "このブロックを新しいチャットにコピーしてください。まず BaseBrief receiver task を受け入れ、まだプロジェクトを進めないでください。",
+    targetRepo: "対象リポジトリ（Target repository）：この Sidecar bundle を生成したリポジトリを開いてください。",
+    sidecarBundle: (bundleCue) => `Sidecar bundle：${bundleCue} を読み、\`manifest.json\`、\`state-summary.json\`、\`handoff.md\`、\`next-chat-prompt.md\`、\`receiver-entry-task.md\`、\`risk-boundaries.md\` を確認してください。`,
+    firstResponse: "最初の返信：BaseBrief を識別し、`current_goal` と `receiver_entry_task` を復唱し、少なくとも2つの risk boundaries を復唱し、この bundle が続行できるほど理解可能かを述べてください。",
+    wait: "ユーザー確認を待ってから続行してください。（Wait for user confirmation before continuing.）",
+    currentGoal: "current_goal:",
+    receiverEntryTask: "receiver_entry_task:",
+    riskBoundaries: "risk_boundaries:",
+    hardStops: "停止条件（Hard stops）:",
+    noProvider: "provider request を行わないこと。（No provider request.）",
+    noRawPrivate: "raw private output を出さないこと。（No raw private output.）",
+    noRuntime: "runtime integration を行わないこと。（No runtime integration.）",
+    noSchema: "schema change を行わないこと。（No schema change.）",
+    noAutoAdvance: "auto-advance しないこと。（No auto-advance.）",
+    clawBoundary: "OpenClaw/Hermes runtime に接続せず、profile/config/memory/workspace ファイルを書き込まないこと。",
+  },
+};
+
 function renderHandoff(state, target, riskBoundaries) {
   return [
     "# BaseBrief Sidecar Handoff Bundle",
@@ -220,35 +312,36 @@ function sidecarBundleCue(repoRoot, outputDir) {
   return "the directory that contains this `new-window-starter.md` file";
 }
 
-function renderNewWindowStarter(state, target, riskBoundaries, bundleCue) {
+function renderNewWindowStarter(state, target, riskBoundaries, bundleCue, starterLanguage) {
+  const copy = STARTER_COPY[starterLanguage];
   return [
-    "# BaseBrief New Window Starter",
+    copy.title,
     "",
-    "Copy this block into a new chat. Start by accepting the BaseBrief receiver task; do not continue the project yet.",
+    copy.intro,
     "",
-    "Target repository: open the repository that generated this Sidecar bundle.",
-    `Sidecar bundle: read ${bundleCue}, including \`manifest.json\`, \`state-summary.json\`, \`handoff.md\`, \`next-chat-prompt.md\`, \`receiver-entry-task.md\`, and \`risk-boundaries.md\`.`,
+    copy.targetRepo,
+    copy.sidecarBundle(bundleCue),
     "",
-    "First response: identify BaseBrief, restate `current_goal`, restate `receiver_entry_task`, restate at least two risk boundaries, and say whether the bundle is understandable enough to continue.",
+    copy.firstResponse,
     "",
-    "Wait for user confirmation before continuing.",
+    copy.wait,
     "",
-    "current_goal:",
+    copy.currentGoal,
     state.handoff.current_goal,
     "",
-    "receiver_entry_task:",
+    copy.receiverEntryTask,
     state.handoff.receiver_entry_task,
     "",
-    "risk_boundaries:",
+    copy.riskBoundaries,
     renderList(riskBoundaries),
     "",
-    "Hard stops:",
-    "- No provider request.",
-    "- No raw private output.",
-    "- No runtime integration.",
-    "- No schema change.",
-    "- No auto-advance.",
-    ...(target === "openclaw" ? ["- Do not connect OpenClaw/Hermes runtime or write profile/config/memory/workspace files."] : []),
+    copy.hardStops,
+    `- ${copy.noProvider}`,
+    `- ${copy.noRawPrivate}`,
+    `- ${copy.noRuntime}`,
+    `- ${copy.noSchema}`,
+    `- ${copy.noAutoAdvance}`,
+    ...(target === "openclaw" ? [`- ${copy.clawBoundary}`] : []),
   ].join(os.EOL);
 }
 
@@ -415,7 +508,7 @@ function checkStarterContract({ newWindowStarter, stateSummary, target, errors }
     ? stateSummary.risk_boundaries.filter((item) => String(item || "").trim())
     : [];
 
-  if (!/(target repo|target repository)/i.test(newWindowStarter)) {
+  if (!/(target repo|target repository|目标仓库|対象リポジトリ)/i.test(newWindowStarter)) {
     errors.push("new-window-starter.md must include a target repository cue");
   }
   if (!/(sidecar bundle|directory that contains this `new-window-starter\.md` file)/i.test(newWindowStarter)) {
@@ -433,7 +526,7 @@ function checkStarterContract({ newWindowStarter, stateSummary, target, errors }
       break;
     }
   }
-  if (!/Wait for user confirmation/i.test(newWindowStarter)) {
+  if (!/(Wait for user confirmation|等待用户确认|ユーザー確認)/i.test(newWindowStarter)) {
     errors.push("new-window-starter.md must require waiting for user confirmation");
   }
   if (!/No provider request/i.test(newWindowStarter)) {
@@ -552,6 +645,7 @@ function buildSidecarBundle(options) {
 
   const state = stateResult.state;
   const riskBoundaries = riskBoundariesForTarget(state, target);
+  const starterLanguage = resolveStarterLanguage(options.starterLanguage || "auto", state);
   if (!state.handoff.current_goal.trim()) throw new Error("sidecar current_goal must be non-empty");
   if (!state.handoff.receiver_entry_task.trim()) throw new Error("sidecar receiver_entry_task must be non-empty");
   if (riskBoundaries.length < 2) throw new Error("sidecar risk boundaries must contain at least two items");
@@ -565,7 +659,7 @@ function buildSidecarBundle(options) {
   fs.mkdirSync(outputDir, { recursive: true });
   writeText(path.join(outputDir, OUTPUT_FILES.handoff), renderHandoff(state, target, riskBoundaries));
   writeText(path.join(outputDir, OUTPUT_FILES.nextChatPrompt), renderNextChatPrompt(state, target, riskBoundaries));
-  writeText(path.join(outputDir, OUTPUT_FILES.newWindowStarter), renderNewWindowStarter(state, target, riskBoundaries, bundleCue));
+  writeText(path.join(outputDir, OUTPUT_FILES.newWindowStarter), renderNewWindowStarter(state, target, riskBoundaries, bundleCue, starterLanguage));
   writeText(path.join(outputDir, OUTPUT_FILES.receiverEntryTask), renderReceiverEntryTask(state));
   writeText(path.join(outputDir, OUTPUT_FILES.riskBoundaries), renderRiskBoundaries(riskBoundaries));
   writeJson(path.join(outputDir, OUTPUT_FILES.stateSummary), stateSummary);
@@ -579,6 +673,7 @@ function buildSidecarBundle(options) {
     repo: repoRoot,
     input: stateResult.input,
     outputDir,
+    starterLanguage,
     outputFiles: Object.fromEntries(Object.entries(outputFiles).map(([key, fileName]) => [key, path.join(outputDir, fileName)])),
     manifest,
   };
@@ -589,10 +684,12 @@ function parseArgs(argv) {
   const repoIndex = args.indexOf("--repo");
   const targetIndex = args.indexOf("--target");
   const outputDirIndex = args.indexOf("--output-dir");
+  const starterLanguageIndex = args.indexOf("--starter-language");
   return {
     repoPath: repoIndex >= 0 ? args[repoIndex + 1] : "",
     target: targetIndex >= 0 ? args[targetIndex + 1] : "",
     outputDir: outputDirIndex >= 0 ? args[outputDirIndex + 1] : "",
+    starterLanguage: starterLanguageIndex >= 0 ? args[starterLanguageIndex + 1] : "auto",
     jsonMode: args.includes("--json"),
   };
 }
@@ -603,6 +700,7 @@ function formatHuman(result) {
     `schemaVersion=${result.schemaVersion}`,
     `target=${result.target}`,
     `projectStateSchemaVersion=${result.projectStateSchemaVersion}`,
+    `starter_language=${result.starterLanguage || "auto"}`,
     `new_window_starter=${result.outputFiles.newWindowStarter}`,
     "",
   ].join(os.EOL);
@@ -625,8 +723,11 @@ module.exports = {
   SIDECAR_SCHEMA_VERSION,
   SUPPORTED_TARGETS,
   OUTPUT_FILES,
+  SUPPORTED_STARTER_LANGUAGES,
   buildSidecarBundle,
   checkSidecarBundle,
+  detectStarterLanguage,
   formatHuman,
   riskBoundariesForTarget,
+  resolveStarterLanguage,
 };

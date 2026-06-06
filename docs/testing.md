@@ -60,6 +60,14 @@ The v0.8.x matrix is tracked in
 not require provider smoke, receiver thread creation, Auto Flow runs, runtime
 integration, OpenClaw/Hermes runtime connection, or provider benchmarks.
 
+## v0.8.8 Starter Language Routing
+
+`v0.8.8` adds `--starter-language auto|zh-CN|en|ja` for Sidecar
+`new-window-starter.md`. The flag localizes only the copyable starter shell:
+protocol fields, paths, file names, schema names, and English hard-stop anchors
+remain literal. `auto` falls back to `zh-CN` for mixed or unclear language, and
+this is not an automatic translation service.
+
 Expected release-check output without provider env remains:
 
 ```text
