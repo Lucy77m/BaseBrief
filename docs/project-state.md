@@ -38,6 +38,23 @@ The state file records only local, mechanical state:
 - non-goal markers for provider requests, Auto Flow, receiver thread creation,
   and secret storage
 
+## Golden Path Role
+
+Project State is the middle layer in the public integrated handoff path:
+
+```text
+receiver-ready.md -> state-init/state-advance -> sidecar-build -> sidecar-check -> new-window-starter.md -> receiver first response
+```
+
+Use `state-init` when the repo is entering local continuity for the first time.
+Use `state-advance` when the repo already has a valid
+`.basebrief/state.json` and you are promoting a newer reviewed
+`receiver-ready.md` into the same local continuity line.
+
+`state-status`, `state-validate`, and `state-history` remain optional
+inspection commands. They help confirm local state, but they do not replace the
+main path described in [Integrated Handoff Golden Path](golden-path.md).
+
 ## Lifecycle Commands
 
 `state-read` reads the existing `.basebrief/state.json` and validates the full

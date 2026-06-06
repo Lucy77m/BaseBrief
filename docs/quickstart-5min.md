@@ -36,6 +36,15 @@ node scripts/basebrief.js check --input tests/outputs/private/quickstart/build
 
 普通接续直接使用 `readableBrief.md`。不需要 provider-aware 后处理时，不必处理其他产物。
 
+## 路径 B2：已有 reviewed handoff 时走 Golden Path
+
+如果你手上已经有 `receiver-ready.md`，而目标仓库要进入本地连续性链路，就不要自己在 `Project State`、`CLI Lite` 和 Sidecar 文档之间来回拼步骤。直接走 [Integrated Handoff Golden Path](golden-path.md)：
+
+- 首次写入本地连续性状态：`receiver-ready.md -> state-init -> sidecar-build -> sidecar-check -> new-window-starter.md -> receiver first response`
+- 已有有效 `.basebrief/state.json` 时更新连续性状态：`receiver-ready.md -> state-advance -> sidecar-build -> sidecar-check -> new-window-starter.md -> receiver first response`
+
+`state-status`、`state-validate` 和 `state-history` 仍然只是一组可选只读检查，不抬升为每次都必须走的主路径。
+
 ## 路径 C：用 Seal/Diff 对比阶段变化
 
 ```text
@@ -118,6 +127,7 @@ node scripts/basebrief.js receiver-check --config <receiver_check_config> --repo
 ## 下一步
 
 - [Handoff 契约](handoff.md)
+- [Integrated Handoff Golden Path](golden-path.md)
 - [Seal/Diff](seal-diff.md)
 - [模式选择](mode-selection.md)
 - [完整文档索引](index.md)

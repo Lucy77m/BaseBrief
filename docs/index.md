@@ -10,6 +10,7 @@
 - [完整 walkthrough](walkthrough.md)
 - [工具集成](integrations.md)
 - [Handoff 契约](handoff.md)
+- [Integrated Handoff Golden Path](golden-path.md)
 - [CLI Lite](cli-lite.md)
 - [Adapter 输出](adapters.md)
 - [Artifact checks](checks.md)
@@ -36,6 +37,7 @@
 ## 方向与验证
 
 - [v0.9.0 integrated handoff readiness candidate](releases/v0.9.0.md)
+- [v0.9.1 golden path closure candidate](releases/v0.9.1.md)
 - [v0.6.0 project state directory release](releases/v0.6.0.md)
 - [v0.8.0 sidecar handoff bundle candidate](releases/v0.8.0.md)
 - [v0.8.1 sidecar check hardening candidate](releases/v0.8.1.md)

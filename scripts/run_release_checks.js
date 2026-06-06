@@ -129,11 +129,13 @@ function checkRequiredFiles() {
     "docs/releases/v0.8.7.md",
     "docs/releases/v0.8.8.md",
     "docs/releases/v0.9.0.md",
+    "docs/releases/v0.9.1.md",
     "docs/testing-v0.4.x-test-matrix.md",
     "docs/testing-v0.6.x-test-matrix.md",
     "docs/testing-v0.7.x-test-matrix.md",
     "docs/testing-v0.8.x-test-matrix.md",
     "docs/cli-lite.md",
+    "docs/golden-path.md",
     "docs/seal-diff.md",
     "docs/contextops.md",
     "docs/testing.md",
@@ -277,6 +279,7 @@ function checkContentContracts() {
   const walkthroughDoc = readText("docs/walkthrough.md");
   const modeSelectionDoc = readText("docs/mode-selection.md");
   const handoffDoc = readText("docs/handoff.md");
+  const goldenPathDoc = readText("docs/golden-path.md");
   const checksDoc = readText("docs/checks.md");
   const receiverCheckDoc = readText("docs/receiver-check.md");
   const receiverFlowDoc = readText("docs/receiver-flow.md");
@@ -305,6 +308,7 @@ function checkContentContracts() {
   const sidecarV087ReleaseDoc = readText("docs/releases/v0.8.7.md");
   const sidecarV088ReleaseDoc = readText("docs/releases/v0.8.8.md");
   const readinessV090ReleaseDoc = readText("docs/releases/v0.9.0.md");
+  const goldenPathV091ReleaseDoc = readText("docs/releases/v0.9.1.md");
   const postReleaseBaselineDoc = readText("docs/baselines/v0.4.0-post-release-baseline.md");
   const v060PostReleaseBaselineDoc = readText("docs/baselines/v0.6.0-post-release-baseline.md");
   const projectStateModelDoc = readText("docs/design/project-state-model.md");
@@ -359,6 +363,7 @@ function checkContentContracts() {
   assert(readme.includes("docs/index.md"), "README.md should link to the documentation index");
   assert(readme.includes("docs/integrations.md"), "README.md should link to integrations docs");
   assert(readme.includes("docs/handoff.md"), "README.md should link to handoff contract docs");
+  assert(readme.includes("docs/golden-path.md"), "README.md should link to golden path docs");
   assert(readme.includes("docs/cli-lite.md"), "README.md should link to CLI Lite docs");
   assert(readme.includes("docs/receiver-check.md"), "README.md should link to Receiver Safe Check docs");
   assert(readme.includes("docs/receiver-flow.md"), "README.md should link to Receiver Flow Draft docs");
@@ -400,7 +405,9 @@ function checkContentContracts() {
   assert(readme.includes("docs/releases/v0.8.7.md"), "README.md should link to v0.8.7 copyable starter");
   assert(readme.includes("docs/releases/v0.8.8.md"), "README.md should link to v0.8.8 starter language routing");
   assert(readme.includes("docs/releases/v0.9.0.md"), "README.md should link to v0.9.0 readiness candidate");
+  assert(readme.includes("docs/releases/v0.9.1.md"), "README.md should link to v0.9.1 golden-path candidate");
   assert(readme.includes("Integrated Handoff Readiness"), "README.md should define v0.9.0 readiness");
+  assert(readme.includes("Integrated Handoff Golden Path"), "README.md should mention the golden-path guide");
   assert(readme.includes("docs/releases/v0.8.3.md"), "README.md should link to v0.8.3 sidecar discoverability polish");
   assert(readme.includes("docs/releases/v0.8.2.md"), "README.md should link to v0.8.2 sidecar receiver acceptance evidence");
   assert(readme.includes("docs/releases/v0.8.1.md"), "README.md should link to v0.8.1 sidecar check hardening");
@@ -431,6 +438,7 @@ function checkContentContracts() {
   assert(englishReadme.includes("docs/quickstart-5min.md"), "README.en.md should link to the quickstart");
   assert(englishReadme.includes("docs/index.md"), "README.en.md should link to the documentation index");
   assert(englishReadme.includes("docs/handoff.md"), "README.en.md should link to handoff docs");
+  assert(englishReadme.includes("docs/golden-path.md"), "README.en.md should link to golden path docs");
   assert(englishReadme.includes("docs/cli-lite.md"), "README.en.md should link to CLI Lite docs");
   assert(englishReadme.includes("docs/receiver-check.md"), "README.en.md should link to Receiver Safe Check docs");
   assert(englishReadme.includes("docs/receiver-flow.md"), "README.en.md should link to Receiver Flow Draft docs");
@@ -474,7 +482,9 @@ function checkContentContracts() {
   assert(englishReadme.includes("docs/releases/v0.8.7.md"), "README.en.md should link to v0.8.7 copyable starter");
   assert(englishReadme.includes("docs/releases/v0.8.8.md"), "README.en.md should link to v0.8.8 starter language routing");
   assert(englishReadme.includes("docs/releases/v0.9.0.md"), "README.en.md should link to v0.9.0 readiness candidate");
+  assert(englishReadme.includes("docs/releases/v0.9.1.md"), "README.en.md should link to v0.9.1 golden-path candidate");
   assert(englishReadme.includes("Integrated Handoff Readiness"), "README.en.md should define v0.9.0 readiness");
+  assert(englishReadme.includes("Integrated Handoff Golden Path"), "README.en.md should mention the golden-path guide");
   assert(englishReadme.includes("docs/releases/v0.8.3.md"), "README.en.md should link to v0.8.3 sidecar discoverability polish");
   assert(englishReadme.includes("docs/releases/v0.8.2.md"), "README.en.md should link to v0.8.2 sidecar receiver acceptance evidence");
   assert(englishReadme.includes("docs/releases/v0.8.1.md"), "README.en.md should link to v0.8.1 sidecar check hardening");
@@ -515,8 +525,12 @@ function checkContentContracts() {
   assert(modeSelectionDoc.includes("选完模式后怎么办"), "mode-selection.md must explain the next action");
   assert(quickstartDoc.includes("路径 A"), "quickstart must document the Skill-first path");
   assert(quickstartDoc.includes("路径 B"), "quickstart must document the local build path");
+  assert(quickstartDoc.includes("路径 B2"), "quickstart must document the reviewed-handoff golden path");
   assert(quickstartDoc.includes("路径 C"), "quickstart must document the Seal/Diff path");
   assert(quickstartDoc.includes("路径 D"), "quickstart must document the Receiver Safe Check path");
+  assert(quickstartDoc.includes("golden-path.md"), "quickstart must link to the golden path guide");
+  assert(quickstartDoc.includes("state-init -> sidecar-build -> sidecar-check"), "quickstart must document first-pass golden path");
+  assert(quickstartDoc.includes("state-advance -> sidecar-build -> sidecar-check"), "quickstart must document follow-up golden path");
   assert(quickstartDoc.includes("tests/outputs/private/quickstart/build"), "quickstart build must use the ignored private output directory");
   assert(quickstartDoc.includes("tests/outputs/private/quickstart/before.json"), "quickstart seal must use the ignored private output directory");
   assert(knownLimitationsDoc.includes("Free-form Markdown"), "Known Limitations must document free-form Markdown input boundary");
@@ -537,6 +551,7 @@ function checkContentContracts() {
   assert(docsIndex.includes("dogfooding/project-state-lifecycle-v0.7.0.md"), "Docs index must link v0.7.0 lifecycle dogfooding");
   assert(docsIndex.includes("receiver-flow.md"), "Docs index must link Receiver Flow Draft docs");
   assert(docsIndex.includes("project-state.md"), "Docs index must link Project State docs");
+  assert(docsIndex.includes("golden-path.md"), "Docs index must link golden path docs");
   assert(docsIndex.includes("design/project-state-model.md"), "Docs index must link project-state model docs");
   assert(docsIndex.includes("design/project-state-validation-rules.md"), "Docs index must link project-state validation docs");
   assert(docsIndex.includes("design/project-state-lifecycle-readiness.md"), "Docs index must link project-state lifecycle readiness docs");
@@ -562,6 +577,7 @@ function checkContentContracts() {
   assert(docsIndex.includes("releases/v0.8.7.md"), "Docs index must link v0.8.7 copyable starter candidate");
   assert(docsIndex.includes("releases/v0.8.8.md"), "Docs index must link v0.8.8 starter language routing candidate");
   assert(docsIndex.includes("releases/v0.9.0.md"), "Docs index must link v0.9.0 readiness candidate");
+  assert(docsIndex.includes("releases/v0.9.1.md"), "Docs index must link v0.9.1 golden-path candidate");
   assert(docsIndex.includes("releases/v0.7.0.md"), "Docs index must link v0.7.0 lifecycle release candidate");
   assert(docsIndex.includes("releases/v0.6.3.md"), "Docs index must link v0.6.3 lifecycle readiness candidate");
   assert(docsIndex.includes("releases/v0.6.2.md"), "Docs index must link v0.6.2 self-dogfooding evidence candidate");
@@ -661,6 +677,8 @@ function checkContentContracts() {
   assert(projectStateDoc.includes("state-advance --repo <target-repo> --source <receiver-ready.md>"), "Project State docs must document state-advance");
   assert(projectStateDoc.includes("sidecar-build --repo <target-repo>"), "Project State docs must document sidecar-build");
   assert(projectStateDoc.includes("sidecar-check --input <sidecar-dir>"), "Project State docs must document sidecar-check");
+  assert(projectStateDoc.includes("receiver-ready.md -> state-init/state-advance -> sidecar-build -> sidecar-check -> new-window-starter.md -> receiver first response"), "Project State docs must define the golden path");
+  assert(projectStateDoc.includes("Integrated Handoff Golden Path"), "Project State docs must link to the golden-path guide");
   assert(projectStateDoc.includes("new-window-starter.md"), "Project State docs must document copyable sidecar starter");
   assert(projectStateDoc.includes("--starter-language auto|zh-CN|en|ja"), "Project State docs must document starter language option");
   assert(projectStateDoc.includes("output_files.newWindowStarter"), "Project State docs must document starter manifest compatibility");
@@ -708,6 +726,7 @@ function checkContentContracts() {
   assert(testingDoc.includes("v0.8.7 Copyable New-Window Starter"), "Testing docs must document v0.8.7 copyable starter");
   assert(testingDoc.includes("v0.8.8 Starter Language Routing"), "Testing docs must document v0.8.8 starter language routing");
   assert(testingDoc.includes("v0.9.0 Integrated Handoff Readiness Candidate"), "Testing docs must document v0.9.0 readiness candidate");
+  assert(testingDoc.includes("v0.9.1 Golden Path Closure Candidate"), "Testing docs must document v0.9.1 golden-path closure candidate");
   assert(testingDoc.includes("new-window-starter.md"), "Testing docs must document Sidecar starter");
   assert(testingDoc.includes("pass/fail"), "Testing docs must document Sidecar receiver pass/fail reporting");
   assert(testingDoc.includes("manual_required"), "Testing docs must preserve manual-required receiver execution status");
@@ -769,6 +788,9 @@ function checkContentContracts() {
   assert(cliLiteDoc.includes("node scripts/basebrief.js state-advance --repo <target-repo> --source <receiver-ready.md>"), "cli-lite.md must document state-advance command");
   assert(cliLiteDoc.includes("node scripts/basebrief.js sidecar-build --repo <target-repo>"), "cli-lite.md must document sidecar-build command");
   assert(cliLiteDoc.includes("node scripts/basebrief.js sidecar-check --input <sidecar-dir>"), "cli-lite.md must document sidecar-check command");
+  assert(cliLiteDoc.includes("Golden Path Grouped Flow"), "cli-lite.md must group the integrated handoff path");
+  assert(cliLiteDoc.includes("receiver-ready.md -> state-init/state-advance -> sidecar-build -> sidecar-check -> new-window-starter.md -> receiver first response"), "cli-lite.md must document the golden path");
+  assert(cliLiteDoc.includes("golden-path.md"), "cli-lite.md must link to the golden-path guide");
   assert(cliLiteDoc.includes("new-window-starter.md"), "cli-lite.md must document copyable sidecar starter");
   assert(cliLiteDoc.includes("--starter-language auto|zh-CN|en|ja"), "cli-lite.md must document starter language option");
   assert(cliLiteDoc.includes("Protocol fields, paths, file names, schema"), "cli-lite.md must document literal protocol fields for starter language routing");
@@ -802,6 +824,33 @@ function checkContentContracts() {
   assert(roadmapDoc.includes("Current v0.9.0 readiness target"), "Roadmap must name the current v0.9.0 readiness target");
   assert(roadmapDoc.includes("Integrated Handoff Readiness"), "Roadmap must define Integrated Handoff Readiness");
   assert(roadmapDoc.includes("provider requests, runtime integration, schema changes"), "Roadmap must keep v0.9.0 out of runtime/provider/schema scope");
+  assert(goldenPathDoc.includes("Integrated Handoff Golden Path"), "golden-path.md must have a stable title");
+  assert(goldenPathDoc.includes("receiver-ready.md -> state-init/state-advance -> sidecar-build -> sidecar-check -> new-window-starter.md -> receiver first response"), "golden-path.md must define the integrated path");
+  assert(goldenPathDoc.includes("state-init --repo <target-repo> --source <receiver-ready.md>"), "golden-path.md must document state-init");
+  assert(goldenPathDoc.includes("state-advance --repo <target-repo> --source <receiver-ready.md>"), "golden-path.md must document state-advance");
+  assert(goldenPathDoc.includes("sidecar-build --repo <target-repo>"), "golden-path.md must document sidecar-build");
+  assert(goldenPathDoc.includes("sidecar-check --input <sidecar-dir>"), "golden-path.md must document sidecar-check");
+  assert(goldenPathDoc.includes("state-status"), "golden-path.md must mention optional state-status inspection");
+  assert(goldenPathDoc.includes("state-validate"), "golden-path.md must mention optional state-validate inspection");
+  assert(goldenPathDoc.includes("state-history"), "golden-path.md must mention optional state-history inspection");
+  assert(goldenPathDoc.includes("pass/fail"), "golden-path.md must preserve receiver pass/fail reporting");
+  assert(goldenPathDoc.includes("wait for user confirmation"), "golden-path.md must preserve receiver confirmation");
+  assert(goldenPathDoc.includes("No provider request"), "golden-path.md must reject provider requests");
+  assert(goldenPathDoc.includes("No raw private output"), "golden-path.md must reject raw private output");
+  assert(goldenPathDoc.includes("No runtime integration"), "golden-path.md must reject runtime integration");
+  assert(goldenPathDoc.includes("No schema change"), "golden-path.md must reject schema changes");
+  assert(goldenPathDoc.includes("No Auto Flow"), "golden-path.md must reject Auto Flow");
+  assert(goldenPathDoc.includes("basebrief-project-state-v1"), "golden-path.md must preserve project-state schema");
+  assert(goldenPathDoc.includes("basebrief-sidecar-v1"), "golden-path.md must preserve sidecar schema");
+  assert(goldenPathV091ReleaseDoc.includes("Golden Path Closure Candidate"), "v0.9.1 release doc must define golden-path closure candidate");
+  assert(goldenPathV091ReleaseDoc.includes("receiver-ready.md -> state-init/state-advance -> sidecar-build -> sidecar-check -> new-window-starter.md -> receiver first response"), "v0.9.1 release doc must define the golden path");
+  assert(goldenPathV091ReleaseDoc.includes("pass/fail"), "v0.9.1 release doc must preserve receiver pass/fail reporting");
+  assert(goldenPathV091ReleaseDoc.includes("No provider request"), "v0.9.1 release doc must reject provider requests");
+  assert(goldenPathV091ReleaseDoc.includes("No raw private output"), "v0.9.1 release doc must reject raw private output");
+  assert(goldenPathV091ReleaseDoc.includes("No runtime integration"), "v0.9.1 release doc must reject runtime integration");
+  assert(goldenPathV091ReleaseDoc.includes("No schema change"), "v0.9.1 release doc must reject schema changes");
+  assert(goldenPathV091ReleaseDoc.includes("No Auto Flow"), "v0.9.1 release doc must reject Auto Flow");
+  assert(goldenPathV091ReleaseDoc.includes("provider_probe_status=skipped"), "v0.9.1 release doc must preserve skipped provider gate");
   assert(roadmapDoc.includes(".basebrief/state.json"), "roadmap baseline must describe project-state direction");
   assert(roadmapDoc.includes("Do not add BB13"), "roadmap baseline must include experiment freeze rule");
   ["mimo", "deepseek", "relay-openai-gpt55-codex-oauth"].forEach((profileId) => {
@@ -1731,6 +1780,7 @@ function checkArtifactChecker() {
     "docs/releases/v0.8.5.md",
     "docs/releases/v0.8.6.md",
     "docs/releases/v0.8.7.md",
+    "docs/releases/v0.9.1.md",
     "docs/releases/v0.9.0.md",
     "docs/dogfooding/sidecar-external-receiver-smoke-v0.8.4.md",
     "docs/dogfooding/sidecar-manual-receiver-smoke-v0.8.5.md",

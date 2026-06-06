@@ -40,6 +40,33 @@ npm run check
 
 These scripts are only validation shortcuts. They do not add a published package, global install flow, or new CLI surface.
 
+## Golden Path Grouped Flow
+
+For the integrated local handoff path, keep the commands grouped by intent
+instead of treating them as one flat list:
+
+```text
+node scripts/basebrief.js state-init --repo <target-repo> --source <receiver-ready.md> --json
+node scripts/basebrief.js state-advance --repo <target-repo> --source <receiver-ready.md> --json
+node scripts/basebrief.js sidecar-build --repo <target-repo> --target generic --starter-language zh-CN --output-dir <ignored-private-dir> --json
+node scripts/basebrief.js sidecar-check --input <sidecar-dir> --json
+```
+
+- first reviewed handoff into local continuity: `state-init`
+- later reviewed handoff update for the same repo: `state-advance`
+- package current local state for the next chat: `sidecar-build`
+- validate the bundle before handing off the starter: `sidecar-check`
+
+The receiver-facing line is:
+
+```text
+receiver-ready.md -> state-init/state-advance -> sidecar-build -> sidecar-check -> new-window-starter.md -> receiver first response
+```
+
+`state-status`, `state-validate`, and `state-history` stay as optional read-only
+inspection commands. See [Integrated Handoff Golden Path](golden-path.md) for
+the public walkthrough.
+
 ## Commands
 
 Run `node scripts/basebrief.js`, `node scripts/basebrief.js --help`, or `node scripts/basebrief.js -h` to print the current command list and Quickstart link.

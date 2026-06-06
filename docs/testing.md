@@ -40,6 +40,24 @@ provider env remains:
 provider_probe_status=skipped
 ```
 
+## v0.9.1 Golden Path Closure Candidate
+
+`v0.9.1` is a docs/usability hardening patch on top of the `v0.9.0` readiness
+line. It keeps the same integrated local path:
+receiver-ready.md -> state-init/state-advance -> sidecar-build ->
+sidecar-check -> new-window-starter.md -> receiver first response.
+
+This patch adds one public `Integrated Handoff Golden Path` guide and keeps the
+receiver first-response contract explicit: restate key fields, report
+`pass/fail`, and wait for confirmation. It adds no new command, no provider
+request, no runtime integration, no schema change, and no Auto Flow behavior.
+
+Expected release-check output without provider env remains:
+
+```text
+provider_probe_status=skipped
+```
+
 ## v0.4.1 Stabilization Candidate
 
 `v0.4.1` is a stabilization-only cycle after the `v0.4.0` public release. It uses
