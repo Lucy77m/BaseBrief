@@ -597,6 +597,7 @@ function formatHuman(result) {
       `schemaVersion=${result.schemaVersion}`,
       `target=${result.target}`,
       `projectStateSchemaVersion=${result.projectStateSchemaVersion}`,
+      `new_window_starter=${result.outputFiles.newWindowStarter}`,
       "",
     ].join(os.EOL);
   }

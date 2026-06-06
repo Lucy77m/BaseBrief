@@ -217,10 +217,15 @@ Generated files:
 
 - `handoff.md`
 - `next-chat-prompt.md`
+- `new-window-starter.md`
 - `receiver-entry-task.md`
 - `risk-boundaries.md`
 - `state-summary.json`
 - `manifest.json`
+
+`new-window-starter.md` is the short copyable block for opening a new chat. It
+points the receiver to the sidecar bundle and keeps `next-chat-prompt.md` as
+the contract file the receiver must validate.
 
 The `openclaw` target only adds stronger safety wording. It does not connect
 OpenClaw or Hermes runtime, does not write profile/config/memory/workspace
@@ -239,12 +244,20 @@ node scripts/basebrief.js sidecar-check --input <sidecar-dir> [--json]
 ```
 
 `sidecar-check` is the v0.8.1 read-only acceptance gate for generated sidecar
-bundles. It validates the six required files, parses `manifest.json` and
-`state-summary.json`, checks the `basebrief-sidecar-v1` and
+bundles. It validates the six required contract files, parses `manifest.json`
+and `state-summary.json`, checks the `basebrief-sidecar-v1` and
 `basebrief-project-state-v1` markers, and verifies that `next-chat-prompt.md`
 contains the current goal, receiver task, at least two risk boundaries, wait
 for user confirmation, No provider request, No raw private output, No runtime
 integration, and No auto-advance.
+
+For v0.8.7-and-later bundles, if `manifest.json` declares
+`output_files.newWindowStarter`, `sidecar-check` also requires
+`new-window-starter.md` to contain the target repository cue, sidecar bundle
+instruction, current goal, receiver task, at least two risk boundaries, wait
+for user confirmation, No provider request, No raw private output, No runtime
+integration, No schema change, and No auto-advance. Older v0.8 bundles that do
+not declare this file remain accepted by this compatibility gate.
 
 For `openclaw` bundles it also requires explicit wording that OpenClaw/Hermes
 runtime, profile, config, memory, and workspace integration are out of scope.

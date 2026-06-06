@@ -68,16 +68,23 @@ formatting and safety wording only: no runtime integration, no provider
 request, no raw private output, no OpenClaw/Hermes profile/config/memory
 writes, and no schema change.
 
+The generated bundle includes `new-window-starter.md`, a short copyable block
+for the user to paste into a new chat. It points the receiver to the Sidecar
+bundle while keeping `next-chat-prompt.md` as the receiver contract.
+
 Default output is `.basebrief/sidecar/<target>/`. Public dogfooding records
 should summarize the result only; raw sidecar output belongs in ignored private
 directories.
 
 `sidecar-check` is the v0.8.1 acceptance layer for the generated bundle. It is
 a read-only consumer of sidecar output, not a Project State writer. It requires
-the six bundle files, validates `basebrief-sidecar-v1` and
+the six contract files, validates `basebrief-sidecar-v1` and
 `basebrief-project-state-v1` metadata, checks that `current_goal`,
 `receiver_entry_task`, and at least two `risk_boundaries` are understandable in
 `next-chat-prompt.md`, and reuses the artifact checker for public-safe output.
+For v0.8.7-and-later bundles, it also validates `new-window-starter.md` when
+`manifest.json` declares `output_files.newWindowStarter`; older bundles without
+that manifest key remain compatible.
 It does not change `.basebrief/state.json`, does not change schema, does not
 call providers, and does not connect runtime systems.
 

@@ -72,6 +72,19 @@ This matrix covers the local v0.8 sidecar handoff work.
 - Do not mark any receiver smoke row `passed` without all required intake fields.
 - Preserve `basebrief-project-state-v1` and `basebrief-sidecar-v1`.
 
+## v0.8.7 Copyable New-Window Starter
+
+- `sidecar-build` writes `new-window-starter.md` as the copyable block for a
+  user to paste into a new chat.
+- `manifest.json` exposes `output_files.newWindowStarter`.
+- `sidecar-check` validates the starter when the manifest declares it, including
+  target repository cue, sidecar bundle instruction, current goal, receiver
+  task, at least two risk boundaries, wait for user confirmation, No provider
+  request, No raw private output, No runtime integration, No schema change, and
+  No auto-advance.
+- Old v0.8 bundles without `output_files.newWindowStarter` remain compatible.
+- Preserve `basebrief-project-state-v1` and `basebrief-sidecar-v1`.
+
 ## Standard Local Commands
 
 ```text

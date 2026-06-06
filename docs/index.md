@@ -27,6 +27,7 @@
 - [v0.8.4 External Receiver Smoke Evidence](releases/v0.8.4.md)
 - [v0.8.5 Manual Receiver Smoke Result Intake](releases/v0.8.5.md)
 - [v0.8.6 Manual Receiver Smoke Result Intake Evidence](releases/v0.8.6.md)
+- [v0.8.7 Copyable New-Window Starter](releases/v0.8.7.md)
 - [Seal/Diff](seal-diff.md)
 - [Known Limitations](known-limitations.md)
 
@@ -40,6 +41,7 @@
 - [v0.8.4 external receiver smoke evidence candidate](releases/v0.8.4.md)
 - [v0.8.5 manual receiver smoke result intake candidate](releases/v0.8.5.md)
 - [v0.8.6 manual receiver smoke result intake evidence candidate](releases/v0.8.6.md)
+- [v0.8.7 copyable new-window starter candidate](releases/v0.8.7.md)
 - [v0.7.0 project state lifecycle candidate](releases/v0.7.0.md)
 - [v0.6.3 lifecycle readiness gate candidate](releases/v0.6.3.md)
 - [v0.6.2 self-dogfooding evidence candidate](releases/v0.6.2.md)

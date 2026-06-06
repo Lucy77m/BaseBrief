@@ -1881,6 +1881,16 @@ test("CLI Lite rejects missing command, missing args, and invalid adapter target
       findings: [{ severity: "WARNING", ruleId: "sample.warning", file: "sample.md", line: 1, message: "Review this." }],
     },
   }), /WARNING sample\.warning sample\.md:1 Review this\./);
+  assert.match(formatHuman({
+    command: "sidecar-build",
+    outputDir: "tests/outputs/private/sidecar-generic",
+    schemaVersion: SIDECAR_SCHEMA_VERSION,
+    target: "generic",
+    projectStateSchemaVersion: PROJECT_STATE_SCHEMA_VERSION,
+    outputFiles: {
+      newWindowStarter: "tests/outputs/private/sidecar-generic/new-window-starter.md",
+    },
+  }), /new_window_starter=tests\/outputs\/private\/sidecar-generic\/new-window-starter\.md/);
   assert.throws(() => run(["node", "scripts/basebrief.js", "deploy"]), /Unknown command: deploy/);
   assert.throws(() => commandInit({}), /Missing --output-dir/);
   assert.throws(() => commandBuild({ "output-dir": "out" }), /Missing --input/);
@@ -2958,6 +2968,7 @@ test("Sidecar build writes generic bundle from valid project state", () => withT
   const manifest = JSON.parse(fs.readFileSync(path.join(outputDir, "manifest.json"), "utf8"));
   const stateSummary = JSON.parse(fs.readFileSync(path.join(outputDir, "state-summary.json"), "utf8"));
   const prompt = fs.readFileSync(path.join(outputDir, "next-chat-prompt.md"), "utf8");
+  const starter = fs.readFileSync(path.join(outputDir, "new-window-starter.md"), "utf8");
 
   assert.equal(result.command, "sidecar-build");
   assert.equal(result.schemaVersion, SIDECAR_SCHEMA_VERSION);
@@ -2966,6 +2977,8 @@ test("Sidecar build writes generic bundle from valid project state", () => withT
   assert.equal(manifest.schemaVersion, SIDECAR_SCHEMA_VERSION);
   assert.equal(manifest.projectStateSchemaVersion, PROJECT_STATE_SCHEMA_VERSION);
   assert.equal(manifest.output_files.handoff, "handoff.md");
+  assert.equal(manifest.output_files.newWindowStarter, "new-window-starter.md");
+  assert.equal(result.outputFiles.newWindowStarter, path.join(outputDir, "new-window-starter.md"));
   assert.equal(stateSummary.projectStateSchemaVersion, PROJECT_STATE_SCHEMA_VERSION);
   assert.match(stateSummary.current_goal, /Prepare a reviewed receiver handoff/);
   assert.match(prompt, /current_goal/);
@@ -2976,6 +2989,16 @@ test("Sidecar build writes generic bundle from valid project state", () => withT
   assert.match(prompt, /No runtime integration/);
   assert.match(prompt, /No schema change/);
   assert.match(prompt, /No auto-advance/);
+  assert.match(starter, /Target repository/);
+  assert.match(starter, /Sidecar bundle/);
+  assert.match(starter, /current_goal/);
+  assert.match(starter, /receiver_entry_task/);
+  assert.match(starter, /Wait for user confirmation/);
+  assert.match(starter, /No provider request/);
+  assert.match(starter, /No raw private output/);
+  assert.match(starter, /No runtime integration/);
+  assert.match(starter, /No schema change/);
+  assert.match(starter, /No auto-advance/);
   assert(stateSummary.risk_boundaries.length >= 2);
   assert.doesNotMatch(JSON.stringify(manifest), /[A-Z]:\\/);
   assert.doesNotMatch(JSON.stringify(stateSummary), /[A-Z]:\\/);
@@ -2999,11 +3022,14 @@ test("Sidecar build writes OpenClaw-safe bundle without runtime integration", ()
   const outputDir = path.join(tempDir, "openclaw-sidecar");
   const result = commandSidecarBuild({ repo: repoDir, target: "openclaw", "output-dir": outputDir });
   const prompt = fs.readFileSync(path.join(outputDir, "next-chat-prompt.md"), "utf8");
+  const starter = fs.readFileSync(path.join(outputDir, "new-window-starter.md"), "utf8");
   const risks = fs.readFileSync(path.join(outputDir, "risk-boundaries.md"), "utf8");
 
   assert.equal(result.target, "openclaw");
   assert.match(prompt, /OpenClaw\/Hermes runtime/);
   assert.match(prompt, /profile\/config\/memory\/workspace/);
+  assert.match(starter, /OpenClaw\/Hermes runtime/);
+  assert.match(starter, /profile\/config\/memory\/workspace/);
   assert.match(risks, /Do not connect OpenClaw or Hermes runtime/);
   assert.match(risks, /No provider request/);
   assert.equal(checkArtifacts({ inputPath: outputDir }).status, "passed");
@@ -3066,6 +3092,45 @@ test("Sidecar check rejects malformed or incomplete bundles", () => withTempDir(
   result = checkSidecarBundle({ inputPath: invalidTargetDir });
   assert.equal(result.check_status, "failed");
   assert(result.errors.some((error) => error.includes("manifest.json.target must be generic or openclaw")));
+}));
+
+test("Sidecar check validates copyable new-window starter while keeping old bundles compatible", () => withTempDir((tempDir) => {
+  const { outputDir: missingDir } = createSidecarFixture(path.join(tempDir, "missing"), "generic");
+  fs.rmSync(path.join(missingDir, "new-window-starter.md"));
+  let result = checkSidecarBundle({ inputPath: missingDir });
+  assert.equal(result.check_status, "failed");
+  assert(result.errors.some((error) => error.includes("Missing declared sidecar file: new-window-starter.md")));
+
+  const { outputDir: weakDir } = createSidecarFixture(path.join(tempDir, "weak"), "generic");
+  const starterPath = path.join(weakDir, "new-window-starter.md");
+  const weakStarter = fs.readFileSync(starterPath, "utf8")
+    .replace(/Target repository/gi, "Workspace")
+    .replace(/Sidecar bundle/gi, "Bundle")
+    .replace(/directory that contains this `new-window-starter\.md` file/gi, "nearby files")
+    .replace(/Wait for user confirmation/gi, "Continue after review")
+    .replace(/No provider request/gi, "Provider requests are not covered")
+    .replace(/No runtime integration/gi, "Runtime details are not covered")
+    .replace(/No schema change/gi, "Schema details are not covered")
+    .replace(/No auto-advance/gi, "Advance after review");
+  fs.writeFileSync(starterPath, weakStarter, "utf8");
+  result = checkSidecarBundle({ inputPath: weakDir });
+  assert.equal(result.check_status, "failed");
+  assert(result.errors.some((error) => error.includes("target repository cue")));
+  assert(result.errors.some((error) => error.includes("sidecar bundle path instruction")));
+  assert(result.errors.some((error) => error.includes("waiting for user confirmation")));
+  assert(result.errors.some((error) => error.includes("No provider request")));
+  assert(result.errors.some((error) => error.includes("No runtime integration")));
+  assert(result.errors.some((error) => error.includes("No schema change")));
+  assert(result.errors.some((error) => error.includes("No auto-advance")));
+
+  const { outputDir: oldDir } = createSidecarFixture(path.join(tempDir, "old"), "generic");
+  const manifestPath = path.join(oldDir, "manifest.json");
+  const manifest = JSON.parse(fs.readFileSync(manifestPath, "utf8"));
+  delete manifest.output_files.newWindowStarter;
+  fs.writeFileSync(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`, "utf8");
+  fs.rmSync(path.join(oldDir, "new-window-starter.md"));
+  result = checkSidecarBundle({ inputPath: oldDir });
+  assert.equal(result.check_status, "passed");
 }));
 
 test("Sidecar check rejects weak state summary and prompt contracts", () => withTempDir((tempDir) => {
@@ -3272,6 +3337,8 @@ test("CLI Lite exposes project state commands with public-safe json paths", () =
     assert.equal(sidecarResult.input.startsWith("tests"), true);
     assert.equal(sidecarResult.outputDir.startsWith("tests"), true);
     assert.equal(sidecarResult.outputFiles.handoff.startsWith("tests"), true);
+    assert.equal(sidecarResult.outputFiles.newWindowStarter.startsWith("tests"), true);
+    assert.equal(sidecarResult.manifest.output_files.newWindowStarter, "new-window-starter.md");
     assert.match(HELP_TEXT, /sidecar-build --repo <target-repo>/);
 
     const sidecarCheckCli = spawnSync(process.execPath, [

@@ -67,7 +67,7 @@ node scripts/basebrief.js sidecar-build --repo . --target generic --output-dir t
 node scripts/basebrief.js sidecar-check --input tests/outputs/private/sidecar-generic --json
 ```
 
-`sidecar-build` creates a `generic` or `openclaw` handoff bundle. `sidecar-check` is a read-only structure gate for the bundle and receiver boundaries. The v0.8.x Sidecar is a local consumer layer for `basebrief-project-state-v1`; it does not change the schema, is not Auto Flow, does not create sessions, does not call providers, and does not integrate with the OpenClaw/Hermes runtime. Sidecar public boundaries stay No provider request / No raw private output / No runtime integration / No schema change; when provider environment variables are absent, release checks keep `provider_probe_status=skipped`. Public records: [v0.8.0](docs/releases/v0.8.0.md), [v0.8.1](docs/releases/v0.8.1.md), [v0.8.2](docs/releases/v0.8.2.md), [v0.8.3](docs/releases/v0.8.3.md), [v0.8.6](docs/releases/v0.8.6.md), and the [v0.8.x test matrix](docs/testing-v0.8.x-test-matrix.md).
+`sidecar-build` creates a `generic` or `openclaw` handoff bundle and writes a copyable new-window starter at `new-window-starter.md`. `sidecar-check` is a read-only structure gate for the bundle, receiver boundaries, and the starter. The v0.8.x Sidecar is a local consumer layer for `basebrief-project-state-v1`; it does not change the schema, is not Auto Flow, does not create sessions, does not call providers, and does not integrate with the OpenClaw/Hermes runtime. Sidecar public boundaries stay No provider request / No raw private output / No runtime integration / No schema change; when provider environment variables are absent, release checks keep `provider_probe_status=skipped`. Public records: [v0.8.0](docs/releases/v0.8.0.md), [v0.8.1](docs/releases/v0.8.1.md), [v0.8.2](docs/releases/v0.8.2.md), [v0.8.3](docs/releases/v0.8.3.md), [v0.8.6](docs/releases/v0.8.6.md), [v0.8.7](docs/releases/v0.8.7.md), and the [v0.8.x test matrix](docs/testing-v0.8.x-test-matrix.md).
 
 ## Seal/Diff
 
@@ -103,7 +103,7 @@ It only processes explicit input files and does not scan or modify other project
 - artifact checker
 - optional read-only Receiver Safe Check v1
 - zero-dependency CLI Lite: `init`, `build`, `check`, `receiver-init`, `receiver-check`, `receiver-flow`, `review-draft`, `state-init`, `state-read`, `state-status`, `state-validate`, `state-history`, `state-advance`, `sidecar-build`, `sidecar-check`, `seal`, `diff`
-- Project State Sidecar: builds `generic` / `openclaw` bundles from local `basebrief-project-state-v1` state and checks them with `basebrief-sidecar-v1`
+- Project State Sidecar: builds `generic` / `openclaw` bundles and `new-window-starter.md` from local `basebrief-project-state-v1` state, then checks them with `basebrief-sidecar-v1`
 - local file-based Seal/Diff v1
 
 BaseBrief is not a chat client, agent runtime, hosted platform, secret manager, project-management system, or provider gateway.
@@ -122,6 +122,7 @@ BaseBrief is not a chat client, agent runtime, hosted platform, secret manager, 
 - [Project State lifecycle readiness](docs/design/project-state-lifecycle-readiness.md)
 - [Project State lifecycle model](docs/design/project-state-lifecycle-model.md)
 - [v0.8.x sidecar test matrix](docs/testing-v0.8.x-test-matrix.md)
+- [v0.8.7 Copyable New-Window Starter](docs/releases/v0.8.7.md)
 - [v0.8.6 Manual Receiver Smoke Result Intake Evidence](docs/releases/v0.8.6.md)
 - [v0.8.3 Sidecar Discoverability Polish](docs/releases/v0.8.3.md)
 - [v0.8.2 Sidecar Receiver Acceptance Evidence](docs/releases/v0.8.2.md)

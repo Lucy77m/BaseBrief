@@ -12,11 +12,13 @@ const SUPPORTED_TARGETS = new Set(["generic", "openclaw"]);
 const OUTPUT_FILES = {
   handoff: "handoff.md",
   nextChatPrompt: "next-chat-prompt.md",
+  newWindowStarter: "new-window-starter.md",
   receiverEntryTask: "receiver-entry-task.md",
   riskBoundaries: "risk-boundaries.md",
   stateSummary: "state-summary.json",
   manifest: "manifest.json",
 };
+const REQUIRED_OUTPUT_FILE_KEYS = ["handoff", "nextChatPrompt", "receiverEntryTask", "riskBoundaries", "stateSummary", "manifest"];
 
 const BASE_RISK_BOUNDARIES = [
   "No provider request.",
@@ -210,6 +212,46 @@ function renderNextChatPrompt(state, target, riskBoundaries) {
   ].join(os.EOL);
 }
 
+function sidecarBundleCue(repoRoot, outputDir) {
+  const relative = path.relative(repoRoot, outputDir);
+  if (relative && !relative.startsWith("..") && !path.isAbsolute(relative)) {
+    return normalizeSlash(relative);
+  }
+  return "the directory that contains this `new-window-starter.md` file";
+}
+
+function renderNewWindowStarter(state, target, riskBoundaries, bundleCue) {
+  return [
+    "# BaseBrief New Window Starter",
+    "",
+    "Copy this block into a new chat. Start by accepting the BaseBrief receiver task; do not continue the project yet.",
+    "",
+    "Target repository: open the repository that generated this Sidecar bundle.",
+    `Sidecar bundle: read ${bundleCue}, including \`manifest.json\`, \`state-summary.json\`, \`handoff.md\`, \`next-chat-prompt.md\`, \`receiver-entry-task.md\`, and \`risk-boundaries.md\`.`,
+    "",
+    "First response: identify BaseBrief, restate `current_goal`, restate `receiver_entry_task`, restate at least two risk boundaries, and say whether the bundle is understandable enough to continue.",
+    "",
+    "Wait for user confirmation before continuing.",
+    "",
+    "current_goal:",
+    state.handoff.current_goal,
+    "",
+    "receiver_entry_task:",
+    state.handoff.receiver_entry_task,
+    "",
+    "risk_boundaries:",
+    renderList(riskBoundaries),
+    "",
+    "Hard stops:",
+    "- No provider request.",
+    "- No raw private output.",
+    "- No runtime integration.",
+    "- No schema change.",
+    "- No auto-advance.",
+    ...(target === "openclaw" ? ["- Do not connect OpenClaw/Hermes runtime or write profile/config/memory/workspace files."] : []),
+  ].join(os.EOL);
+}
+
 function renderReceiverEntryTask(state) {
   return [
     "# Receiver Entry Task",
@@ -304,7 +346,7 @@ function validateSidecarJsonShape(value, label, errors) {
 }
 
 function checkRequiredFiles(inputDir, errors) {
-  const files = Object.values(OUTPUT_FILES);
+  const files = REQUIRED_OUTPUT_FILE_KEYS.map((key) => OUTPUT_FILES[key]);
   for (const fileName of files) {
     const filePath = path.join(inputDir, fileName);
     if (!fs.existsSync(filePath)) {
@@ -366,6 +408,69 @@ function checkPromptContract({ nextChatPrompt, stateSummary, target, errors }) {
   }
 }
 
+function checkStarterContract({ newWindowStarter, stateSummary, target, errors }) {
+  const currentGoal = String((stateSummary && stateSummary.current_goal) || "");
+  const receiverEntryTask = String((stateSummary && stateSummary.receiver_entry_task) || "");
+  const riskBoundaries = Array.isArray(stateSummary && stateSummary.risk_boundaries)
+    ? stateSummary.risk_boundaries.filter((item) => String(item || "").trim())
+    : [];
+
+  if (!/(target repo|target repository)/i.test(newWindowStarter)) {
+    errors.push("new-window-starter.md must include a target repository cue");
+  }
+  if (!/(sidecar bundle|directory that contains this `new-window-starter\.md` file)/i.test(newWindowStarter)) {
+    errors.push("new-window-starter.md must include a sidecar bundle path instruction");
+  }
+  if (currentGoal.trim() && !textIncludes(newWindowStarter, currentGoal)) {
+    errors.push("new-window-starter.md must include current_goal content");
+  }
+  if (receiverEntryTask.trim() && !textIncludes(newWindowStarter, receiverEntryTask)) {
+    errors.push("new-window-starter.md must include receiver_entry_task content");
+  }
+  for (const risk of riskBoundaries.slice(0, 2)) {
+    if (!textIncludes(newWindowStarter, risk)) {
+      errors.push("new-window-starter.md must include at least two risk boundary items");
+      break;
+    }
+  }
+  if (!/Wait for user confirmation/i.test(newWindowStarter)) {
+    errors.push("new-window-starter.md must require waiting for user confirmation");
+  }
+  if (!/No provider request/i.test(newWindowStarter)) {
+    errors.push("new-window-starter.md must include No provider request");
+  }
+  if (!/No raw private output/i.test(newWindowStarter)) {
+    errors.push("new-window-starter.md must include No raw private output");
+  }
+  if (!/No runtime(?: integration)?/i.test(newWindowStarter)) {
+    errors.push("new-window-starter.md must include No runtime integration");
+  }
+  if (!/No schema change/i.test(newWindowStarter)) {
+    errors.push("new-window-starter.md must include No schema change");
+  }
+  if (!/No auto-advance/i.test(newWindowStarter)) {
+    errors.push("new-window-starter.md must include No auto-advance");
+  }
+  if (target === "openclaw") {
+    if (!/(OpenClaw\/Hermes runtime|OpenClaw or Hermes runtime)/i.test(newWindowStarter)) {
+      errors.push("openclaw new-window-starter.md must prohibit OpenClaw/Hermes runtime integration");
+    }
+    if (!/(profile\/config\/memory\/workspace|profile[\s\S]*config[\s\S]*memory[\s\S]*workspace)/i.test(newWindowStarter)) {
+      errors.push("openclaw new-window-starter.md must prohibit profile/config/memory/workspace writes");
+    }
+  }
+}
+
+function getDeclaredNewWindowStarter(manifest, errors) {
+  if (!manifest || !manifest.output_files || typeof manifest.output_files !== "object") return "";
+  if (!Object.prototype.hasOwnProperty.call(manifest.output_files, "newWindowStarter")) return "";
+  if (manifest.output_files.newWindowStarter !== OUTPUT_FILES.newWindowStarter) {
+    errors.push(`manifest.json output_files.newWindowStarter must be ${OUTPUT_FILES.newWindowStarter}`);
+    return "";
+  }
+  return manifest.output_files.newWindowStarter;
+}
+
 function checkSidecarBundle(options) {
   if (!options.inputPath) throw new Error("Missing --input <sidecar-dir>");
   const inputDir = path.resolve(options.inputPath);
@@ -400,6 +505,22 @@ function checkSidecarBundle(options) {
     : "";
   if (stateSummary) {
     checkPromptContract({ nextChatPrompt, stateSummary, target, errors });
+  }
+  const newWindowStarterName = getDeclaredNewWindowStarter(manifest, errors);
+  if (newWindowStarterName) {
+    const newWindowStarterPath = path.join(inputDir, newWindowStarterName);
+    if (!fs.existsSync(newWindowStarterPath)) {
+      errors.push(`Missing declared sidecar file: ${newWindowStarterName}`);
+    } else if (!fs.statSync(newWindowStarterPath).isFile()) {
+      errors.push(`Declared sidecar path must be a file: ${newWindowStarterName}`);
+    } else if (stateSummary) {
+      checkStarterContract({
+        newWindowStarter: fs.readFileSync(newWindowStarterPath, "utf8"),
+        stateSummary,
+        target,
+        errors,
+      });
+    }
   }
 
   const artifactCheck = checkArtifacts({ inputPath: inputDir });
@@ -439,10 +560,12 @@ function buildSidecarBundle(options) {
   const outputFiles = { ...OUTPUT_FILES };
   const stateSummary = stateSummaryFromState(state, target, riskBoundaries);
   const manifest = manifestForBundle({ target, state, outputFiles, generatedAt });
+  const bundleCue = sidecarBundleCue(repoRoot, outputDir);
 
   fs.mkdirSync(outputDir, { recursive: true });
   writeText(path.join(outputDir, OUTPUT_FILES.handoff), renderHandoff(state, target, riskBoundaries));
   writeText(path.join(outputDir, OUTPUT_FILES.nextChatPrompt), renderNextChatPrompt(state, target, riskBoundaries));
+  writeText(path.join(outputDir, OUTPUT_FILES.newWindowStarter), renderNewWindowStarter(state, target, riskBoundaries, bundleCue));
   writeText(path.join(outputDir, OUTPUT_FILES.receiverEntryTask), renderReceiverEntryTask(state));
   writeText(path.join(outputDir, OUTPUT_FILES.riskBoundaries), renderRiskBoundaries(riskBoundaries));
   writeJson(path.join(outputDir, OUTPUT_FILES.stateSummary), stateSummary);
@@ -480,6 +603,7 @@ function formatHuman(result) {
     `schemaVersion=${result.schemaVersion}`,
     `target=${result.target}`,
     `projectStateSchemaVersion=${result.projectStateSchemaVersion}`,
+    `new_window_starter=${result.outputFiles.newWindowStarter}`,
     "",
   ].join(os.EOL);
 }

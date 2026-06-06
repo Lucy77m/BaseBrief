@@ -42,6 +42,30 @@ Expected release-check output without provider env remains:
 provider_probe_status=skipped
 ```
 
+## v0.8.7 Copyable New-Window Starter
+
+`v0.8.7` adds `new-window-starter.md` to generated Sidecar bundles. This is a
+copyable starter block for users opening a new chat; `next-chat-prompt.md`
+remains the receiver contract.
+
+The starter must point to the target repository and Sidecar bundle, restate
+`current_goal` and `receiver_entry_task`, include at least two risk boundaries,
+and preserve wait for user confirmation, No provider request, No raw private
+output, No runtime integration, No schema change, and No auto-advance.
+`sidecar-check` validates the starter only when `manifest.json` declares
+`output_files.newWindowStarter`, so old v0.8 bundles remain compatible.
+
+The v0.8.x matrix is tracked in
+[testing-v0.8.x-test-matrix.md](testing-v0.8.x-test-matrix.md). This patch does
+not require provider smoke, receiver thread creation, Auto Flow runs, runtime
+integration, OpenClaw/Hermes runtime connection, or provider benchmarks.
+
+Expected release-check output without provider env remains:
+
+```text
+provider_probe_status=skipped
+```
+
 ## v0.8.5 Manual Receiver Smoke Result Intake
 
 `v0.8.5` adds a public-safe result intake layer for manual OpenCode and Claude
