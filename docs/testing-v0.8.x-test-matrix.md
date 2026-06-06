@@ -72,6 +72,19 @@ This matrix covers the local v0.8 sidecar handoff work.
 - Do not mark any receiver smoke row `passed` without all required intake fields.
 - Preserve `basebrief-project-state-v1` and `basebrief-sidecar-v1`.
 
+## OpenClaw/Hermes Manual Receiver Smoke Follow-up
+
+- Record `hermes-agent` as `passed` from a public-safe first-response
+  acceptance summary.
+- Record `openclaw-agent` as `passed` only after a strict six-file
+  absolute-path recheck against the historical `openclaw` bundle.
+- Keep the `v0.8.5` / `v0.8.6` checkpoint tables unchanged; this is follow-up
+  evidence, not a historical row rewrite.
+- Treat the result as manual first-response acceptance closure only, not proof
+  of the latest freshly rebuilt `openclaw` bundle and not provider/runtime
+  integration.
+- Preserve `basebrief-project-state-v1` and `basebrief-sidecar-v1`.
+
 ## v0.8.7 Copyable New-Window Starter
 
 - `sidecar-build` writes `new-window-starter.md` as the copyable block for a
@@ -79,9 +92,9 @@ This matrix covers the local v0.8 sidecar handoff work.
 - `manifest.json` exposes `output_files.newWindowStarter`.
 - `sidecar-check` validates the starter when the manifest declares it, including
   target repository cue, sidecar bundle instruction, current goal, receiver
-  task, at least two risk boundaries, wait for user confirmation, No provider
-  request, No raw private output, No runtime integration, No schema change, and
-  No auto-advance.
+  task, at least two risk boundaries, report pass/fail, wait for user
+  confirmation, No provider request, No raw private output, No runtime
+  integration, No schema change, and No auto-advance.
 - Old v0.8 bundles without `output_files.newWindowStarter` remain compatible.
 - Preserve `basebrief-project-state-v1` and `basebrief-sidecar-v1`.
 
@@ -97,6 +110,8 @@ This matrix covers the local v0.8 sidecar handoff work.
 - Localized hard stops preserve the English anchors: No provider request, No
   raw private output, No runtime integration, No schema change, and No
   auto-advance.
+- Localized first-response instructions preserve `pass/fail` as a literal
+  receiver acceptance anchor.
 - `sidecar-check` accepts localized starter shells while preserving the same
   required content and old-bundle compatibility.
 - Preserve `basebrief-project-state-v1` and `basebrief-sidecar-v1`.

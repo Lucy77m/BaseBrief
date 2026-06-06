@@ -224,8 +224,8 @@ Generated files:
 - `manifest.json`
 
 `new-window-starter.md` is the short copyable block for opening a new chat. It
-points the receiver to the sidecar bundle and keeps `next-chat-prompt.md` as
-the contract file the receiver must validate.
+points the receiver to the sidecar bundle, asks for a `pass/fail` report, and
+keeps `next-chat-prompt.md` as the contract file the receiver must validate.
 
 `--starter-language` controls only the user-facing starter shell. `auto` is the
 default: it uses the natural-language body of the Project State handoff and
@@ -261,10 +261,11 @@ integration, and No auto-advance.
 For v0.8.7-and-later bundles, if `manifest.json` declares
 `output_files.newWindowStarter`, `sidecar-check` also requires
 `new-window-starter.md` to contain the target repository cue, sidecar bundle
-instruction, current goal, receiver task, at least two risk boundaries, wait
-for user confirmation, No provider request, No raw private output, No runtime
-integration, No schema change, and No auto-advance. Older v0.8 bundles that do
-not declare this file remain accepted by this compatibility gate.
+instruction, current goal, receiver task, at least two risk boundaries, a
+`pass/fail` report instruction, wait for user confirmation, No provider
+request, No raw private output, No runtime integration, No schema change, and
+No auto-advance. Older v0.8 bundles that do not declare this file remain
+accepted by this compatibility gate.
 
 For `openclaw` bundles it also requires explicit wording that OpenClaw/Hermes
 runtime, profile, config, memory, and workspace integration are out of scope.

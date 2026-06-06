@@ -73,6 +73,16 @@ node scripts/basebrief_receiver_check.js --config <receiver-check-config.json> -
 
 `pass` 与 `difference_found` 退出码均为 `0`。只有 `blocked` 或无效调用退出非零。
 
+Sidecar 或 `new-window-starter.md` 会要求 receiver 先给出人类可读的
+`pass/fail` 结论。这个锚点用于向用户说明接手验收是否通过，但它不是
+完整的机器状态词表：
+
+- 人类报告 `pass`：对应 `handoff_acceptance: pass`。
+- 人类报告 `fail` 且核验已完成：机器结果通常应是 `difference_found`，
+  表示差异已被准确报告，不等于 Agent 执行失败。
+- `blocked` 只用于无效、不安全或无法安全运行的情况；它不是普通不一致
+  时的默认 `fail`。
+
 ## 安全边界
 
 - 不接受原始 Shell 命令、自定义参数或自定义环境变量。

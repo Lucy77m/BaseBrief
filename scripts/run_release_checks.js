@@ -89,6 +89,7 @@ function checkRequiredFiles() {
     "docs/dogfooding/sidecar-external-receiver-smoke-v0.8.4.md",
     "docs/dogfooding/sidecar-manual-receiver-smoke-v0.8.5.md",
     "docs/dogfooding/sidecar-manual-receiver-smoke-v0.8.6.md",
+    "docs/dogfooding/sidecar-openclaw-hermes-manual-smoke-followup.md",
     "docs/integrations.md",
     "docs/adapters.md",
     "docs/walkthrough.md",
@@ -245,6 +246,10 @@ function checkContentContracts() {
   const docsIndex = readText("docs/index.md");
   const quickstartDoc = readText("docs/quickstart-5min.md");
   const knownLimitationsDoc = readText("docs/known-limitations.md");
+  const receiverDifferenceExampleReadme = readText("examples/receiver/difference-found/README.md");
+  const receiverBlockedExampleReadme = readText("examples/receiver/blocked/README.md");
+  const receiverLanguageRoutingExampleReadme = readText("examples/receiver/language-routing/README.md");
+  const receiverLanguageRoutingReport = readText("examples/receiver/language-routing/receiver-report.md");
   const dogfoodingDoc = readText("docs/dogfooding/v0.2.2-first-run-workflow.md");
   const receiverReadyDogfoodingDoc = readText("docs/dogfooding/receiver-ready-v1-evidence.md");
   const receiverFrictionDoc = readText("docs/dogfooding/receiver-friction-log.md");
@@ -264,6 +269,7 @@ function checkContentContracts() {
   const sidecarExternalReceiverSmokeV084Doc = readText("docs/dogfooding/sidecar-external-receiver-smoke-v0.8.4.md");
   const sidecarManualReceiverSmokeV085Doc = readText("docs/dogfooding/sidecar-manual-receiver-smoke-v0.8.5.md");
   const sidecarManualReceiverSmokeV086Doc = readText("docs/dogfooding/sidecar-manual-receiver-smoke-v0.8.6.md");
+  const sidecarOpenClawHermesManualSmokeFollowupDoc = readText("docs/dogfooding/sidecar-openclaw-hermes-manual-smoke-followup.md");
   const testingDoc = readText("docs/testing.md");
   const usabilityFeedbackTemplate = readText(".github/ISSUE_TEMPLATE/usability_feedback.md");
   const adaptersDoc = readText("docs/adapters.md");
@@ -387,6 +393,7 @@ function checkContentContracts() {
   assert(readme.includes("docs/testing-v0.7.x-test-matrix.md"), "README.md should link to v0.7.x test matrix");
   assert(readme.includes("docs/testing-v0.8.x-test-matrix.md"), "README.md should link to v0.8.x sidecar test matrix");
   assert(readme.includes("new-window-starter.md"), "README.md should mention the copyable Sidecar starter");
+  assert(readme.includes("pass/fail"), "README.md should document the Sidecar receiver pass/fail report");
   assert(readme.includes("--starter-language auto|zh-CN|en|ja"), "README.md should mention starter language routing");
   assert(readme.includes("docs/releases/v0.8.7.md"), "README.md should link to v0.8.7 copyable starter");
   assert(readme.includes("docs/releases/v0.8.8.md"), "README.md should link to v0.8.8 starter language routing");
@@ -458,6 +465,7 @@ function checkContentContracts() {
   assert(englishReadme.includes("docs/testing-v0.7.x-test-matrix.md"), "README.en.md should link to v0.7.x test matrix");
   assert(englishReadme.includes("docs/testing-v0.8.x-test-matrix.md"), "README.en.md should link to v0.8.x sidecar test matrix");
   assert(englishReadme.includes("new-window-starter.md"), "README.en.md should mention the copyable Sidecar starter");
+  assert(englishReadme.includes("pass/fail"), "README.en.md should document the Sidecar receiver pass/fail report");
   assert(englishReadme.includes("--starter-language auto|zh-CN|en|ja"), "README.en.md should mention starter language routing");
   assert(englishReadme.includes("docs/releases/v0.8.7.md"), "README.en.md should link to v0.8.7 copyable starter");
   assert(englishReadme.includes("docs/releases/v0.8.8.md"), "README.en.md should link to v0.8.8 starter language routing");
@@ -492,6 +500,7 @@ function checkContentContracts() {
     "SKILL.md must keep cache-ready out of ordinary routing",
   );
   assert(skill.includes("新窗口开场白（可复制）"), "SKILL.md must require copyable new-window starter output");
+  assert(skill.includes("pass/fail"), "SKILL.md must preserve the Sidecar receiver pass/fail anchor");
   assert(skill.includes("--starter-language auto|zh-CN|en|ja"), "SKILL.md must document starter language routing");
   assert(
     modeSelectionDoc.includes("`cache-ready` 是显式实验路线"),
@@ -568,7 +577,21 @@ function checkContentContracts() {
   assert(receiverReadyDogfoodingDoc.includes("User-provided external evidence"), "Receiver-ready evidence must distinguish external evidence");
   assert(receiverReadyDogfoodingDoc.includes("not proof across all tools"), "Receiver-ready evidence must keep the interpretation scoped");
   assert(receiverReadyDogfoodingDoc.includes("Low-budget Validation Rule"), "Receiver-ready evidence must record the validation budget");
+  assert(receiverDifferenceExampleReadme.includes("human-facing `fail`"), "Receiver difference example must distinguish human-facing fail wording");
+  assert(receiverDifferenceExampleReadme.includes("machine result stays `difference_found`"), "Receiver difference example must preserve machine difference_found semantics");
+  assert(receiverBlockedExampleReadme.includes("human-facing"), "Receiver blocked example must distinguish human-facing fail wording");
+  assert(receiverBlockedExampleReadme.includes("machine result must stay `blocked`"), "Receiver blocked example must preserve blocked semantics");
+  assert(receiverLanguageRoutingExampleReadme.includes("BaseBrief"), "Receiver language-routing example must identify BaseBrief");
+  assert(receiverLanguageRoutingExampleReadme.includes("current_goal"), "Receiver language-routing example must restate current_goal");
+  assert(receiverLanguageRoutingExampleReadme.includes("receiver_entry_task"), "Receiver language-routing example must restate receiver_entry_task");
+  assert(receiverLanguageRoutingExampleReadme.includes("pass/fail"), "Receiver language-routing example must preserve pass/fail wording");
+  assert(receiverLanguageRoutingExampleReadme.includes("wait_for_user_confirmation"), "Receiver language-routing example must preserve wait-for-confirmation anchor");
+  assert(receiverLanguageRoutingReport.includes("BaseBrief"), "Receiver language-routing report must identify BaseBrief");
+  assert(receiverLanguageRoutingReport.includes("receiver 验收结论是 pass"), "Receiver language-routing report must include a pass report");
+  assert(receiverLanguageRoutingReport.includes("等待你的确认"), "Receiver language-routing report must stop at the confirmation gate");
   assert(receiverFrictionDoc.includes("actual_handoff_friction"), "Receiver friction log must record the report shape");
+  assert(receiverFrictionDoc.includes("pass/fail"), "Receiver friction log must preserve human-facing pass/fail wording");
+  assert(receiverFrictionDoc.includes("receiver_acceptance_words"), "Receiver friction log must record receiver_acceptance_words");
   assert(receiverFrictionDoc.includes("difference_found"), "Receiver friction log must document difference_found");
   assert(receiverFrictionDoc.includes("blocked"), "Receiver friction log must document blocked");
   assert(receiverFrictionDoc.includes("v0.3.1"), "Receiver friction log must name v0.3.1 stabilization");
@@ -671,6 +694,11 @@ function checkContentContracts() {
   assert(testingDoc.includes("v0.8.4 External Receiver Smoke Evidence"), "Testing docs must document v0.8.4 external receiver smoke evidence");
   assert(testingDoc.includes("v0.8.5 Manual Receiver Smoke Result Intake"), "Testing docs must document v0.8.5 manual receiver smoke intake");
   assert(testingDoc.includes("v0.8.6 Manual Receiver Smoke Result Intake Evidence"), "Testing docs must document v0.8.6 manual receiver smoke evidence");
+  assert(testingDoc.includes("OpenClaw/Hermes Manual Receiver Smoke Follow-up"), "Testing docs must document OpenClaw/Hermes manual smoke follow-up");
+  assert(testingDoc.includes("v0.8.7 Copyable New-Window Starter"), "Testing docs must document v0.8.7 copyable starter");
+  assert(testingDoc.includes("v0.8.8 Starter Language Routing"), "Testing docs must document v0.8.8 starter language routing");
+  assert(testingDoc.includes("new-window-starter.md"), "Testing docs must document Sidecar starter");
+  assert(testingDoc.includes("pass/fail"), "Testing docs must document Sidecar receiver pass/fail reporting");
   assert(testingDoc.includes("manual_required"), "Testing docs must preserve manual-required receiver execution status");
   assert(testingDoc.includes("not_run"), "Testing docs must preserve not-run receiver execution status");
   assert(testingDoc.includes("testing-v0.8.x-test-matrix.md"), "Testing docs must link v0.8.x test matrix");
@@ -867,6 +895,10 @@ function checkContentContracts() {
   assert(receiverCheckDoc.includes("basebrief-receiver-check-result-v1"), "Receiver Safe Check docs must name the result contract");
   assert(receiverCheckDoc.includes("不等同于重跑来源窗口的完整测试"), "Receiver Safe Check docs must distinguish lightweight checks from full tests");
   assert(receiverCheckDoc.includes("receiver-init --repo <target-repo> --output <receiver-check-config.json>"), "Receiver Safe Check docs must show receiver-init workflow");
+  assert(receiverCheckDoc.includes("`pass/fail`"), "Receiver Safe Check docs must distinguish human-facing pass/fail wording");
+  assert(receiverCheckDoc.includes("`difference_found`"), "Receiver Safe Check docs must document difference_found semantics");
+  assert(receiverCheckDoc.includes("`blocked`"), "Receiver Safe Check docs must document blocked semantics");
+  assert(receiverCheckDoc.includes("不等于 Agent 执行失败"), "Receiver Safe Check docs must preserve difference_found wording");
   assert(releaseCandidateDoc.includes("Receiver-ready v1"), "v0.3.0 release candidate must describe Receiver-ready v1");
   assert(releaseCandidateDoc.includes("Receiver Safe Check v1"), "v0.3.0 release candidate must describe Receiver Safe Check v1");
   assert(releaseCandidateDoc.includes("receiver-init --repo <target-repo>"), "v0.3.0 release candidate must describe explicit receiver workflow");
@@ -1145,6 +1177,7 @@ function checkContentContracts() {
   assert(docsIndex.includes("dogfooding/sidecar-external-receiver-smoke-v0.8.4.md"), "Docs index must link v0.8.4 sidecar external receiver smoke evidence");
   assert(docsIndex.includes("dogfooding/sidecar-manual-receiver-smoke-v0.8.5.md"), "Docs index must link v0.8.5 sidecar manual receiver smoke intake");
   assert(docsIndex.includes("dogfooding/sidecar-manual-receiver-smoke-v0.8.6.md"), "Docs index must link v0.8.6 sidecar manual receiver smoke evidence");
+  assert(docsIndex.includes("dogfooding/sidecar-openclaw-hermes-manual-smoke-followup.md"), "Docs index must link OpenClaw/Hermes manual smoke follow-up");
   assert(projectStateV063ReleaseDoc.includes("Lifecycle Readiness Gate Candidate"), "v0.6.3 release doc must describe readiness candidate");
   assert(projectStateV063ReleaseDoc.includes("not a lifecycle release"), "v0.6.3 release doc must reject lifecycle release status");
   assert(projectStateV063ReleaseDoc.includes("No state lifecycle commands"), "v0.6.3 release doc must state no lifecycle commands");
@@ -1241,6 +1274,8 @@ function checkContentContracts() {
   assert(sidecarV085ReleaseDoc.includes("openclaw"), "v0.8.5 release doc must document openclaw target");
   assert(sidecarV085ReleaseDoc.includes("basebrief-project-state-v1"), "v0.8.5 release doc must preserve project-state schema");
   assert(sidecarV085ReleaseDoc.includes("basebrief-sidecar-v1"), "v0.8.5 release doc must preserve sidecar schema");
+  assert(sidecarV085ReleaseDoc.includes("new-window-starter.md"), "v0.8.5 release doc must connect to new-window-starter.md");
+  assert(sidecarV085ReleaseDoc.includes("pass/fail"), "v0.8.5 release doc must preserve pass/fail wording");
   assert(sidecarV085ReleaseDoc.includes("No provider request"), "v0.8.5 release doc must state no provider request");
   assert(sidecarV085ReleaseDoc.includes("No raw private output"), "v0.8.5 release doc must state no raw private output");
   assert(sidecarV085ReleaseDoc.includes("No runtime integration"), "v0.8.5 release doc must state no runtime integration");
@@ -1259,6 +1294,8 @@ function checkContentContracts() {
   assert(sidecarV086ReleaseDoc.includes("Only the two generic receiver smoke rows are marked `passed`"), "v0.8.6 release doc must scope passed rows to generic");
   assert(sidecarV086ReleaseDoc.includes("basebrief-project-state-v1"), "v0.8.6 release doc must preserve project-state schema");
   assert(sidecarV086ReleaseDoc.includes("basebrief-sidecar-v1"), "v0.8.6 release doc must preserve sidecar schema");
+  assert(sidecarV086ReleaseDoc.includes("new-window-starter.md"), "v0.8.6 release doc must connect to new-window-starter.md");
+  assert(sidecarV086ReleaseDoc.includes("pass/fail"), "v0.8.6 release doc must preserve pass/fail wording");
   assert(sidecarV086ReleaseDoc.includes("No raw private output"), "v0.8.6 release doc must state raw-output boundary");
   assert(sidecarV086ReleaseDoc.includes("No runtime integration"), "v0.8.6 release doc must state runtime boundary");
   assert(sidecarV086ReleaseDoc.includes("No schema change"), "v0.8.6 release doc must state schema boundary");
@@ -1271,6 +1308,7 @@ function checkContentContracts() {
   assert(sidecarV087ReleaseDoc.includes("new-window-starter.md"), "v0.8.7 release doc must mention new-window-starter.md");
   assert(sidecarV087ReleaseDoc.includes("output_files.newWindowStarter"), "v0.8.7 release doc must document manifest output key");
   assert(sidecarV087ReleaseDoc.includes("new_window_starter=<path>"), "v0.8.7 release doc must document CLI human output");
+  assert(sidecarV087ReleaseDoc.includes("pass/fail"), "v0.8.7 release doc must document receiver pass/fail reporting");
   assert(sidecarV087ReleaseDoc.includes("old v0.8 bundles"), "v0.8.7 release doc must document old bundle compatibility");
   assert(sidecarV087ReleaseDoc.includes("No provider request"), "v0.8.7 release doc must state no provider request");
   assert(sidecarV087ReleaseDoc.includes("No raw private output"), "v0.8.7 release doc must state raw-output boundary");
@@ -1288,6 +1326,7 @@ function checkContentContracts() {
   assert(sidecarV088ReleaseDoc.includes("buildSidecarBundle({ starterLanguage })"), "v0.8.8 release doc must document JS API option");
   assert(sidecarV088ReleaseDoc.includes("falls back to `zh-CN`"), "v0.8.8 release doc must document zh-CN fallback");
   assert(sidecarV088ReleaseDoc.includes("No automatic translation service"), "v0.8.8 release doc must reject translation-service scope");
+  assert(sidecarV088ReleaseDoc.includes("pass/fail"), "v0.8.8 release doc must preserve receiver pass/fail anchor");
   assert(sidecarV088ReleaseDoc.includes("basebrief-project-state-v1"), "v0.8.8 release doc must preserve project-state schema");
   assert(sidecarV088ReleaseDoc.includes("basebrief-sidecar-v1"), "v0.8.8 release doc must preserve sidecar schema");
   assert(sidecarV088ReleaseDoc.includes("No provider request"), "v0.8.8 release doc must state no provider request");
@@ -1338,6 +1377,10 @@ function checkContentContracts() {
   assert(sidecarManualReceiverSmokeV085Doc.includes("no_auto_advance"), "v0.8.5 dogfooding doc must require no-auto-advance field");
   assert(sidecarManualReceiverSmokeV085Doc.includes("no_provider"), "v0.8.5 dogfooding doc must require no-provider field");
   assert(sidecarManualReceiverSmokeV085Doc.includes("no_runtime"), "v0.8.5 dogfooding doc must require no-runtime field");
+  assert(sidecarManualReceiverSmokeV085Doc.includes("new-window-starter.md"), "v0.8.5 dogfooding doc must link to the starter acceptance anchor");
+  assert(sidecarManualReceiverSmokeV085Doc.includes("pass/fail"), "v0.8.5 dogfooding doc must preserve pass/fail wording");
+  assert(sidecarManualReceiverSmokeV085Doc.includes("human-facing `pass`"), "v0.8.5 dogfooding doc must require human-facing pass for passed rows");
+  assert(sidecarManualReceiverSmokeV085Doc.includes("human-facing `fail`"), "v0.8.5 dogfooding doc must explain failed human-facing reports");
   assert(sidecarManualReceiverSmokeV085Doc.includes("No provider request"), "v0.8.5 dogfooding doc must state no provider request");
   assert(sidecarManualReceiverSmokeV085Doc.includes("No raw private output"), "v0.8.5 dogfooding doc must state no raw private output");
   assert(sidecarManualReceiverSmokeV085Doc.includes("No runtime integration"), "v0.8.5 dogfooding doc must state no runtime integration");
@@ -1357,6 +1400,9 @@ function checkContentContracts() {
   assert(sidecarManualReceiverSmokeV086Doc.includes("no_auto_advance: yes"), "v0.8.6 dogfooding doc must record no-auto-advance field");
   assert(sidecarManualReceiverSmokeV086Doc.includes("no_provider: yes"), "v0.8.6 dogfooding doc must record no-provider field");
   assert(sidecarManualReceiverSmokeV086Doc.includes("no_runtime: yes"), "v0.8.6 dogfooding doc must record no-runtime field");
+  assert(sidecarManualReceiverSmokeV086Doc.includes("new-window-starter.md"), "v0.8.6 dogfooding doc must link to the starter acceptance anchor");
+  assert(sidecarManualReceiverSmokeV086Doc.includes("reported `pass`"), "v0.8.6 dogfooding doc must preserve pass evidence");
+  assert(sidecarManualReceiverSmokeV086Doc.includes("No provider request"), "v0.8.6 dogfooding doc must reject provider requests");
   assert(sidecarManualReceiverSmokeV086Doc.includes("Only the two generic rows are marked `passed`"), "v0.8.6 dogfooding doc must scope passed rows to generic");
   assert(sidecarManualReceiverSmokeV086Doc.includes("No raw private output"), "v0.8.6 dogfooding doc must state raw-output boundary");
   assert(sidecarManualReceiverSmokeV086Doc.includes("No runtime integration"), "v0.8.6 dogfooding doc must state runtime boundary");
@@ -1366,6 +1412,21 @@ function checkContentContracts() {
   assert(sidecarManualReceiverSmokeV086Doc.includes("provider_probe_status=skipped"), "v0.8.6 dogfooding doc must preserve skipped provider gate");
   assert(!sidecarManualReceiverSmokeV086Doc.includes("opencode | openclaw | passed"), "v0.8.6 dogfooding doc must not claim OpenCode openclaw pass");
   assert(!sidecarManualReceiverSmokeV086Doc.includes("claude-code | openclaw | passed"), "v0.8.6 dogfooding doc must not claim Claude Code openclaw pass");
+  assert(sidecarOpenClawHermesManualSmokeFollowupDoc.includes("Sidecar OpenClaw/Hermes Manual Smoke Follow-up"), "OpenClaw/Hermes follow-up doc must have stable title");
+  assert(sidecarOpenClawHermesManualSmokeFollowupDoc.includes("user-supplied private summary file"), "OpenClaw/Hermes follow-up doc must describe the private summary source");
+  assert(sidecarOpenClawHermesManualSmokeFollowupDoc.includes("six named files read by absolute path"), "OpenClaw/Hermes follow-up doc must require six-file absolute-path reads");
+  assert(sidecarOpenClawHermesManualSmokeFollowupDoc.includes("`hermes-agent` | passed"), "OpenClaw/Hermes follow-up doc must record Hermes passed status");
+  assert(sidecarOpenClawHermesManualSmokeFollowupDoc.includes("`openclaw-agent` | passed"), "OpenClaw/Hermes follow-up doc must record OpenClaw passed status");
+  assert(sidecarOpenClawHermesManualSmokeFollowupDoc.includes("strict six-file absolute-path recheck"), "OpenClaw/Hermes follow-up doc must record the strict recheck");
+  assert(sidecarOpenClawHermesManualSmokeFollowupDoc.includes("reported `pass`"), "OpenClaw/Hermes follow-up doc must preserve pass reporting");
+  assert(sidecarOpenClawHermesManualSmokeFollowupDoc.includes("waited for user confirmation"), "OpenClaw/Hermes follow-up doc must preserve the confirmation gate");
+  assert(sidecarOpenClawHermesManualSmokeFollowupDoc.includes("does not define or"), "OpenClaw/Hermes follow-up doc must reject v0.9.0 expansion");
+  assert(sidecarOpenClawHermesManualSmokeFollowupDoc.includes("start `v0.9.0`"), "OpenClaw/Hermes follow-up doc must reject v0.9.0 start");
+  assert(sidecarOpenClawHermesManualSmokeFollowupDoc.includes("No provider request"), "OpenClaw/Hermes follow-up doc must state no provider request");
+  assert(sidecarOpenClawHermesManualSmokeFollowupDoc.includes("No runtime integration"), "OpenClaw/Hermes follow-up doc must state no runtime integration");
+  assert(sidecarOpenClawHermesManualSmokeFollowupDoc.includes("Do not write OpenClaw/Hermes profile/config/memory/workspace files"), "OpenClaw/Hermes follow-up doc must state no-write boundary");
+  assert(sidecarOpenClawHermesManualSmokeFollowupDoc.includes("latest freshly rebuilt `openclaw` bundle"), "OpenClaw/Hermes follow-up doc must preserve the rebuilt-bundle limitation");
+  assert(sidecarOpenClawHermesManualSmokeFollowupDoc.includes("provider_probe_status=skipped"), "OpenClaw/Hermes follow-up doc must preserve skipped provider gate");
   assert(v08xTestMatrixDoc.includes("v0.8.x Sidecar Test Matrix"), "v0.8.x matrix must have stable title");
   assert(v08xTestMatrixDoc.includes("sidecar-build"), "v0.8.x matrix must document sidecar-build");
   assert(v08xTestMatrixDoc.includes("sidecar-check"), "v0.8.x matrix must document sidecar-check");
@@ -1380,11 +1441,13 @@ function checkContentContracts() {
   assert(v08xTestMatrixDoc.includes("v0.8.4 External Receiver Smoke Evidence"), "v0.8.x matrix must document v0.8.4 external receiver smoke evidence");
   assert(v08xTestMatrixDoc.includes("v0.8.5 Manual Receiver Smoke Result Intake"), "v0.8.x matrix must document v0.8.5 manual receiver smoke intake");
   assert(v08xTestMatrixDoc.includes("v0.8.6 Manual Receiver Smoke Result Intake Evidence"), "v0.8.x matrix must document v0.8.6 manual receiver smoke evidence");
+  assert(v08xTestMatrixDoc.includes("OpenClaw/Hermes Manual Receiver Smoke Follow-up"), "v0.8.x matrix must document OpenClaw/Hermes manual smoke follow-up");
   assert(v08xTestMatrixDoc.includes("v0.8.7 Copyable New-Window Starter"), "v0.8.x matrix must document v0.8.7 copyable starter");
   assert(v08xTestMatrixDoc.includes("v0.8.8 Starter Language Routing"), "v0.8.x matrix must document v0.8.8 starter language routing");
   assert(v08xTestMatrixDoc.includes("--starter-language auto|zh-CN|en|ja"), "v0.8.x matrix must document starter language option");
   assert(v08xTestMatrixDoc.includes("falls back to `zh-CN`"), "v0.8.x matrix must document zh-CN starter fallback");
   assert(v08xTestMatrixDoc.includes("new-window-starter.md"), "v0.8.x matrix must document new-window-starter.md");
+  assert(v08xTestMatrixDoc.includes("pass/fail"), "v0.8.x matrix must document receiver pass/fail reporting");
   assert(v08xTestMatrixDoc.includes("output_files.newWindowStarter"), "v0.8.x matrix must document starter manifest output key");
   assert(v08xTestMatrixDoc.includes("Old v0.8 bundles"), "v0.8.x matrix must document old bundle compatibility");
   assert(v08xTestMatrixDoc.includes("Claude Code generic as `passed`"), "v0.8.x matrix must document Claude Code passed result");
@@ -1646,6 +1709,7 @@ function checkArtifactChecker() {
     "docs/dogfooding/sidecar-external-receiver-smoke-v0.8.4.md",
     "docs/dogfooding/sidecar-manual-receiver-smoke-v0.8.5.md",
     "docs/dogfooding/sidecar-manual-receiver-smoke-v0.8.6.md",
+    "docs/dogfooding/sidecar-openclaw-hermes-manual-smoke-followup.md",
     "examples/receiver-check-config.json",
     "examples/receiver/difference-found",
     "examples/receiver/blocked",

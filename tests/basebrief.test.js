@@ -239,6 +239,7 @@ test("v0.3.1 receiver stabilization documents examples, local npm scripts, and r
   const differenceReadme = readText("examples/receiver/difference-found/README.md");
   const blockedReadme = readText("examples/receiver/blocked/README.md");
   const languageReadme = readText("examples/receiver/language-routing/README.md");
+  const languageReport = readText("examples/receiver/language-routing/receiver-report.md");
   const differenceResult = readJson("examples/receiver/difference-found/receiver-check-result.json");
   const blockedResult = readJson("examples/receiver/blocked/blocked-result.json");
 
@@ -273,17 +274,29 @@ test("v0.3.1 receiver stabilization documents examples, local npm scripts, and r
   assert.match(release, /provider_probe_status=skipped/);
   assert.match(release, /No push, tag, or formal release/);
   assert.match(frictionLog, /actual_handoff_friction/);
+  assert.match(frictionLog, /pass\/fail/);
+  assert.match(frictionLog, /receiver_acceptance_words/);
   assert.match(frictionLog, /difference_found/);
   assert.match(frictionLog, /blocked/);
 
+  assert.match(differenceReadme, /human-facing `fail`/);
   assert.match(differenceReadme, /does not mean the agent failed/);
   assert.equal(differenceResult.handoff_acceptance, "difference_found");
   assert.equal(differenceResult.receiver_task_status, "completed");
+  assert.match(blockedReadme, /human-facing/);
   assert.match(blockedReadme, /cannot run safely/);
   assert.equal(blockedResult.handoff_acceptance, "blocked");
   assert.equal(blockedResult.receiver_task_status, "blocked");
+  assert.match(languageReadme, /BaseBrief/);
+  assert.match(languageReadme, /current_goal/);
+  assert.match(languageReadme, /receiver_entry_task/);
   assert.match(languageReadme, /match_latest_user_message/);
+  assert.match(languageReadme, /pass\/fail/);
   assert.match(languageReadme, /technical literals/);
+  assert.match(languageReadme, /wait_for_user_confirmation/);
+  assert.match(languageReport, /BaseBrief/);
+  assert.match(languageReport, /receiver 验收结论是 pass/);
+  assert.match(languageReport, /等待你的确认/);
 
   for (const relativePath of [
     "docs/releases/v0.3.1.md",
@@ -1003,6 +1016,8 @@ test("v0.8.1 sidecar check documents read-only bundle acceptance", () => {
   assert.match(docsIndex, /releases\/v0\.8\.1\.md/);
   assert.match(cliLite, /sidecar-check --input <sidecar-dir>/);
   assert.match(projectState, /sidecar-check --input <sidecar-dir>/);
+  assert.match(cliLite, /pass\/fail/);
+  assert.match(projectState, /pass\/fail/);
   assert.match(release, /Sidecar Check Hardening Candidate/);
   assert.match(release, /basebrief-sidecar-v1/);
   assert.match(release, /basebrief-project-state-v1/);
@@ -1209,11 +1224,17 @@ test("v0.8.5 manual receiver smoke intake stays not-run until public-safe eviden
   assert.match(dogfooding, /no_auto_advance/);
   assert.match(dogfooding, /no_provider/);
   assert.match(dogfooding, /no_runtime/);
+  assert.match(dogfooding, /new-window-starter\.md/);
+  assert.match(dogfooding, /pass\/fail/);
+  assert.match(dogfooding, /human-facing `pass`/);
+  assert.match(dogfooding, /human-facing `fail`/);
   assert.match(dogfooding, /opencode \| generic \| not_run \| manual_required/);
   assert.match(dogfooding, /claude-code \| generic \| not_run \| manual_required/);
   assert.doesNotMatch(dogfooding, /opencode \| generic \| passed/);
   assert.doesNotMatch(dogfooding, /claude-code \| generic \| passed/);
   assert.match(release, /Manual Receiver Smoke Result Intake Candidate/);
+  assert.match(release, /new-window-starter\.md/);
+  assert.match(release, /pass\/fail/);
   assert.match(release, /OpenCode generic receiver smoke: not_run, manual_required/);
   assert.match(release, /Claude Code generic receiver smoke: not_run, manual_required/);
   assert.match(release, /No external receiver prompt was invoked from Codex/);
@@ -1266,9 +1287,14 @@ test("v0.8.6 manual receiver smoke result evidence records generic passes only",
   assert.match(dogfooding, /no_auto_advance: yes/);
   assert.match(dogfooding, /no_provider: yes/);
   assert.match(dogfooding, /no_runtime: yes/);
+  assert.match(dogfooding, /new-window-starter\.md/);
+  assert.match(dogfooding, /reported `pass`/);
+  assert.match(dogfooding, /No provider request/);
   assert.match(dogfooding, /Only the two generic rows are marked `passed`/);
 
   assert.match(release, /Manual Receiver Smoke Result Intake Evidence Candidate/);
+  assert.match(release, /new-window-starter\.md/);
+  assert.match(release, /pass\/fail/);
   assert.match(release, /OpenCode generic receiver smoke: passed/);
   assert.match(release, /Claude Code generic receiver smoke: passed/);
   assert.match(release, /Only the two generic receiver smoke rows are marked `passed`/);
@@ -1281,6 +1307,48 @@ test("v0.8.6 manual receiver smoke result evidence records generic passes only",
     "docs/testing-v0.8.x-test-matrix.md",
     "docs/dogfooding/sidecar-manual-receiver-smoke-v0.8.6.md",
     "docs/releases/v0.8.6.md",
+  ]) {
+    const result = checkArtifacts({ inputPath: path.join(repoRoot, relativePath) });
+    assert.equal(result.status, "passed", relativePath);
+    assert.equal(result.errorCount, 0, relativePath);
+  }
+});
+
+test("OpenClaw and Hermes manual smoke follow-up closes the first-response gap without rewriting v0.8.5/v0.8.6 history", () => {
+  const docsIndex = readText("docs/index.md");
+  const testing = readText("docs/testing.md");
+  const matrix = readText("docs/testing-v0.8.x-test-matrix.md");
+  const dogfooding = readText("docs/dogfooding/sidecar-openclaw-hermes-manual-smoke-followup.md");
+
+  assert.match(docsIndex, /dogfooding\/sidecar-openclaw-hermes-manual-smoke-followup\.md/);
+  assert.match(testing, /OpenClaw\/Hermes Manual Receiver Smoke Follow-up/);
+  assert.match(testing, /hermes-agent/);
+  assert.match(testing, /openclaw-agent/);
+  assert.match(testing, /strict six-file absolute-path/);
+  assert.match(testing, /does not rewrite the `v0\.8\.5` \/ `v0\.8\.6` checkpoint tables/);
+  assert.match(matrix, /OpenClaw\/Hermes Manual Receiver Smoke Follow-up/);
+  assert.match(matrix, /hermes-agent/);
+  assert.match(matrix, /openclaw-agent/);
+  assert.match(matrix, /strict six-file/);
+  assert.match(matrix, /latest freshly rebuilt `openclaw` bundle/);
+  assert.match(dogfooding, /user-supplied private summary file/);
+  assert.match(dogfooding, /six named files read by absolute path/);
+  assert.match(dogfooding, /`hermes-agent` \| passed/);
+  assert.match(dogfooding, /`openclaw-agent` \| passed/);
+  assert.match(dogfooding, /strict six-file absolute-path recheck/);
+  assert.match(dogfooding, /reported `pass`/);
+  assert.match(dogfooding, /waited for user confirmation/);
+  assert.match(dogfooding, /does not define or\s+start `v0\.9\.0`/);
+  assert.match(dogfooding, /No provider request/);
+  assert.match(dogfooding, /No runtime integration/);
+  assert.match(dogfooding, /Do not write OpenClaw\/Hermes profile\/config\/memory\/workspace files/);
+  assert.match(dogfooding, /latest freshly rebuilt `openclaw` bundle/);
+  assert.match(dogfooding, /provider_probe_status=skipped/);
+
+  for (const relativePath of [
+    "docs/testing.md",
+    "docs/testing-v0.8.x-test-matrix.md",
+    "docs/dogfooding/sidecar-openclaw-hermes-manual-smoke-followup.md",
   ]) {
     const result = checkArtifacts({ inputPath: path.join(repoRoot, relativePath) });
     assert.equal(result.status, "passed", relativePath);
@@ -2995,6 +3063,7 @@ test("Sidecar build writes generic bundle from valid project state", () => withT
   assert.match(starter, /Sidecar bundle/);
   assert.match(starter, /current_goal/);
   assert.match(starter, /receiver_entry_task/);
+  assert.match(starter, /pass\/fail/);
   assert.match(starter, /Wait for user confirmation/);
   assert.match(starter, /No provider request/);
   assert.match(starter, /No raw private output/);
@@ -3019,12 +3088,15 @@ test("Sidecar build localizes copyable new-window starter languages", () => with
   assert.match(zhStarter, /# BaseBrief 新窗口开场白/);
   assert.match(zhStarter, /目标仓库/);
   assert.match(zhStarter, /Wait for user confirmation/);
+  assert.match(zhStarter, /pass\/fail/);
   assert.match(zhStarter, /No provider request/);
   assert.match(zhStarter, /current_goal/);
   assert.match(enStarter, /# BaseBrief New Window Starter/);
   assert.match(enStarter, /Target repository/);
+  assert.match(enStarter, /pass\/fail/);
   assert.match(jaStarter, /# BaseBrief 新規ウィンドウ開始文/);
   assert.match(jaStarter, /対象リポジトリ/);
+  assert.match(jaStarter, /pass\/fail/);
   assert.match(jaStarter, /No raw private output/);
   assert.match(jaStarter, /receiver_entry_task/);
 
@@ -3180,6 +3252,7 @@ test("Sidecar check validates copyable new-window starter while keeping old bund
     .replace(/Sidecar bundle/gi, "Bundle")
     .replace(/directory that contains this `new-window-starter\.md` file/gi, "nearby files")
     .replace(/Wait for user confirmation/gi, "Continue after review")
+    .replace(/pass\/fail/gi, "result")
     .replace(/No provider request/gi, "Provider requests are not covered")
     .replace(/No runtime integration/gi, "Runtime details are not covered")
     .replace(/No schema change/gi, "Schema details are not covered")
@@ -3190,6 +3263,7 @@ test("Sidecar check validates copyable new-window starter while keeping old bund
   assert(result.errors.some((error) => error.includes("target repository cue")));
   assert(result.errors.some((error) => error.includes("sidecar bundle path instruction")));
   assert(result.errors.some((error) => error.includes("waiting for user confirmation")));
+  assert(result.errors.some((error) => error.includes("pass/fail")));
   assert(result.errors.some((error) => error.includes("No provider request")));
   assert(result.errors.some((error) => error.includes("No runtime integration")));
   assert(result.errors.some((error) => error.includes("No schema change")));

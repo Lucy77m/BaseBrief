@@ -14,8 +14,8 @@ the v0.8.x Sidecar work into v0.9.
 
 | Tool | Target | Status | Public-safe acceptance summary |
 | --- | --- | --- | --- |
-| opencode | generic | passed | Receiver read the v0.8.4 sidecar bundle, restated the current goal, receiver entry task, and seven risk boundaries, and confirmed all required guardrails without advancing the project. |
-| claude-code | generic | passed | Generic receiver smoke passed; all sidecar fields were carried and restated, and the receiver waited for user confirmation. |
+| opencode | generic | passed | Receiver read the v0.8.4 sidecar bundle, identified BaseBrief, restated `current_goal`, `receiver_entry_task`, and seven risk boundaries, reported `pass`, and waited for user confirmation without auto-advancing or touching provider/runtime boundaries. |
+| claude-code | generic | passed | Receiver identified BaseBrief, carried and restated the sidecar fields, reported `pass`, and stopped at the user-confirmation gate without provider or runtime activity. |
 | opencode | openclaw | not_run | manual_required |
 | claude-code | openclaw | not_run | manual_required |
 
@@ -39,7 +39,7 @@ wait_for_user_confirmation: yes
 no_auto_advance: yes
 no_provider: yes
 no_runtime: yes
-public_safe_notes: Receiver read the v0.8.4 sidecar bundle, restated the current goal, receiver entry task, and seven risk boundaries, and confirmed all required guardrails without advancing the project.
+public_safe_notes: Receiver read the v0.8.4 sidecar bundle, identified BaseBrief, restated `current_goal`, `receiver_entry_task`, and seven risk boundaries, reported `pass`, and waited for user confirmation without auto-advancing or touching provider/runtime boundaries.
 ```
 
 ```text
@@ -56,7 +56,7 @@ wait_for_user_confirmation: yes
 no_auto_advance: yes
 no_provider: yes
 no_runtime: yes
-public_safe_notes: Generic receiver smoke passed; all sidecar fields were carried and restated, and the receiver waited for user confirmation.
+public_safe_notes: Receiver identified BaseBrief, carried and restated the sidecar fields, reported `pass`, and stopped at the user-confirmation gate without provider or runtime activity.
 ```
 
 ## Interpretation
@@ -64,19 +64,22 @@ public_safe_notes: Generic receiver smoke passed; all sidecar fields were carrie
 The generic receiver path now has public-safe acceptance evidence from both
 OpenCode and Claude Code. Both summaries satisfy the v0.8.5 pass rule: BaseBrief,
 v0.8.x, the current commit, `current_goal`, `receiver_entry_task`, at least two
-risk boundaries, wait-for-confirmation, no auto-advance, no provider, and no
-runtime were all confirmed.
+risk boundaries, human-facing `pass`, wait-for-confirmation, no auto-advance,
+no provider, and no runtime were all confirmed. This is the same receiver
+acceptance anchor later surfaced by `new-window-starter.md`.
 
 OpenClaw-target rows remain `not_run` with `manual_required`; no OpenClaw/Hermes
 runtime or profile/config/memory/workspace writes were attempted.
 
 ## Boundaries
 
+- No provider request.
 - No raw private output.
 - No runtime integration.
 - No schema change.
 - No Auto Flow.
 - No receiver thread creation.
+- No auto-advance beyond the receiver acceptance report.
 - Wait for user confirmation before continuing from the bundle.
 - No OpenClaw/Hermes runtime connection.
 - No OpenClaw/Hermes profile/config/memory/workspace writes.

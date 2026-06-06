@@ -172,7 +172,7 @@ const STARTER_COPY = {
     intro: "Copy this block into a new chat. Start by accepting the BaseBrief receiver task; do not continue the project yet.",
     targetRepo: "Target repository: open the repository that generated this Sidecar bundle.",
     sidecarBundle: (bundleCue) => `Sidecar bundle: read ${bundleCue}, including \`manifest.json\`, \`state-summary.json\`, \`handoff.md\`, \`next-chat-prompt.md\`, \`receiver-entry-task.md\`, and \`risk-boundaries.md\`.`,
-    firstResponse: "First response: identify BaseBrief, restate `current_goal`, restate `receiver_entry_task`, restate at least two risk boundaries, and say whether the bundle is understandable enough to continue.",
+    firstResponse: "First response: identify BaseBrief, restate `current_goal`, restate `receiver_entry_task`, restate at least two risk boundaries, report pass/fail, and say whether the bundle is understandable enough to continue.",
     wait: "Wait for user confirmation before continuing.",
     currentGoal: "current_goal:",
     receiverEntryTask: "receiver_entry_task:",
@@ -190,7 +190,7 @@ const STARTER_COPY = {
     intro: "把这段复制到新聊天。先接收 BaseBrief receiver task；暂时不要继续推进项目。",
     targetRepo: "目标仓库（Target repository）：打开生成此 Sidecar bundle 的仓库。",
     sidecarBundle: (bundleCue) => `Sidecar bundle：读取 ${bundleCue}，包括 \`manifest.json\`、\`state-summary.json\`、\`handoff.md\`、\`next-chat-prompt.md\`、\`receiver-entry-task.md\` 和 \`risk-boundaries.md\`。`,
-    firstResponse: "首条回复：识别 BaseBrief，复述 `current_goal`，复述 `receiver_entry_task`，复述至少两个 risk boundaries，并说明这个 bundle 是否足够清楚、可以继续。",
+    firstResponse: "首条回复：识别 BaseBrief，复述 `current_goal`，复述 `receiver_entry_task`，复述至少两个 risk boundaries，报告 pass/fail，并说明这个 bundle 是否足够清楚、可以继续。",
     wait: "等待用户确认后再继续。（Wait for user confirmation before continuing.）",
     currentGoal: "current_goal:",
     receiverEntryTask: "receiver_entry_task:",
@@ -208,7 +208,7 @@ const STARTER_COPY = {
     intro: "このブロックを新しいチャットにコピーしてください。まず BaseBrief receiver task を受け入れ、まだプロジェクトを進めないでください。",
     targetRepo: "対象リポジトリ（Target repository）：この Sidecar bundle を生成したリポジトリを開いてください。",
     sidecarBundle: (bundleCue) => `Sidecar bundle：${bundleCue} を読み、\`manifest.json\`、\`state-summary.json\`、\`handoff.md\`、\`next-chat-prompt.md\`、\`receiver-entry-task.md\`、\`risk-boundaries.md\` を確認してください。`,
-    firstResponse: "最初の返信：BaseBrief を識別し、`current_goal` と `receiver_entry_task` を復唱し、少なくとも2つの risk boundaries を復唱し、この bundle が続行できるほど理解可能かを述べてください。",
+    firstResponse: "最初の返信：BaseBrief を識別し、`current_goal` と `receiver_entry_task` を復唱し、少なくとも2つの risk boundaries を復唱し、pass/fail を報告し、この bundle が続行できるほど理解可能かを述べてください。",
     wait: "ユーザー確認を待ってから続行してください。（Wait for user confirmation before continuing.）",
     currentGoal: "current_goal:",
     receiverEntryTask: "receiver_entry_task:",
@@ -528,6 +528,9 @@ function checkStarterContract({ newWindowStarter, stateSummary, target, errors }
   }
   if (!/(Wait for user confirmation|等待用户确认|ユーザー確認)/i.test(newWindowStarter)) {
     errors.push("new-window-starter.md must require waiting for user confirmation");
+  }
+  if (!/pass\/fail/i.test(newWindowStarter)) {
+    errors.push("new-window-starter.md must require reporting pass/fail");
   }
   if (!/No provider request/i.test(newWindowStarter)) {
     errors.push("new-window-starter.md must include No provider request");

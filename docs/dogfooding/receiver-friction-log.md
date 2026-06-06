@@ -29,10 +29,15 @@ automation_decision:
 
 Use short status words such as `yes`, `no`, `partial`, `not_applicable`, `pass`, `difference_found`, or `blocked`. Put details in `notes` only when they are public-safe and useful for improving the workflow.
 
+Starter-style receiver prose should still say human-facing `pass/fail` before
+any project work continues; machine fields such as `receiver_check_result`
+carry the finer distinction between `pass`, `difference_found`, and `blocked`.
+
 ## Current Findings
 
 - `cwd_match`: receivers can report whether the current working directory is the target repository before doing project work.
 - `receiver_check_result`: `receiver-check` gives a stable machine result for `pass`, `difference_found`, and `blocked`.
+- `receiver_acceptance_words`: starter-style receiver reports are easier to review when they say human-facing `pass/fail` first and then preserve the machine result separately.
 - `changed_files_match`: an exact `expected_changed_files` list turns dirty-worktree review into a mechanical comparison.
 - `source_vs_receiver_verification_clear`: receiver reports are clearer when inherited source-window facts are separated from current-window rechecks.
 - `language_match`: `response_language: match_latest_user_message` works best when code, paths, commands, and field names are explicitly excluded from language detection.
@@ -95,6 +100,7 @@ Friction classification:
 
 ## Stabilization Decisions
 
+- Keep human-facing `pass/fail` as the receiver narrative acceptance anchor; use machine `pass`, `difference_found`, and `blocked` to explain why.
 - Keep `difference_found` as a completed receiver task, not an agent failure.
 - Keep `blocked` for invalid config, unsafe paths, missing target repositories, or checks that cannot run safely.
 - Keep private receiver artifacts under ignored local output directories.

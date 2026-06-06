@@ -41,6 +41,10 @@ no_runtime: yes | no
 public_safe_notes: <summary only>
 ```
 
+`public_safe_notes` must stay public-safe and explicitly say whether the
+receiver reported human-facing `pass` or `fail` before stopping at the
+confirmation gate.
+
 ## Pass Rule
 
 A row can be marked `passed` only when the public-safe summary confirms:
@@ -51,13 +55,19 @@ A row can be marked `passed` only when the public-safe summary confirms:
 - `current_goal` was repeated.
 - The receiver entry task was repeated.
 - At least two risk boundaries were listed.
+- The receiver explicitly reported human-facing `pass`.
 - The receiver said it will wait for user confirmation.
 - The receiver said no auto-advance.
 - The receiver said no provider.
 - The receiver said no runtime.
 
 If any required item is missing, use `failed`, `timed_out`, `unavailable`, or
-`not_run`; do not write `passed`.
+`not_run`; do not write `passed`. If the receiver reported human-facing `fail`,
+the row also cannot be marked `passed`.
+
+This is the same acceptance anchor later surfaced by `new-window-starter.md`:
+identify BaseBrief, restate key fields, report `pass/fail`, and stop at the
+wait-for-confirmation gate.
 
 ## Boundaries
 
@@ -67,6 +77,7 @@ If any required item is missing, use `failed`, `timed_out`, `unavailable`, or
 - No schema change.
 - No Auto Flow.
 - No receiver thread creation from Codex.
+- No auto-advance beyond the receiver acceptance report.
 - Wait for user confirmation before continuing from the bundle.
 - No OpenClaw/Hermes runtime connection.
 - No OpenClaw/Hermes profile/config/memory/workspace writes.

@@ -4,6 +4,10 @@ This example shows a completed receiver check where repository state differs fro
 
 `difference_found` means the receiver task completed and reported the difference. It does not mean the agent failed.
 
+In starter-style receiver prose, this would usually be reported as a
+human-facing `fail`, while the machine result stays `difference_found` to show
+that the acceptance check completed safely and accurately.
+
 Expected report shape:
 
 ```text

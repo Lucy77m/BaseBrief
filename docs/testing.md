@@ -50,8 +50,9 @@ remains the receiver contract.
 
 The starter must point to the target repository and Sidecar bundle, restate
 `current_goal` and `receiver_entry_task`, include at least two risk boundaries,
-and preserve wait for user confirmation, No provider request, No raw private
-output, No runtime integration, No schema change, and No auto-advance.
+report `pass/fail`, and preserve wait for user confirmation, No provider
+request, No raw private output, No runtime integration, No schema change, and
+No auto-advance.
 `sidecar-check` validates the starter only when `manifest.json` declares
 `output_files.newWindowStarter`, so old v0.8 bundles remain compatible.
 
@@ -65,8 +66,9 @@ integration, OpenClaw/Hermes runtime connection, or provider benchmarks.
 `v0.8.8` adds `--starter-language auto|zh-CN|en|ja` for Sidecar
 `new-window-starter.md`. The flag localizes only the copyable starter shell:
 protocol fields, paths, file names, schema names, and English hard-stop anchors
-remain literal. `auto` falls back to `zh-CN` for mixed or unclear language, and
-this is not an automatic translation service.
+remain literal, including the `pass/fail` receiver acceptance anchor. `auto`
+falls back to `zh-CN` for mixed or unclear language, and this is not an
+automatic translation service.
 
 Expected release-check output without provider env remains:
 
@@ -126,6 +128,18 @@ Expected release-check output without provider env remains:
 ```text
 provider_probe_status=skipped
 ```
+
+## OpenClaw/Hermes Manual Receiver Smoke Follow-up
+
+A later public-safe follow-up closes the remaining OpenClaw/Hermes manual
+first-response gap. It records `hermes-agent` as `passed` and
+`openclaw-agent` as `passed` only after a strict six-file absolute-path
+recheck against a historical `openclaw` Sidecar bundle.
+
+This follow-up does not rewrite the `v0.8.5` / `v0.8.6` checkpoint tables. It
+is manual gap closure only, not proof of provider/runtime integration and not
+proof that the latest freshly rebuilt `openclaw` bundle was exercised end to
+end by an external agent.
 
 ## v0.5.0 Guided Receiver Flow Candidate
 

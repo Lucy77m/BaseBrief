@@ -70,7 +70,8 @@ writes, and no schema change.
 
 The generated bundle includes `new-window-starter.md`, a short copyable block
 for the user to paste into a new chat. It points the receiver to the Sidecar
-bundle while keeping `next-chat-prompt.md` as the receiver contract. The
+bundle, asks for a `pass/fail` report, and keeps `next-chat-prompt.md` as the
+receiver contract. The
 optional `--starter-language auto|zh-CN|en|ja` flag localizes only that
 copyable starter shell; protocol fields, paths, file names, schema names, and
 English hard-stop anchors remain literal.
@@ -86,8 +87,9 @@ the six contract files, validates `basebrief-sidecar-v1` and
 `receiver_entry_task`, and at least two `risk_boundaries` are understandable in
 `next-chat-prompt.md`, and reuses the artifact checker for public-safe output.
 For v0.8.7-and-later bundles, it also validates `new-window-starter.md` when
-`manifest.json` declares `output_files.newWindowStarter`; older bundles without
-that manifest key remain compatible.
+`manifest.json` declares `output_files.newWindowStarter`, including its
+`pass/fail` report instruction; older bundles without that manifest key remain
+compatible.
 It does not change `.basebrief/state.json`, does not change schema, does not
 call providers, and does not connect runtime systems.
 

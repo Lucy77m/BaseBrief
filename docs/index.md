@@ -86,6 +86,7 @@
 - [Sidecar external receiver smoke v0.8.4](dogfooding/sidecar-external-receiver-smoke-v0.8.4.md)
 - [Sidecar manual receiver smoke v0.8.5](dogfooding/sidecar-manual-receiver-smoke-v0.8.5.md)
 - [Sidecar manual receiver smoke v0.8.6](dogfooding/sidecar-manual-receiver-smoke-v0.8.6.md)
+- [Sidecar OpenClaw/Hermes manual smoke follow-up](dogfooding/sidecar-openclaw-hermes-manual-smoke-followup.md)
 - [Usability feedback template](../.github/ISSUE_TEMPLATE/usability_feedback.md)
 
 ## Cache-ready 实验历史
