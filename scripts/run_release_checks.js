@@ -88,6 +88,7 @@ function checkRequiredFiles() {
     "docs/dogfooding/sidecar-receiver-acceptance-v0.8.2.md",
     "docs/dogfooding/sidecar-external-receiver-smoke-v0.8.4.md",
     "docs/dogfooding/sidecar-manual-receiver-smoke-v0.8.5.md",
+    "docs/dogfooding/sidecar-manual-receiver-smoke-v0.8.6.md",
     "docs/integrations.md",
     "docs/adapters.md",
     "docs/walkthrough.md",
@@ -123,6 +124,7 @@ function checkRequiredFiles() {
     "docs/releases/v0.8.3.md",
     "docs/releases/v0.8.4.md",
     "docs/releases/v0.8.5.md",
+    "docs/releases/v0.8.6.md",
     "docs/testing-v0.4.x-test-matrix.md",
     "docs/testing-v0.6.x-test-matrix.md",
     "docs/testing-v0.7.x-test-matrix.md",
@@ -259,6 +261,7 @@ function checkContentContracts() {
   const sidecarReceiverAcceptanceV082Doc = readText("docs/dogfooding/sidecar-receiver-acceptance-v0.8.2.md");
   const sidecarExternalReceiverSmokeV084Doc = readText("docs/dogfooding/sidecar-external-receiver-smoke-v0.8.4.md");
   const sidecarManualReceiverSmokeV085Doc = readText("docs/dogfooding/sidecar-manual-receiver-smoke-v0.8.5.md");
+  const sidecarManualReceiverSmokeV086Doc = readText("docs/dogfooding/sidecar-manual-receiver-smoke-v0.8.6.md");
   const testingDoc = readText("docs/testing.md");
   const usabilityFeedbackTemplate = readText(".github/ISSUE_TEMPLATE/usability_feedback.md");
   const adaptersDoc = readText("docs/adapters.md");
@@ -289,6 +292,7 @@ function checkContentContracts() {
   const sidecarV083ReleaseDoc = readText("docs/releases/v0.8.3.md");
   const sidecarV084ReleaseDoc = readText("docs/releases/v0.8.4.md");
   const sidecarV085ReleaseDoc = readText("docs/releases/v0.8.5.md");
+  const sidecarV086ReleaseDoc = readText("docs/releases/v0.8.6.md");
   const postReleaseBaselineDoc = readText("docs/baselines/v0.4.0-post-release-baseline.md");
   const v060PostReleaseBaselineDoc = readText("docs/baselines/v0.6.0-post-release-baseline.md");
   const projectStateModelDoc = readText("docs/design/project-state-model.md");
@@ -525,6 +529,7 @@ function checkContentContracts() {
   assert(docsIndex.includes("releases/v0.8.3.md"), "Docs index must link v0.8.3 sidecar discoverability polish candidate");
   assert(docsIndex.includes("releases/v0.8.4.md"), "Docs index must link v0.8.4 sidecar external receiver smoke candidate");
   assert(docsIndex.includes("releases/v0.8.5.md"), "Docs index must link v0.8.5 sidecar manual receiver smoke intake candidate");
+  assert(docsIndex.includes("releases/v0.8.6.md"), "Docs index must link v0.8.6 sidecar manual receiver smoke evidence candidate");
   assert(docsIndex.includes("releases/v0.7.0.md"), "Docs index must link v0.7.0 lifecycle release candidate");
   assert(docsIndex.includes("releases/v0.6.3.md"), "Docs index must link v0.6.3 lifecycle readiness candidate");
   assert(docsIndex.includes("releases/v0.6.2.md"), "Docs index must link v0.6.2 self-dogfooding evidence candidate");
@@ -646,6 +651,7 @@ function checkContentContracts() {
   assert(testingDoc.includes("v0.8.2 Sidecar Receiver Acceptance Evidence"), "Testing docs must document v0.8.2 sidecar receiver acceptance evidence");
   assert(testingDoc.includes("v0.8.4 External Receiver Smoke Evidence"), "Testing docs must document v0.8.4 external receiver smoke evidence");
   assert(testingDoc.includes("v0.8.5 Manual Receiver Smoke Result Intake"), "Testing docs must document v0.8.5 manual receiver smoke intake");
+  assert(testingDoc.includes("v0.8.6 Manual Receiver Smoke Result Intake Evidence"), "Testing docs must document v0.8.6 manual receiver smoke evidence");
   assert(testingDoc.includes("manual_required"), "Testing docs must preserve manual-required receiver execution status");
   assert(testingDoc.includes("not_run"), "Testing docs must preserve not-run receiver execution status");
   assert(testingDoc.includes("testing-v0.8.x-test-matrix.md"), "Testing docs must link v0.8.x test matrix");
@@ -1115,6 +1121,7 @@ function checkContentContracts() {
   assert(docsIndex.includes("dogfooding/sidecar-receiver-acceptance-v0.8.2.md"), "Docs index must link v0.8.2 sidecar receiver acceptance evidence");
   assert(docsIndex.includes("dogfooding/sidecar-external-receiver-smoke-v0.8.4.md"), "Docs index must link v0.8.4 sidecar external receiver smoke evidence");
   assert(docsIndex.includes("dogfooding/sidecar-manual-receiver-smoke-v0.8.5.md"), "Docs index must link v0.8.5 sidecar manual receiver smoke intake");
+  assert(docsIndex.includes("dogfooding/sidecar-manual-receiver-smoke-v0.8.6.md"), "Docs index must link v0.8.6 sidecar manual receiver smoke evidence");
   assert(projectStateV063ReleaseDoc.includes("Lifecycle Readiness Gate Candidate"), "v0.6.3 release doc must describe readiness candidate");
   assert(projectStateV063ReleaseDoc.includes("not a lifecycle release"), "v0.6.3 release doc must reject lifecycle release status");
   assert(projectStateV063ReleaseDoc.includes("No state lifecycle commands"), "v0.6.3 release doc must state no lifecycle commands");
@@ -1220,6 +1227,23 @@ function checkContentContracts() {
   assert(sidecarV085ReleaseDoc.includes("provider_probe_status=skipped"), "v0.8.5 release doc must preserve skipped provider gate");
   assert(!sidecarV085ReleaseDoc.includes("OpenCode generic receiver smoke: passed"), "v0.8.5 release doc must not claim OpenCode generic pass");
   assert(!sidecarV085ReleaseDoc.includes("Claude Code generic receiver smoke: passed"), "v0.8.5 release doc must not claim Claude Code generic pass");
+  assert(sidecarV086ReleaseDoc.includes("Manual Receiver Smoke Result Intake Evidence Candidate"), "v0.8.6 release doc must describe manual receiver smoke evidence");
+  assert(sidecarV086ReleaseDoc.includes("OpenCode generic receiver smoke: passed"), "v0.8.6 release doc must record OpenCode generic passed status");
+  assert(sidecarV086ReleaseDoc.includes("Claude Code generic receiver smoke: passed"), "v0.8.6 release doc must record Claude Code generic passed status");
+  assert(sidecarV086ReleaseDoc.includes("OpenCode openclaw receiver smoke: not_run"), "v0.8.6 release doc must preserve OpenCode openclaw not-run status");
+  assert(sidecarV086ReleaseDoc.includes("Claude Code openclaw receiver smoke: not_run"), "v0.8.6 release doc must preserve Claude Code openclaw not-run status");
+  assert(sidecarV086ReleaseDoc.includes("manual_required"), "v0.8.6 release doc must preserve manual-required status");
+  assert(sidecarV086ReleaseDoc.includes("Only the two generic receiver smoke rows are marked `passed`"), "v0.8.6 release doc must scope passed rows to generic");
+  assert(sidecarV086ReleaseDoc.includes("basebrief-project-state-v1"), "v0.8.6 release doc must preserve project-state schema");
+  assert(sidecarV086ReleaseDoc.includes("basebrief-sidecar-v1"), "v0.8.6 release doc must preserve sidecar schema");
+  assert(sidecarV086ReleaseDoc.includes("No raw private output"), "v0.8.6 release doc must state raw-output boundary");
+  assert(sidecarV086ReleaseDoc.includes("No runtime integration"), "v0.8.6 release doc must state runtime boundary");
+  assert(sidecarV086ReleaseDoc.includes("No schema change"), "v0.8.6 release doc must state schema boundary");
+  assert(sidecarV086ReleaseDoc.includes("No Auto Flow"), "v0.8.6 release doc must state Auto Flow boundary");
+  assert(sidecarV086ReleaseDoc.includes("Wait for user confirmation"), "v0.8.6 release doc must state user-confirmation boundary");
+  assert(sidecarV086ReleaseDoc.includes("provider_probe_status=skipped"), "v0.8.6 release doc must preserve skipped provider gate");
+  assert(!sidecarV086ReleaseDoc.includes("OpenCode openclaw receiver smoke: passed"), "v0.8.6 release doc must not claim OpenCode openclaw pass");
+  assert(!sidecarV086ReleaseDoc.includes("Claude Code openclaw receiver smoke: passed"), "v0.8.6 release doc must not claim Claude Code openclaw pass");
   assert(sidecarReceiverAcceptanceV082Doc.includes("Sidecar Receiver Acceptance v0.8.2"), "v0.8.2 dogfooding doc must have stable title");
   assert(sidecarReceiverAcceptanceV082Doc.includes("sidecar-build"), "v0.8.2 dogfooding doc must document sidecar-build");
   assert(sidecarReceiverAcceptanceV082Doc.includes("sidecar-check"), "v0.8.2 dogfooding doc must document sidecar-check");
@@ -1270,6 +1294,26 @@ function checkContentContracts() {
   assert(sidecarManualReceiverSmokeV085Doc.includes("provider_probe_status=skipped"), "v0.8.5 dogfooding doc must preserve skipped provider gate");
   assert(!sidecarManualReceiverSmokeV085Doc.includes("opencode | generic | passed"), "v0.8.5 dogfooding doc must not claim OpenCode generic pass");
   assert(!sidecarManualReceiverSmokeV085Doc.includes("claude-code | generic | passed"), "v0.8.5 dogfooding doc must not claim Claude Code generic pass");
+  assert(sidecarManualReceiverSmokeV086Doc.includes("Sidecar Manual Receiver Smoke v0.8.6"), "v0.8.6 dogfooding doc must have stable title");
+  assert(sidecarManualReceiverSmokeV086Doc.includes("opencode | generic | passed"), "v0.8.6 dogfooding doc must record OpenCode generic passed status");
+  assert(sidecarManualReceiverSmokeV086Doc.includes("claude-code | generic | passed"), "v0.8.6 dogfooding doc must record Claude Code generic passed status");
+  assert(sidecarManualReceiverSmokeV086Doc.includes("opencode | openclaw | not_run | manual_required"), "v0.8.6 dogfooding doc must preserve OpenCode openclaw not-run status");
+  assert(sidecarManualReceiverSmokeV086Doc.includes("claude-code | openclaw | not_run | manual_required"), "v0.8.6 dogfooding doc must preserve Claude Code openclaw not-run status");
+  assert(sidecarManualReceiverSmokeV086Doc.includes("v08x_identified: yes"), "v0.8.6 dogfooding doc must record v0.8.x acceptance field");
+  assert(sidecarManualReceiverSmokeV086Doc.includes("risk_boundaries_count: 7"), "v0.8.6 dogfooding doc must record risk boundary count");
+  assert(sidecarManualReceiverSmokeV086Doc.includes("wait_for_user_confirmation: yes"), "v0.8.6 dogfooding doc must record user confirmation field");
+  assert(sidecarManualReceiverSmokeV086Doc.includes("no_auto_advance: yes"), "v0.8.6 dogfooding doc must record no-auto-advance field");
+  assert(sidecarManualReceiverSmokeV086Doc.includes("no_provider: yes"), "v0.8.6 dogfooding doc must record no-provider field");
+  assert(sidecarManualReceiverSmokeV086Doc.includes("no_runtime: yes"), "v0.8.6 dogfooding doc must record no-runtime field");
+  assert(sidecarManualReceiverSmokeV086Doc.includes("Only the two generic rows are marked `passed`"), "v0.8.6 dogfooding doc must scope passed rows to generic");
+  assert(sidecarManualReceiverSmokeV086Doc.includes("No raw private output"), "v0.8.6 dogfooding doc must state raw-output boundary");
+  assert(sidecarManualReceiverSmokeV086Doc.includes("No runtime integration"), "v0.8.6 dogfooding doc must state runtime boundary");
+  assert(sidecarManualReceiverSmokeV086Doc.includes("No schema change"), "v0.8.6 dogfooding doc must state schema boundary");
+  assert(sidecarManualReceiverSmokeV086Doc.includes("basebrief-project-state-v1"), "v0.8.6 dogfooding doc must preserve project-state schema");
+  assert(sidecarManualReceiverSmokeV086Doc.includes("basebrief-sidecar-v1"), "v0.8.6 dogfooding doc must preserve sidecar schema");
+  assert(sidecarManualReceiverSmokeV086Doc.includes("provider_probe_status=skipped"), "v0.8.6 dogfooding doc must preserve skipped provider gate");
+  assert(!sidecarManualReceiverSmokeV086Doc.includes("opencode | openclaw | passed"), "v0.8.6 dogfooding doc must not claim OpenCode openclaw pass");
+  assert(!sidecarManualReceiverSmokeV086Doc.includes("claude-code | openclaw | passed"), "v0.8.6 dogfooding doc must not claim Claude Code openclaw pass");
   assert(v08xTestMatrixDoc.includes("v0.8.x Sidecar Test Matrix"), "v0.8.x matrix must have stable title");
   assert(v08xTestMatrixDoc.includes("sidecar-build"), "v0.8.x matrix must document sidecar-build");
   assert(v08xTestMatrixDoc.includes("sidecar-check"), "v0.8.x matrix must document sidecar-check");
@@ -1283,6 +1327,9 @@ function checkContentContracts() {
   assert(v08xTestMatrixDoc.includes("v0.8.3 Discoverability Polish"), "v0.8.x matrix must document v0.8.3 discoverability polish");
   assert(v08xTestMatrixDoc.includes("v0.8.4 External Receiver Smoke Evidence"), "v0.8.x matrix must document v0.8.4 external receiver smoke evidence");
   assert(v08xTestMatrixDoc.includes("v0.8.5 Manual Receiver Smoke Result Intake"), "v0.8.x matrix must document v0.8.5 manual receiver smoke intake");
+  assert(v08xTestMatrixDoc.includes("v0.8.6 Manual Receiver Smoke Result Intake Evidence"), "v0.8.x matrix must document v0.8.6 manual receiver smoke evidence");
+  assert(v08xTestMatrixDoc.includes("Claude Code generic as `passed`"), "v0.8.x matrix must document Claude Code passed result");
+  assert(v08xTestMatrixDoc.includes("OpenCode generic as `passed`"), "v0.8.x matrix must document OpenCode passed result");
   assert(v08xTestMatrixDoc.includes("manual_required"), "v0.8.x matrix must preserve manual-required external status");
   assert(v08xTestMatrixDoc.includes("not_run"), "v0.8.x matrix must preserve not-run external status");
   assert(v08xTestMatrixDoc.includes("basebrief-sidecar-v1"), "v0.8.x matrix must preserve sidecar schema");
@@ -1535,8 +1582,10 @@ function checkArtifactChecker() {
     "docs/releases/v0.8.3.md",
     "docs/releases/v0.8.4.md",
     "docs/releases/v0.8.5.md",
+    "docs/releases/v0.8.6.md",
     "docs/dogfooding/sidecar-external-receiver-smoke-v0.8.4.md",
     "docs/dogfooding/sidecar-manual-receiver-smoke-v0.8.5.md",
+    "docs/dogfooding/sidecar-manual-receiver-smoke-v0.8.6.md",
     "examples/receiver-check-config.json",
     "examples/receiver/difference-found",
     "examples/receiver/blocked",

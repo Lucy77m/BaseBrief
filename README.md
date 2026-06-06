@@ -67,7 +67,7 @@ node scripts/basebrief.js sidecar-build --repo . --target generic --output-dir t
 node scripts/basebrief.js sidecar-check --input tests/outputs/private/sidecar-generic --json
 ```
 
-`sidecar-build` 生成 `generic` 或 `openclaw` handoff bundle；`sidecar-check` 只读验收 bundle 结构和接手边界。v0.8.x Sidecar 是 `basebrief-project-state-v1` 的本地消费层，不改变 schema，不是 Auto Flow，不创建新会话，不调用 provider，也不接入 OpenClaw/Hermes runtime。Sidecar 公开边界保持 No provider request / No raw private output / No runtime integration / No schema change；未注入 provider 环境变量时 release checks 保持 `provider_probe_status=skipped`。公开记录见 [v0.8.0](docs/releases/v0.8.0.md)、[v0.8.1](docs/releases/v0.8.1.md)、[v0.8.2](docs/releases/v0.8.2.md)、[v0.8.3](docs/releases/v0.8.3.md) 与 [v0.8.x test matrix](docs/testing-v0.8.x-test-matrix.md)。
+`sidecar-build` 生成 `generic` 或 `openclaw` handoff bundle；`sidecar-check` 只读验收 bundle 结构和接手边界。v0.8.x Sidecar 是 `basebrief-project-state-v1` 的本地消费层，不改变 schema，不是 Auto Flow，不创建新会话，不调用 provider，也不接入 OpenClaw/Hermes runtime。Sidecar 公开边界保持 No provider request / No raw private output / No runtime integration / No schema change；未注入 provider 环境变量时 release checks 保持 `provider_probe_status=skipped`。公开记录见 [v0.8.0](docs/releases/v0.8.0.md)、[v0.8.1](docs/releases/v0.8.1.md)、[v0.8.2](docs/releases/v0.8.2.md)、[v0.8.3](docs/releases/v0.8.3.md)、[v0.8.6](docs/releases/v0.8.6.md) 与 [v0.8.x test matrix](docs/testing-v0.8.x-test-matrix.md)。
 
 ## Seal/Diff
 
@@ -122,6 +122,7 @@ BaseBrief 不是聊天客户端、Agent runtime、托管平台、密钥管理器
 - [Project State lifecycle readiness](docs/design/project-state-lifecycle-readiness.md)
 - [Project State lifecycle model](docs/design/project-state-lifecycle-model.md)
 - [v0.8.x sidecar test matrix](docs/testing-v0.8.x-test-matrix.md)
+- [v0.8.6 Manual Receiver Smoke Result Intake Evidence](docs/releases/v0.8.6.md)
 - [v0.8.3 Sidecar Discoverability Polish](docs/releases/v0.8.3.md)
 - [v0.8.2 Sidecar Receiver Acceptance Evidence](docs/releases/v0.8.2.md)
 - [v0.8.1 Sidecar Check Hardening](docs/releases/v0.8.1.md)

@@ -66,6 +66,35 @@ Expected release-check output without provider env remains:
 provider_probe_status=skipped
 ```
 
+## v0.8.6 Manual Receiver Smoke Result Intake Evidence
+
+`v0.8.6` records public-safe result summaries for the generic OpenCode and
+Claude Code receiver smoke rows. It does not open v0.9, change CLI/API/schema
+behavior, create receiver threads, copy raw runner output, or record provider
+details in public docs.
+
+The accepted summaries mark OpenCode generic and Claude Code generic as
+`passed`, because both public-safe intake summaries confirmed BaseBrief, v0.8.x,
+the current commit, `current_goal`, receiver entry task, seven risk boundaries,
+wait for user confirmation, no auto-advance, no provider, and no runtime.
+OpenClaw-target rows remain `not_run` with `manual_required`.
+
+A future OpenClaw-target pass still requires all v0.8.5 intake fields:
+BaseBrief, v0.8.x, current commit, `current_goal`, receiver entry task, at
+least two risk boundaries, wait for user confirmation, no auto-advance, no
+provider, and no runtime.
+
+The v0.8.x matrix is tracked in
+[testing-v0.8.x-test-matrix.md](testing-v0.8.x-test-matrix.md). No raw private
+output, private paths, secrets, provider endpoints, model values, token output,
+or API keys are copied into public docs.
+
+Expected release-check output without provider env remains:
+
+```text
+provider_probe_status=skipped
+```
+
 ## v0.5.0 Guided Receiver Flow Candidate
 
 `v0.5.0` adds `receiver-flow --guided` as an explicit human-input mode. It keeps

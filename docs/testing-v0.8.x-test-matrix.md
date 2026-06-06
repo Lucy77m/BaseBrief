@@ -59,6 +59,19 @@ This matrix covers the local v0.8 sidecar handoff work.
   values, token output, or API keys into tracked docs.
 - Preserve `basebrief-project-state-v1` and `basebrief-sidecar-v1`.
 
+## v0.8.6 Manual Receiver Smoke Result Intake Evidence
+
+- Accept public-safe summaries for `opencode + generic` and
+  `claude-code + generic`.
+- Record OpenCode generic as `passed` only after a complete public-safe intake
+  summary confirms all required fields.
+- Record Claude Code generic as `passed` only after a complete public-safe
+  intake summary confirms all required fields.
+- Keep OpenClaw-target rows `not_run` with `manual_required` unless the user
+  supplies lightweight public-safe summaries.
+- Do not mark any receiver smoke row `passed` without all required intake fields.
+- Preserve `basebrief-project-state-v1` and `basebrief-sidecar-v1`.
+
 ## Standard Local Commands
 
 ```text
