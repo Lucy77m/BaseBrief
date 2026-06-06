@@ -1629,6 +1629,7 @@ test("v1.0.0 delta handoff RC hardening exposes local-first delta without expand
   const roadmap = readText("docs/roadmap/basebrief-long-term-baseline.md");
   const cliLite = readText("docs/cli-lite.md");
   const release = readText("docs/releases/v1.0.0.md");
+  const v101Release = readText("docs/releases/v1.0.1.md");
   const plan = readText("docs/releases/v1.0.0-plan.md");
   const rcReview = readText("docs/releases/v1.0.0-rc-review.md");
   const spec = readText("docs/specs/delta-handoff.md");
@@ -1656,6 +1657,7 @@ test("v1.0.0 delta handoff RC hardening exposes local-first delta without expand
   assert.match(docsIndex, /releases\/v1\.0\.0\.md/);
   assert.match(docsIndex, /releases\/v1\.0\.0-plan\.md/);
   assert.match(docsIndex, /releases\/v1\.0\.0-rc-review\.md/);
+  assert.match(docsIndex, /releases\/v1\.0\.1\.md/);
   assert.match(docsIndex, /specs\/delta-handoff\.md/);
   assert.match(docsIndex, /\.\.\/examples\/delta-handoff\.md/);
   assert.match(docsIndex, /dogfooding\/delta-handoff-fresh-receiver-v1\.0\.md/);
@@ -1691,12 +1693,26 @@ test("v1.0.0 delta handoff RC hardening exposes local-first delta without expand
   assert.match(plan, /Reviewable Delta Handoff Compiler/);
   assert.match(rcReview, /v1\.0\.0 RC Review Package/);
   assert.match(rcReview, /Commit-Ready Summary/);
+  assert.match(rcReview, /docs\/releases\/v1\.0\.1\.md/);
   assert.match(rcReview, /delta-handoff-fresh-receiver-v1\.0\.md/);
   assert.match(rcReview, /delta-handoff-baseline-advance-v1\.0\.md/);
   assert.match(rcReview, /\.basebrief\/delta-baseline\.json/);
   assert.match(rcReview, /provider_probe_status=skipped/);
   assert.match(rcReview, /No provider request/);
   assert.match(rcReview, /No schema-v2 work/);
+  assert.match(v101Release, /v1\.0\.1 Delta Receiver Clarity Patch/);
+  assert.match(v101Release, /basebrief-delta-handoff-v1/);
+  assert.match(v101Release, /basebrief-delta-baseline-v1/);
+  assert.match(v101Release, /basebrief-project-state-v1/);
+  assert.match(v101Release, /baseline_source: missing/);
+  assert.match(v101Release, /no-baseline\.\.HEAD/);
+  assert.match(v101Release, /commits_in_range: 0/);
+  assert.match(v101Release, /stateDiff\.status: unchanged/);
+  assert.match(v101Release, /provider_probe_status=skipped/);
+  assert.match(v101Release, /No provider request/);
+  assert.match(v101Release, /No runtime integration/);
+  assert.match(v101Release, /No plugin, MCP, IDE/);
+  assert.match(v101Release, /No schema-v2 work/);
   assert.match(spec, /basebrief-delta-baseline-v1/);
   assert.match(spec, /needs-review/);
   assert.match(dogfooding, /handoff_acceptance: pass/);
@@ -1708,6 +1724,12 @@ test("v1.0.0 delta handoff RC hardening exposes local-first delta without expand
   assert.match(baselineAdvanceDogfooding, /handoff_acceptance: pass/);
   assert.match(baselineAdvanceDogfooding, /provider_probe_status=skipped/);
   assert.match(example, /schemaVersion: basebrief-delta-handoff-v1/);
+  assert.match(example, /## How To Read This Delta/);
+  assert.match(example, /baseline_source: \.basebrief\/delta-baseline\.json/);
+  assert.match(example, /commits_in_range: 0/);
+  assert.match(example, /stateDiff\.status: unchanged/);
+  assert.match(example, /reviewed Project State matches the delta baseline/);
+  assert.match(example, /Worktree Changed Files/);
 
   for (const relativePath of [
     "README.md",
@@ -1718,6 +1740,7 @@ test("v1.0.0 delta handoff RC hardening exposes local-first delta without expand
     "docs/releases/v1.0.0.md",
     "docs/releases/v1.0.0-plan.md",
     "docs/releases/v1.0.0-rc-review.md",
+    "docs/releases/v1.0.1.md",
     "docs/specs/delta-handoff.md",
     "docs/dogfooding/delta-handoff-fresh-receiver-v1.0.md",
     "docs/dogfooding/delta-handoff-baseline-advance-v1.0.md",
@@ -3916,6 +3939,9 @@ test("Delta Handoff writes reviewable delta output and advances local baseline o
     assert.match(initialContent, /review_status=reviewed/);
     assert.match(initialContent, /review_status=needs-review/);
     assert.match(initialContent, /schemaVersion: basebrief-delta-handoff-v1/);
+    assert.match(initialContent, /## How To Read This Delta/);
+    assert.match(initialContent, /baseline_source: missing/);
+    assert.match(initialContent, /no-baseline\.\.HEAD/);
     assert.equal(JSON.parse(fs.readFileSync(path.join(repoDir, ".basebrief", "state.json"), "utf8")).schemaVersion, PROJECT_STATE_SCHEMA_VERSION);
 
     git(repoDir, ["add", "notes.md"]);
@@ -3932,10 +3958,16 @@ test("Delta Handoff writes reviewable delta output and advances local baseline o
     git(repoDir, ["add", "followup.md"]);
     git(repoDir, ["commit", "-m", "add followup note"]);
     const followup = runDelta({ repoPath: repoDir, outputDir: cliOutputDir });
+    const followupContent = fs.readFileSync(path.join(cliOutputDir, "delta-handoff.md"), "utf8");
     assert.equal(followup.baseline.exists, true);
     assert.equal(followup.git.commitCount, 1);
     assert.deepEqual(followup.git.changedFilesInRange, ["followup.md"]);
     assert.equal(followup.stateDiff.status, "unchanged");
+    assert.match(followupContent, /## How To Read This Delta/);
+    assert.match(followupContent, /commits_in_range: 0/);
+    assert.match(followupContent, /does not mean the worktree is clean/);
+    assert.match(followupContent, /stateDiff\.status: unchanged/);
+    assert.match(followupContent, /does not mean git or worktree content is unchanged/);
 
     const explicit = runDelta({ repoPath: repoDir, outputDir: cliOutputDir, since: firstHead });
     assert.equal(explicit.git.commitCount, 2);

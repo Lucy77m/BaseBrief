@@ -137,6 +137,7 @@ function checkRequiredFiles() {
     "docs/releases/v1.0.0.md",
     "docs/releases/v1.0.0-plan.md",
     "docs/releases/v1.0.0-rc-review.md",
+    "docs/releases/v1.0.1.md",
     "docs/specs/delta-handoff.md",
     "docs/testing-v0.4.x-test-matrix.md",
     "docs/testing-v0.6.x-test-matrix.md",
@@ -333,6 +334,7 @@ function checkContentContracts() {
   const deltaV100ReleaseDoc = readText("docs/releases/v1.0.0.md");
   const v100PlanDoc = readText("docs/releases/v1.0.0-plan.md");
   const v100RcReviewDoc = readText("docs/releases/v1.0.0-rc-review.md");
+  const v101ReleaseDoc = readText("docs/releases/v1.0.1.md");
   const deltaHandoffSpecDoc = readText("docs/specs/delta-handoff.md");
   const postReleaseBaselineDoc = readText("docs/baselines/v0.4.0-post-release-baseline.md");
   const v060PostReleaseBaselineDoc = readText("docs/baselines/v0.6.0-post-release-baseline.md");
@@ -653,6 +655,7 @@ function checkContentContracts() {
   assert(docsIndex.includes("releases/v0.3.2.md"), "Docs index must link v0.3.2 release candidate");
   assert(docsIndex.includes("releases/v0.3.1.md"), "Docs index must link v0.3.1 release candidate");
   assert(docsIndex.includes("releases/v0.3.0.md"), "Docs index must link v0.3.0 release candidate");
+  assert(docsIndex.includes("releases/v1.0.1.md"), "Docs index must link v1.0.1 clarity patch");
   assert(receiverReadyDogfoodingDoc.includes("User-provided external evidence"), "Receiver-ready evidence must distinguish external evidence");
   assert(receiverReadyDogfoodingDoc.includes("not proof across all tools"), "Receiver-ready evidence must keep the interpretation scoped");
   assert(receiverReadyDogfoodingDoc.includes("Low-budget Validation Rule"), "Receiver-ready evidence must record the validation budget");
@@ -897,10 +900,24 @@ function checkContentContracts() {
   assert(v100RcReviewDoc.includes("Commit-Ready Summary"), "v1.0 RC review doc must include commit-ready summary");
   assert(v100RcReviewDoc.includes("docs/dogfooding/delta-handoff-fresh-receiver-v1.0.md"), "v1.0 RC review doc must link fresh receiver evidence");
   assert(v100RcReviewDoc.includes("docs/dogfooding/delta-handoff-baseline-advance-v1.0.md"), "v1.0 RC review doc must link baseline-advance evidence");
+  assert(v100RcReviewDoc.includes("docs/releases/v1.0.1.md"), "v1.0 RC review doc must link the v1.0.1 clarity patch");
   assert(v100RcReviewDoc.includes(".basebrief/delta-baseline.json"), "v1.0 RC review doc must document local baseline artifact");
   assert(v100RcReviewDoc.includes("provider_probe_status=skipped"), "v1.0 RC review doc must preserve skipped provider gate");
   assert(v100RcReviewDoc.includes("No provider request"), "v1.0 RC review doc must reject provider scope");
   assert(v100RcReviewDoc.includes("No schema-v2 work"), "v1.0 RC review doc must reject schema-v2 scope");
+  assert(v101ReleaseDoc.includes("v1.0.1 Delta Receiver Clarity Patch"), "v1.0.1 release doc must have stable title");
+  assert(v101ReleaseDoc.includes("basebrief-delta-handoff-v1"), "v1.0.1 release doc must preserve delta handoff schema");
+  assert(v101ReleaseDoc.includes("basebrief-delta-baseline-v1"), "v1.0.1 release doc must preserve delta baseline schema");
+  assert(v101ReleaseDoc.includes("basebrief-project-state-v1"), "v1.0.1 release doc must preserve project-state schema");
+  assert(v101ReleaseDoc.includes("baseline_source: missing"), "v1.0.1 release doc must explain first-run baseline state");
+  assert(v101ReleaseDoc.includes("no-baseline..HEAD"), "v1.0.1 release doc must explain the first-run range sentinel");
+  assert(v101ReleaseDoc.includes("commits_in_range: 0"), "v1.0.1 release doc must explain zero-commit ranges");
+  assert(v101ReleaseDoc.includes("stateDiff.status: unchanged"), "v1.0.1 release doc must explain unchanged state diffs");
+  assert(v101ReleaseDoc.includes("provider_probe_status=skipped"), "v1.0.1 release doc must preserve skipped provider gate");
+  assert(v101ReleaseDoc.includes("No provider request"), "v1.0.1 release doc must reject provider scope");
+  assert(v101ReleaseDoc.includes("No runtime integration"), "v1.0.1 release doc must reject runtime scope");
+  assert(v101ReleaseDoc.includes("No plugin, MCP, IDE"), "v1.0.1 release doc must reject plugin/MCP/IDE scope");
+  assert(v101ReleaseDoc.includes("No schema-v2 work"), "v1.0.1 release doc must reject schema-v2 scope");
   assert(deltaHandoffSpecDoc.includes("basebrief-delta-baseline-v1"), "delta spec must define baseline schema");
   assert(deltaHandoffSpecDoc.includes("reviewed"), "delta spec must define reviewed semantics");
   assert(deltaHandoffSpecDoc.includes("needs-review"), "delta spec must define needs-review semantics");
@@ -908,6 +925,11 @@ function checkContentContracts() {
   assert(deltaHandoffExample.includes("schemaVersion: basebrief-delta-handoff-v1"), "delta example must use delta handoff schema");
   assert(deltaHandoffExample.includes("review_status=reviewed"), "delta example must show reviewed sections");
   assert(deltaHandoffExample.includes("review_status=needs-review"), "delta example must show needs-review sections");
+  assert(deltaHandoffExample.includes("## How To Read This Delta"), "delta example must include receiver clarity guidance");
+  assert(deltaHandoffExample.includes("baseline_source: .basebrief/delta-baseline.json"), "delta example must show a baseline-present case");
+  assert(deltaHandoffExample.includes("commits_in_range: 0"), "delta example must show the zero-commit-range case");
+  assert(deltaHandoffExample.includes("stateDiff.status: unchanged"), "delta example must explain unchanged state diffs");
+  assert(deltaHandoffExample.includes("Worktree Changed Files"), "delta example must keep worktree changes visible");
   assert(deltaHandoffExample.includes("No provider request"), "delta example must preserve provider boundary");
   assert(roadmapDoc.includes("current `v1.0` line is Delta Handoff RC hardening"), "Roadmap must identify current v1.0 Delta Handoff RC line");
   assert(roadmapDoc.includes("Phase 8B: Delta Handoff"), "Roadmap must document Delta Handoff phase");
@@ -1976,6 +1998,7 @@ function checkArtifactChecker() {
     "docs/releases/v1.0.0.md",
     "docs/releases/v1.0.0-plan.md",
     "docs/releases/v1.0.0-rc-review.md",
+    "docs/releases/v1.0.1.md",
     "docs/testing-v0.9.x-test-matrix.md",
     "docs/dogfooding/sidecar-external-receiver-smoke-v0.8.4.md",
     "docs/dogfooding/sidecar-manual-receiver-smoke-v0.8.5.md",

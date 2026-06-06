@@ -9,6 +9,15 @@ generated_at: 2026-06-07T00:00:00.000Z
 - reviewed: current project state fields copied from `.basebrief/state.json`
 - needs-review: git range facts, changed-file facts, and generated state diff summary
 
+## How To Read This Delta
+
+- `reviewed` sections come from the current reviewed Project State.
+- `needs-review` sections are generated from git facts, worktree facts, and Seal/Diff state summaries.
+- `baseline_source: missing` is normal for a first delta run before `.basebrief/delta-baseline.json` exists.
+- `no-baseline..HEAD` is a human-readable first-run sentinel, not a git revision range.
+- `commits_in_range: 0` does not mean the worktree is clean; check `Worktree Changed Files` too.
+- `stateDiff.status: unchanged` means reviewed Project State matches the delta baseline; it does not mean git or worktree content is unchanged.
+
 ## Current Goal
 
 review_status=reviewed
@@ -23,31 +32,30 @@ review_status=needs-review
 - head: example-head
 - baseline_source: .basebrief/delta-baseline.json
 - range: example-baseline..HEAD
-- commits_in_range: 2
+- commits_in_range: 0
 
 ### Commits
 
-- abc1234 docs: add delta handoff spec
-- def5678 feat: add minimal delta command
+- none
 
 ### Changed Files In Range
 
-- docs/specs/delta-handoff.md
-- scripts/basebrief_delta.js
+- none
 
 ### Worktree Changed Files
 
 - docs/releases/v1.0.0-plan.md
+- scripts/basebrief_delta.js
 
 ## State Diff
 
 review_status=needs-review
 
-- status: changed
-- changed_fields: verified_facts,risk_boundaries
-- task_boundary_changed: true
-- verified_facts.added: 1
-- risk_boundaries.added: 1
+- status: unchanged
+- changed_fields: none
+- task_boundary_changed: false
+
+- no state-level field changes available
 
 ## Verified Facts
 
@@ -83,4 +91,3 @@ review_status=reviewed
 
 Read this delta handoff, verify the generated facts, then continue the next
 narrow v1.0 implementation slice.
-

@@ -46,6 +46,7 @@
 - [v1.0.0 delta handoff RC candidate](releases/v1.0.0.md)
 - [v1.0.0 adopted planning baseline](releases/v1.0.0-plan.md)
 - [v1.0.0 RC review package](releases/v1.0.0-rc-review.md)
+- [v1.0.1 delta receiver clarity patch](releases/v1.0.1.md)
 - [v1.0 Delta Handoff fresh receiver dogfooding](dogfooding/delta-handoff-fresh-receiver-v1.0.md)
 - [v1.0 Delta Handoff baseline-advance dogfooding](dogfooding/delta-handoff-baseline-advance-v1.0.md)
 - [v0.9.x integrated handoff closure matrix](testing-v0.9.x-test-matrix.md)
