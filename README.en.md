@@ -69,6 +69,8 @@ node scripts/basebrief.js sidecar-check --input tests/outputs/private/sidecar-ge
 
 `sidecar-build` creates a `generic` or `openclaw` handoff bundle and writes a copyable new-window starter at `new-window-starter.md` that asks the receiver to restate key fields, report `pass/fail`, and wait for confirmation; `--starter-language auto|zh-CN|en|ja` controls only the starter shell language, while protocol fields, paths, file names, and English hard-stop anchors stay literal. `sidecar-check` is a read-only structure gate for the bundle, receiver boundaries, and the starter. The v0.8.x Sidecar is a local consumer layer for `basebrief-project-state-v1`; it does not change the schema, is not Auto Flow, does not create sessions, does not call providers, and does not integrate with the OpenClaw/Hermes runtime. Sidecar public boundaries stay No provider request / No raw private output / No runtime integration / No schema change; when provider environment variables are absent, release checks keep `provider_probe_status=skipped`. Public records: [v0.8.0](docs/releases/v0.8.0.md), [v0.8.1](docs/releases/v0.8.1.md), [v0.8.2](docs/releases/v0.8.2.md), [v0.8.3](docs/releases/v0.8.3.md), [v0.8.6](docs/releases/v0.8.6.md), [v0.8.7](docs/releases/v0.8.7.md), [v0.8.8](docs/releases/v0.8.8.md), and the [v0.8.x test matrix](docs/testing-v0.8.x-test-matrix.md).
 
+`v0.9.0` is an Integrated Handoff Readiness / public hardening candidate. It aligns receiver-ready handoff, Project State, Sidecar bundle, and the receiver first response as one local readiness line; it is not provider, runtime, schema, Auto Flow, plugin, platform, or v1.0 work. See [v0.9.0 Integrated Handoff Readiness](docs/releases/v0.9.0.md).
+
 ## Seal/Diff
 
 Seal/Diff answers: what changed in facts, decisions, risks, and task boundaries between two phases?
@@ -121,6 +123,7 @@ BaseBrief is not a chat client, agent runtime, hosted platform, secret manager, 
 - [Project State validation rules](docs/design/project-state-validation-rules.md)
 - [Project State lifecycle readiness](docs/design/project-state-lifecycle-readiness.md)
 - [Project State lifecycle model](docs/design/project-state-lifecycle-model.md)
+- [v0.9.0 Integrated Handoff Readiness](docs/releases/v0.9.0.md)
 - [v0.8.x sidecar test matrix](docs/testing-v0.8.x-test-matrix.md)
 - [v0.8.7 Copyable New-Window Starter](docs/releases/v0.8.7.md)
 - [v0.8.6 Manual Receiver Smoke Result Intake Evidence](docs/releases/v0.8.6.md)

@@ -69,6 +69,8 @@ node scripts/basebrief.js sidecar-check --input tests/outputs/private/sidecar-ge
 
 `sidecar-build` 生成 `generic` 或 `openclaw` handoff bundle，并额外写出可复制的新窗口开场白 `new-window-starter.md`，要求 receiver 复述关键字段、报告 `pass/fail` 并等待确认；`--starter-language auto|zh-CN|en|ja` 只控制开场白外壳语言，协议字段、路径、文件名和英文 hard-stop 锚点保持原文。`sidecar-check` 只读验收 bundle 结构、接手边界和新开场白。v0.8.x Sidecar 是 `basebrief-project-state-v1` 的本地消费层，不改变 schema，不是 Auto Flow，不创建新会话，不调用 provider，也不接入 OpenClaw/Hermes runtime。Sidecar 公开边界保持 No provider request / No raw private output / No runtime integration / No schema change；未注入 provider 环境变量时 release checks 保持 `provider_probe_status=skipped`。公开记录见 [v0.8.0](docs/releases/v0.8.0.md)、[v0.8.1](docs/releases/v0.8.1.md)、[v0.8.2](docs/releases/v0.8.2.md)、[v0.8.3](docs/releases/v0.8.3.md)、[v0.8.6](docs/releases/v0.8.6.md)、[v0.8.7](docs/releases/v0.8.7.md)、[v0.8.8](docs/releases/v0.8.8.md) 与 [v0.8.x test matrix](docs/testing-v0.8.x-test-matrix.md)。
 
+`v0.9.0` 是 Integrated Handoff Readiness / public hardening candidate：它把 receiver-ready handoff、Project State、Sidecar bundle 和 receiver 首条回复整理成一条本地 readiness 线，不是 provider、runtime、schema、Auto Flow、插件、平台化或 v1.0 工作。见 [v0.9.0 Integrated Handoff Readiness](docs/releases/v0.9.0.md)。
+
 ## Seal/Diff
 
 Seal/Diff 用来回答：阶段前后，事实、决策、风险边界和下一步任务发生了什么变化？
@@ -121,6 +123,7 @@ BaseBrief 不是聊天客户端、Agent runtime、托管平台、密钥管理器
 - [Project State validation rules](docs/design/project-state-validation-rules.md)
 - [Project State lifecycle readiness](docs/design/project-state-lifecycle-readiness.md)
 - [Project State lifecycle model](docs/design/project-state-lifecycle-model.md)
+- [v0.9.0 Integrated Handoff Readiness](docs/releases/v0.9.0.md)
 - [v0.8.x sidecar test matrix](docs/testing-v0.8.x-test-matrix.md)
 - [v0.8.7 Copyable New-Window Starter](docs/releases/v0.8.7.md)
 - [v0.8.6 Manual Receiver Smoke Result Intake Evidence](docs/releases/v0.8.6.md)

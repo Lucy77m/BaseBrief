@@ -3,7 +3,11 @@
 Project State is the local continuity layer for reviewed receiver handoffs.
 `v0.6.0` introduced `.basebrief/state.json`; `v0.7.0` adds lifecycle
 inspection and reviewed-state advancement without changing the
-`basebrief-project-state-v1` schema.
+`basebrief-project-state-v1` schema. `v0.8.x` adds Sidecar as the local
+consumer layer for Project State. `v0.9.0` is Integrated Handoff Readiness: a
+public hardening line that connects receiver-ready handoff, Project State,
+Sidecar bundle, and receiver first response without changing schema or adding
+provider/runtime behavior.
 
 ```bash
 node scripts/basebrief.js state-init --repo <target-repo> --source <receiver-ready.md> --json
@@ -98,11 +102,14 @@ call providers, and does not connect runtime systems.
 - No provider request.
 - No raw private output.
 - No Auto Flow.
+- No Web UI.
+- No plugin or platform work.
 - No receiver thread creation.
 - No secret storage.
 - No automatic promotion from draft to ready.
 - No schema change.
 - No runtime integration.
+- No v1.0 claim.
 - BB9 handoff schema is unchanged.
 - Receiver Safe Check config and result schemas are unchanged.
 

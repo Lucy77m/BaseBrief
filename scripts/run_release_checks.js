@@ -128,6 +128,7 @@ function checkRequiredFiles() {
     "docs/releases/v0.8.6.md",
     "docs/releases/v0.8.7.md",
     "docs/releases/v0.8.8.md",
+    "docs/releases/v0.9.0.md",
     "docs/testing-v0.4.x-test-matrix.md",
     "docs/testing-v0.6.x-test-matrix.md",
     "docs/testing-v0.7.x-test-matrix.md",
@@ -303,6 +304,7 @@ function checkContentContracts() {
   const sidecarV086ReleaseDoc = readText("docs/releases/v0.8.6.md");
   const sidecarV087ReleaseDoc = readText("docs/releases/v0.8.7.md");
   const sidecarV088ReleaseDoc = readText("docs/releases/v0.8.8.md");
+  const readinessV090ReleaseDoc = readText("docs/releases/v0.9.0.md");
   const postReleaseBaselineDoc = readText("docs/baselines/v0.4.0-post-release-baseline.md");
   const v060PostReleaseBaselineDoc = readText("docs/baselines/v0.6.0-post-release-baseline.md");
   const projectStateModelDoc = readText("docs/design/project-state-model.md");
@@ -397,6 +399,8 @@ function checkContentContracts() {
   assert(readme.includes("--starter-language auto|zh-CN|en|ja"), "README.md should mention starter language routing");
   assert(readme.includes("docs/releases/v0.8.7.md"), "README.md should link to v0.8.7 copyable starter");
   assert(readme.includes("docs/releases/v0.8.8.md"), "README.md should link to v0.8.8 starter language routing");
+  assert(readme.includes("docs/releases/v0.9.0.md"), "README.md should link to v0.9.0 readiness candidate");
+  assert(readme.includes("Integrated Handoff Readiness"), "README.md should define v0.9.0 readiness");
   assert(readme.includes("docs/releases/v0.8.3.md"), "README.md should link to v0.8.3 sidecar discoverability polish");
   assert(readme.includes("docs/releases/v0.8.2.md"), "README.md should link to v0.8.2 sidecar receiver acceptance evidence");
   assert(readme.includes("docs/releases/v0.8.1.md"), "README.md should link to v0.8.1 sidecar check hardening");
@@ -469,6 +473,8 @@ function checkContentContracts() {
   assert(englishReadme.includes("--starter-language auto|zh-CN|en|ja"), "README.en.md should mention starter language routing");
   assert(englishReadme.includes("docs/releases/v0.8.7.md"), "README.en.md should link to v0.8.7 copyable starter");
   assert(englishReadme.includes("docs/releases/v0.8.8.md"), "README.en.md should link to v0.8.8 starter language routing");
+  assert(englishReadme.includes("docs/releases/v0.9.0.md"), "README.en.md should link to v0.9.0 readiness candidate");
+  assert(englishReadme.includes("Integrated Handoff Readiness"), "README.en.md should define v0.9.0 readiness");
   assert(englishReadme.includes("docs/releases/v0.8.3.md"), "README.en.md should link to v0.8.3 sidecar discoverability polish");
   assert(englishReadme.includes("docs/releases/v0.8.2.md"), "README.en.md should link to v0.8.2 sidecar receiver acceptance evidence");
   assert(englishReadme.includes("docs/releases/v0.8.1.md"), "README.en.md should link to v0.8.1 sidecar check hardening");
@@ -555,6 +561,7 @@ function checkContentContracts() {
   assert(docsIndex.includes("releases/v0.8.6.md"), "Docs index must link v0.8.6 sidecar manual receiver smoke evidence candidate");
   assert(docsIndex.includes("releases/v0.8.7.md"), "Docs index must link v0.8.7 copyable starter candidate");
   assert(docsIndex.includes("releases/v0.8.8.md"), "Docs index must link v0.8.8 starter language routing candidate");
+  assert(docsIndex.includes("releases/v0.9.0.md"), "Docs index must link v0.9.0 readiness candidate");
   assert(docsIndex.includes("releases/v0.7.0.md"), "Docs index must link v0.7.0 lifecycle release candidate");
   assert(docsIndex.includes("releases/v0.6.3.md"), "Docs index must link v0.6.3 lifecycle readiness candidate");
   assert(docsIndex.includes("releases/v0.6.2.md"), "Docs index must link v0.6.2 self-dogfooding evidence candidate");
@@ -661,10 +668,13 @@ function checkContentContracts() {
   assert(projectStateDoc.includes(".basebrief/history/"), "Project State docs must document history output");
   assert(projectStateDoc.includes(".basebrief/sidecar/<target>/"), "Project State docs must document sidecar output directory");
   assert(projectStateDoc.includes("basebrief-project-state-v1"), "Project State docs must document schema version");
+  assert(projectStateDoc.includes("v0.9.0"), "Project State docs must document v0.9.0 readiness");
   assert(projectStateDoc.includes("No provider request"), "Project State docs must state no provider request");
   assert(projectStateDoc.includes("No raw private output"), "Project State docs must state no raw private output");
   assert(projectStateDoc.includes("No runtime integration"), "Project State docs must state no runtime integration");
   assert(projectStateDoc.includes("No Auto Flow"), "Project State docs must state no Auto Flow");
+  assert(projectStateDoc.includes("No plugin or platform work"), "Project State docs must reject plugin/platform scope");
+  assert(projectStateDoc.includes("No v1.0 claim"), "Project State docs must reject v1.0 claims");
   assert(projectStateDoc.includes("No receiver thread creation"), "Project State docs must state no receiver thread creation");
   assert(projectStateDoc.includes("No schema change"), "Project State docs must state no schema change");
   assert(projectStateDoc.includes("BB9 handoff schema is unchanged"), "Project State docs must protect BB9 schema");
@@ -697,6 +707,7 @@ function checkContentContracts() {
   assert(testingDoc.includes("OpenClaw/Hermes Manual Receiver Smoke Follow-up"), "Testing docs must document OpenClaw/Hermes manual smoke follow-up");
   assert(testingDoc.includes("v0.8.7 Copyable New-Window Starter"), "Testing docs must document v0.8.7 copyable starter");
   assert(testingDoc.includes("v0.8.8 Starter Language Routing"), "Testing docs must document v0.8.8 starter language routing");
+  assert(testingDoc.includes("v0.9.0 Integrated Handoff Readiness Candidate"), "Testing docs must document v0.9.0 readiness candidate");
   assert(testingDoc.includes("new-window-starter.md"), "Testing docs must document Sidecar starter");
   assert(testingDoc.includes("pass/fail"), "Testing docs must document Sidecar receiver pass/fail reporting");
   assert(testingDoc.includes("manual_required"), "Testing docs must preserve manual-required receiver execution status");
@@ -788,7 +799,9 @@ function checkContentContracts() {
   assert(structuredLiteExample.includes("BASEBRIEF_HANDOFF_JSON_BEGIN"), "structured lite example must include handoff JSON begin marker");
   assert(structuredLiteExample.includes("BASEBRIEF_HANDOFF_JSON_END"), "structured lite example must include handoff JSON end marker");
   assert(structuredLiteExample.includes('"open_questions"'), "structured lite example must include open questions");
-  assert(roadmapDoc.includes("v0.6.0"), "roadmap baseline must describe current v0.6.0 candidate");
+  assert(roadmapDoc.includes("Current v0.9.0 readiness target"), "Roadmap must name the current v0.9.0 readiness target");
+  assert(roadmapDoc.includes("Integrated Handoff Readiness"), "Roadmap must define Integrated Handoff Readiness");
+  assert(roadmapDoc.includes("provider requests, runtime integration, schema changes"), "Roadmap must keep v0.9.0 out of runtime/provider/schema scope");
   assert(roadmapDoc.includes(".basebrief/state.json"), "roadmap baseline must describe project-state direction");
   assert(roadmapDoc.includes("Do not add BB13"), "roadmap baseline must include experiment freeze rule");
   ["mimo", "deepseek", "relay-openai-gpt55-codex-oauth"].forEach((profileId) => {
@@ -1335,6 +1348,18 @@ function checkContentContracts() {
   assert(sidecarV088ReleaseDoc.includes("No schema change"), "v0.8.8 release doc must state schema boundary");
   assert(sidecarV088ReleaseDoc.includes("No Auto Flow"), "v0.8.8 release doc must state Auto Flow boundary");
   assert(sidecarV088ReleaseDoc.includes("provider_probe_status=skipped"), "v0.8.8 release doc must preserve skipped provider gate");
+  assert(readinessV090ReleaseDoc.includes("Integrated Handoff Readiness Candidate"), "v0.9.0 release doc must define readiness candidate");
+  assert(readinessV090ReleaseDoc.includes("receiver-ready handoff -> Project State -> Sidecar bundle -> receiver first response"), "v0.9.0 release doc must define integrated handoff path");
+  assert(readinessV090ReleaseDoc.includes("No provider request"), "v0.9.0 release doc must reject provider requests");
+  assert(readinessV090ReleaseDoc.includes("No raw private output"), "v0.9.0 release doc must reject raw private output");
+  assert(readinessV090ReleaseDoc.includes("No runtime integration"), "v0.9.0 release doc must reject runtime integration");
+  assert(readinessV090ReleaseDoc.includes("No schema change"), "v0.9.0 release doc must reject schema changes");
+  assert(readinessV090ReleaseDoc.includes("No Auto Flow"), "v0.9.0 release doc must reject Auto Flow");
+  assert(readinessV090ReleaseDoc.includes("No plugin or platform work"), "v0.9.0 release doc must reject plugin/platform scope");
+  assert(readinessV090ReleaseDoc.includes("No v1.0 claim"), "v0.9.0 release doc must reject v1.0 claims");
+  assert(readinessV090ReleaseDoc.includes("No cross-provider cache claim"), "v0.9.0 release doc must reject cross-provider cache claims");
+  assert(readinessV090ReleaseDoc.includes("No claim based on audited billing records"), "v0.9.0 release doc must reject billing audit claims");
+  assert(readinessV090ReleaseDoc.includes("provider_probe_status=skipped"), "v0.9.0 release doc must preserve skipped provider gate");
   assert(sidecarReceiverAcceptanceV082Doc.includes("Sidecar Receiver Acceptance v0.8.2"), "v0.8.2 dogfooding doc must have stable title");
   assert(sidecarReceiverAcceptanceV082Doc.includes("sidecar-build"), "v0.8.2 dogfooding doc must document sidecar-build");
   assert(sidecarReceiverAcceptanceV082Doc.includes("sidecar-check"), "v0.8.2 dogfooding doc must document sidecar-check");
@@ -1706,6 +1731,7 @@ function checkArtifactChecker() {
     "docs/releases/v0.8.5.md",
     "docs/releases/v0.8.6.md",
     "docs/releases/v0.8.7.md",
+    "docs/releases/v0.9.0.md",
     "docs/dogfooding/sidecar-external-receiver-smoke-v0.8.4.md",
     "docs/dogfooding/sidecar-manual-receiver-smoke-v0.8.5.md",
     "docs/dogfooding/sidecar-manual-receiver-smoke-v0.8.6.md",

@@ -1356,6 +1356,54 @@ test("OpenClaw and Hermes manual smoke follow-up closes the first-response gap w
   }
 });
 
+test("v0.9.0 readiness line defines integrated handoff hardening without expanding scope", () => {
+  const readme = readText("README.md");
+  const englishReadme = readText("README.en.md");
+  const docsIndex = readText("docs/index.md");
+  const testing = readText("docs/testing.md");
+  const projectState = readText("docs/project-state.md");
+  const roadmap = readText("docs/roadmap/basebrief-long-term-baseline.md");
+  const release = readText("docs/releases/v0.9.0.md");
+
+  for (const doc of [readme, englishReadme, docsIndex, testing, projectState, roadmap, release]) {
+    assert.match(doc, /v0\.9\.0/);
+    assert.match(doc, /Integrated Handoff Readiness/);
+  }
+
+  assert.match(release, /receiver-ready handoff -> Project State -> Sidecar bundle -> receiver first response/);
+  assert.match(release, /public hardening candidate/);
+  assert.match(release, /No provider request/);
+  assert.match(release, /No raw private output/);
+  assert.match(release, /No runtime integration/);
+  assert.match(release, /No schema change/);
+  assert.match(release, /No Auto Flow/);
+  assert.match(release, /No plugin or platform work/);
+  assert.match(release, /No v1\.0 claim/);
+  assert.match(release, /No cross-provider cache claim/);
+  assert.match(release, /No claim based on audited billing records/);
+  assert.match(release, /provider_probe_status=skipped/);
+  assert.match(roadmap, /Current v0\.9\.0 readiness target/);
+  assert.match(roadmap, /basebrief-project-state-v1/);
+  assert.match(roadmap, /basebrief-sidecar-v1/);
+  assert.match(roadmap, /provider requests, runtime integration, schema changes/);
+  assert.match(projectState, /No plugin or platform work/);
+  assert.match(projectState, /No v1\.0 claim/);
+  assert.match(testing, /provider_probe_status=skipped/);
+
+  for (const relativePath of [
+    "README.md",
+    "README.en.md",
+    "docs/testing.md",
+    "docs/project-state.md",
+    "docs/roadmap/basebrief-long-term-baseline.md",
+    "docs/releases/v0.9.0.md",
+  ]) {
+    const result = checkArtifacts({ inputPath: path.join(repoRoot, relativePath) });
+    assert.equal(result.status, "passed", relativePath);
+    assert.equal(result.errorCount, 0, relativePath);
+  }
+});
+
 test("public quickstart and minimal examples provide a clean first-use path", () => {
   const quickstart = readText("docs/quickstart-5min.md");
   const minimalBrief = readText("examples/minimal/output-basebrief-lite.md");

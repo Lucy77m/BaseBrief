@@ -8,7 +8,7 @@ This document is the planning baseline for the next stages of BaseBrief. It is n
 
 BaseBrief should continue as one public skill entry with internal modes and supporting tools.
 
-Version `v0.2.0` completed the first local toolchain: structured handoff, provider profile metadata, file-based adapters, artifact checks, CLI Lite, and Seal/Diff v1. The `v0.2.1` public-entry polish and `v0.2.2` first-run workflow validation completed the initial usability closure. The `v0.3.0` release candidate adds receiver-ready semantics, Receiver Safe Check v1, and an explicit `receiver-init -> receiver-check` local workflow without changing BB9 or the normal Full/Lite entry. The `v0.3.1` stabilization pass records receiver friction, adds public receiver examples, and adds local validation scripts without changing the receiver schemas or CLI command semantics. The `v0.5.3` closure stabilizes guided, extract, and review-draft evidence. The current `v0.6.0` candidate adds local `.basebrief/state.json` project state after reviewed receiver-ready handoffs, still without Auto Flow.
+Version `v0.2.0` completed the first local toolchain: structured handoff, provider profile metadata, file-based adapters, artifact checks, CLI Lite, and Seal/Diff v1. The receiver line then added Receiver Safe Check, Receiver Flow Draft, review-draft gates, and public receiver examples. The Project State line added local `.basebrief/state.json`, lifecycle inspection, and reviewed-state advancement; `v0.6.0` established that local Project State directory without changing `basebrief-project-state-v1`. The `v0.8.x` Sidecar line now consumes Project State into `generic` / `openclaw` bundles, validates `basebrief-sidecar-v1`, writes `new-window-starter.md`, preserves `pass/fail` receiver acceptance, and closes the public-safe OpenClaw/Hermes manual first-response gap. The current `v0.9.0` candidate is Integrated Handoff Readiness: a public hardening line for receiver-ready handoff -> Project State -> Sidecar bundle -> receiver first response, still without provider requests, runtime integration, schema changes, Auto Flow, plugins, platform work, or v1.0 claims.
 
 The useful product shape is no longer "choose a cache-ready mode for normal work." The stronger direction is:
 
@@ -235,7 +235,7 @@ Exit criteria:
 - Zero-install skill usage remains documented.
 - The CLI is optional, not required for normal template use.
 
-Current v0.3 target: `scripts/basebrief.js` is a zero-dependency Node wrapper for init, build, check, receiver-init, receiver-check, seal, and diff. Local npm scripts may wrap validation commands, but BaseBrief stays optional and does not create a published npm package, global command, plugin, or provider integration.
+Current v0.3.0 target: `scripts/basebrief.js` is a zero-dependency Node wrapper for init, build, check, receiver-init, receiver-check, seal, and diff. Local npm scripts may wrap validation commands, but BaseBrief stays optional and does not create a published npm package, global command, plugin, or provider integration.
 
 ### Phase 8: Seal and Diff
 
@@ -259,7 +259,7 @@ Current v1 target: local `basebrief-seal-v1` snapshots and diff summaries compar
 
 Goal: make receiver acceptance explicit and locally verifiable without turning BaseBrief into an agent runtime.
 
-Current v0.3 target:
+Current v0.3.0 target:
 
 - receiver-ready human-readable protocol
 - explicit source-window versus receiver-window verification
@@ -298,12 +298,20 @@ Current v0.3.3 evidence target:
 - keep `handoff_status: draft_needs_review` as the only receiver-flow handoff status
 - avoid new CLI commands, new npm scripts, schema changes, provider requests, receiver thread creation, and Auto Flow
 
-Current v0.4.0 release-candidate target:
+Current v0.4.0 release-candidate target (historical, now completed):
 
 - integrate BB9 handoff, CLI Lite, Artifact Checker, Receiver Safe Check, Receiver Flow Draft, Seal/Diff, local npm validation scripts, and public-safe evidence into one release-candidate line
 - keep BaseBrief local-first and file-based
 - keep `cache-ready` experimental and provider-specific
 - keep Auto Flow, Web UI, Cursor adapter, hosted service, installed CLI, published npm package, CI matrix, and `.basebrief/` project state out of scope
+
+Current v0.9.0 readiness target:
+
+- define Integrated Handoff Readiness as a public hardening candidate
+- connect receiver-ready handoff, Project State, Sidecar bundle, and receiver first response in docs and release checks
+- keep `basebrief-project-state-v1`, `basebrief-sidecar-v1`, BB9, and Receiver Safe Check schemas unchanged
+- keep `provider_probe_status=skipped` as the correct no-provider gate
+- avoid provider requests, runtime integration, Auto Flow, Web UI, plugins, platform work, npm publishing, global CLI, v1.0 claims, and cross-provider cache claims
 
 ### Phase 9: ContextOps Vision
 
@@ -334,9 +342,9 @@ A new BB experiment is allowed only when all of the following are true:
 
 ## Near-term Priority Order
 
-1. Prepare the `v0.4.0` local release candidate for explicit user review.
+1. Prepare the `v0.9.0` Integrated Handoff Readiness candidate for explicit user review.
 2. Keep push, tag, and formal release pending until the user separately approves them.
-3. Observe whether the integrated local toolchain prevents real handoff mistakes.
+3. Observe whether the integrated Project State -> Sidecar -> receiver first-response line prevents real handoff mistakes.
 4. Keep installed CLI, plugins, provider experiments, ContextOps expansion, and speculative features frozen unless measured usage creates a concrete blocker.
 5. Choose later versions only from repeated, measured usage evidence.
 
@@ -363,6 +371,6 @@ BaseBrief is off track if:
 
 ## Current Strategic Decision
 
-The current development cycle should complete the `v0.3.0` receiver workflow and release preparation without chasing a new benchmark variant, installed CLI, or plugin.
+The current development cycle should complete the `v0.9.0` Integrated Handoff Readiness line without chasing a new benchmark variant, installed CLI, plugin, runtime integration, provider request, schema change, or platform surface.
 
 After release, the next development cycle should gather adoption evidence and make only evidence-driven fixes. BB12 remains a MiMo-specific optimization candidate, while new experiments, speculative features, and broader platform work remain frozen.

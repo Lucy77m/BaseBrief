@@ -24,6 +24,22 @@ npm run check
 
 这些 npm scripts 只包装上面的本地 Node 命令；它们不表示 BaseBrief 已成为发布 npm package 或安装式 CLI。
 
+## v0.9.0 Integrated Handoff Readiness Candidate
+
+`v0.9.0` is a public hardening line for the integrated local handoff path:
+receiver-ready handoff -> Project State -> Sidecar bundle -> receiver first
+response. It adds no provider request, runtime integration, schema change, Auto
+Flow, Web UI, plugin/platform work, published npm package, global CLI, v1.0
+claim, cross-provider cache claim, or real billing audit claim.
+
+This candidate keeps the v0.8.x Sidecar receiver closure connected to the
+readiness docs and release checks. Expected release-check output without
+provider env remains:
+
+```text
+provider_probe_status=skipped
+```
+
 ## v0.4.1 Stabilization Candidate
 
 `v0.4.1` is a stabilization-only cycle after the `v0.4.0` public release. It uses

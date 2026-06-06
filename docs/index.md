@@ -20,6 +20,7 @@
 - [Project State validation rules](design/project-state-validation-rules.md)
 - [Project State lifecycle readiness](design/project-state-lifecycle-readiness.md)
 - [Project State lifecycle model](design/project-state-lifecycle-model.md)
+- [v0.9.0 Integrated Handoff Readiness](releases/v0.9.0.md)
 - [v0.8.0 Sidecar Handoff Bundle](releases/v0.8.0.md)
 - [v0.8.1 Sidecar Check Hardening](releases/v0.8.1.md)
 - [v0.8.2 Sidecar Receiver Acceptance Evidence](releases/v0.8.2.md)
@@ -34,6 +35,7 @@
 
 ## 方向与验证
 
+- [v0.9.0 integrated handoff readiness candidate](releases/v0.9.0.md)
 - [v0.6.0 project state directory release](releases/v0.6.0.md)
 - [v0.8.0 sidecar handoff bundle candidate](releases/v0.8.0.md)
 - [v0.8.1 sidecar check hardening candidate](releases/v0.8.1.md)
