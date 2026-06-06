@@ -92,6 +92,7 @@ function checkRequiredFiles() {
     "docs/dogfooding/sidecar-openclaw-hermes-manual-smoke-followup.md",
     "docs/dogfooding/delta-handoff-fresh-receiver-v1.0.md",
     "docs/dogfooding/delta-handoff-baseline-advance-v1.0.md",
+    "docs/dogfooding/delta-receiver-acceptance-v1.1.md",
     "docs/integrations.md",
     "docs/adapters.md",
     "docs/walkthrough.md",
@@ -138,6 +139,7 @@ function checkRequiredFiles() {
     "docs/releases/v1.0.0-plan.md",
     "docs/releases/v1.0.0-rc-review.md",
     "docs/releases/v1.0.1.md",
+    "docs/releases/v1.1.0-plan.md",
     "docs/specs/delta-handoff.md",
     "docs/testing-v0.4.x-test-matrix.md",
     "docs/testing-v0.6.x-test-matrix.md",
@@ -293,6 +295,7 @@ function checkContentContracts() {
   const sidecarOpenClawHermesManualSmokeFollowupDoc = readText("docs/dogfooding/sidecar-openclaw-hermes-manual-smoke-followup.md");
   const deltaHandoffFreshReceiverDoc = readText("docs/dogfooding/delta-handoff-fresh-receiver-v1.0.md");
   const deltaHandoffBaselineAdvanceDoc = readText("docs/dogfooding/delta-handoff-baseline-advance-v1.0.md");
+  const deltaReceiverAcceptanceDoc = readText("docs/dogfooding/delta-receiver-acceptance-v1.1.md");
   const testingDoc = readText("docs/testing.md");
   const usabilityFeedbackTemplate = readText(".github/ISSUE_TEMPLATE/usability_feedback.md");
   const adaptersDoc = readText("docs/adapters.md");
@@ -335,6 +338,7 @@ function checkContentContracts() {
   const v100PlanDoc = readText("docs/releases/v1.0.0-plan.md");
   const v100RcReviewDoc = readText("docs/releases/v1.0.0-rc-review.md");
   const v101ReleaseDoc = readText("docs/releases/v1.0.1.md");
+  const v110PlanDoc = readText("docs/releases/v1.1.0-plan.md");
   const deltaHandoffSpecDoc = readText("docs/specs/delta-handoff.md");
   const postReleaseBaselineDoc = readText("docs/baselines/v0.4.0-post-release-baseline.md");
   const v060PostReleaseBaselineDoc = readText("docs/baselines/v0.6.0-post-release-baseline.md");
@@ -918,6 +922,20 @@ function checkContentContracts() {
   assert(v101ReleaseDoc.includes("No runtime integration"), "v1.0.1 release doc must reject runtime scope");
   assert(v101ReleaseDoc.includes("No plugin, MCP, IDE"), "v1.0.1 release doc must reject plugin/MCP/IDE scope");
   assert(v101ReleaseDoc.includes("No schema-v2 work"), "v1.0.1 release doc must reject schema-v2 scope");
+  assert(v110PlanDoc.includes("v1.1.0 Delta Receiver Acceptance Plan"), "v1.1.0 plan must have stable title");
+  assert(v110PlanDoc.includes("Delta Receiver Acceptance Kit"), "v1.1.0 plan must name the receiver acceptance kit");
+  assert(v110PlanDoc.includes("live repository state versus inherited handoff facts"), "v1.1.0 plan must require live-vs-inherited separation");
+  assert(v110PlanDoc.includes("receiver_task_status"), "v1.1.0 plan must require receiver status reporting");
+  assert(v110PlanDoc.includes("handoff_acceptance"), "v1.1.0 plan must require handoff acceptance reporting");
+  assert(v110PlanDoc.includes("basebrief-project-state-v1"), "v1.1.0 plan must preserve project-state schema");
+  assert(v110PlanDoc.includes("basebrief-delta-handoff-v1"), "v1.1.0 plan must preserve delta handoff schema");
+  assert(v110PlanDoc.includes("basebrief-delta-baseline-v1"), "v1.1.0 plan must preserve delta baseline schema");
+  assert(v110PlanDoc.includes("No provider request"), "v1.1.0 plan must reject provider scope");
+  assert(v110PlanDoc.includes("No runtime integration"), "v1.1.0 plan must reject runtime scope");
+  assert(v110PlanDoc.includes("No plugin, MCP, IDE"), "v1.1.0 plan must reject plugin/MCP/IDE scope");
+  assert(v110PlanDoc.includes("No schema-v2 work"), "v1.1.0 plan must reject schema-v2 scope");
+  assert(v110PlanDoc.includes("No new CLI command"), "v1.1.0 plan must avoid new CLI commands");
+  assert(v110PlanDoc.includes("provider_probe_status=skipped"), "v1.1.0 plan must preserve skipped provider gate");
   assert(deltaHandoffSpecDoc.includes("basebrief-delta-baseline-v1"), "delta spec must define baseline schema");
   assert(deltaHandoffSpecDoc.includes("reviewed"), "delta spec must define reviewed semantics");
   assert(deltaHandoffSpecDoc.includes("needs-review"), "delta spec must define needs-review semantics");
@@ -935,6 +953,9 @@ function checkContentContracts() {
   assert(roadmapDoc.includes("Phase 8B: Delta Handoff"), "Roadmap must document Delta Handoff phase");
   assert(roadmapDoc.includes("fresh receiver dogfooding has reported `handoff_acceptance: pass`"), "Roadmap must record fresh receiver pass");
   assert(roadmapDoc.includes("basebrief-project-state-v1` remains unchanged"), "Roadmap must preserve project-state schema in v1.0");
+  assert(roadmapDoc.includes("Next v1.1 planning target"), "Roadmap must document v1.1 receiver acceptance target");
+  assert(roadmapDoc.includes("Delta Receiver Acceptance Kit"), "Roadmap must name v1.1 receiver acceptance kit");
+  assert(roadmapDoc.includes("receiver contract, not an"), "Roadmap must keep v1.1 out of runtime scope");
   assert(contextOpsDoc.includes("not a product surface"), "contextops.md must keep ContextOps out of product surface");
   assert(contextOpsDoc.includes("Current Non-Goals"), "contextops.md must define non-goals");
   assert(contextOpsDoc.includes("hosted service"), "contextops.md must reject hosted-service scope");
@@ -1706,6 +1727,19 @@ function checkContentContracts() {
   assert(deltaHandoffBaselineAdvanceDoc.includes("basebrief-project-state-v1"), "Delta baseline-advance doc must preserve project-state schema");
   assert(deltaHandoffBaselineAdvanceDoc.includes("handoff_acceptance: pass"), "Delta baseline-advance doc must record receiver pass");
   assert(deltaHandoffBaselineAdvanceDoc.includes("provider_probe_status=skipped"), "Delta baseline-advance doc must preserve skipped provider gate");
+  assert(deltaReceiverAcceptanceDoc.includes("Delta Receiver Acceptance Dogfooding v1.1"), "Delta receiver acceptance doc must have stable title");
+  assert(deltaReceiverAcceptanceDoc.includes("receiver_task_status"), "Delta receiver acceptance doc must require receiver task status");
+  assert(deltaReceiverAcceptanceDoc.includes("repository_state_status"), "Delta receiver acceptance doc must require repository state status");
+  assert(deltaReceiverAcceptanceDoc.includes("handoff_acceptance"), "Delta receiver acceptance doc must require handoff acceptance");
+  assert(deltaReceiverAcceptanceDoc.includes("blocking_or_repair_notes"), "Delta receiver acceptance doc must require repair notes");
+  assert(deltaReceiverAcceptanceDoc.includes("live repository state"), "Delta receiver acceptance doc must require live repository state");
+  assert(deltaReceiverAcceptanceDoc.includes("inherited handoff facts"), "Delta receiver acceptance doc must separate inherited facts");
+  assert(deltaReceiverAcceptanceDoc.includes("difference_found"), "Delta receiver acceptance doc must define difference handling");
+  assert(deltaReceiverAcceptanceDoc.includes("No provider request"), "Delta receiver acceptance doc must reject provider scope");
+  assert(deltaReceiverAcceptanceDoc.includes("No runtime integration"), "Delta receiver acceptance doc must reject runtime scope");
+  assert(deltaReceiverAcceptanceDoc.includes("No plugin, MCP, IDE"), "Delta receiver acceptance doc must reject plugin/MCP/IDE scope");
+  assert(deltaReceiverAcceptanceDoc.includes("No schema-v2 work"), "Delta receiver acceptance doc must reject schema-v2 scope");
+  assert(deltaReceiverAcceptanceDoc.includes("provider_probe_status=skipped"), "Delta receiver acceptance doc must preserve skipped provider gate");
   assert(v08xTestMatrixDoc.includes("v0.8.x Sidecar Test Matrix"), "v0.8.x matrix must have stable title");
   assert(v08xTestMatrixDoc.includes("sidecar-build"), "v0.8.x matrix must document sidecar-build");
   assert(v08xTestMatrixDoc.includes("sidecar-check"), "v0.8.x matrix must document sidecar-check");
@@ -1999,6 +2033,7 @@ function checkArtifactChecker() {
     "docs/releases/v1.0.0-plan.md",
     "docs/releases/v1.0.0-rc-review.md",
     "docs/releases/v1.0.1.md",
+    "docs/releases/v1.1.0-plan.md",
     "docs/testing-v0.9.x-test-matrix.md",
     "docs/dogfooding/sidecar-external-receiver-smoke-v0.8.4.md",
     "docs/dogfooding/sidecar-manual-receiver-smoke-v0.8.5.md",
@@ -2006,6 +2041,7 @@ function checkArtifactChecker() {
     "docs/dogfooding/sidecar-openclaw-hermes-manual-smoke-followup.md",
     "docs/dogfooding/delta-handoff-fresh-receiver-v1.0.md",
     "docs/dogfooding/delta-handoff-baseline-advance-v1.0.md",
+    "docs/dogfooding/delta-receiver-acceptance-v1.1.md",
     "examples/receiver-check-config.json",
     "examples/receiver/difference-found",
     "examples/receiver/blocked",

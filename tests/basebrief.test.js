@@ -1630,11 +1630,13 @@ test("v1.0.0 delta handoff RC hardening exposes local-first delta without expand
   const cliLite = readText("docs/cli-lite.md");
   const release = readText("docs/releases/v1.0.0.md");
   const v101Release = readText("docs/releases/v1.0.1.md");
+  const v110Plan = readText("docs/releases/v1.1.0-plan.md");
   const plan = readText("docs/releases/v1.0.0-plan.md");
   const rcReview = readText("docs/releases/v1.0.0-rc-review.md");
   const spec = readText("docs/specs/delta-handoff.md");
   const dogfooding = readText("docs/dogfooding/delta-handoff-fresh-receiver-v1.0.md");
   const baselineAdvanceDogfooding = readText("docs/dogfooding/delta-handoff-baseline-advance-v1.0.md");
+  const receiverAcceptanceDogfooding = readText("docs/dogfooding/delta-receiver-acceptance-v1.1.md");
   const example = readText("examples/delta-handoff.md");
 
   assert.match(readme, /docs\/releases\/v1\.0\.0\.md/);
@@ -1658,10 +1660,12 @@ test("v1.0.0 delta handoff RC hardening exposes local-first delta without expand
   assert.match(docsIndex, /releases\/v1\.0\.0-plan\.md/);
   assert.match(docsIndex, /releases\/v1\.0\.0-rc-review\.md/);
   assert.match(docsIndex, /releases\/v1\.0\.1\.md/);
+  assert.match(docsIndex, /releases\/v1\.1\.0-plan\.md/);
   assert.match(docsIndex, /specs\/delta-handoff\.md/);
   assert.match(docsIndex, /\.\.\/examples\/delta-handoff\.md/);
   assert.match(docsIndex, /dogfooding\/delta-handoff-fresh-receiver-v1\.0\.md/);
   assert.match(docsIndex, /dogfooding\/delta-handoff-baseline-advance-v1\.0\.md/);
+  assert.match(docsIndex, /dogfooding\/delta-receiver-acceptance-v1\.1\.md/);
 
   assert.match(testing, /v1\.0 Delta Handoff RC Candidate/);
   assert.match(testing, /v1\.0 Delta Handoff Fresh Receiver Dogfooding/);
@@ -1673,6 +1677,8 @@ test("v1.0.0 delta handoff RC hardening exposes local-first delta without expand
   assert.match(roadmap, /current `v1\.0` line is Delta Handoff RC hardening/);
   assert.match(roadmap, /fresh receiver dogfooding has reported `handoff_acceptance: pass`/);
   assert.match(roadmap, /basebrief-project-state-v1` remains unchanged/);
+  assert.match(roadmap, /Next v1\.1 planning target/);
+  assert.match(roadmap, /Delta Receiver Acceptance Kit/);
   assert.doesNotMatch(roadmap, /Current v0\.9\.0 readiness target/);
 
   assert.match(cliLite, /delta --repo <target-repo> --output-dir <dir>/);
@@ -1713,6 +1719,20 @@ test("v1.0.0 delta handoff RC hardening exposes local-first delta without expand
   assert.match(v101Release, /No runtime integration/);
   assert.match(v101Release, /No plugin, MCP, IDE/);
   assert.match(v101Release, /No schema-v2 work/);
+  assert.match(v110Plan, /v1\.1\.0 Delta Receiver Acceptance Plan/);
+  assert.match(v110Plan, /Delta Receiver Acceptance Kit/);
+  assert.match(v110Plan, /live repository state versus inherited handoff facts/);
+  assert.match(v110Plan, /receiver_task_status/);
+  assert.match(v110Plan, /handoff_acceptance/);
+  assert.match(v110Plan, /basebrief-project-state-v1/);
+  assert.match(v110Plan, /basebrief-delta-handoff-v1/);
+  assert.match(v110Plan, /basebrief-delta-baseline-v1/);
+  assert.match(v110Plan, /No provider request/);
+  assert.match(v110Plan, /No runtime integration/);
+  assert.match(v110Plan, /No plugin, MCP, IDE/);
+  assert.match(v110Plan, /No schema-v2 work/);
+  assert.match(v110Plan, /No new CLI command/);
+  assert.match(v110Plan, /provider_probe_status=skipped/);
   assert.match(spec, /basebrief-delta-baseline-v1/);
   assert.match(spec, /needs-review/);
   assert.match(dogfooding, /handoff_acceptance: pass/);
@@ -1723,6 +1743,19 @@ test("v1.0.0 delta handoff RC hardening exposes local-first delta without expand
   assert.match(baselineAdvanceDogfooding, /basebrief-project-state-v1/);
   assert.match(baselineAdvanceDogfooding, /handoff_acceptance: pass/);
   assert.match(baselineAdvanceDogfooding, /provider_probe_status=skipped/);
+  assert.match(receiverAcceptanceDogfooding, /Delta Receiver Acceptance Dogfooding v1\.1/);
+  assert.match(receiverAcceptanceDogfooding, /receiver_task_status/);
+  assert.match(receiverAcceptanceDogfooding, /repository_state_status/);
+  assert.match(receiverAcceptanceDogfooding, /handoff_acceptance/);
+  assert.match(receiverAcceptanceDogfooding, /blocking_or_repair_notes/);
+  assert.match(receiverAcceptanceDogfooding, /live repository state/);
+  assert.match(receiverAcceptanceDogfooding, /inherited handoff facts/);
+  assert.match(receiverAcceptanceDogfooding, /difference_found/);
+  assert.match(receiverAcceptanceDogfooding, /No provider request/);
+  assert.match(receiverAcceptanceDogfooding, /No runtime integration/);
+  assert.match(receiverAcceptanceDogfooding, /No plugin, MCP, IDE/);
+  assert.match(receiverAcceptanceDogfooding, /No schema-v2 work/);
+  assert.match(receiverAcceptanceDogfooding, /provider_probe_status=skipped/);
   assert.match(example, /schemaVersion: basebrief-delta-handoff-v1/);
   assert.match(example, /## How To Read This Delta/);
   assert.match(example, /baseline_source: \.basebrief\/delta-baseline\.json/);
@@ -1741,9 +1774,11 @@ test("v1.0.0 delta handoff RC hardening exposes local-first delta without expand
     "docs/releases/v1.0.0-plan.md",
     "docs/releases/v1.0.0-rc-review.md",
     "docs/releases/v1.0.1.md",
+    "docs/releases/v1.1.0-plan.md",
     "docs/specs/delta-handoff.md",
     "docs/dogfooding/delta-handoff-fresh-receiver-v1.0.md",
     "docs/dogfooding/delta-handoff-baseline-advance-v1.0.md",
+    "docs/dogfooding/delta-receiver-acceptance-v1.1.md",
     "examples/delta-handoff.md",
   ]) {
     const result = checkArtifacts({ inputPath: path.join(repoRoot, relativePath) });
@@ -3964,7 +3999,7 @@ test("Delta Handoff writes reviewable delta output and advances local baseline o
     assert.deepEqual(followup.git.changedFilesInRange, ["followup.md"]);
     assert.equal(followup.stateDiff.status, "unchanged");
     assert.match(followupContent, /## How To Read This Delta/);
-    assert.match(followupContent, /commits_in_range: 0/);
+    assert.match(followupContent, /commits_in_range: 1/);
     assert.match(followupContent, /does not mean the worktree is clean/);
     assert.match(followupContent, /stateDiff\.status: unchanged/);
     assert.match(followupContent, /does not mean git or worktree content is unchanged/);

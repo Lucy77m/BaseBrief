@@ -280,6 +280,18 @@ Exit criteria:
   evidence
 - `provider_probe_status=skipped` remains the correct no-provider gate
 
+Next v1.1 planning target:
+
+- keep the v1.0 Delta Handoff line local-first and review-based
+- define the Delta Receiver Acceptance Kit as a receiver contract, not an
+  automated runtime
+- require the receiver to separate live repository state from inherited handoff
+  facts before proposing implementation work
+- keep `basebrief-project-state-v1`, `basebrief-delta-handoff-v1`, and
+  `basebrief-delta-baseline-v1` unchanged
+- avoid provider requests, runtime integration, plugin, MCP, IDE, hosted,
+  Auto Flow, npm publication, and schema-v2 work
+
 ### Phase 8A: Receiver Workflow
 
 Goal: make receiver acceptance explicit and locally verifiable without turning BaseBrief into an agent runtime.
@@ -373,7 +385,7 @@ A new BB experiment is allowed only when all of the following are true:
 
 1. Complete the `v1.0` Delta Handoff RC hardening line for explicit user review.
 2. Keep push, tag, and formal release pending until the user separately approves them.
-3. Observe whether Delta Handoff plus the existing Project State -> Sidecar -> receiver first-response line prevents real handoff mistakes.
+3. Use the v1.1 Delta Receiver Acceptance Kit to observe whether Delta Handoff plus the existing Project State -> Sidecar -> receiver first-response line prevents real handoff mistakes.
 4. Keep installed CLI, plugins, provider experiments, ContextOps expansion, and speculative features frozen unless measured usage creates a concrete blocker.
 5. Choose later versions only from repeated, measured usage evidence.
 
