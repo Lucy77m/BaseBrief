@@ -21,6 +21,7 @@ const {
 } = require("./basebrief_project_state");
 const { commandDiff: commandSealDiff, commandSeal: commandCreateSeal } = require("./basebrief_seal");
 const { buildSidecarBundle, checkSidecarBundle } = require("./basebrief_sidecar");
+const { runDelta } = require("./basebrief_delta");
 
 const STARTER_FILE = "basebrief-handoff-input.json";
 const HELP_TEXT = [
@@ -45,6 +46,7 @@ const HELP_TEXT = [
   "  node scripts/basebrief.js sidecar-check --input <sidecar-dir> [--json]",
   "  node scripts/basebrief.js seal --input <markdown-or-json> --output <file>",
   "  node scripts/basebrief.js diff --before <file> --after <file>",
+  "  node scripts/basebrief.js delta --repo <target-repo> --output-dir <dir> [--since <commit>] [--advance-baseline] [--json]",
   "",
   "Start here:",
   "  docs/quickstart-5min.md",
@@ -59,7 +61,7 @@ function parseOptions(args) {
       continue;
     }
     const key = arg.slice(2);
-    if (key === "json" || key === "check" || key === "guided" || key === "extract") {
+    if (key === "json" || key === "check" || key === "guided" || key === "extract" || key === "advance-baseline") {
       options[key] = true;
       continue;
     }
@@ -336,6 +338,15 @@ function commandDiff(options) {
   });
 }
 
+function commandDelta(options) {
+  return runDelta({
+    repoPath: options.repo,
+    outputDir: options["output-dir"],
+    since: options.since || "",
+    advanceBaseline: Boolean(options["advance-baseline"]),
+  });
+}
+
 function run(argv) {
   const command = argv[2];
   if (!command || command === "--help" || command === "-h") return { command: "help" };
@@ -360,6 +371,7 @@ function run(argv) {
   if (command === "sidecar-check") return commandSidecarCheck(options);
   if (command === "seal") return commandSeal(options);
   if (command === "diff") return commandDiff(options);
+  if (command === "delta") return commandDelta(options);
   throw new Error(`Unknown command: ${command}`);
 }
 
@@ -467,6 +479,23 @@ function toPublicResult(result) {
     return {
       ...result,
       output: publicPath(result.output, cwd),
+    };
+  }
+  if (result.command === "delta") {
+    return {
+      ...result,
+      repo: publicPath(result.repo, cwd),
+      outputDir: publicPath(result.outputDir, cwd),
+      outputFiles: toRelativeMap(result.outputFiles, cwd),
+      baseline: {
+        ...result.baseline,
+        input: publicPath(result.baseline.input, cwd),
+        output: result.baseline.output ? publicPath(result.baseline.output, cwd) : "",
+      },
+      projectState: {
+        ...result.projectState,
+        input: publicPath(result.projectState.input, cwd),
+      },
     };
   }
   return result;
@@ -623,6 +652,17 @@ function formatHuman(result) {
       "",
     ].join(os.EOL);
   }
+  if (result.command === "delta") {
+    return [
+      `BaseBrief delta handoff written to ${result.outputFiles.deltaHandoff}`,
+      `schemaVersion=${result.schemaVersion}`,
+      `baseline_exists=${result.baseline.exists}`,
+      `baseline_advanced=${result.baseline.advanced}`,
+      `git_range=${result.git.range}`,
+      `state_diff_status=${result.stateDiff.status}`,
+      "",
+    ].join(os.EOL);
+  }
   return `${JSON.stringify(result, null, 2)}${os.EOL}`;
 }
 
@@ -690,6 +730,7 @@ module.exports = {
   commandSidecarBuild,
   commandSidecarCheck,
   commandSeal,
+  commandDelta,
   formatFindingLines,
   formatHuman,
   parseOptions,

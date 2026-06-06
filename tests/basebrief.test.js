@@ -16,7 +16,7 @@ const {
 } = require("../scripts/basebrief_build_handoff");
 const { buildAdapterArtifacts, normalizeTargets } = require("../scripts/basebrief_build_adapters");
 const { checkArtifacts } = require("../scripts/basebrief_check_artifacts");
-const { HELP_TEXT, commandBuild, commandCheck, commandDiff, commandInit, commandReceiverCheck, commandReceiverFlow, commandReceiverInit, commandReviewDraft, commandSidecarBuild, commandSidecarCheck, commandStateAdvance, commandStateHistory, commandStateInit, commandStateRead, commandStateStatus, commandStateValidate, commandSeal, formatHuman, run, starterInput } = require("../scripts/basebrief");
+const { HELP_TEXT, commandBuild, commandCheck, commandDelta, commandDiff, commandInit, commandReceiverCheck, commandReceiverFlow, commandReceiverInit, commandReviewDraft, commandSidecarBuild, commandSidecarCheck, commandStateAdvance, commandStateHistory, commandStateInit, commandStateRead, commandStateStatus, commandStateValidate, commandSeal, formatHuman, run, starterInput } = require("../scripts/basebrief");
 const {
   CONFIG_SCHEMA_VERSION: RECEIVER_CHECK_SCHEMA_VERSION,
   RESULT_SCHEMA_VERSION: RECEIVER_CHECK_RESULT_SCHEMA_VERSION,
@@ -30,6 +30,7 @@ const { REVIEW_DRAFT_SCHEMA_VERSION, runReviewDraft } = require("../scripts/base
 const { PROJECT_STATE_SCHEMA_VERSION, runStateAdvance, runStateHistory, runStateInit, runStateRead, runStateStatus, runStateValidate } = require("../scripts/basebrief_project_state");
 const { SIDECAR_SCHEMA_VERSION, buildSidecarBundle, checkSidecarBundle, detectStarterLanguage } = require("../scripts/basebrief_sidecar");
 const { createSealFromInput, diffSeals, readSealOrInput, SEAL_SCHEMA_VERSION } = require("../scripts/basebrief_seal");
+const { DELTA_BASELINE_SCHEMA_VERSION, DELTA_HANDOFF_SCHEMA_VERSION, readDeltaBaseline, runDelta } = require("../scripts/basebrief_delta");
 const { buildSummary, getPromptForVariant, SCENARIOS, PROVIDER_PROFILES } = require("../scripts/provider_cache_benchmark");
 const { classifyRelayUsage } = require("../scripts/provider_relay_usage_audit");
 const { routeMode } = require("../scripts/mode_router");
@@ -1599,9 +1600,9 @@ test("v0.9.3 final closure freeze aligns the whole v0.9.x line for release revie
   assert.match(matrix, /No Auto Flow/);
   assert.match(matrix, /No v1\.0 work/);
 
-  assert.match(roadmap, /Current v0\.9\.x closure line/);
+  assert.match(roadmap, /`v0\.9\.x` closure line is frozen/);
   assert.match(roadmap, /v0\.9\.3 Final Closure \/ Freeze/);
-  assert.match(roadmap, /v0\.9\.x closure\/freeze line/);
+  assert.match(roadmap, /current `v1\.0` line is Delta Handoff RC hardening/);
   assert.doesNotMatch(roadmap, /Current v0\.9\.0 readiness target/);
 
   for (const relativePath of [
@@ -1613,6 +1614,114 @@ test("v0.9.3 final closure freeze aligns the whole v0.9.x line for release revie
     "docs/roadmap/basebrief-long-term-baseline.md",
     "docs/releases/v0.9.3.md",
     "docs/testing-v0.9.x-test-matrix.md",
+  ]) {
+    const result = checkArtifacts({ inputPath: path.join(repoRoot, relativePath) });
+    assert.equal(result.status, "passed", relativePath);
+    assert.equal(result.errorCount, 0, relativePath);
+  }
+});
+
+test("v1.0.0 delta handoff RC hardening exposes local-first delta without expanding scope", () => {
+  const readme = readText("README.md");
+  const englishReadme = readText("README.en.md");
+  const docsIndex = readText("docs/index.md");
+  const testing = readText("docs/testing.md");
+  const roadmap = readText("docs/roadmap/basebrief-long-term-baseline.md");
+  const cliLite = readText("docs/cli-lite.md");
+  const release = readText("docs/releases/v1.0.0.md");
+  const plan = readText("docs/releases/v1.0.0-plan.md");
+  const rcReview = readText("docs/releases/v1.0.0-rc-review.md");
+  const spec = readText("docs/specs/delta-handoff.md");
+  const dogfooding = readText("docs/dogfooding/delta-handoff-fresh-receiver-v1.0.md");
+  const baselineAdvanceDogfooding = readText("docs/dogfooding/delta-handoff-baseline-advance-v1.0.md");
+  const example = readText("examples/delta-handoff.md");
+
+  assert.match(readme, /docs\/releases\/v1\.0\.0\.md/);
+  assert.match(readme, /docs\/specs\/delta-handoff\.md/);
+  assert.match(readme, /docs\/dogfooding\/delta-handoff-fresh-receiver-v1\.0\.md/);
+  assert.match(readme, /docs\/dogfooding\/delta-handoff-baseline-advance-v1\.0\.md/);
+  assert.match(readme, /Delta Handoff RC hardening/);
+  assert.match(readme, /basebrief-project-state-v1` 保持不变/);
+  assert.match(readme, /provider_probe_status=skipped/);
+  assert.match(readme, /`delta`/);
+
+  assert.match(englishReadme, /docs\/releases\/v1\.0\.0\.md/);
+  assert.match(englishReadme, /docs\/specs\/delta-handoff\.md/);
+  assert.match(englishReadme, /docs\/dogfooding\/delta-handoff-fresh-receiver-v1\.0\.md/);
+  assert.match(englishReadme, /docs\/dogfooding\/delta-handoff-baseline-advance-v1\.0\.md/);
+  assert.match(englishReadme, /Delta Handoff RC hardening/);
+  assert.match(englishReadme, /basebrief-project-state-v1` remains unchanged/);
+  assert.match(englishReadme, /provider_probe_status=skipped/);
+
+  assert.match(docsIndex, /releases\/v1\.0\.0\.md/);
+  assert.match(docsIndex, /releases\/v1\.0\.0-plan\.md/);
+  assert.match(docsIndex, /releases\/v1\.0\.0-rc-review\.md/);
+  assert.match(docsIndex, /specs\/delta-handoff\.md/);
+  assert.match(docsIndex, /\.\.\/examples\/delta-handoff\.md/);
+  assert.match(docsIndex, /dogfooding\/delta-handoff-fresh-receiver-v1\.0\.md/);
+  assert.match(docsIndex, /dogfooding\/delta-handoff-baseline-advance-v1\.0\.md/);
+
+  assert.match(testing, /v1\.0 Delta Handoff RC Candidate/);
+  assert.match(testing, /v1\.0 Delta Handoff Fresh Receiver Dogfooding/);
+  assert.match(testing, /v1\.0 Delta Handoff Baseline-Advance Dogfooding/);
+  assert.match(testing, /basebrief-project-state-v1` unchanged/);
+  assert.match(testing, /provider_probe_status=skipped/);
+
+  assert.match(roadmap, /Phase 8B: Delta Handoff/);
+  assert.match(roadmap, /current `v1\.0` line is Delta Handoff RC hardening/);
+  assert.match(roadmap, /fresh receiver dogfooding has reported `handoff_acceptance: pass`/);
+  assert.match(roadmap, /basebrief-project-state-v1` remains unchanged/);
+  assert.doesNotMatch(roadmap, /Current v0\.9\.0 readiness target/);
+
+  assert.match(cliLite, /delta --repo <target-repo> --output-dir <dir>/);
+  assert.match(release, /v1\.0\.0 Delta Handoff RC Candidate/);
+  assert.match(release, /Reviewable Delta Handoff Compiler/);
+  assert.match(release, /node scripts\/basebrief\.js delta/);
+  assert.match(release, /v1\.0\.0-rc-review\.md/);
+  assert.match(release, /handoff_acceptance: pass/);
+  assert.match(release, /delta-handoff-baseline-advance-v1\.0\.md/);
+  assert.match(release, /baseline-advance closure/);
+  assert.match(release, /basebrief-project-state-v1` remains unchanged/);
+  assert.match(release, /provider_probe_status=skipped/);
+  assert.match(release, /No provider request/);
+  assert.match(release, /No runtime integration/);
+  assert.match(release, /No schema-v2 work/);
+  assert.match(release, /No plugin, MCP, IDE/);
+
+  assert.match(plan, /Reviewable Delta Handoff Compiler/);
+  assert.match(rcReview, /v1\.0\.0 RC Review Package/);
+  assert.match(rcReview, /Commit-Ready Summary/);
+  assert.match(rcReview, /delta-handoff-fresh-receiver-v1\.0\.md/);
+  assert.match(rcReview, /delta-handoff-baseline-advance-v1\.0\.md/);
+  assert.match(rcReview, /\.basebrief\/delta-baseline\.json/);
+  assert.match(rcReview, /provider_probe_status=skipped/);
+  assert.match(rcReview, /No provider request/);
+  assert.match(rcReview, /No schema-v2 work/);
+  assert.match(spec, /basebrief-delta-baseline-v1/);
+  assert.match(spec, /needs-review/);
+  assert.match(dogfooding, /handoff_acceptance: pass/);
+  assert.match(baselineAdvanceDogfooding, /Delta Handoff Baseline-Advance Dogfooding v1\.0/);
+  assert.match(baselineAdvanceDogfooding, /delta --advance-baseline/);
+  assert.match(baselineAdvanceDogfooding, /First run wrote local baseline/);
+  assert.match(baselineAdvanceDogfooding, /Second run no longer reported `baseline_source: missing`/);
+  assert.match(baselineAdvanceDogfooding, /basebrief-project-state-v1/);
+  assert.match(baselineAdvanceDogfooding, /handoff_acceptance: pass/);
+  assert.match(baselineAdvanceDogfooding, /provider_probe_status=skipped/);
+  assert.match(example, /schemaVersion: basebrief-delta-handoff-v1/);
+
+  for (const relativePath of [
+    "README.md",
+    "README.en.md",
+    "docs/index.md",
+    "docs/testing.md",
+    "docs/roadmap/basebrief-long-term-baseline.md",
+    "docs/releases/v1.0.0.md",
+    "docs/releases/v1.0.0-plan.md",
+    "docs/releases/v1.0.0-rc-review.md",
+    "docs/specs/delta-handoff.md",
+    "docs/dogfooding/delta-handoff-fresh-receiver-v1.0.md",
+    "docs/dogfooding/delta-handoff-baseline-advance-v1.0.md",
+    "examples/delta-handoff.md",
   ]) {
     const result = checkArtifacts({ inputPath: path.join(repoRoot, relativePath) });
     assert.equal(result.status, "passed", relativePath);
@@ -3770,6 +3879,92 @@ test("CLI Lite exposes project state commands with public-safe json paths", () =
     fs.rmSync(repoDir, { recursive: true, force: true });
     fs.rmSync(sourceDir, { recursive: true, force: true });
     fs.rmSync(sidecarDir, { recursive: true, force: true });
+  }
+}));
+
+test("Delta Handoff writes reviewable delta output and advances local baseline only when requested", () => withTempDir((tempDir) => {
+  const repoDir = path.join(repoRoot, "tests", "outputs", "private", `delta-repo-${Date.now()}`);
+  const sourceDir = path.join(repoRoot, "tests", "outputs", "private", `delta-source-${Date.now()}`);
+  const outputDir = path.join(repoRoot, "tests", "outputs", "private", `delta-output-${Date.now()}`);
+  const cliOutputDir = path.join(repoRoot, "tests", "outputs", "private", `delta-cli-${Date.now()}`);
+  try {
+    fs.mkdirSync(repoDir, { recursive: true });
+    fs.mkdirSync(sourceDir, { recursive: true });
+    git(repoDir, ["init"]);
+    git(repoDir, ["config", "user.email", "basebrief@example.invalid"]);
+    git(repoDir, ["config", "user.name", "BaseBrief Delta Test"]);
+    fs.writeFileSync(path.join(repoDir, "safe.js"), "const safe = true;\n", "utf8");
+    git(repoDir, ["add", "."]);
+    git(repoDir, ["commit", "-m", "initial fixture"]);
+    const firstHead = git(repoDir, ["rev-parse", "HEAD"]);
+
+    const { draftPath } = createGuidedDraft(tempDir);
+    const readyPath = path.join(sourceDir, "receiver-ready.md");
+    runReviewDraft({ draftPath, outputPath: readyPath });
+    runStateInit({ repoPath: repoDir, sourcePath: readyPath });
+
+    fs.writeFileSync(path.join(repoDir, "notes.md"), "local delta note\n", "utf8");
+    const initial = runDelta({ repoPath: repoDir, outputDir });
+    const initialContent = fs.readFileSync(path.join(outputDir, "delta-handoff.md"), "utf8");
+    assert.equal(initial.command, "delta");
+    assert.equal(initial.schemaVersion, DELTA_HANDOFF_SCHEMA_VERSION);
+    assert.equal(initial.baseline.exists, false);
+    assert.equal(initial.baseline.advanced, false);
+    assert.equal(fs.existsSync(path.join(repoDir, ".basebrief", "delta-baseline.json")), false);
+    assert.equal(initial.stateDiff.status, "no_previous_baseline");
+    assert(initial.git.worktreeChangedFiles.includes("notes.md"));
+    assert.match(initialContent, /review_status=reviewed/);
+    assert.match(initialContent, /review_status=needs-review/);
+    assert.match(initialContent, /schemaVersion: basebrief-delta-handoff-v1/);
+    assert.equal(JSON.parse(fs.readFileSync(path.join(repoDir, ".basebrief", "state.json"), "utf8")).schemaVersion, PROJECT_STATE_SCHEMA_VERSION);
+
+    git(repoDir, ["add", "notes.md"]);
+    git(repoDir, ["commit", "-m", "add delta note"]);
+    const advanced = commandDelta({ repo: repoDir, "output-dir": outputDir, "advance-baseline": true });
+    assert.equal(advanced.baseline.advanced, true);
+    const baselineInfo = readDeltaBaseline(repoDir);
+    assert.equal(baselineInfo.exists, true);
+    assert.equal(baselineInfo.baseline.schemaVersion, DELTA_BASELINE_SCHEMA_VERSION);
+    assert.equal(baselineInfo.baseline.repo.head, git(repoDir, ["rev-parse", "HEAD"]));
+    assert.equal(baselineInfo.baseline.state.updated_at, JSON.parse(fs.readFileSync(path.join(repoDir, ".basebrief", "state.json"), "utf8")).updated_at);
+
+    fs.writeFileSync(path.join(repoDir, "followup.md"), "second delta note\n", "utf8");
+    git(repoDir, ["add", "followup.md"]);
+    git(repoDir, ["commit", "-m", "add followup note"]);
+    const followup = runDelta({ repoPath: repoDir, outputDir: cliOutputDir });
+    assert.equal(followup.baseline.exists, true);
+    assert.equal(followup.git.commitCount, 1);
+    assert.deepEqual(followup.git.changedFilesInRange, ["followup.md"]);
+    assert.equal(followup.stateDiff.status, "unchanged");
+
+    const explicit = runDelta({ repoPath: repoDir, outputDir: cliOutputDir, since: firstHead });
+    assert.equal(explicit.git.commitCount, 2);
+    assert(explicit.git.changedFilesInRange.includes("notes.md"));
+    assert(explicit.git.changedFilesInRange.includes("followup.md"));
+
+    const cli = spawnSync(process.execPath, [
+      "scripts/basebrief.js",
+      "delta",
+      "--repo",
+      repoDir,
+      "--output-dir",
+      cliOutputDir,
+      "--json",
+    ], { cwd: repoRoot, encoding: "utf8" });
+    assert.equal(cli.status, 0, cli.stderr);
+    const cliResult = JSON.parse(cli.stdout);
+    assert.equal(cliResult.command, "delta");
+    assert.equal(cliResult.repo.startsWith("tests"), true);
+    assert.equal(cliResult.outputFiles.deltaHandoff.startsWith("tests"), true);
+    assert.equal(cliResult.baseline.input.startsWith("tests"), true);
+    assert.equal(cliResult.projectState.input.startsWith("tests"), true);
+    assert.match(HELP_TEXT, /delta --repo <target-repo> --output-dir <dir>/);
+    assert.match(formatHuman(followup), /BaseBrief delta handoff written/);
+  } finally {
+    fs.rmSync(repoDir, { recursive: true, force: true });
+    fs.rmSync(sourceDir, { recursive: true, force: true });
+    fs.rmSync(outputDir, { recursive: true, force: true });
+    fs.rmSync(cliOutputDir, { recursive: true, force: true });
   }
 }));
 

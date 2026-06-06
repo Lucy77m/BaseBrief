@@ -23,6 +23,8 @@
 - [Project State lifecycle model](design/project-state-lifecycle-model.md)
 - [v0.9.0 Integrated Handoff Readiness](releases/v0.9.0.md)
 - [v0.9.x Integrated Handoff Closure Matrix](testing-v0.9.x-test-matrix.md)
+- [v1.0.0 Delta Handoff RC Candidate](releases/v1.0.0.md)
+- [Delta Handoff Spec](specs/delta-handoff.md)
 - [v0.8.0 Sidecar Handoff Bundle](releases/v0.8.0.md)
 - [v0.8.1 Sidecar Check Hardening](releases/v0.8.1.md)
 - [v0.8.2 Sidecar Receiver Acceptance Evidence](releases/v0.8.2.md)
@@ -41,6 +43,11 @@
 - [v0.9.1 golden path closure candidate](releases/v0.9.1.md)
 - [v0.9.2 golden path example closure candidate](releases/v0.9.2.md)
 - [v0.9.3 final closure / freeze candidate](releases/v0.9.3.md)
+- [v1.0.0 delta handoff RC candidate](releases/v1.0.0.md)
+- [v1.0.0 adopted planning baseline](releases/v1.0.0-plan.md)
+- [v1.0.0 RC review package](releases/v1.0.0-rc-review.md)
+- [v1.0 Delta Handoff fresh receiver dogfooding](dogfooding/delta-handoff-fresh-receiver-v1.0.md)
+- [v1.0 Delta Handoff baseline-advance dogfooding](dogfooding/delta-handoff-baseline-advance-v1.0.md)
 - [v0.9.x integrated handoff closure matrix](testing-v0.9.x-test-matrix.md)
 - [v0.6.0 project state directory release](releases/v0.6.0.md)
 - [v0.8.0 sidecar handoff bundle candidate](releases/v0.8.0.md)
@@ -95,6 +102,7 @@
 - [Sidecar manual receiver smoke v0.8.5](dogfooding/sidecar-manual-receiver-smoke-v0.8.5.md)
 - [Sidecar manual receiver smoke v0.8.6](dogfooding/sidecar-manual-receiver-smoke-v0.8.6.md)
 - [Sidecar OpenClaw/Hermes manual smoke follow-up](dogfooding/sidecar-openclaw-hermes-manual-smoke-followup.md)
+- [Delta Handoff fresh receiver dogfooding v1.0](dogfooding/delta-handoff-fresh-receiver-v1.0.md)
 - [Usability feedback template](../.github/ISSUE_TEMPLATE/usability_feedback.md)
 
 ## Cache-ready 实验历史
@@ -133,3 +141,4 @@
 - [Receiver Flow rejected candidate draft](../examples/receiver-flow-review/rejected-candidate/README.md)
 - [Receiver Flow rejected empty draft](../examples/receiver-flow-review/rejected-empty/README.md)
 - [Project State local state example](../examples/project-state/README.md)
+- [Delta Handoff example](../examples/delta-handoff.md)

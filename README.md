@@ -14,6 +14,7 @@ English README: [README.en.md](README.en.md)
 2. [Handoff 契约与产物](docs/handoff.md)
 3. [Integrated Handoff Golden Path](docs/golden-path.md)
 4. [Seal/Diff 阶段变化对比](docs/seal-diff.md)
+5. [v1.0 Delta Handoff RC](docs/releases/v1.0.0.md)
 
 完整文档与实验历史见 [文档索引](docs/index.md)。
 
@@ -75,6 +76,8 @@ node scripts/basebrief.js sidecar-check --input tests/outputs/private/sidecar-ge
 `v0.9.2` 再补上一套 public-safe 的 [Golden Path example kit](examples/golden-path/README.md)，让用户不只知道该走哪条路径，也拿得到 first-pass / follow-up 的公开样例闭环。见 [v0.9.2 Golden Path Example Closure Candidate](docs/releases/v0.9.2.md)。
 `v0.9.3` 最后把 `v0.9.x` 收成一条可发布前审看的 local closure/freeze line：`v0.9.0` 定义，`v0.9.1` 指路，`v0.9.2` 给样例，`v0.9.3` 收口冻结。它只补聚合测试矩阵、路线文案和最终 release doc，不新增命令、不改 schema，也不引入 runtime/provider 行为。见 [v0.9.x Integrated Handoff Closure Matrix](docs/testing-v0.9.x-test-matrix.md) 与 [v0.9.3 Final Closure / Freeze Candidate](docs/releases/v0.9.3.md)。
 
+`v1.0.0` 开启 Delta Handoff RC hardening：新增本地 `delta` 命令，把当前 Project State、git range facts、changed-file facts 和 Seal/Diff 状态变化整理成 reviewable `delta-handoff.md`。它保持 local-first，不推进 provider、runtime、plugin、MCP、IDE、schema-v2 或平台化工作；`basebrief-project-state-v1` 保持不变，未注入 provider 环境变量时 release checks 仍保持 `provider_probe_status=skipped`。入口见 [v1.0.0 Delta Handoff RC Candidate](docs/releases/v1.0.0.md)、[Delta Handoff Spec](docs/specs/delta-handoff.md)、[Delta Handoff fresh receiver dogfooding v1.0](docs/dogfooding/delta-handoff-fresh-receiver-v1.0.md) 与 [Delta Handoff baseline-advance dogfooding v1.0](docs/dogfooding/delta-handoff-baseline-advance-v1.0.md)。
+
 ## Seal/Diff
 
 Seal/Diff 用来回答：阶段前后，事实、决策、风险边界和下一步任务发生了什么变化？
@@ -108,7 +111,7 @@ node scripts/basebrief.js diff --before tests/outputs/private/quickstart/before.
 - Handoff Builder 与 Codex / Claude 文件型 Adapter
 - Artifact Checker
 - 可选、只读的 Receiver Safe Check v1
-- 零依赖 CLI Lite：`init`、`build`、`check`、`receiver-init`、`receiver-check`、`receiver-flow`、`review-draft`、`state-init`、`state-read`、`state-status`、`state-validate`、`state-history`、`state-advance`、`sidecar-build`、`sidecar-check`、`seal`、`diff`
+- 零依赖 CLI Lite：`init`、`build`、`check`、`receiver-init`、`receiver-check`、`receiver-flow`、`review-draft`、`state-init`、`state-read`、`state-status`、`state-validate`、`state-history`、`state-advance`、`sidecar-build`、`sidecar-check`、`seal`、`diff`、`delta`
 - Project State Sidecar：从本地 `basebrief-project-state-v1` 生成 `generic` / `openclaw` bundle 和 `new-window-starter.md`，并用 `basebrief-sidecar-v1` 做只读结构验收
 - 本地、文件型 Seal/Diff v1
 
@@ -133,6 +136,10 @@ BaseBrief 不是聊天客户端、Agent runtime、托管平台、密钥管理器
 - [v0.9.1 Golden Path Closure Candidate](docs/releases/v0.9.1.md)
 - [v0.9.2 Golden Path Example Closure Candidate](docs/releases/v0.9.2.md)
 - [v0.9.3 Final Closure / Freeze Candidate](docs/releases/v0.9.3.md)
+- [v1.0.0 Delta Handoff RC Candidate](docs/releases/v1.0.0.md)
+- [Delta Handoff Spec](docs/specs/delta-handoff.md)
+- [Delta Handoff fresh receiver dogfooding v1.0](docs/dogfooding/delta-handoff-fresh-receiver-v1.0.md)
+- [Delta Handoff baseline-advance dogfooding v1.0](docs/dogfooding/delta-handoff-baseline-advance-v1.0.md)
 - [v0.9.x Integrated Handoff Closure Matrix](docs/testing-v0.9.x-test-matrix.md)
 - [v0.8.x sidecar test matrix](docs/testing-v0.8.x-test-matrix.md)
 - [v0.8.7 Copyable New-Window Starter](docs/releases/v0.8.7.md)

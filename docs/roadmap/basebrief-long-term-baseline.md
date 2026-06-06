@@ -8,7 +8,7 @@ This document is the planning baseline for the next stages of BaseBrief. It is n
 
 BaseBrief should continue as one public skill entry with internal modes and supporting tools.
 
-Version `v0.2.0` completed the first local toolchain: structured handoff, provider profile metadata, file-based adapters, artifact checks, CLI Lite, and Seal/Diff v1. The receiver line then added Receiver Safe Check, Receiver Flow Draft, review-draft gates, and public receiver examples. The Project State line added local `.basebrief/state.json`, lifecycle inspection, and reviewed-state advancement; `v0.6.0` established that local Project State directory without changing `basebrief-project-state-v1`. The `v0.8.x` Sidecar line now consumes Project State into `generic` / `openclaw` bundles, validates `basebrief-sidecar-v1`, writes `new-window-starter.md`, preserves `pass/fail` receiver acceptance, and closes the public-safe OpenClaw/Hermes manual first-response gap. The current `v0.9.x` closure line is: v0.9.0 Integrated Handoff Readiness defines the local line, v0.9.1 Golden Path Closure explains it, v0.9.2 Golden Path Example Closure adds public-safe examples, and v0.9.3 Final Closure / Freeze closes the line without provider requests, runtime integration, schema changes, Auto Flow, plugins, platform work, or v1.0 work.
+Version `v0.2.0` completed the first local toolchain: structured handoff, provider profile metadata, file-based adapters, artifact checks, CLI Lite, and Seal/Diff v1. The receiver line then added Receiver Safe Check, Receiver Flow Draft, review-draft gates, and public receiver examples. The Project State line added local `.basebrief/state.json`, lifecycle inspection, and reviewed-state advancement; `v0.6.0` established that local Project State directory without changing `basebrief-project-state-v1`. The `v0.8.x` Sidecar line now consumes Project State into `generic` / `openclaw` bundles, validates `basebrief-sidecar-v1`, writes `new-window-starter.md`, preserves `pass/fail` receiver acceptance, and closes the public-safe OpenClaw/Hermes manual first-response gap. The `v0.9.x` closure line is frozen: v0.9.0 Integrated Handoff Readiness defines the local line, v0.9.1 Golden Path Closure explains it, v0.9.2 Golden Path Example Closure adds public-safe examples, and v0.9.3 Final Closure / Freeze closes the line without provider requests, runtime integration, schema changes, Auto Flow, plugins, or platform work. The current `v1.0` line is Delta Handoff RC hardening: a local `delta` command compiles Project State, git facts, changed-file facts, and Seal/Diff state changes into reviewable `delta-handoff.md` while keeping `basebrief-project-state-v1` unchanged.
 
 The useful product shape is no longer "choose a cache-ready mode for normal work." The stronger direction is:
 
@@ -255,6 +255,31 @@ Exit criteria:
 
 Current v1 target: local `basebrief-seal-v1` snapshots and diff summaries compare BB9 handoff state across phases. Seal/Diff remains file-based and optional.
 
+### Phase 8B: Delta Handoff
+
+Goal: help a fresh coding-agent window understand what changed since the last
+accepted continuity point without widening BaseBrief into provider, runtime,
+plugin, MCP, IDE, hosted, or schema-v2 work.
+
+Current v1.0 RC target:
+
+- `delta` reads current Project State, git range facts, changed-file facts, and
+  Seal/Diff state changes
+- output is `delta-handoff.md`
+- `reviewed` sections come from current `.basebrief/state.json`
+- `needs-review` sections come from generated git and diff summaries
+- `.basebrief/delta-baseline.json` is local delta state only
+- `basebrief-project-state-v1` remains unchanged
+- fresh receiver dogfooding has reported `handoff_acceptance: pass`
+
+Exit criteria:
+
+- a fresh receiver can restate the current goal, key decisions, risk
+  boundaries, recent changes, and next narrow implementation slice
+- release checks cover the delta CLI, public spec/example, and dogfooding
+  evidence
+- `provider_probe_status=skipped` remains the correct no-provider gate
+
 ### Phase 8A: Receiver Workflow
 
 Goal: make receiver acceptance explicit and locally verifiable without turning BaseBrief into an agent runtime.
@@ -346,9 +371,9 @@ A new BB experiment is allowed only when all of the following are true:
 
 ## Near-term Priority Order
 
-1. Prepare the `v0.9.x` closure/freeze line for explicit user review.
+1. Complete the `v1.0` Delta Handoff RC hardening line for explicit user review.
 2. Keep push, tag, and formal release pending until the user separately approves them.
-3. Observe whether the integrated Project State -> Sidecar -> receiver first-response line prevents real handoff mistakes.
+3. Observe whether Delta Handoff plus the existing Project State -> Sidecar -> receiver first-response line prevents real handoff mistakes.
 4. Keep installed CLI, plugins, provider experiments, ContextOps expansion, and speculative features frozen unless measured usage creates a concrete blocker.
 5. Choose later versions only from repeated, measured usage evidence.
 
@@ -375,9 +400,11 @@ BaseBrief is off track if:
 
 ## Current Strategic Decision
 
-The current development cycle should complete the v0.9.x closure/freeze line:
-v0.9.0 define, v0.9.1 guide, v0.9.2 example, v0.9.3 Final Closure / Freeze,
-without chasing a new benchmark variant, installed CLI, plugin,
-runtime integration, provider request, schema change, or platform surface.
+The current development cycle should complete the v1.0 Delta Handoff RC
+hardening line: adopted plan, delta spec, public example, CLI Lite `delta`,
+fresh receiver evidence, and release-check coverage.
 
-After release, the next development cycle should gather adoption evidence and make only evidence-driven fixes. BB12 remains a MiMo-specific optimization candidate, while new experiments, speculative features, and broader platform work remain frozen.
+It should not chase a new benchmark variant, installed CLI, plugin, MCP, IDE,
+runtime integration, provider request, schema-v2 work, hosted service, or
+platform surface. BB12 remains a MiMo-specific optimization candidate, while
+new experiments, speculative features, and broader platform work remain frozen.

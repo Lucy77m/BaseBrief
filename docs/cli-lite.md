@@ -28,6 +28,7 @@ node scripts/basebrief.js sidecar-build --repo . --target generic --starter-lang
 node scripts/basebrief.js sidecar-check --input tests/outputs/private/sidecar-generic --json
 node scripts/basebrief.js seal --input examples/seal-before-input.json --output tests/outputs/private/seal-before.json
 node scripts/basebrief.js diff --before examples/seal-before-input.json --after examples/seal-after-input.json --json
+node scripts/basebrief.js delta --repo . --output-dir tests/outputs/private/delta --json
 ```
 
 The repository also includes minimal local npm scripts:
@@ -320,10 +321,27 @@ node scripts/basebrief.js diff --before <seal-or-input> --after <seal-or-input> 
 
 This command compares two BB9 inputs or seals and reports changes in facts, decisions, risks, open questions, and task boundaries.
 
+### delta
+
+```text
+node scripts/basebrief.js delta --repo <target-repo> --output-dir <dir> [--since <commit>] [--advance-baseline] [--json]
+```
+
+This command writes `<output-dir>/delta-handoff.md` from the current valid
+`<target-repo>/.basebrief/state.json`, git range facts, worktree changed-file
+facts, and the local delta baseline when present.
+
+By default it does not advance the baseline. Passing `--advance-baseline`
+writes `<target-repo>/.basebrief/delta-baseline.json` after generation. That
+baseline is delta-local and does not change `basebrief-project-state-v1`.
+
+The output separates `reviewed` project-state continuity from `needs-review`
+generated git and diff summaries. See [Delta Handoff Spec](specs/delta-handoff.md).
+
 ## JSON Output
 
 `--json` prints a stable summary with command metadata, output file names, and check status. It does not copy full prompt text into the summary.
 
 ## Boundary
 
-CLI Lite exists to make the proven local workflow easier to repeat. It should stay thin: no package publishing, no global install, no account system, no hosted service, no automatic secret management, and no raw-command execution.
+CLI Lite exists to make the proven local workflow easier to repeat. It should stay thin: no package publishing, no global install, no account system, no hosted service, no automatic secret management, no provider request, and no raw-command execution.

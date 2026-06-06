@@ -93,6 +93,73 @@ Expected release-check output without provider env remains:
 provider_probe_status=skipped
 ```
 
+## v1.0 Delta Handoff RC Candidate
+
+`v1.0.0` adds a local Delta Handoff line: `delta` reads current Project State,
+git range facts, changed-file facts, and Seal/Diff state changes to write a
+reviewable `delta-handoff.md`.
+
+This candidate includes the adopted planning baseline, the Delta Handoff spec,
+a public-safe delta example, CLI Lite `delta`, and fresh receiver dogfooding.
+It keeps `basebrief-project-state-v1` unchanged and does not add provider
+requests, runtime integration, plugin, MCP, IDE, schema-v2, Auto Flow, hosted
+service, global CLI, or npm publishing.
+
+Expected release-check output without provider env remains:
+
+```text
+provider_probe_status=skipped
+```
+
+## v1.0 Delta Handoff Fresh Receiver Dogfooding
+
+The first v1.0 Delta Handoff fresh receiver check is recorded in
+[Delta Handoff Fresh Receiver Dogfooding v1.0](dogfooding/delta-handoff-fresh-receiver-v1.0.md).
+
+The receiver checked `delta-handoff.md`, the adopted v1.0 planning baseline,
+and `git status --short --branch` in read-only mode. It did not rerun the
+source-window test suite and did not write files. The acceptance result was:
+
+```text
+receiver_task_status: completed
+repository_state_status: match
+handoff_acceptance: pass
+blocking_or_repair_notes: none
+```
+
+This evidence supports the Phase 3 goal that a fresh window can restate the
+current goal, key decisions, risk boundaries, recent changes, and a narrow next
+implementation slice without widening into provider, runtime, plugin, MCP, IDE,
+or schema-v2 work.
+
+Expected release-check output without provider env remains:
+
+```text
+provider_probe_status=skipped
+```
+
+## v1.0 Delta Handoff Baseline-Advance Dogfooding
+
+The baseline-advance closure is recorded in
+[Delta Handoff Baseline-Advance Dogfooding v1.0](dogfooding/delta-handoff-baseline-advance-v1.0.md).
+
+This evidence uses one real local repo lifecycle:
+
+- first `delta --advance-baseline` writes `.basebrief/delta-baseline.json`
+- second `delta` becomes baseline-present instead of `baseline_source: missing`
+- second delta may still report `commits_in_range: 0` and `stateDiff.status: unchanged`
+  when no reviewed-state or commit baseline change happened between runs
+
+It keeps `.basebrief/` local-only, keeps `basebrief-project-state-v1`
+unchanged, does not rerun source-window tests in the receiver thread, and does
+not widen into provider, runtime, plugin, MCP, IDE, or schema-v2 work.
+
+Expected release-check output without provider env remains:
+
+```text
+provider_probe_status=skipped
+```
+
 ## v0.4.1 Stabilization Candidate
 
 `v0.4.1` is a stabilization-only cycle after the `v0.4.0` public release. It uses

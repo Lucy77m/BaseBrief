@@ -90,6 +90,8 @@ function checkRequiredFiles() {
     "docs/dogfooding/sidecar-manual-receiver-smoke-v0.8.5.md",
     "docs/dogfooding/sidecar-manual-receiver-smoke-v0.8.6.md",
     "docs/dogfooding/sidecar-openclaw-hermes-manual-smoke-followup.md",
+    "docs/dogfooding/delta-handoff-fresh-receiver-v1.0.md",
+    "docs/dogfooding/delta-handoff-baseline-advance-v1.0.md",
     "docs/integrations.md",
     "docs/adapters.md",
     "docs/walkthrough.md",
@@ -132,6 +134,10 @@ function checkRequiredFiles() {
     "docs/releases/v0.9.1.md",
     "docs/releases/v0.9.2.md",
     "docs/releases/v0.9.3.md",
+    "docs/releases/v1.0.0.md",
+    "docs/releases/v1.0.0-plan.md",
+    "docs/releases/v1.0.0-rc-review.md",
+    "docs/specs/delta-handoff.md",
     "docs/testing-v0.4.x-test-matrix.md",
     "docs/testing-v0.6.x-test-matrix.md",
     "docs/testing-v0.7.x-test-matrix.md",
@@ -174,6 +180,7 @@ function checkRequiredFiles() {
     "scripts/basebrief_project_state.js",
     "scripts/basebrief_sidecar.js",
     "scripts/basebrief_seal.js",
+    "scripts/basebrief_delta.js",
     "scripts/bb9_provider_profiles.json",
     "schemas/bb9-handoff.schema.json",
     "schemas/basebrief-receiver-check.schema.json",
@@ -201,6 +208,7 @@ function checkRequiredFiles() {
     "examples/adapter-claude-project-context.md",
     "examples/seal-before-input.json",
     "examples/seal-after-input.json",
+    "examples/delta-handoff.md",
     "examples/next-chat-example.md",
     "examples/receiver-check-config.json",
     "examples/receiver/difference-found/README.md",
@@ -282,6 +290,8 @@ function checkContentContracts() {
   const sidecarManualReceiverSmokeV085Doc = readText("docs/dogfooding/sidecar-manual-receiver-smoke-v0.8.5.md");
   const sidecarManualReceiverSmokeV086Doc = readText("docs/dogfooding/sidecar-manual-receiver-smoke-v0.8.6.md");
   const sidecarOpenClawHermesManualSmokeFollowupDoc = readText("docs/dogfooding/sidecar-openclaw-hermes-manual-smoke-followup.md");
+  const deltaHandoffFreshReceiverDoc = readText("docs/dogfooding/delta-handoff-fresh-receiver-v1.0.md");
+  const deltaHandoffBaselineAdvanceDoc = readText("docs/dogfooding/delta-handoff-baseline-advance-v1.0.md");
   const testingDoc = readText("docs/testing.md");
   const usabilityFeedbackTemplate = readText(".github/ISSUE_TEMPLATE/usability_feedback.md");
   const adaptersDoc = readText("docs/adapters.md");
@@ -320,6 +330,10 @@ function checkContentContracts() {
   const goldenPathV091ReleaseDoc = readText("docs/releases/v0.9.1.md");
   const goldenPathExampleV092ReleaseDoc = readText("docs/releases/v0.9.2.md");
   const closureV093ReleaseDoc = readText("docs/releases/v0.9.3.md");
+  const deltaV100ReleaseDoc = readText("docs/releases/v1.0.0.md");
+  const v100PlanDoc = readText("docs/releases/v1.0.0-plan.md");
+  const v100RcReviewDoc = readText("docs/releases/v1.0.0-rc-review.md");
+  const deltaHandoffSpecDoc = readText("docs/specs/delta-handoff.md");
   const postReleaseBaselineDoc = readText("docs/baselines/v0.4.0-post-release-baseline.md");
   const v060PostReleaseBaselineDoc = readText("docs/baselines/v0.6.0-post-release-baseline.md");
   const projectStateModelDoc = readText("docs/design/project-state-model.md");
@@ -343,6 +357,7 @@ function checkContentContracts() {
   const projectStateExample = readJson("examples/project-state/state.json");
   const sealSchema = readJson("schemas/basebrief-seal.schema.json");
   const providerProfiles = readJson("scripts/bb9_provider_profiles.json");
+  const deltaHandoffExample = readText("examples/delta-handoff.md");
   const structuredFullExample = readText("examples/structured-handoff-full.md");
   const structuredLiteExample = readText("examples/structured-handoff-lite.md");
   const goldenPathExampleReadme = readText("examples/golden-path/README.md");
@@ -426,6 +441,11 @@ function checkContentContracts() {
   assert(readme.includes("docs/releases/v0.9.1.md"), "README.md should link to v0.9.1 golden-path candidate");
   assert(readme.includes("docs/releases/v0.9.2.md"), "README.md should link to v0.9.2 golden-path example candidate");
   assert(readme.includes("docs/releases/v0.9.3.md"), "README.md should link to v0.9.3 closure candidate");
+  assert(readme.includes("docs/releases/v1.0.0.md"), "README.md should link to v1.0.0 delta handoff RC");
+  assert(readme.includes("docs/specs/delta-handoff.md"), "README.md should link to delta handoff spec");
+  assert(readme.includes("docs/dogfooding/delta-handoff-fresh-receiver-v1.0.md"), "README.md should link to delta fresh receiver dogfooding");
+  assert(readme.includes("Delta Handoff RC hardening"), "README.md should describe v1.0 Delta Handoff RC hardening");
+  assert(readme.includes("basebrief-project-state-v1` 保持不变"), "README.md should preserve project-state schema for v1.0");
   assert(readme.includes("docs/testing-v0.9.x-test-matrix.md"), "README.md should link to v0.9.x closure matrix");
   assert(readme.includes("Integrated Handoff Readiness"), "README.md should define v0.9.0 readiness");
   assert(readme.includes("Integrated Handoff Golden Path"), "README.md should mention the golden-path guide");
@@ -507,6 +527,11 @@ function checkContentContracts() {
   assert(englishReadme.includes("docs/releases/v0.9.1.md"), "README.en.md should link to v0.9.1 golden-path candidate");
   assert(englishReadme.includes("docs/releases/v0.9.2.md"), "README.en.md should link to v0.9.2 golden-path example candidate");
   assert(englishReadme.includes("docs/releases/v0.9.3.md"), "README.en.md should link to v0.9.3 closure candidate");
+  assert(englishReadme.includes("docs/releases/v1.0.0.md"), "README.en.md should link to v1.0.0 delta handoff RC");
+  assert(englishReadme.includes("docs/specs/delta-handoff.md"), "README.en.md should link to delta handoff spec");
+  assert(englishReadme.includes("docs/dogfooding/delta-handoff-fresh-receiver-v1.0.md"), "README.en.md should link to delta fresh receiver dogfooding");
+  assert(englishReadme.includes("Delta Handoff RC hardening"), "README.en.md should describe v1.0 Delta Handoff RC hardening");
+  assert(englishReadme.includes("basebrief-project-state-v1` remains unchanged"), "README.en.md should preserve project-state schema for v1.0");
   assert(englishReadme.includes("docs/testing-v0.9.x-test-matrix.md"), "README.en.md should link to v0.9.x closure matrix");
   assert(englishReadme.includes("Integrated Handoff Readiness"), "README.en.md should define v0.9.0 readiness");
   assert(englishReadme.includes("Integrated Handoff Golden Path"), "README.en.md should mention the golden-path guide");
@@ -760,6 +785,9 @@ function checkContentContracts() {
   assert(testingDoc.includes("v0.9.1 Golden Path Closure Candidate"), "Testing docs must document v0.9.1 golden-path closure candidate");
   assert(testingDoc.includes("v0.9.2 Golden Path Example Closure Candidate"), "Testing docs must document v0.9.2 golden-path example closure candidate");
   assert(testingDoc.includes("v0.9.3 Final Closure / Freeze Candidate"), "Testing docs must document v0.9.3 closure candidate");
+  assert(testingDoc.includes("v1.0 Delta Handoff Fresh Receiver Dogfooding"), "Testing docs must document v1.0 delta fresh receiver dogfooding");
+  assert(testingDoc.includes("v1.0 Delta Handoff RC Candidate"), "Testing docs must document v1.0 delta RC candidate");
+  assert(testingDoc.includes("basebrief-project-state-v1` unchanged"), "Testing docs must preserve v1.0 project-state schema");
   assert(testingDoc.includes("testing-v0.9.x-test-matrix.md"), "Testing docs must link v0.9.x closure matrix");
   assert(testingDoc.includes("new-window-starter.md"), "Testing docs must document Sidecar starter");
   assert(testingDoc.includes("pass/fail"), "Testing docs must document Sidecar receiver pass/fail reporting");
@@ -809,6 +837,9 @@ function checkContentContracts() {
   assert(cliLiteDoc.includes("node scripts/basebrief.js build"), "cli-lite.md must document build command");
   assert(cliLiteDoc.includes("node scripts/basebrief.js seal"), "cli-lite.md must document seal command");
   assert(cliLiteDoc.includes("node scripts/basebrief.js diff"), "cli-lite.md must document diff command");
+  assert(cliLiteDoc.includes("node scripts/basebrief.js delta --repo <target-repo> --output-dir <dir>"), "cli-lite.md must document delta command");
+  assert(cliLiteDoc.includes("--advance-baseline"), "cli-lite.md must document delta baseline advance option");
+  assert(cliLiteDoc.includes("specs/delta-handoff.md"), "cli-lite.md must link delta handoff spec");
   assert(cliLiteDoc.includes("node scripts/basebrief.js receiver-flow"), "cli-lite.md must document receiver-flow command");
   assert(cliLiteDoc.includes("--guided"), "cli-lite.md must document receiver-flow guided option");
   assert(cliLiteDoc.includes("--extract --source <draft-or-context.md>"), "cli-lite.md must document receiver-flow extract option");
@@ -846,6 +877,42 @@ function checkContentContracts() {
   assert(sealDiffDoc.includes("scripts/basebrief_seal.js"), "seal-diff.md must document seal script");
   assert(sealDiffDoc.includes("basebrief-seal-v1"), "seal-diff.md must document seal schema version");
   assert(sealDiffDoc.includes("not a project-management system"), "seal-diff.md must state product boundary");
+  assert(deltaV100ReleaseDoc.includes("v1.0.0 Delta Handoff RC Candidate"), "v1.0.0 release doc must have stable title");
+  assert(deltaV100ReleaseDoc.includes("Reviewable Delta Handoff Compiler"), "v1.0.0 release doc must name the quality bar");
+  assert(deltaV100ReleaseDoc.includes("node scripts/basebrief.js delta"), "v1.0.0 release doc must document delta command");
+  assert(deltaV100ReleaseDoc.includes("v1.0.0-rc-review.md"), "v1.0.0 release doc must link RC review package");
+  assert(deltaV100ReleaseDoc.includes("basebrief-project-state-v1` remains unchanged"), "v1.0.0 release doc must preserve project-state schema");
+  assert(deltaV100ReleaseDoc.includes("handoff_acceptance: pass"), "v1.0.0 release doc must record fresh receiver pass");
+  assert(deltaV100ReleaseDoc.includes("delta-handoff-baseline-advance-v1.0.md"), "v1.0.0 release doc must link baseline-advance evidence");
+  assert(deltaV100ReleaseDoc.includes("baseline-advance closure"), "v1.0.0 release doc must record baseline-advance closure");
+  assert(deltaV100ReleaseDoc.includes("provider_probe_status=skipped"), "v1.0.0 release doc must preserve skipped provider gate");
+  assert(deltaV100ReleaseDoc.includes("No provider request"), "v1.0.0 release doc must reject provider scope");
+  assert(deltaV100ReleaseDoc.includes("No runtime integration"), "v1.0.0 release doc must reject runtime scope");
+  assert(deltaV100ReleaseDoc.includes("No schema-v2 work"), "v1.0.0 release doc must reject schema-v2 work");
+  assert(deltaV100ReleaseDoc.includes("No plugin, MCP, IDE"), "v1.0.0 release doc must reject plugin/MCP/IDE work");
+  assert(v100PlanDoc.includes("Reviewable Delta Handoff Compiler"), "v1.0 plan must define the internal quality bar");
+  assert(v100PlanDoc.includes("basebrief-project-state-v1"), "v1.0 plan must preserve project-state v1");
+  assert(v100PlanDoc.includes("provider requests"), "v1.0 plan must reject provider scope");
+  assert(v100RcReviewDoc.includes("v1.0.0 RC Review Package"), "v1.0 RC review doc must have stable title");
+  assert(v100RcReviewDoc.includes("Commit-Ready Summary"), "v1.0 RC review doc must include commit-ready summary");
+  assert(v100RcReviewDoc.includes("docs/dogfooding/delta-handoff-fresh-receiver-v1.0.md"), "v1.0 RC review doc must link fresh receiver evidence");
+  assert(v100RcReviewDoc.includes("docs/dogfooding/delta-handoff-baseline-advance-v1.0.md"), "v1.0 RC review doc must link baseline-advance evidence");
+  assert(v100RcReviewDoc.includes(".basebrief/delta-baseline.json"), "v1.0 RC review doc must document local baseline artifact");
+  assert(v100RcReviewDoc.includes("provider_probe_status=skipped"), "v1.0 RC review doc must preserve skipped provider gate");
+  assert(v100RcReviewDoc.includes("No provider request"), "v1.0 RC review doc must reject provider scope");
+  assert(v100RcReviewDoc.includes("No schema-v2 work"), "v1.0 RC review doc must reject schema-v2 scope");
+  assert(deltaHandoffSpecDoc.includes("basebrief-delta-baseline-v1"), "delta spec must define baseline schema");
+  assert(deltaHandoffSpecDoc.includes("reviewed"), "delta spec must define reviewed semantics");
+  assert(deltaHandoffSpecDoc.includes("needs-review"), "delta spec must define needs-review semantics");
+  assert(deltaHandoffSpecDoc.includes("does not change"), "delta spec must preserve project-state schema");
+  assert(deltaHandoffExample.includes("schemaVersion: basebrief-delta-handoff-v1"), "delta example must use delta handoff schema");
+  assert(deltaHandoffExample.includes("review_status=reviewed"), "delta example must show reviewed sections");
+  assert(deltaHandoffExample.includes("review_status=needs-review"), "delta example must show needs-review sections");
+  assert(deltaHandoffExample.includes("No provider request"), "delta example must preserve provider boundary");
+  assert(roadmapDoc.includes("current `v1.0` line is Delta Handoff RC hardening"), "Roadmap must identify current v1.0 Delta Handoff RC line");
+  assert(roadmapDoc.includes("Phase 8B: Delta Handoff"), "Roadmap must document Delta Handoff phase");
+  assert(roadmapDoc.includes("fresh receiver dogfooding has reported `handoff_acceptance: pass`"), "Roadmap must record fresh receiver pass");
+  assert(roadmapDoc.includes("basebrief-project-state-v1` remains unchanged"), "Roadmap must preserve project-state schema in v1.0");
   assert(contextOpsDoc.includes("not a product surface"), "contextops.md must keep ContextOps out of product surface");
   assert(contextOpsDoc.includes("Current Non-Goals"), "contextops.md must define non-goals");
   assert(contextOpsDoc.includes("hosted service"), "contextops.md must reject hosted-service scope");
@@ -858,7 +925,8 @@ function checkContentContracts() {
   assert(structuredLiteExample.includes('"open_questions"'), "structured lite example must include open questions");
   assert(roadmapDoc.includes("Current v0.9.x closure line"), "Roadmap must name the current v0.9.x closure line");
   assert(roadmapDoc.includes("v0.9.3 Final Closure / Freeze"), "Roadmap must include the v0.9.3 closure stage");
-  assert(roadmapDoc.includes("v0.9.x closure/freeze line"), "Roadmap must define the current closure/freeze line");
+  assert(roadmapDoc.includes("`v0.9.x` closure line is frozen"), "Roadmap must preserve the frozen v0.9.x closure line");
+  assert(roadmapDoc.includes("Complete the `v1.0` Delta Handoff RC hardening line for explicit user review"), "Roadmap must make v1.0 RC hardening the first near-term priority");
   assert(roadmapDoc.includes("provider requests, runtime integration, schema changes"), "Roadmap must keep v0.9.x out of runtime/provider/schema scope");
   assert(goldenPathDoc.includes("Integrated Handoff Golden Path"), "golden-path.md must have a stable title");
   assert(goldenPathDoc.includes("receiver-ready.md -> state-init/state-advance -> sidecar-build -> sidecar-check -> new-window-starter.md -> receiver first response"), "golden-path.md must define the integrated path");
@@ -1597,6 +1665,25 @@ function checkContentContracts() {
   assert(sidecarOpenClawHermesManualSmokeFollowupDoc.includes("Do not write OpenClaw/Hermes profile/config/memory/workspace files"), "OpenClaw/Hermes follow-up doc must state no-write boundary");
   assert(sidecarOpenClawHermesManualSmokeFollowupDoc.includes("latest freshly rebuilt `openclaw` bundle"), "OpenClaw/Hermes follow-up doc must preserve the rebuilt-bundle limitation");
   assert(sidecarOpenClawHermesManualSmokeFollowupDoc.includes("provider_probe_status=skipped"), "OpenClaw/Hermes follow-up doc must preserve skipped provider gate");
+  assert(deltaHandoffFreshReceiverDoc.includes("Delta Handoff Fresh Receiver Dogfooding v1.0"), "Delta dogfooding doc must have stable title");
+  assert(deltaHandoffFreshReceiverDoc.includes("receiver_task_status: completed"), "Delta dogfooding doc must record completed receiver status");
+  assert(deltaHandoffFreshReceiverDoc.includes("repository_state_status: match"), "Delta dogfooding doc must record repository match");
+  assert(deltaHandoffFreshReceiverDoc.includes("handoff_acceptance: pass"), "Delta dogfooding doc must record pass acceptance");
+  assert(deltaHandoffFreshReceiverDoc.includes("blocking_or_repair_notes: none"), "Delta dogfooding doc must record no repair notes");
+  assert(deltaHandoffFreshReceiverDoc.includes("No provider request"), "Delta dogfooding doc must preserve provider boundary");
+  assert(deltaHandoffFreshReceiverDoc.includes("No runtime integration"), "Delta dogfooding doc must preserve runtime boundary");
+  assert(deltaHandoffFreshReceiverDoc.includes("No schema-v2 work"), "Delta dogfooding doc must reject schema-v2 work");
+  assert(deltaHandoffFreshReceiverDoc.includes("No raw private output"), "Delta dogfooding doc must reject raw private output");
+  assert(deltaHandoffFreshReceiverDoc.includes("provider_probe_status=skipped"), "Delta dogfooding doc must preserve skipped provider gate");
+  assert(deltaHandoffBaselineAdvanceDoc.includes("Delta Handoff Baseline-Advance Dogfooding v1.0"), "Delta baseline-advance doc must have stable title");
+  assert(deltaHandoffBaselineAdvanceDoc.includes("delta --advance-baseline"), "Delta baseline-advance doc must document advance-baseline command");
+  assert(deltaHandoffBaselineAdvanceDoc.includes("First run wrote local baseline"), "Delta baseline-advance doc must record first-run baseline write");
+  assert(deltaHandoffBaselineAdvanceDoc.includes("Second run no longer reported `baseline_source: missing`"), "Delta baseline-advance doc must record baseline-present transition");
+  assert(deltaHandoffBaselineAdvanceDoc.includes(".basebrief/delta-baseline.json"), "Delta baseline-advance doc must document local baseline path");
+  assert(deltaHandoffBaselineAdvanceDoc.includes(".gitignore"), "Delta baseline-advance doc must document local-only ignored boundary");
+  assert(deltaHandoffBaselineAdvanceDoc.includes("basebrief-project-state-v1"), "Delta baseline-advance doc must preserve project-state schema");
+  assert(deltaHandoffBaselineAdvanceDoc.includes("handoff_acceptance: pass"), "Delta baseline-advance doc must record receiver pass");
+  assert(deltaHandoffBaselineAdvanceDoc.includes("provider_probe_status=skipped"), "Delta baseline-advance doc must preserve skipped provider gate");
   assert(v08xTestMatrixDoc.includes("v0.8.x Sidecar Test Matrix"), "v0.8.x matrix must have stable title");
   assert(v08xTestMatrixDoc.includes("sidecar-build"), "v0.8.x matrix must document sidecar-build");
   assert(v08xTestMatrixDoc.includes("sidecar-check"), "v0.8.x matrix must document sidecar-check");
@@ -1886,11 +1973,16 @@ function checkArtifactChecker() {
     "docs/releases/v0.9.2.md",
     "docs/releases/v0.9.3.md",
     "docs/releases/v0.9.0.md",
+    "docs/releases/v1.0.0.md",
+    "docs/releases/v1.0.0-plan.md",
+    "docs/releases/v1.0.0-rc-review.md",
     "docs/testing-v0.9.x-test-matrix.md",
     "docs/dogfooding/sidecar-external-receiver-smoke-v0.8.4.md",
     "docs/dogfooding/sidecar-manual-receiver-smoke-v0.8.5.md",
     "docs/dogfooding/sidecar-manual-receiver-smoke-v0.8.6.md",
     "docs/dogfooding/sidecar-openclaw-hermes-manual-smoke-followup.md",
+    "docs/dogfooding/delta-handoff-fresh-receiver-v1.0.md",
+    "docs/dogfooding/delta-handoff-baseline-advance-v1.0.md",
     "examples/receiver-check-config.json",
     "examples/receiver/difference-found",
     "examples/receiver/blocked",
@@ -2342,6 +2434,32 @@ function checkCliLite() {
     assert(stateHistoryAfterResult.entries.length === 1, "CLI state-history must report one archived entry");
     assert(stateHistoryAfterResult.entries[0].validation_status === "passed", "CLI state-history archived entry must validate");
 
+    const deltaDir = path.join(tempRoot, "delta");
+    const deltaStdout = execFileSync(process.execPath, [
+      "scripts/basebrief.js",
+      "delta",
+      "--repo",
+      receiverRepo,
+      "--output-dir",
+      deltaDir,
+      "--advance-baseline",
+      "--json",
+    ], {
+      cwd: repoRoot,
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "pipe"],
+      env: process.env,
+    });
+    const deltaResult = JSON.parse(deltaStdout);
+    assert(deltaResult.command === "delta", "CLI delta must return command metadata");
+    assert(deltaResult.schemaVersion === "basebrief-delta-handoff-v1", "CLI delta must return delta handoff schema");
+    assert(deltaResult.baselineSchemaVersion === "basebrief-delta-baseline-v1", "CLI delta must return baseline schema");
+    assert(deltaResult.outputFiles.deltaHandoff.startsWith("tests"), "CLI delta must return public-safe output path");
+    assert(deltaResult.projectState.schemaVersion === "basebrief-project-state-v1", "CLI delta must preserve project-state schema");
+    assert(deltaResult.baseline.advanced === true, "CLI delta must advance baseline only when requested");
+    assert(fs.existsSync(path.join(deltaDir, "delta-handoff.md")), "CLI delta must write delta-handoff.md");
+    assert(fs.existsSync(path.join(receiverRepo, ".basebrief", "delta-baseline.json")), "CLI delta must write local baseline when requested");
+
     const sidecarDir = path.join(tempRoot, "sidecar-generic");
     const sidecarBuildStdout = execFileSync(process.execPath, [
       "scripts/basebrief.js",
@@ -2406,7 +2524,7 @@ function checkCliLite() {
   } finally {
     fs.rmSync(tempRoot, { recursive: true, force: true });
   }
-  return 19;
+  return 20;
 }
 
 function checkFirstRunWorkflow() {
