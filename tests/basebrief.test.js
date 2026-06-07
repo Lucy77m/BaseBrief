@@ -1731,6 +1731,9 @@ test("v1.0.0 delta handoff RC hardening exposes local-first delta without expand
   assert.match(v110Release, /handoff_acceptance: difference_found/);
   assert.match(v110Release, /handoff_acceptance: pass/);
   assert.match(v110Release, /commits_in_range: 4/);
+  assert.match(v110Release, /historical pre-commit closeout fact/);
+  assert.match(v110Release, /count drift is non-blocking/);
+  assert.match(v110Release, /branch, HEAD, and worktree facts/);
   assert.match(v110Release, /worktreeChangedFiles: \[\]/);
   assert.match(v110Release, /basebrief-project-state-v1/);
   assert.match(v110Release, /basebrief-delta-handoff-v1/);
@@ -1771,13 +1774,26 @@ test("v1.0.0 delta handoff RC hardening exposes local-first delta without expand
   assert.match(receiverAcceptanceDogfooding, /repository_state_status/);
   assert.match(receiverAcceptanceDogfooding, /handoff_acceptance/);
   assert.match(receiverAcceptanceDogfooding, /blocking_or_repair_notes/);
+  assert.match(receiverAcceptanceDogfooding, /current_goal/);
+  assert.match(receiverAcceptanceDogfooding, /live_repo_state/);
+  assert.match(receiverAcceptanceDogfooding, /inherited_fact_differences/);
+  assert.match(receiverAcceptanceDogfooding, /hard_boundaries/);
+  assert.match(receiverAcceptanceDogfooding, /next_narrow_slice/);
   assert.match(receiverAcceptanceDogfooding, /live repository state/);
   assert.match(receiverAcceptanceDogfooding, /inherited handoff facts/);
+  assert.match(receiverAcceptanceDogfooding, /receiver-window rechecks/);
   assert.match(receiverAcceptanceDogfooding, /difference_found/);
   assert.match(receiverAcceptanceDogfooding, /Local Dry-Run Result/);
   assert.match(receiverAcceptanceDogfooding, /handoff_acceptance: difference_found/);
   assert.match(receiverAcceptanceDogfooding, /handoff_acceptance: pass/);
+  assert(
+    receiverAcceptanceDogfooding.indexOf("handoff_acceptance: difference_found") <
+    receiverAcceptanceDogfooding.indexOf("handoff_acceptance: pass")
+  );
   assert.match(receiverAcceptanceDogfooding, /commits_in_range: 3/);
+  assert.match(receiverAcceptanceDogfooding, /historical count drift/);
+  assert.match(receiverAcceptanceDogfooding, /should not\s+treat an explainable historical count drift as blocking/);
+  assert.match(receiverAcceptanceDogfooding, /branch, HEAD, and worktree facts/);
   assert.match(receiverAcceptanceDogfooding, /worktreeChangedFiles: \[\]/);
   assert.match(receiverAcceptanceDogfooding, /no baseline advance/);
   assert.match(receiverAcceptanceDogfooding, /No provider request/);

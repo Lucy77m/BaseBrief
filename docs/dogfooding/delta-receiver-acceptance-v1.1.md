@@ -68,6 +68,11 @@ Observed refreshed delta facts:
 - `worktreeChangedFiles: []`
 - artifact check passed with zero errors and zero warnings
 
+Historical dry-run or pre-commit `commits_in_range` values may stay in public
+evidence as facts from the time they were recorded. A later receiver should not
+treat an explainable historical count drift as blocking when the refreshed
+`delta-handoff.md` branch, HEAD, and worktree facts match live repository state.
+
 Second pass result:
 
 ```text
@@ -88,11 +93,14 @@ The receiver response should include:
 - `repository_state_status`
 - `handoff_acceptance`
 - `blocking_or_repair_notes`
-- current goal
-- live repository state versus inherited handoff facts
-- changed files and worktree state
-- hard boundaries
-- next narrow implementation slice
+- `current_goal`
+- `live_repo_state`
+- `inherited_fact_differences`
+- `hard_boundaries`
+- `next_narrow_slice`
+
+The report should explicitly separate inherited handoff facts, live repository
+facts, and receiver-window rechecks before it recommends the next narrow slice.
 
 ## Pass Criteria
 
