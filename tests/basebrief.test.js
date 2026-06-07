@@ -16,7 +16,7 @@ const {
 } = require("../scripts/basebrief_build_handoff");
 const { buildAdapterArtifacts, normalizeTargets } = require("../scripts/basebrief_build_adapters");
 const { checkArtifacts } = require("../scripts/basebrief_check_artifacts");
-const { HELP_TEXT, commandBuild, commandCheck, commandDelta, commandDiff, commandInit, commandReceiverCheck, commandReceiverFlow, commandReceiverInit, commandReviewDraft, commandSidecarBuild, commandSidecarCheck, commandStateAdvance, commandStateHistory, commandStateInit, commandStateRead, commandStateStatus, commandStateValidate, commandSeal, formatHuman, run, starterInput } = require("../scripts/basebrief");
+const { HELP_TEXT, commandBuild, commandCheck, commandContextPack, commandDelta, commandDiff, commandInit, commandReceiverCheck, commandReceiverFlow, commandReceiverInit, commandReviewDraft, commandSidecarBuild, commandSidecarCheck, commandStateAdvance, commandStateHistory, commandStateInit, commandStateRead, commandStateStatus, commandStateValidate, commandSeal, formatHuman, run, starterInput } = require("../scripts/basebrief");
 const {
   CONFIG_SCHEMA_VERSION: RECEIVER_CHECK_SCHEMA_VERSION,
   RESULT_SCHEMA_VERSION: RECEIVER_CHECK_RESULT_SCHEMA_VERSION,
@@ -31,6 +31,7 @@ const { PROJECT_STATE_SCHEMA_VERSION, runStateAdvance, runStateHistory, runState
 const { SIDECAR_SCHEMA_VERSION, buildSidecarBundle, checkSidecarBundle, detectStarterLanguage } = require("../scripts/basebrief_sidecar");
 const { createSealFromInput, diffSeals, readSealOrInput, SEAL_SCHEMA_VERSION } = require("../scripts/basebrief_seal");
 const { DELTA_BASELINE_SCHEMA_VERSION, DELTA_HANDOFF_SCHEMA_VERSION, readDeltaBaseline, runDelta } = require("../scripts/basebrief_delta");
+const { CONTEXT_PACK_FILES, DEFAULT_MAX_FILES, buildContextPack } = require("../scripts/basebrief_context_pack");
 const { buildSummary, getPromptForVariant, SCENARIOS, PROVIDER_PROFILES } = require("../scripts/provider_cache_benchmark");
 const { classifyRelayUsage } = require("../scripts/provider_relay_usage_audit");
 const { routeMode } = require("../scripts/mode_router");
@@ -1673,6 +1674,9 @@ test("v1.0.0 delta handoff RC hardening exposes local-first delta without expand
   const v190Release = readText("docs/releases/v1.9.0.md");
   const v190Plan = readText("docs/releases/v1.9.0-plan.md");
   const v191Release = readText("docs/releases/v1.9.1.md");
+  const v200Plan = readText("docs/releases/v2.0.0-plan.md");
+  const contextPackLiteRoadmap = readText("docs/roadmap/basebrief-v2-context-pack-lite.md");
+  const contextPackLiteSpec = readText("docs/specs/context-pack-lite.md");
   const v1xDeltaReceiverMatrix = readText("docs/testing-v1.x-delta-receiver-closure-matrix.md");
   const plan = readText("docs/releases/v1.0.0-plan.md");
   const rcReview = readText("docs/releases/v1.0.0-rc-review.md");
@@ -1741,6 +1745,9 @@ test("v1.0.0 delta handoff RC hardening exposes local-first delta without expand
   assert.match(docsIndex, /releases\/v1\.9\.0-plan\.md/);
   assert.match(docsIndex, /releases\/v1\.9\.1\.md/);
   assert.match(docsIndex, /testing-v1\.x-delta-receiver-closure-matrix\.md/);
+  assert.match(docsIndex, /roadmap\/basebrief-v2-context-pack-lite\.md/);
+  assert.match(docsIndex, /releases\/v2\.0\.0-plan\.md/);
+  assert.match(docsIndex, /specs\/context-pack-lite\.md/);
   assert.match(docsIndex, /specs\/delta-handoff\.md/);
   assert.match(docsIndex, /\.\.\/examples\/delta-handoff\.md/);
   assert.match(docsIndex, /dogfooding\/delta-handoff-fresh-receiver-v1\.0\.md/);
@@ -1843,6 +1850,33 @@ test("v1.0.0 delta handoff RC hardening exposes local-first delta without expand
   assert.match(roadmap, /repeated local receiver usage evidence/);
   assert.doesNotMatch(roadmap, /Next v1\.3 planning target/);
   assert.doesNotMatch(roadmap, /Current v0\.9\.0 readiness target/);
+
+  assert.match(contextPackLiteRoadmap, /BaseBrief v2\.0 is Context Pack Lite/);
+  assert.match(contextPackLiteRoadmap, /v1\.x answers: what changed/);
+  assert.match(contextPackLiteRoadmap, /v2\.0 answers: what local context pack/);
+  assert.match(contextPackLiteRoadmap, /v2\.0 Context Pack Lite/);
+  assert.match(contextPackLiteRoadmap, /v2\.1 Context Pack Check/);
+  assert.match(contextPackLiteRoadmap, /v2\.2 Workflow Runner Lite/);
+  for (const artifact of ["MANIFEST.md", "REPO_MAP.md", "KEY_FILES.md", "RECENT_DELTA.md", "RISK_BOUNDARIES.md", "RECEIVER_STATE.md", "NEXT_WINDOW_STARTER.md"]) {
+    assert.match(contextPackLiteRoadmap, new RegExp(artifact.replace(".", "\\.")));
+    assert.match(contextPackLiteSpec, new RegExp(artifact.replace(".", "\\.")));
+  }
+  for (const term of ["reviewed", "needs-review", "generated", "not_available", "not_applicable", "stale", "source", "trust"]) {
+    assert.match(contextPackLiteRoadmap, new RegExp(term));
+    assert.match(contextPackLiteSpec, new RegExp(term));
+  }
+  assert.match(contextPackLiteRoadmap, /a provider request path/);
+  assert.match(contextPackLiteRoadmap, /a Repomix or Gitingest replacement/);
+  assert.match(contextPackLiteRoadmap, /v2\.0-A does not implement a new command/);
+  assert.match(v200Plan, /No `context-pack` command in v2\.0-A/);
+  assert.match(v200Plan, /No provider request/);
+  assert.match(v200Plan, /No AI automatic summary/);
+  assert.match(v200Plan, /No vector database, embedding, or semantic index/);
+  assert.match(v200Plan, /No `schema-v2`/);
+  assert.match(v200Plan, /provider_probe_status=skipped/);
+  assert.match(contextPackLiteSpec, /This spec defines the artifact contract only/);
+  assert.match(contextPackLiteSpec, /do not invent receiver history/);
+  assert.match(contextPackLiteSpec, /Prefer integrating this with the existing check surface/);
 
   assert.match(cliLite, /delta --repo <target-repo> --output-dir <dir>/);
   assert.match(release, /v1\.0\.0 Delta Handoff RC Candidate/);
@@ -4903,6 +4937,101 @@ test("Delta Handoff writes reviewable delta output and advances local baseline o
     fs.rmSync(cliOutputDir, { recursive: true, force: true });
   }
 }));
+
+test("Context Pack Lite writes seven reviewable artifacts without expanding scope", () => {
+  const repoDir = path.join(repoRoot, "tests", "outputs", "private", `context-pack-repo-${Date.now()}`);
+  const outputDir = path.join(repoRoot, "tests", "outputs", "private", `context-pack-output-${Date.now()}`);
+  const cliOutputDir = path.join(repoRoot, "tests", "outputs", "private", `context-pack-cli-${Date.now()}`);
+  const commandOutputDir = path.join(repoRoot, "tests", "outputs", "private", `context-pack-command-${Date.now()}`);
+  const nonEmptyDir = path.join(repoRoot, "tests", "outputs", "private", `context-pack-nonempty-${Date.now()}`);
+  const nonGitDir = path.join(repoRoot, "tests", "outputs", "private", `context-pack-nongit-${Date.now()}`);
+  try {
+    fs.mkdirSync(path.join(repoDir, "docs"), { recursive: true });
+    fs.mkdirSync(path.join(repoDir, "scripts"), { recursive: true });
+    fs.writeFileSync(path.join(repoDir, "README.md"), "# Fixture\n", "utf8");
+    fs.writeFileSync(path.join(repoDir, "docs", "index.md"), "# Docs\n", "utf8");
+    fs.writeFileSync(path.join(repoDir, "scripts", "basebrief.js"), "console.log('fixture');\n", "utf8");
+    git(repoDir, ["init"]);
+    git(repoDir, ["config", "user.email", "basebrief@example.invalid"]);
+    git(repoDir, ["config", "user.name", "BaseBrief Context Pack Test"]);
+    git(repoDir, ["add", "."]);
+    git(repoDir, ["commit", "-m", "context fixture"]);
+    fs.writeFileSync(path.join(repoDir, "notes.md"), "dirty note\n", "utf8");
+
+    const result = buildContextPack({ repoPath: repoDir, outputDir, maxFiles: 2 });
+    assert.equal(result.command, "context-pack");
+    assert.equal(result.status, "generated");
+    assert.equal(result.limits.maxFiles, 2);
+    assert.equal(result.limits.includedFiles, 2);
+    assert.equal(result.limits.truncated, true);
+    assert.equal(Object.keys(result.outputFiles).length, 7);
+    for (const fileName of Object.values(CONTEXT_PACK_FILES)) {
+      assert.equal(fs.existsSync(path.join(outputDir, fileName)), true, fileName);
+    }
+    const manifest = fs.readFileSync(path.join(outputDir, "MANIFEST.md"), "utf8");
+    const receiverState = fs.readFileSync(path.join(outputDir, "RECEIVER_STATE.md"), "utf8");
+    const recentDelta = fs.readFileSync(path.join(outputDir, "RECENT_DELTA.md"), "utf8");
+    const starter = fs.readFileSync(path.join(outputDir, "NEXT_WINDOW_STARTER.md"), "utf8");
+    assert.match(manifest, /Review status: generated/);
+    assert.match(manifest, /Worktree status: dirty/);
+    assert.match(receiverState, /\.basebrief\/state\.json`: not_available/);
+    assert.match(receiverState, /\.basebrief\/delta-baseline\.json`: not_available/);
+    assert.match(recentDelta, /notes\.md/);
+    assert.match(starter, /No provider/);
+    assert.match(starter, /schema-v2/);
+
+    const cli = spawnSync(process.execPath, [
+      "scripts/basebrief.js",
+      "context-pack",
+      "--repo",
+      repoDir,
+      "--output-dir",
+      cliOutputDir,
+      "--max-files",
+      "2",
+      "--json",
+    ], { cwd: repoRoot, encoding: "utf8" });
+    assert.equal(cli.status, 0, cli.stderr);
+    const cliResult = JSON.parse(cli.stdout);
+    assert.equal(cliResult.command, "context-pack");
+    assert.equal(cliResult.repo.startsWith("tests"), true);
+    assert.equal(cliResult.outputDir.startsWith("tests"), true);
+    assert.equal(cliResult.outputFiles.manifest.startsWith("tests"), true);
+    assert.equal(cliResult.git.worktree_status, "dirty");
+    assert.equal(cliResult.limits.maxFiles, 2);
+
+    assert.match(formatHuman(commandContextPack({ repo: repoDir, "output-dir": commandOutputDir })), /BaseBrief context pack written/);
+    assert.match(HELP_TEXT, /context-pack --repo <target-repo> --output-dir <dir>/);
+
+    fs.mkdirSync(nonEmptyDir, { recursive: true });
+    fs.writeFileSync(path.join(nonEmptyDir, "existing.md"), "occupied\n", "utf8");
+    assert.throws(
+      () => buildContextPack({ repoPath: repoDir, outputDir: nonEmptyDir }),
+      /output directory already exists and is not empty/,
+    );
+    assert.throws(
+      () => buildContextPack({ repoPath: repoDir, outputDir: path.join(repoDir, ".env", "context-pack") }),
+      /must not use an \.env path/,
+    );
+    fs.mkdirSync(nonGitDir, { recursive: true });
+    assert.throws(
+      () => buildContextPack({ repoPath: nonGitDir, outputDir: path.join(nonGitDir, "out") }),
+      /target repository root|not a git repository|failed/,
+    );
+    assert.throws(
+      () => buildContextPack({ repoPath: repoDir, outputDir: path.join(repoRoot, "tests", "outputs", "private", `context-pack-bad-${Date.now()}`), maxFiles: "0" }),
+      /--max-files must be a positive integer/,
+    );
+    assert.equal(DEFAULT_MAX_FILES, 80);
+  } finally {
+    fs.rmSync(repoDir, { recursive: true, force: true });
+    fs.rmSync(outputDir, { recursive: true, force: true });
+    fs.rmSync(cliOutputDir, { recursive: true, force: true });
+    fs.rmSync(commandOutputDir, { recursive: true, force: true });
+    fs.rmSync(nonEmptyDir, { recursive: true, force: true });
+    fs.rmSync(nonGitDir, { recursive: true, force: true });
+  }
+});
 
 test("Seal/Diff v1 creates stable seal snapshots from BB9 input", () => {
   const input = readJson("examples/seal-before-input.json");

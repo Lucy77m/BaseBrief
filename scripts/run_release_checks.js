@@ -163,6 +163,9 @@ function checkRequiredFiles() {
     "docs/releases/v1.9.0-plan.md",
     "docs/releases/v1.9.1.md",
     "docs/specs/delta-handoff.md",
+    "docs/releases/v2.0.0-plan.md",
+    "docs/specs/context-pack-lite.md",
+    "docs/roadmap/basebrief-v2-context-pack-lite.md",
     "docs/testing-v0.4.x-test-matrix.md",
     "docs/testing-v0.6.x-test-matrix.md",
     "docs/testing-v0.7.x-test-matrix.md",
@@ -207,6 +210,7 @@ function checkRequiredFiles() {
     "scripts/basebrief_sidecar.js",
     "scripts/basebrief_seal.js",
     "scripts/basebrief_delta.js",
+    "scripts/basebrief_context_pack.js",
     "scripts/bb9_provider_profiles.json",
     "schemas/bb9-handoff.schema.json",
     "schemas/basebrief-receiver-check.schema.json",
@@ -399,6 +403,9 @@ function checkContentContracts() {
   const v190PlanDoc = readText("docs/releases/v1.9.0-plan.md");
   const v191ReleaseDoc = readText("docs/releases/v1.9.1.md");
   const deltaHandoffSpecDoc = readText("docs/specs/delta-handoff.md");
+  const v200PlanDoc = readText("docs/releases/v2.0.0-plan.md");
+  const contextPackLiteSpecDoc = readText("docs/specs/context-pack-lite.md");
+  const v2ContextPackRoadmapDoc = readText("docs/roadmap/basebrief-v2-context-pack-lite.md");
   const postReleaseBaselineDoc = readText("docs/baselines/v0.4.0-post-release-baseline.md");
   const v060PostReleaseBaselineDoc = readText("docs/baselines/v0.6.0-post-release-baseline.md");
   const projectStateModelDoc = readText("docs/design/project-state-model.md");
@@ -1375,6 +1382,45 @@ function checkContentContracts() {
   assert(v191ReleaseDoc.includes("No command output format change"), "v1.9.1 final closure doc must avoid command output changes");
   assert(v191ReleaseDoc.includes("No v1.10 feature line"), "v1.9.1 final closure doc must avoid opening v1.10");
   assert(v191ReleaseDoc.includes("provider_probe_status=skipped"), "v1.9.1 final closure doc must preserve skipped provider gate");
+  assert(docsIndex.includes("roadmap/basebrief-v2-context-pack-lite.md"), "Docs index must link v2 context pack roadmap");
+  assert(docsIndex.includes("releases/v2.0.0-plan.md"), "Docs index must link v2.0.0 context pack plan");
+  assert(docsIndex.includes("specs/context-pack-lite.md"), "Docs index must link context pack lite spec");
+  assert(v2ContextPackRoadmapDoc.includes("BaseBrief v2.0 is Context Pack Lite"), "v2 roadmap must freeze Context Pack Lite direction");
+  assert(v2ContextPackRoadmapDoc.includes("v1.x answers: what changed"), "v2 roadmap must define relationship to v1.x");
+  assert(v2ContextPackRoadmapDoc.includes("v2.0 Context Pack Lite"), "v2 roadmap must order Context Pack Lite before later work");
+  assert(v2ContextPackRoadmapDoc.includes("v2.1 Context Pack Check"), "v2 roadmap must keep check as later line");
+  assert(v2ContextPackRoadmapDoc.includes("v2.2 Workflow Runner Lite"), "v2 roadmap must keep workflow runner later");
+  assert(v2ContextPackRoadmapDoc.includes("MANIFEST.md"), "v2 roadmap must define manifest artifact");
+  assert(v2ContextPackRoadmapDoc.includes("REPO_MAP.md"), "v2 roadmap must define repo map artifact");
+  assert(v2ContextPackRoadmapDoc.includes("KEY_FILES.md"), "v2 roadmap must define key files artifact");
+  assert(v2ContextPackRoadmapDoc.includes("RECENT_DELTA.md"), "v2 roadmap must define recent delta artifact");
+  assert(v2ContextPackRoadmapDoc.includes("RISK_BOUNDARIES.md"), "v2 roadmap must define risk boundaries artifact");
+  assert(v2ContextPackRoadmapDoc.includes("RECEIVER_STATE.md"), "v2 roadmap must define receiver state artifact");
+  assert(v2ContextPackRoadmapDoc.includes("NEXT_WINDOW_STARTER.md"), "v2 roadmap must define next-window starter artifact");
+  assert(v2ContextPackRoadmapDoc.includes("a provider request path"), "v2 roadmap must preserve provider boundary");
+  assert(v2ContextPackRoadmapDoc.includes("not_available"), "v2 roadmap must allow missing-input degradation");
+  assert(v200PlanDoc.includes("No `context-pack` command in v2.0-A"), "v2 plan must stay docs-first");
+  assert(v200PlanDoc.includes("context-pack --repo <target-repo>"), "v2 plan must document the v2.0-B context-pack command");
+  assert(v200PlanDoc.includes("v2.0 Context Pack Lite"), "v2 plan must order Context Pack Lite first");
+  assert(v200PlanDoc.includes("v2.1 Context Pack Check"), "v2 plan must keep check later");
+  assert(v200PlanDoc.includes("v2.2 Workflow Runner Lite"), "v2 plan must keep runner later");
+  assert(v200PlanDoc.includes("not_available"), "v2 plan must define missing input degradation");
+  assert(v200PlanDoc.includes("provider_probe_status=skipped"), "v2 plan must preserve skipped provider gate");
+  assert(contextPackLiteSpecDoc.includes("MANIFEST.md"), "context pack spec must define manifest artifact");
+  assert(contextPackLiteSpecDoc.includes("REPO_MAP.md"), "context pack spec must define repo map artifact");
+  assert(contextPackLiteSpecDoc.includes("KEY_FILES.md"), "context pack spec must define key files artifact");
+  assert(contextPackLiteSpecDoc.includes("RECENT_DELTA.md"), "context pack spec must define recent delta artifact");
+  assert(contextPackLiteSpecDoc.includes("RISK_BOUNDARIES.md"), "context pack spec must define risk boundaries artifact");
+  assert(contextPackLiteSpecDoc.includes("RECEIVER_STATE.md"), "context pack spec must define receiver state artifact");
+  assert(contextPackLiteSpecDoc.includes("NEXT_WINDOW_STARTER.md"), "context pack spec must define next-window starter artifact");
+  assert(contextPackLiteSpecDoc.includes("context-pack --repo <target-repo>"), "context pack spec must document the minimal generator command");
+  assert(contextPackLiteSpecDoc.includes("reviewed"), "context pack spec must define reviewed status");
+  assert(contextPackLiteSpecDoc.includes("needs-review"), "context pack spec must define needs-review status");
+  assert(contextPackLiteSpecDoc.includes("source"), "context pack spec must define source metadata");
+  assert(contextPackLiteSpecDoc.includes("trust"), "context pack spec must define trust metadata");
+  assert(contextPackLiteSpecDoc.includes("stale"), "context pack spec must define stale semantics");
+  assert(contextPackLiteSpecDoc.includes("no provider request"), "context pack spec must preserve provider boundary");
+  assert(contextPackLiteSpecDoc.includes("no AI automatic summary"), "context pack spec must avoid AI auto-summary");
   assert(deltaHandoffSpecDoc.includes("basebrief-delta-baseline-v1"), "delta spec must define baseline schema");
   assert(deltaHandoffSpecDoc.includes("reviewed"), "delta spec must define reviewed semantics");
   assert(deltaHandoffSpecDoc.includes("needs-review"), "delta spec must define needs-review semantics");
@@ -2923,6 +2969,7 @@ function checkCliLite() {
     assert(helpStdout.includes("sidecar-build --repo <target-repo>"), "CLI help must expose Sidecar build");
     assert(helpStdout.includes("--starter-language auto|zh-CN|en|ja"), "CLI help must expose starter language option");
     assert(helpStdout.includes("sidecar-check --input <sidecar-dir>"), "CLI help must expose Sidecar check");
+    assert(helpStdout.includes("context-pack --repo <target-repo> --output-dir <dir>"), "CLI help must expose Context Pack Lite");
 
     const noCommandStdout = execFileSync(process.execPath, [
       "scripts/basebrief.js",
@@ -3325,6 +3372,32 @@ function checkCliLite() {
     assert(fs.existsSync(path.join(deltaDir, "delta-handoff.md")), "CLI delta must write delta-handoff.md");
     assert(fs.existsSync(path.join(receiverRepo, ".basebrief", "delta-baseline.json")), "CLI delta must write local baseline when requested");
 
+    const contextPackDir = path.join(tempRoot, "context-pack");
+    const contextPackStdout = execFileSync(process.execPath, [
+      "scripts/basebrief.js",
+      "context-pack",
+      "--repo",
+      receiverRepo,
+      "--output-dir",
+      contextPackDir,
+      "--max-files",
+      "4",
+      "--json",
+    ], {
+      cwd: repoRoot,
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "pipe"],
+      env: process.env,
+    });
+    const contextPackResult = JSON.parse(contextPackStdout);
+    assert(contextPackResult.command === "context-pack", "CLI context-pack must return command metadata");
+    assert(contextPackResult.status === "generated", "CLI context-pack must report generated status");
+    assert(contextPackResult.outputDir.startsWith("tests"), "CLI context-pack must return a public-safe output path");
+    assert(contextPackResult.outputFiles.manifest.endsWith("MANIFEST.md"), "CLI context-pack must report manifest path");
+    assert(contextPackResult.limits.maxFiles === 4, "CLI context-pack must honor max-files");
+    assert(fs.existsSync(path.join(contextPackDir, "MANIFEST.md")), "CLI context-pack must write MANIFEST.md");
+    assert(fs.existsSync(path.join(contextPackDir, "NEXT_WINDOW_STARTER.md")), "CLI context-pack must write NEXT_WINDOW_STARTER.md");
+
     const sidecarDir = path.join(tempRoot, "sidecar-generic");
     const sidecarBuildStdout = execFileSync(process.execPath, [
       "scripts/basebrief.js",
@@ -3389,7 +3462,7 @@ function checkCliLite() {
   } finally {
     fs.rmSync(tempRoot, { recursive: true, force: true });
   }
-  return 20;
+  return 21;
 }
 
 function checkFirstRunWorkflow() {

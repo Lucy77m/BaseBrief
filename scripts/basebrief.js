@@ -22,6 +22,7 @@ const {
 const { commandDiff: commandSealDiff, commandSeal: commandCreateSeal } = require("./basebrief_seal");
 const { buildSidecarBundle, checkSidecarBundle } = require("./basebrief_sidecar");
 const { runDelta } = require("./basebrief_delta");
+const { buildContextPack } = require("./basebrief_context_pack");
 
 const STARTER_FILE = "basebrief-handoff-input.json";
 const HELP_TEXT = [
@@ -47,6 +48,7 @@ const HELP_TEXT = [
   "  node scripts/basebrief.js seal --input <markdown-or-json> --output <file>",
   "  node scripts/basebrief.js diff --before <file> --after <file>",
   "  node scripts/basebrief.js delta --repo <target-repo> --output-dir <dir> [--since <commit>] [--advance-baseline] [--json]",
+  "  node scripts/basebrief.js context-pack --repo <target-repo> --output-dir <dir> [--since <commit>] [--max-files <n>] [--json]",
   "",
   "Start here:",
   "  docs/quickstart-5min.md",
@@ -347,6 +349,15 @@ function commandDelta(options) {
   });
 }
 
+function commandContextPack(options) {
+  return buildContextPack({
+    repoPath: options.repo,
+    outputDir: options["output-dir"],
+    since: options.since || "",
+    maxFiles: options["max-files"] || "",
+  });
+}
+
 function run(argv) {
   const command = argv[2];
   if (!command || command === "--help" || command === "-h") return { command: "help" };
@@ -372,6 +383,7 @@ function run(argv) {
   if (command === "seal") return commandSeal(options);
   if (command === "diff") return commandDiff(options);
   if (command === "delta") return commandDelta(options);
+  if (command === "context-pack") return commandContextPack(options);
   throw new Error(`Unknown command: ${command}`);
 }
 
@@ -496,6 +508,14 @@ function toPublicResult(result) {
         ...result.projectState,
         input: publicPath(result.projectState.input, cwd),
       },
+    };
+  }
+  if (result.command === "context-pack") {
+    return {
+      ...result,
+      repo: publicPath(result.repo, cwd),
+      outputDir: publicPath(result.outputDir, cwd),
+      outputFiles: toRelativeMap(result.outputFiles, cwd),
     };
   }
   return result;
@@ -663,6 +683,17 @@ function formatHuman(result) {
       "",
     ].join(os.EOL);
   }
+  if (result.command === "context-pack") {
+    return [
+      `BaseBrief context pack written to ${result.outputDir}`,
+      `files=${Object.keys(result.outputFiles).length}`,
+      `repo=${result.repo}`,
+      `branch=${result.git.branch}`,
+      `head=${result.git.head}`,
+      `worktree_status=${result.git.worktree_status}`,
+      "",
+    ].join(os.EOL);
+  }
   return `${JSON.stringify(result, null, 2)}${os.EOL}`;
 }
 
@@ -731,6 +762,7 @@ module.exports = {
   commandSidecarCheck,
   commandSeal,
   commandDelta,
+  commandContextPack,
   formatFindingLines,
   formatHuman,
   parseOptions,
