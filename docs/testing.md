@@ -303,6 +303,53 @@ Expected release-check output without provider env remains:
 provider_probe_status=skipped
 ```
 
+## v1.5 Delta Receiver Lint Mini Plan
+
+`v1.5.0` is the recommended next planning direction after v1.4. It should
+connect the receiver report contract to the existing artifact checker without
+adding a new CLI command, JSON schema, command output format, provider request,
+runtime integration, plugin, MCP, IDE, Auto Flow behavior, hosted service, or
+npm publication.
+
+The plan keeps explicit receiver detection narrow: receiver result JSON,
+starter-style receiver Markdown, and delta-style receiver Markdown only. Core
+contract gaps become errors; missing `difference_found` or historical drift
+explanations become warnings.
+
+Expected release-check output without provider env remains:
+
+```text
+provider_probe_status=skipped
+```
+
+## v1.5 Delta Receiver Lint Mini Local Closeout
+
+`v1.5.0` locally closes the Delta Receiver Lint Mini line. It extends the
+existing artifact checker so explicit receiver Markdown/text reports and
+`basebrief-receiver-check-result-v1` JSON outputs can fail on missing receiver
+contract pieces without changing schema, CLI shape, or runtime scope.
+
+The closeout adds receiver-specific rule families for missing machine fields,
+missing report sections, missing starter anchors, missing fact-layer
+separation, invalid result consistency, missing `difference_found` semantics,
+and missing non-blocking historical `commits_in_range` drift explanation.
+
+The local validation gate for this closeout is:
+
+```text
+node scripts/basebrief.js check --input examples/receiver/language-routing/receiver-report.md --json
+node scripts/basebrief.js check --input examples/receiver/difference-found/receiver-check-result.json --json
+node scripts/run_release_checks.js
+npm run check
+git diff --check
+```
+
+Expected release-check output without provider env remains:
+
+```text
+provider_probe_status=skipped
+```
+
 ## v0.4.1 Stabilization Candidate
 
 `v0.4.1` is a stabilization-only cycle after the `v0.4.0` public release. It uses

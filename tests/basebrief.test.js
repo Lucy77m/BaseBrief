@@ -296,8 +296,14 @@ test("v0.3.1 receiver stabilization documents examples, local npm scripts, and r
   assert.match(languageReadme, /technical literals/);
   assert.match(languageReadme, /wait_for_user_confirmation/);
   assert.match(languageReport, /BaseBrief/);
-  assert.match(languageReport, /receiver 验收结论是 pass/);
-  assert.match(languageReport, /等待你的确认/);
+  assert.match(languageReport, /pass\/fail/);
+  assert.match(languageReport, /receiver_task_status: completed/);
+  assert.match(languageReport, /declared_checks_status: skipped/);
+  assert.match(languageReport, /handoff_acceptance: pass/);
+  assert.match(languageReport, /source_window_inherited_facts/);
+  assert.match(languageReport, /live_repo_state/);
+  assert.match(languageReport, /receiver_window_rechecks/);
+  assert.match(languageReport, /wait for user confirmation/);
 
   for (const relativePath of [
     "docs/releases/v0.3.1.md",
@@ -1620,7 +1626,7 @@ test("v0.9.3 final closure freeze aligns the whole v0.9.x line for release revie
   assert.match(roadmap, /`v0\.9\.x` closure line is frozen/);
   assert.match(roadmap, /v0\.9\.3 Final Closure \/ Freeze/);
   assert.match(roadmap, /current `v1\.0` line is Delta Handoff RC hardening/);
-  assert.match(roadmap, /Keep the locally closed v1\.0-v1\.4 Delta Handoff \/ Receiver \/ Starter \/ Usage Pack line reviewable/);
+  assert.match(roadmap, /Keep the locally closed v1\.0-v1\.5 Delta Handoff \/ Receiver \/ Starter \/ Usage Pack \/ Lint line reviewable/);
   assert.doesNotMatch(roadmap, /Current v0\.9\.0 readiness target/);
 
   for (const relativePath of [
@@ -1656,8 +1662,12 @@ test("v1.0.0 delta handoff RC hardening exposes local-first delta without expand
   const v130Plan = readText("docs/releases/v1.3.0-plan.md");
   const v140Release = readText("docs/releases/v1.4.0.md");
   const v140Plan = readText("docs/releases/v1.4.0-plan.md");
+  const v150Release = readText("docs/releases/v1.5.0.md");
+  const v150Plan = readText("docs/releases/v1.5.0-plan.md");
   const plan = readText("docs/releases/v1.0.0-plan.md");
   const rcReview = readText("docs/releases/v1.0.0-rc-review.md");
+  const checksDoc = readText("docs/checks.md");
+  const receiverCheckDoc = readText("docs/receiver-check.md");
   const spec = readText("docs/specs/delta-handoff.md");
   const dogfooding = readText("docs/dogfooding/delta-handoff-fresh-receiver-v1.0.md");
   const baselineAdvanceDogfooding = readText("docs/dogfooding/delta-handoff-baseline-advance-v1.0.md");
@@ -1700,6 +1710,8 @@ test("v1.0.0 delta handoff RC hardening exposes local-first delta without expand
   assert.match(docsIndex, /receiver-usage-pack\.md/);
   assert.match(docsIndex, /releases\/v1\.4\.0\.md/);
   assert.match(docsIndex, /releases\/v1\.4\.0-plan\.md/);
+  assert.match(docsIndex, /releases\/v1\.5\.0\.md/);
+  assert.match(docsIndex, /releases\/v1\.5\.0-plan\.md/);
   assert.match(docsIndex, /specs\/delta-handoff\.md/);
   assert.match(docsIndex, /\.\.\/examples\/delta-handoff\.md/);
   assert.match(docsIndex, /dogfooding\/delta-handoff-fresh-receiver-v1\.0\.md/);
@@ -1720,12 +1732,27 @@ test("v1.0.0 delta handoff RC hardening exposes local-first delta without expand
   assert.match(testing, /v1\.3 Delta Receiver Starter Integration Local Closeout/);
   assert.match(testing, /v1\.4 Delta Receiver Usage Pack Plan/);
   assert.match(testing, /v1\.4 Delta Receiver Usage Pack Local Closeout/);
+  assert.match(testing, /v1\.5 Delta Receiver Lint Mini Plan/);
+  assert.match(testing, /v1\.5 Delta Receiver Lint Mini Local Closeout/);
+  assert.match(testing, /receiver-specific rule families/);
   assert.match(testing, /Markdown\/text report kit/);
   assert.match(testing, /non-blocking historical `commits_in_range` drift/);
   assert.match(testing, /docs\/receiver-usage-pack\.md/);
   assert.match(testing, /examples\/receiver\/usage-pack\/README\.md/);
   assert.match(testing, /basebrief-project-state-v1` unchanged/);
   assert.match(testing, /provider_probe_status=skipped/);
+
+  assert.match(checksDoc, /## Receiver Lint/);
+  assert.match(checksDoc, /basebrief-receiver-check-result-v1/);
+  assert.match(checksDoc, /receiver\.missing-machine-field/);
+  assert.match(checksDoc, /receiver\.missing-human-anchor/);
+  assert.match(checksDoc, /receiver\.missing-drift-semantics/);
+  assert.match(checksDoc, /completed verification\s+result, not an agent failure/i);
+  assert.match(receiverCheckDoc, /Artifact Checker Compatibility/);
+  assert.match(receiverCheckDoc, /examples\/receiver\/difference-found\/receiver-check-result\.json/);
+  assert.match(receiverCheckDoc, /basebrief-receiver-check-result-v1/);
+  assert.match(receiverCheckDoc, /receiver_task_status/);
+  assert.match(receiverCheckDoc, /declared_checks_status/);
 
   assert.match(roadmap, /Phase 8B: Delta Handoff/);
   assert.match(roadmap, /Closed v1\.0-v1\.2 Delta line/);
@@ -1745,7 +1772,12 @@ test("v1.0.0 delta handoff RC hardening exposes local-first delta without expand
   assert.match(roadmap, /docs\/releases\/v1\.4\.0\.md/);
   assert.match(roadmap, /docs\/receiver-usage-pack\.md/);
   assert.match(roadmap, /Delta Receiver Usage Pack/);
-  assert.match(roadmap, /v1\.0-v1\.4 Delta Handoff \/ Receiver \/ Starter \/ Usage Pack line reviewable/);
+  assert.match(roadmap, /Local v1\.5 closeout status/);
+  assert.match(roadmap, /docs\/releases\/v1\.5\.0\.md/);
+  assert.match(roadmap, /docs\/releases\/v1\.5\.0-plan\.md/);
+  assert.match(roadmap, /scripts\/basebrief_check_artifacts\.js/);
+  assert.match(roadmap, /Delta Receiver Lint Mini/);
+  assert.match(roadmap, /v1\.0-v1\.5 Delta Handoff \/ Receiver \/ Starter \/ Usage Pack \/ Lint line reviewable/);
   assert.match(roadmap, /repeated local receiver usage evidence/);
   assert.doesNotMatch(roadmap, /Next v1\.3 planning target/);
   assert.doesNotMatch(roadmap, /Current v0\.9\.0 readiness target/);
@@ -1969,6 +2001,42 @@ test("v1.0.0 delta handoff RC hardening exposes local-first delta without expand
   assert.match(v140Release, /No machine-readable JSON schema/);
   assert.match(v140Release, /No command output format change/);
   assert.match(v140Release, /provider_probe_status=skipped/);
+  assert.match(v150Plan, /v1\.5\.0 Delta Receiver Lint Mini Plan/);
+  assert.match(v150Plan, /Delta Receiver Lint Mini/);
+  assert.match(v150Plan, /explicit receiver Markdown and receiver result JSON shapes/);
+  assert.match(v150Plan, /missing machine fields/);
+  assert.match(v150Plan, /missing `difference_found` semantics/);
+  assert.match(v150Plan, /basebrief-receiver-check-result-v1/);
+  assert.match(v150Plan, /No provider request/);
+  assert.match(v150Plan, /No runtime integration/);
+  assert.match(v150Plan, /No plugin, MCP, IDE/);
+  assert.match(v150Plan, /No schema-v2 work/);
+  assert.match(v150Plan, /No new CLI command/);
+  assert.match(v150Plan, /No machine-readable JSON schema/);
+  assert.match(v150Plan, /No command output format change/);
+  assert.match(v150Plan, /provider_probe_status=skipped/);
+  assert.match(v150Release, /v1\.5\.0 Delta Receiver Lint Mini Local Closeout/);
+  assert.match(v150Release, /Delta Receiver Lint Mini/);
+  assert.match(v150Release, /docs\/releases\/v1\.5\.0-plan\.md/);
+  assert.match(v150Release, /scripts\/basebrief_check_artifacts\.js/);
+  assert.match(v150Release, /docs\/checks\.md/);
+  assert.match(v150Release, /docs\/receiver-check\.md/);
+  assert.match(v150Release, /docs\/receiver-usage-pack\.md/);
+  assert.match(v150Release, /receiver\.missing-machine-field/);
+  assert.match(v150Release, /receiver\.invalid-result-consistency/);
+  assert.match(v150Release, /receiver\.missing-drift-semantics/);
+  assert.match(v150Release, /schemaVersion: basebrief-receiver-check-result-v1/);
+  assert.match(v150Release, /`difference_found` remains a completed verification result/);
+  assert.match(v150Release, /node scripts\/basebrief\.js check --input examples\/receiver\/language-routing\/receiver-report\.md --json/);
+  assert.match(v150Release, /node scripts\/basebrief\.js check --input examples\/receiver\/difference-found\/receiver-check-result\.json --json/);
+  assert.match(v150Release, /No provider request/);
+  assert.match(v150Release, /No runtime integration/);
+  assert.match(v150Release, /No plugin, MCP, IDE/);
+  assert.match(v150Release, /No schema-v2 work/);
+  assert.match(v150Release, /No new CLI command/);
+  assert.match(v150Release, /No machine-readable JSON schema/);
+  assert.match(v150Release, /No command output format change/);
+  assert.match(v150Release, /provider_probe_status=skipped/);
   assert.match(spec, /basebrief-delta-baseline-v1/);
   assert.match(spec, /needs-review/);
   assert.match(dogfooding, /handoff_acceptance: pass/);
@@ -2119,7 +2187,9 @@ test("v1.0.0 delta handoff RC hardening exposes local-first delta without expand
   for (const relativePath of [
     "README.md",
     "README.en.md",
+    "docs/checks.md",
     "docs/index.md",
+    "docs/receiver-check.md",
     "docs/testing.md",
     "docs/roadmap/basebrief-long-term-baseline.md",
     "docs/releases/v1.0.0.md",
@@ -2134,6 +2204,8 @@ test("v1.0.0 delta handoff RC hardening exposes local-first delta without expand
     "docs/releases/v1.3.0-plan.md",
     "docs/releases/v1.4.0.md",
     "docs/releases/v1.4.0-plan.md",
+    "docs/releases/v1.5.0.md",
+    "docs/releases/v1.5.0-plan.md",
     "docs/receiver-usage-pack.md",
     "docs/specs/delta-handoff.md",
     "docs/dogfooding/delta-handoff-fresh-receiver-v1.0.md",
@@ -2141,8 +2213,11 @@ test("v1.0.0 delta handoff RC hardening exposes local-first delta without expand
     "docs/dogfooding/delta-receiver-acceptance-v1.1.md",
     "docs/dogfooding/delta-receiver-report-kit-v1.2.md",
     "examples/delta-handoff.md",
+    "examples/receiver/blocked",
+    "examples/receiver/difference-found",
     "examples/receiver/delta-report-pass",
     "examples/receiver/delta-report-difference-found",
+    "examples/receiver/language-routing",
     "examples/receiver/usage-pack",
   ]) {
     const result = checkArtifacts({ inputPath: path.join(repoRoot, relativePath) });
@@ -2446,6 +2521,134 @@ test("artifact checker CLI emits stable json for clean input", () => {
   assert.equal(result.warningCount, 0);
   assert(Array.isArray(result.findings));
 });
+
+test("artifact checker passes clean receiver markdown and result examples", () => {
+  for (const relativePath of [
+    "examples/receiver/delta-report-pass/README.md",
+    "examples/receiver/delta-report-difference-found/README.md",
+    "examples/golden-path/first-pass-receiver-report.md",
+    "examples/golden-path/follow-up-receiver-report.md",
+    "examples/receiver/usage-pack/starter-report-outline.md",
+    "examples/receiver/language-routing/receiver-report.md",
+    "examples/receiver/difference-found/receiver-check-result.json",
+    "examples/receiver/blocked/blocked-result.json",
+  ]) {
+    const result = checkArtifacts({ inputPath: path.join(repoRoot, relativePath) });
+    assert.equal(result.status, "passed", relativePath);
+    assert.equal(result.errorCount, 0, relativePath);
+    assert.equal(result.warningCount, 0, relativePath);
+  }
+});
+
+test("artifact checker reports receiver contract errors for explicit receiver shapes", () => withTempDir((tempDir) => {
+  const receiverDir = path.join(tempDir, "receiver");
+  const goldenPathDir = path.join(tempDir, "golden-path");
+  fs.mkdirSync(receiverDir, { recursive: true });
+  fs.mkdirSync(goldenPathDir, { recursive: true });
+
+  const deltaMissingLiveRepoStatePath = path.join(receiverDir, "delta-receiver-report.md");
+  const starterMissingPassFailPath = path.join(goldenPathDir, "first-pass-receiver-report.md");
+  const starterMissingWaitAnchorPath = path.join(goldenPathDir, "follow-up-receiver-report.md");
+  const starterMissingRechecksPath = path.join(goldenPathDir, "starter-report-outline.md");
+  const jsonMissingDeclaredChecksPath = path.join(receiverDir, "receiver-check-result-missing-declared.json");
+  const jsonInvalidBlockedComboPath = path.join(receiverDir, "receiver-check-result-invalid-blocked.json");
+
+  fs.writeFileSync(
+    deltaMissingLiveRepoStatePath,
+    readText("examples/receiver/delta-report-pass/README.md").replace(/live_repo_state/g, "live_repo_state_removed"),
+    "utf8",
+  );
+  fs.writeFileSync(
+    starterMissingPassFailPath,
+    readText("examples/golden-path/first-pass-receiver-report.md").replace(/pass\/fail/g, "result-anchor"),
+    "utf8",
+  );
+  fs.writeFileSync(
+    starterMissingWaitAnchorPath,
+    readText("examples/golden-path/follow-up-receiver-report.md").replace(/wait for user confirmation/g, "wait for confirmation"),
+    "utf8",
+  );
+  fs.writeFileSync(
+    starterMissingRechecksPath,
+    readText("examples/receiver/usage-pack/starter-report-outline.md").replace(/receiver_window_rechecks/g, "receiver_window_rechecks_removed"),
+    "utf8",
+  );
+  fs.writeFileSync(
+    jsonMissingDeclaredChecksPath,
+    `${JSON.stringify({
+      schemaVersion: "basebrief-receiver-check-result-v1",
+      receiver_task_status: "completed",
+      repository_state_status: "difference_found",
+      handoff_acceptance: "difference_found",
+    }, null, 2)}\n`,
+    "utf8",
+  );
+  fs.writeFileSync(
+    jsonInvalidBlockedComboPath,
+    `${JSON.stringify({
+      ...readJson("examples/receiver/blocked/blocked-result.json"),
+      receiver_task_status: "completed",
+    }, null, 2)}\n`,
+    "utf8",
+  );
+
+  const deltaResult = checkArtifacts({ inputPath: deltaMissingLiveRepoStatePath });
+  assert.equal(deltaResult.status, "failed");
+  assert(deltaResult.findings.some((finding) => finding.ruleId === "receiver.missing-report-section"));
+
+  const missingPassFailResult = checkArtifacts({ inputPath: starterMissingPassFailPath });
+  assert.equal(missingPassFailResult.status, "failed");
+  assert(missingPassFailResult.findings.some((finding) => finding.ruleId === "receiver.missing-human-anchor"));
+
+  const missingWaitResult = checkArtifacts({ inputPath: starterMissingWaitAnchorPath });
+  assert.equal(missingWaitResult.status, "failed");
+  assert(missingWaitResult.findings.some((finding) => finding.ruleId === "receiver.missing-human-anchor"));
+
+  const missingRechecksResult = checkArtifacts({ inputPath: starterMissingRechecksPath });
+  assert.equal(missingRechecksResult.status, "failed");
+  assert(missingRechecksResult.findings.some((finding) => finding.ruleId === "receiver.missing-fact-layer"));
+
+  const missingDeclaredChecksResult = checkArtifacts({ inputPath: jsonMissingDeclaredChecksPath });
+  assert.equal(missingDeclaredChecksResult.status, "failed");
+  assert(missingDeclaredChecksResult.findings.some((finding) => finding.ruleId === "receiver.missing-machine-field"));
+
+  const invalidBlockedComboResult = checkArtifacts({ inputPath: jsonInvalidBlockedComboPath });
+  assert.equal(invalidBlockedComboResult.status, "failed");
+  assert(invalidBlockedComboResult.findings.some((finding) => finding.ruleId === "receiver.invalid-result-consistency"));
+}));
+
+test("artifact checker emits receiver warnings without failing explicit receiver reports", () => withTempDir((tempDir) => {
+  const receiverDir = path.join(tempDir, "receiver");
+  const goldenPathDir = path.join(tempDir, "golden-path");
+  fs.mkdirSync(receiverDir, { recursive: true });
+  fs.mkdirSync(goldenPathDir, { recursive: true });
+
+  const differenceWarningPath = path.join(receiverDir, "delta-difference-receiver-report.md");
+  const driftWarningPath = path.join(goldenPathDir, "starter-report-outline.md");
+
+  fs.writeFileSync(
+    differenceWarningPath,
+    readText("examples/receiver/delta-report-difference-found/README.md").replace(/It does not mean the agent failed\.\s*/g, ""),
+    "utf8",
+  );
+  fs.writeFileSync(
+    driftWarningPath,
+    readText("examples/receiver/usage-pack/starter-report-outline.md").replace(/non-blocking/g, "documented"),
+    "utf8",
+  );
+
+  const differenceWarningResult = checkArtifacts({ inputPath: differenceWarningPath });
+  assert.equal(differenceWarningResult.status, "passed");
+  assert.equal(differenceWarningResult.errorCount, 0);
+  assert.equal(differenceWarningResult.warningCount, 1);
+  assert(differenceWarningResult.findings.some((finding) => finding.ruleId === "receiver.missing-difference-semantics"));
+
+  const driftWarningResult = checkArtifacts({ inputPath: driftWarningPath });
+  assert.equal(driftWarningResult.status, "passed");
+  assert.equal(driftWarningResult.errorCount, 0);
+  assert.equal(driftWarningResult.warningCount, 1);
+  assert(driftWarningResult.findings.some((finding) => finding.ruleId === "receiver.missing-drift-semantics"));
+}));
 
 test("artifact checker reports errors for secrets, bearer tokens, and private paths", () => withTempDir((tempDir) => {
   const filePath = path.join(tempDir, "codex-task.md");

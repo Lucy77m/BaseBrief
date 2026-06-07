@@ -39,6 +39,40 @@ const PROVIDER_GENERAL_CLAIM_PATTERNS = [
   /所有\s*provider\s*都/i,
 ];
 
+const RECEIVER_RESULT_SCHEMA_VERSION = "basebrief-receiver-check-result-v1";
+const DELTA_MARKDOWN_MACHINE_FIELDS = [
+  "receiver_task_status",
+  "repository_state_status",
+  "handoff_acceptance",
+];
+const DELTA_MARKDOWN_REPORT_SECTIONS = [
+  "blocking_or_repair_notes",
+  "current_goal",
+  "live_repo_state",
+  "inherited_fact_differences",
+  "hard_boundaries",
+  "next_narrow_slice",
+];
+const STARTER_MARKDOWN_MACHINE_FIELDS = [
+  "receiver_task_status",
+  "repository_state_status",
+  "declared_checks_status",
+  "handoff_acceptance",
+];
+const STARTER_MARKDOWN_REPORT_SECTIONS = [
+  "current_goal",
+  "receiver_entry_task",
+  "risk_boundaries",
+  "inherited_fact_differences",
+  "hard_boundaries",
+  "next_narrow_slice",
+];
+const STARTER_FACT_LAYERS = [
+  "source_window_inherited_facts",
+  "live_repo_state",
+  "receiver_window_rechecks",
+];
+
 function parseArgs(argv) {
   const args = argv.slice(2);
   const inputIndex = args.indexOf("--input");
@@ -50,6 +84,10 @@ function parseArgs(argv) {
 
 function normalizeSlash(filePath) {
   return filePath.replace(/\\/g, "/");
+}
+
+function escapeRegex(value) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
 function listInputFiles(inputPath) {
@@ -95,6 +133,22 @@ function lineNumberForIndex(content, index) {
   return line;
 }
 
+function hasLabeledField(content, label) {
+  const pattern = new RegExp("^\\s*`?" + escapeRegex(label) + "`?\\s*:", "m");
+  return pattern.test(content);
+}
+
+function findLabeledFieldIndex(content, label) {
+  const pattern = new RegExp("^\\s*`?" + escapeRegex(label) + "`?\\s*:", "m");
+  const match = pattern.exec(content);
+  return match ? match.index : -1;
+}
+
+function getMarkdownTitle(content) {
+  const match = /^#\s+(.+)$/m.exec(content);
+  return match ? match[1] : "";
+}
+
 function hasRiskBoundaries(content) {
   return /\brisk_boundaries\b/i.test(content) || /^##\s+Risk Boundaries\s*$/im.test(content) || /^R=.+/m.test(content);
 }
@@ -123,6 +177,163 @@ function isHandoffOrAdapterArtifact(filePath, content) {
   );
 }
 
+function parseJsonIfPossible(filePath, content) {
+  if (path.extname(filePath).toLowerCase() !== ".json") {
+    return null;
+  }
+  try {
+    return JSON.parse(content);
+  } catch {
+    return null;
+  }
+}
+
+function isReceiverResultArtifact(filePath, content, parsedJson) {
+  return !!parsedJson && parsedJson.schemaVersion === RECEIVER_RESULT_SCHEMA_VERSION;
+}
+
+function looksLikeReceiverMarkdown(filePath, content) {
+  if (path.extname(filePath).toLowerCase() !== ".md") {
+    return false;
+  }
+
+  const normalizedPath = normalizeSlash(filePath).toLowerCase();
+  const hasCoreFields = hasLabeledField(content, "receiver_task_status") &&
+    hasLabeledField(content, "repository_state_status") &&
+    hasLabeledField(content, "handoff_acceptance");
+  if (!hasCoreFields) {
+    return false;
+  }
+
+  const title = getMarkdownTitle(content);
+  const receiverPathHint = /(?:^|\/)(?:receiver|golden-path)\//.test(normalizedPath);
+  const explicitReportHint =
+    /Delta Receiver Report Example/i.test(title) ||
+    /Receiver First Response/i.test(title) ||
+    /Starter Report Outline/i.test(title) ||
+    /Receiver Language Routing Report/i.test(title) ||
+    /receiver-report|starter-report/i.test(path.basename(filePath));
+
+  return receiverPathHint && explicitReportHint;
+}
+
+function isStarterStyleReceiverMarkdown(filePath, content) {
+  if (!looksLikeReceiverMarkdown(filePath, content)) {
+    return false;
+  }
+
+  const hasStarterMachineShape = hasLabeledField(content, "declared_checks_status");
+  const hasStarterAnchor = hasLabeledField(content, "receiver_entry_task") ||
+    hasLabeledField(content, "risk_boundaries") ||
+    hasLabeledField(content, "source_window_inherited_facts") ||
+    hasLabeledField(content, "receiver_window_rechecks") ||
+    hasLabeledField(content, "actual_handoff_friction");
+
+  return hasStarterMachineShape && hasStarterAnchor;
+}
+
+function isDeltaStyleReceiverMarkdown(filePath, content) {
+  if (!looksLikeReceiverMarkdown(filePath, content) || isStarterStyleReceiverMarkdown(filePath, content)) {
+    return false;
+  }
+
+  return DELTA_MARKDOWN_MACHINE_FIELDS.every((field) => hasLabeledField(content, field));
+}
+
+function hasHumanPassFailAnchor(content) {
+  return /pass\/fail/i.test(content) || /`pass`\s+or\s+`fail`/i.test(content);
+}
+
+function hasDifferenceSemantics(content) {
+  return /difference_found[\s\S]{0,240}(?:does not mean the agent failed|not an? (?:agent )?(?:execution )?failure|completed (?:receiver|verification|entry verification)|不等于 Agent 执行失败|核验已完成|正确完成并准确报告差异)/i.test(content);
+}
+
+function hasHistoricalDriftSemantics(content) {
+  return /historical\s+`?commits_in_range`?\s+drift[\s\S]{0,240}(?:non-blocking|not_applicable|不应误判为 blocking|应按 non-blocking)/i.test(content);
+}
+
+function addMissingMachineFields(findings, displayPath, content, fields) {
+  for (const field of fields) {
+    if (!hasLabeledField(content, field)) {
+      addFinding(findings, "ERROR", "receiver.missing-machine-field", displayPath, 1, `Receiver artifact is missing machine field: ${field}.`);
+    }
+  }
+}
+
+function addMissingReportSections(findings, displayPath, content, fields) {
+  for (const field of fields) {
+    if (!hasLabeledField(content, field)) {
+      addFinding(findings, "ERROR", "receiver.missing-report-section", displayPath, 1, `Receiver artifact is missing report section: ${field}.`);
+    }
+  }
+}
+
+function addMissingFactLayers(findings, displayPath, content, fields) {
+  for (const field of fields) {
+    if (!hasLabeledField(content, field)) {
+      addFinding(findings, "ERROR", "receiver.missing-fact-layer", displayPath, 1, `Receiver artifact is missing fact layer: ${field}.`);
+    }
+  }
+}
+
+function addReceiverMarkdownWarnings(findings, displayPath, content) {
+  if (content.includes("difference_found") && !hasDifferenceSemantics(content)) {
+    const index = content.indexOf("difference_found");
+    addFinding(findings, "WARNING", "receiver.missing-difference-semantics", displayPath, lineNumberForIndex(content, index), "Receiver artifact mentions difference_found without explaining that it is a completed verification result, not an agent failure.");
+  }
+
+  if (/historical\s+`?commits_in_range`?\s+drift/i.test(content) && !hasHistoricalDriftSemantics(content)) {
+    const match = /historical\s+`?commits_in_range`?\s+drift/i.exec(content);
+    addFinding(findings, "WARNING", "receiver.missing-drift-semantics", displayPath, lineNumberForIndex(content, match ? match.index : 0), "Receiver artifact mentions historical commits_in_range drift without a non-blocking explanation.");
+  }
+}
+
+function scanReceiverResultJson(findings, displayPath, parsedJson) {
+  for (const field of STARTER_MARKDOWN_MACHINE_FIELDS) {
+    if (!(field in parsedJson)) {
+      addFinding(findings, "ERROR", "receiver.missing-machine-field", displayPath, 1, `Receiver result JSON is missing machine field: ${field}.`);
+    }
+  }
+
+  if (!("handoff_acceptance" in parsedJson) || !("receiver_task_status" in parsedJson) || !("repository_state_status" in parsedJson)) {
+    return;
+  }
+
+  if (parsedJson.handoff_acceptance === "blocked" && parsedJson.receiver_task_status !== "blocked") {
+    addFinding(findings, "ERROR", "receiver.invalid-result-consistency", displayPath, 1, "Receiver result JSON with handoff_acceptance=blocked must set receiver_task_status=blocked.");
+  }
+
+  if (parsedJson.handoff_acceptance !== "blocked" && parsedJson.receiver_task_status !== "completed") {
+    addFinding(findings, "ERROR", "receiver.invalid-result-consistency", displayPath, 1, "Receiver result JSON with non-blocked handoff_acceptance must set receiver_task_status=completed.");
+  }
+
+  if (parsedJson.repository_state_status === "not_applicable" && parsedJson.handoff_acceptance !== "blocked") {
+    addFinding(findings, "ERROR", "receiver.invalid-result-consistency", displayPath, 1, "repository_state_status=not_applicable is only valid for blocked receiver results.");
+  }
+}
+
+function scanStarterStyleReceiverMarkdown(findings, displayPath, content) {
+  addMissingMachineFields(findings, displayPath, content, STARTER_MARKDOWN_MACHINE_FIELDS);
+  addMissingReportSections(findings, displayPath, content, STARTER_MARKDOWN_REPORT_SECTIONS);
+  addMissingFactLayers(findings, displayPath, content, STARTER_FACT_LAYERS);
+
+  if (!hasHumanPassFailAnchor(content)) {
+    addFinding(findings, "ERROR", "receiver.missing-human-anchor", displayPath, 1, "Starter-style receiver report must preserve a human pass/fail anchor.");
+  }
+
+  if (!/wait for user confirmation/i.test(content)) {
+    addFinding(findings, "ERROR", "receiver.missing-human-anchor", displayPath, 1, "Starter-style receiver report must preserve wait for user confirmation.");
+  }
+
+  addReceiverMarkdownWarnings(findings, displayPath, content);
+}
+
+function scanDeltaStyleReceiverMarkdown(findings, displayPath, content) {
+  addMissingMachineFields(findings, displayPath, content, DELTA_MARKDOWN_MACHINE_FIELDS);
+  addMissingReportSections(findings, displayPath, content, DELTA_MARKDOWN_REPORT_SECTIONS);
+  addReceiverMarkdownWarnings(findings, displayPath, content);
+}
+
 function addFinding(findings, severity, ruleId, file, line, message) {
   findings.push({
     severity,
@@ -135,6 +346,7 @@ function addFinding(findings, severity, ruleId, file, line, message) {
 
 function scanContent({ filePath, displayPath, content }) {
   const findings = [];
+  const parsedJson = parseJsonIfPossible(filePath, content);
 
   for (const { ruleId, pattern } of SECRET_PATTERNS) {
     const match = pattern.exec(content);
@@ -171,6 +383,14 @@ function scanContent({ filePath, displayPath, content }) {
       addFinding(findings, "WARNING", "provider.overgeneralized-claim", displayPath, lineNumberForIndex(content, match.index), "Provider-specific evidence may be written as a general claim.");
       break;
     }
+  }
+
+  if (isReceiverResultArtifact(filePath, content, parsedJson)) {
+    scanReceiverResultJson(findings, displayPath, parsedJson);
+  } else if (isStarterStyleReceiverMarkdown(filePath, content)) {
+    scanStarterStyleReceiverMarkdown(findings, displayPath, content);
+  } else if (isDeltaStyleReceiverMarkdown(filePath, content)) {
+    scanDeltaStyleReceiverMarkdown(findings, displayPath, content);
   }
 
   return findings;

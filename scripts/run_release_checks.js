@@ -149,6 +149,8 @@ function checkRequiredFiles() {
     "docs/releases/v1.3.0-plan.md",
     "docs/releases/v1.4.0.md",
     "docs/releases/v1.4.0-plan.md",
+    "docs/releases/v1.5.0.md",
+    "docs/releases/v1.5.0-plan.md",
     "docs/specs/delta-handoff.md",
     "docs/testing-v0.4.x-test-matrix.md",
     "docs/testing-v0.6.x-test-matrix.md",
@@ -360,6 +362,8 @@ function checkContentContracts() {
   const v130PlanDoc = readText("docs/releases/v1.3.0-plan.md");
   const v140ReleaseDoc = readText("docs/releases/v1.4.0.md");
   const v140PlanDoc = readText("docs/releases/v1.4.0-plan.md");
+  const v150ReleaseDoc = readText("docs/releases/v1.5.0.md");
+  const v150PlanDoc = readText("docs/releases/v1.5.0-plan.md");
   const deltaHandoffSpecDoc = readText("docs/specs/delta-handoff.md");
   const postReleaseBaselineDoc = readText("docs/baselines/v0.4.0-post-release-baseline.md");
   const v060PostReleaseBaselineDoc = readText("docs/baselines/v0.6.0-post-release-baseline.md");
@@ -650,6 +654,8 @@ function checkContentContracts() {
   assert(docsIndex.includes("releases/v1.3.0-plan.md"), "Docs index must link v1.3.0 starter integration plan");
   assert(docsIndex.includes("releases/v1.4.0.md"), "Docs index must link v1.4.0 usage pack closeout");
   assert(docsIndex.includes("releases/v1.4.0-plan.md"), "Docs index must link v1.4.0 usage pack plan");
+  assert(docsIndex.includes("releases/v1.5.0.md"), "Docs index must link v1.5.0 lint mini closeout");
+  assert(docsIndex.includes("releases/v1.5.0-plan.md"), "Docs index must link v1.5.0 lint mini plan");
   assert(docsIndex.includes("dogfooding/delta-receiver-report-kit-v1.2.md"), "Docs index must link v1.2 report kit dogfooding");
   assert(docsIndex.includes("../examples/receiver/delta-report-pass/README.md"), "Docs index should link delta receiver pass report example");
   assert(docsIndex.includes("../examples/receiver/delta-report-difference-found/README.md"), "Docs index should link delta receiver difference report example");
@@ -710,8 +716,14 @@ function checkContentContracts() {
   assert(receiverLanguageRoutingExampleReadme.includes("pass/fail"), "Receiver language-routing example must preserve pass/fail wording");
   assert(receiverLanguageRoutingExampleReadme.includes("wait_for_user_confirmation"), "Receiver language-routing example must preserve wait-for-confirmation anchor");
   assert(receiverLanguageRoutingReport.includes("BaseBrief"), "Receiver language-routing report must identify BaseBrief");
-  assert(receiverLanguageRoutingReport.includes("receiver 验收结论是 pass"), "Receiver language-routing report must include a pass report");
-  assert(receiverLanguageRoutingReport.includes("等待你的确认"), "Receiver language-routing report must stop at the confirmation gate");
+  assert(receiverLanguageRoutingReport.includes("pass/fail"), "Receiver language-routing report must preserve pass/fail wording");
+  assert(receiverLanguageRoutingReport.includes("receiver_task_status: completed"), "Receiver language-routing report must include receiver task status");
+  assert(receiverLanguageRoutingReport.includes("declared_checks_status: skipped"), "Receiver language-routing report must explain skipped declared checks");
+  assert(receiverLanguageRoutingReport.includes("handoff_acceptance: pass"), "Receiver language-routing report must include pass acceptance");
+  assert(receiverLanguageRoutingReport.includes("source_window_inherited_facts"), "Receiver language-routing report must separate inherited facts");
+  assert(receiverLanguageRoutingReport.includes("live_repo_state"), "Receiver language-routing report must include live repo facts");
+  assert(receiverLanguageRoutingReport.includes("receiver_window_rechecks"), "Receiver language-routing report must include receiver rechecks");
+  assert(receiverLanguageRoutingReport.includes("wait for user confirmation"), "Receiver language-routing report must stop at the confirmation gate");
   assert(receiverFrictionDoc.includes("actual_handoff_friction"), "Receiver friction log must record the report shape");
   assert(receiverFrictionDoc.includes("pass/fail"), "Receiver friction log must preserve human-facing pass/fail wording");
   assert(receiverFrictionDoc.includes("receiver_acceptance_words"), "Receiver friction log must record receiver_acceptance_words");
@@ -831,6 +843,10 @@ function checkContentContracts() {
   assert(testingDoc.includes("v0.9.3 Final Closure / Freeze Candidate"), "Testing docs must document v0.9.3 closure candidate");
   assert(testingDoc.includes("v1.0 Delta Handoff Fresh Receiver Dogfooding"), "Testing docs must document v1.0 delta fresh receiver dogfooding");
   assert(testingDoc.includes("v1.0 Delta Handoff RC Candidate"), "Testing docs must document v1.0 delta RC candidate");
+  assert(testingDoc.includes("v1.5 Delta Receiver Lint Mini Plan"), "Testing docs must document the v1.5 lint mini plan");
+  assert(testingDoc.includes("v1.5 Delta Receiver Lint Mini Local Closeout"), "Testing docs must document the v1.5 lint mini closeout");
+  assert(testingDoc.includes("receiver-specific rule families"), "Testing docs must describe v1.5 receiver rule families");
+  assert(testingDoc.includes("basebrief-receiver-check-result-v1"), "Testing docs must mention receiver result JSON coverage");
   assert(testingDoc.includes("basebrief-project-state-v1` unchanged"), "Testing docs must preserve v1.0 project-state schema");
   assert(testingDoc.includes("testing-v0.9.x-test-matrix.md"), "Testing docs must link v0.9.x closure matrix");
   assert(testingDoc.includes("new-window-starter.md"), "Testing docs must document Sidecar starter");
@@ -874,6 +890,12 @@ function checkContentContracts() {
   assert(checksDoc.includes("scripts/basebrief_check_artifacts.js"), "checks.md must document artifact checker script");
   assert(checksDoc.includes("--input"), "checks.md must document explicit input behavior");
   assert(checksDoc.includes("not a full security audit"), "checks.md must explain checker boundary");
+  assert(checksDoc.includes("## Receiver Lint"), "checks.md must document receiver lint");
+  assert(checksDoc.includes("basebrief-receiver-check-result-v1"), "checks.md must keep receiver JSON detection explicit");
+  assert(checksDoc.includes("receiver.missing-human-anchor"), "checks.md must list missing-human-anchor");
+  assert(checksDoc.includes("receiver.invalid-result-consistency"), "checks.md must list invalid-result-consistency");
+  assert(checksDoc.includes("receiver.missing-difference-semantics"), "checks.md must list difference-semantics warnings");
+  assert(checksDoc.includes("completed verification"), "checks.md must preserve difference_found semantics");
   assert(cliLiteDoc.includes("scripts/basebrief.js"), "cli-lite.md must document CLI Lite script");
   assert(cliLiteDoc.includes("not a published npm package"), "cli-lite.md must state CLI Lite is not a published npm package");
   assert(cliLiteDoc.includes("v0.4.0"), "cli-lite.md must describe v0.4.0 local toolchain boundary");
@@ -1143,6 +1165,42 @@ function checkContentContracts() {
   assert(v140ReleaseDoc.includes("No machine-readable JSON schema"), "v1.4.0 closeout doc must avoid report schema work");
   assert(v140ReleaseDoc.includes("No command output format change"), "v1.4.0 closeout doc must avoid command output changes");
   assert(v140ReleaseDoc.includes("provider_probe_status=skipped"), "v1.4.0 closeout doc must preserve skipped provider gate");
+  assert(v150PlanDoc.includes("v1.5.0 Delta Receiver Lint Mini Plan"), "v1.5.0 plan must have stable title");
+  assert(v150PlanDoc.includes("Delta Receiver Lint Mini"), "v1.5.0 plan must name the lint line");
+  assert(v150PlanDoc.includes("explicit receiver Markdown and receiver result JSON shapes"), "v1.5.0 plan must keep receiver detection explicit");
+  assert(v150PlanDoc.includes("missing machine fields"), "v1.5.0 plan must classify missing machine fields as errors");
+  assert(v150PlanDoc.includes("missing `difference_found` semantics"), "v1.5.0 plan must classify difference semantics gaps as warnings");
+  assert(v150PlanDoc.includes("basebrief-receiver-check-result-v1"), "v1.5.0 plan must cover receiver result JSON");
+  assert(v150PlanDoc.includes("No provider request"), "v1.5.0 plan must reject provider scope");
+  assert(v150PlanDoc.includes("No runtime integration"), "v1.5.0 plan must reject runtime scope");
+  assert(v150PlanDoc.includes("No plugin, MCP, IDE"), "v1.5.0 plan must reject plugin/MCP/IDE scope");
+  assert(v150PlanDoc.includes("No schema-v2 work"), "v1.5.0 plan must reject schema-v2 scope");
+  assert(v150PlanDoc.includes("No new CLI command"), "v1.5.0 plan must avoid new CLI commands");
+  assert(v150PlanDoc.includes("No machine-readable JSON schema"), "v1.5.0 plan must avoid report schema work");
+  assert(v150PlanDoc.includes("No command output format change"), "v1.5.0 plan must avoid command output changes");
+  assert(v150PlanDoc.includes("provider_probe_status=skipped"), "v1.5.0 plan must preserve skipped provider gate");
+  assert(v150ReleaseDoc.includes("v1.5.0 Delta Receiver Lint Mini Local Closeout"), "v1.5.0 closeout doc must have stable title");
+  assert(v150ReleaseDoc.includes("Delta Receiver Lint Mini"), "v1.5.0 closeout doc must name the lint line");
+  assert(v150ReleaseDoc.includes("docs/releases/v1.5.0-plan.md"), "v1.5.0 closeout doc must link the planning baseline");
+  assert(v150ReleaseDoc.includes("scripts/basebrief_check_artifacts.js"), "v1.5.0 closeout doc must name the checker implementation");
+  assert(v150ReleaseDoc.includes("docs/checks.md"), "v1.5.0 closeout doc must include checks doc coverage");
+  assert(v150ReleaseDoc.includes("docs/receiver-check.md"), "v1.5.0 closeout doc must include receiver-check doc coverage");
+  assert(v150ReleaseDoc.includes("docs/receiver-usage-pack.md"), "v1.5.0 closeout doc must include usage-pack doc coverage");
+  assert(v150ReleaseDoc.includes("receiver.missing-machine-field"), "v1.5.0 closeout doc must list missing-machine-field");
+  assert(v150ReleaseDoc.includes("receiver.invalid-result-consistency"), "v1.5.0 closeout doc must list invalid-result-consistency");
+  assert(v150ReleaseDoc.includes("receiver.missing-drift-semantics"), "v1.5.0 closeout doc must list drift-semantics");
+  assert(v150ReleaseDoc.includes("schemaVersion: basebrief-receiver-check-result-v1"), "v1.5.0 closeout doc must keep JSON detection explicit");
+  assert(v150ReleaseDoc.includes("`difference_found` remains a completed verification result"), "v1.5.0 closeout doc must preserve difference_found semantics");
+  assert(v150ReleaseDoc.includes("node scripts/basebrief.js check --input examples/receiver/language-routing/receiver-report.md --json"), "v1.5.0 closeout doc must record receiver markdown validation");
+  assert(v150ReleaseDoc.includes("node scripts/basebrief.js check --input examples/receiver/difference-found/receiver-check-result.json --json"), "v1.5.0 closeout doc must record receiver JSON validation");
+  assert(v150ReleaseDoc.includes("No provider request"), "v1.5.0 closeout doc must reject provider scope");
+  assert(v150ReleaseDoc.includes("No runtime integration"), "v1.5.0 closeout doc must reject runtime scope");
+  assert(v150ReleaseDoc.includes("No plugin, MCP, IDE"), "v1.5.0 closeout doc must reject plugin/MCP/IDE scope");
+  assert(v150ReleaseDoc.includes("No schema-v2 work"), "v1.5.0 closeout doc must reject schema-v2 scope");
+  assert(v150ReleaseDoc.includes("No new CLI command"), "v1.5.0 closeout doc must avoid new CLI commands");
+  assert(v150ReleaseDoc.includes("No machine-readable JSON schema"), "v1.5.0 closeout doc must avoid report schema work");
+  assert(v150ReleaseDoc.includes("No command output format change"), "v1.5.0 closeout doc must avoid command output changes");
+  assert(v150ReleaseDoc.includes("provider_probe_status=skipped"), "v1.5.0 closeout doc must preserve skipped provider gate");
   assert(deltaHandoffSpecDoc.includes("basebrief-delta-baseline-v1"), "delta spec must define baseline schema");
   assert(deltaHandoffSpecDoc.includes("reviewed"), "delta spec must define reviewed semantics");
   assert(deltaHandoffSpecDoc.includes("needs-review"), "delta spec must define needs-review semantics");
@@ -1175,6 +1233,11 @@ function checkContentContracts() {
   assert(roadmapDoc.includes("docs/releases/v1.4.0.md"), "Roadmap must link v1.4 closeout doc");
   assert(roadmapDoc.includes("docs/receiver-usage-pack.md"), "Roadmap must link usage-pack guide");
   assert(roadmapDoc.includes("Delta Receiver Usage Pack"), "Roadmap must name v1.4 usage pack");
+  assert(roadmapDoc.includes("Local v1.5 closeout status"), "Roadmap must document v1.5 closeout status");
+  assert(roadmapDoc.includes("docs/releases/v1.5.0.md"), "Roadmap must link v1.5 closeout doc");
+  assert(roadmapDoc.includes("docs/releases/v1.5.0-plan.md"), "Roadmap must link v1.5 plan doc");
+  assert(roadmapDoc.includes("scripts/basebrief_check_artifacts.js"), "Roadmap must name the receiver lint implementation");
+  assert(roadmapDoc.includes("Delta Receiver Lint Mini"), "Roadmap must name v1.5 lint mini");
   assert(contextOpsDoc.includes("not a product surface"), "contextops.md must keep ContextOps out of product surface");
   assert(contextOpsDoc.includes("Current Non-Goals"), "contextops.md must define non-goals");
   assert(contextOpsDoc.includes("hosted service"), "contextops.md must reject hosted-service scope");
@@ -1188,7 +1251,7 @@ function checkContentContracts() {
   assert(roadmapDoc.includes("The `v0.9.x` closure line is frozen"), "Roadmap must name the frozen v0.9.x closure line");
   assert(roadmapDoc.includes("v0.9.3 Final Closure / Freeze"), "Roadmap must include the v0.9.3 closure stage");
   assert(roadmapDoc.includes("`v0.9.x` closure line is frozen"), "Roadmap must preserve the frozen v0.9.x closure line");
-  assert(roadmapDoc.includes("Keep the locally closed v1.0-v1.4 Delta Handoff / Receiver / Starter / Usage Pack line reviewable"), "Roadmap must make the closed Delta line the first near-term priority");
+  assert(roadmapDoc.includes("Keep the locally closed v1.0-v1.5 Delta Handoff / Receiver / Starter / Usage Pack / Lint line reviewable"), "Roadmap must make the closed Delta line the first near-term priority");
   assert(roadmapDoc.includes("provider requests, runtime integration, schema changes"), "Roadmap must keep v0.9.x out of runtime/provider/schema scope");
   assert(goldenPathDoc.includes("Integrated Handoff Golden Path"), "golden-path.md must have a stable title");
   assert(goldenPathDoc.includes("receiver-ready.md -> state-init/state-advance -> sidecar-build -> sidecar-check -> new-window-starter.md -> receiver first response"), "golden-path.md must define the integrated path");
@@ -1418,6 +1481,9 @@ function checkContentContracts() {
   assert(receiverCheckDoc.includes("`pass/fail`"), "Receiver Safe Check docs must distinguish human-facing pass/fail wording");
   assert(receiverCheckDoc.includes("`difference_found`"), "Receiver Safe Check docs must document difference_found semantics");
   assert(receiverCheckDoc.includes("`blocked`"), "Receiver Safe Check docs must document blocked semantics");
+  assert(receiverCheckDoc.includes("## Artifact Checker Compatibility"), "Receiver Safe Check docs must document artifact checker compatibility");
+  assert(receiverCheckDoc.includes("declared_checks_status"), "Receiver Safe Check docs must require declared_checks_status");
+  assert(receiverCheckDoc.includes("repository_state_status: not_applicable"), "Receiver Safe Check docs must constrain not_applicable usage");
   assert(receiverCheckDoc.includes("不等于 Agent 执行失败"), "Receiver Safe Check docs must preserve difference_found wording");
   assert(releaseCandidateDoc.includes("Receiver-ready v1"), "v0.3.0 release candidate must describe Receiver-ready v1");
   assert(releaseCandidateDoc.includes("Receiver Safe Check v1"), "v0.3.0 release candidate must describe Receiver Safe Check v1");
@@ -2049,6 +2115,9 @@ function checkContentContracts() {
   assert(receiverUsagePackDoc.includes("docs/dogfooding/delta-receiver-report-kit-v1.2.md"), "Receiver usage-pack doc must point to the v1.2 report kit");
   assert(receiverUsagePackDoc.includes("examples/golden-path/first-pass-receiver-report.md"), "Receiver usage-pack doc must point to first-pass starter example");
   assert(receiverUsagePackDoc.includes("examples/golden-path/follow-up-receiver-report.md"), "Receiver usage-pack doc must point to follow-up starter example");
+  assert(receiverUsagePackDoc.includes("## Checker Coverage"), "Receiver usage-pack doc must document checker coverage");
+  assert(receiverUsagePackDoc.includes("Receiver-specific lint only applies to explicit receiver artifacts"), "Receiver usage-pack doc must keep lint detection explicit");
+  assert(receiverUsagePackDoc.includes("Warnings cover missing `difference_found` semantics explanation"), "Receiver usage-pack doc must describe warning-only coverage");
   assert(receiverUsagePackDoc.includes("No provider request"), "Receiver usage-pack doc must reject provider scope");
   assert(receiverUsagePackDoc.includes("No runtime integration"), "Receiver usage-pack doc must reject runtime scope");
   assert(receiverUsagePackDoc.includes("No plugin, MCP, IDE"), "Receiver usage-pack doc must reject plugin/MCP/IDE scope");
@@ -2366,6 +2435,7 @@ function checkArtifactChecker() {
     "docs/testing-v0.4.x-test-matrix.md",
     "docs/testing-v0.6.x-test-matrix.md",
     "docs/testing-v0.7.x-test-matrix.md",
+    "docs/checks.md",
     "docs/receiver-check.md",
     "docs/receiver-flow.md",
     "docs/project-state.md",
@@ -2407,6 +2477,8 @@ function checkArtifactChecker() {
     "docs/releases/v1.3.0-plan.md",
     "docs/releases/v1.4.0.md",
     "docs/releases/v1.4.0-plan.md",
+    "docs/releases/v1.5.0.md",
+    "docs/releases/v1.5.0-plan.md",
     "docs/receiver-usage-pack.md",
     "docs/testing-v0.9.x-test-matrix.md",
     "docs/dogfooding/sidecar-external-receiver-smoke-v0.8.4.md",

@@ -91,6 +91,28 @@ or pre-commit numbers can remain in public evidence as time-stamped facts from
 the earlier run; current receiver acceptance should still key off refreshed
 branch, HEAD, and worktree facts.
 
+## Checker Coverage
+
+v1.5 connects this receiver contract to the existing artifact checker.
+
+Receiver-specific lint only applies to explicit receiver artifacts:
+
+- receiver result JSON with
+  `schemaVersion: basebrief-receiver-check-result-v1`
+- starter-style Markdown that exposes receiver machine fields and starter
+  report sections
+- delta-style Markdown that exposes receiver machine fields and delta report
+  sections
+
+It does not activate on ordinary docs just because they mention field names.
+
+Errors cover missing machine fields, missing required report sections, missing
+starter `pass/fail`, missing `wait for user confirmation`, missing fact-layer
+separation, and contradictory receiver result JSON.
+
+Warnings cover missing `difference_found` semantics explanation and missing
+non-blocking historical `commits_in_range` drift explanation.
+
 ## Boundaries
 
 - No provider request.

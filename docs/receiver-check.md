@@ -83,6 +83,26 @@ Sidecar 或 `new-window-starter.md` 会要求 receiver 先给出人类可读的
 - `blocked` 只用于无效、不安全或无法安全运行的情况；它不是普通不一致
   时的默认 `fail`。
 
+## Artifact Checker Compatibility
+
+公开安全的 receiver result JSON 现在也可以直接交给 Artifact Checker：
+
+```text
+node scripts/basebrief.js check --input examples/receiver/difference-found/receiver-check-result.json --json
+```
+
+v1.5 的 receiver lint 会对
+`schemaVersion: basebrief-receiver-check-result-v1` 结果追加 receiver 专项检查：
+
+- 必须有 `receiver_task_status`、`repository_state_status`、
+  `declared_checks_status`、`handoff_acceptance`
+- `handoff_acceptance: blocked` 时必须同时是
+  `receiver_task_status: blocked`
+- 非 `blocked` 结果必须是 `receiver_task_status: completed`
+- `repository_state_status: not_applicable` 只允许出现在 `blocked` 结果
+
+这一步不改变 Safe Check schema，也不把 `difference_found` 改写成失败语义。
+
 ## 安全边界
 
 - 不接受原始 Shell 命令、自定义参数或自定义环境变量。

@@ -344,6 +344,19 @@ Local v1.4 closeout status:
 - historical `commits_in_range` drift remains non-blocking when refreshed
   branch, HEAD, and worktree facts match live repository state
 
+Local v1.5 closeout status:
+
+- `docs/releases/v1.5.0-plan.md` defines the Delta Receiver Lint Mini
+- `docs/releases/v1.5.0.md` records the local closeout without making a push,
+  tag, release, package publication, platform, provider, command-output, report
+  schema, or schema-v2 claim
+- `scripts/basebrief_check_artifacts.js` now checks explicit receiver Markdown
+  and `basebrief-receiver-check-result-v1` JSON for receiver contract gaps
+- receiver lint remains shape-based, not repository-wide keyword-based
+- `difference_found` remains a completed verification result and historical
+  `commits_in_range` drift remains non-blocking when refreshed branch, HEAD,
+  and worktree facts still match
+
 ### Phase 8A: Receiver Workflow
 
 Goal: make receiver acceptance explicit and locally verifiable without turning BaseBrief into an agent runtime.
@@ -435,7 +448,7 @@ A new BB experiment is allowed only when all of the following are true:
 
 ## Near-term Priority Order
 
-1. Keep the locally closed v1.0-v1.4 Delta Handoff / Receiver / Starter / Usage Pack line reviewable.
+1. Keep the locally closed v1.0-v1.5 Delta Handoff / Receiver / Starter / Usage Pack / Lint line reviewable.
 2. Keep push, tag, and formal release pending until the user separately approves them.
 3. Choose any later Delta version only from repeated local receiver usage evidence.
 4. Keep installed CLI, plugins, provider experiments, ContextOps expansion, and speculative features frozen unless measured usage creates a concrete blocker.
@@ -464,13 +477,13 @@ BaseBrief is off track if:
 
 ## Current Strategic Decision
 
-The current development cycle has locally closed the v1.0-v1.4 Delta Handoff /
+The current development cycle has locally closed the v1.0-v1.5 Delta Handoff /
 Receiver line: Delta Handoff, Delta Receiver Acceptance, Delta Receiver Report
-Kit, Delta Receiver Starter Integration, and Delta Receiver Usage Pack. The
-next cycle should still avoid provider requests, runtime integration, new CLI
-commands, report schemas, command output changes, plugins, MCP, IDE, Auto
-Flow, or publication work unless repeated local usage exposes a concrete
-blocker.
+Kit, Delta Receiver Starter Integration, Delta Receiver Usage Pack, and Delta
+Receiver Lint Mini. The next cycle should still avoid provider requests,
+runtime integration, new CLI commands, report schemas, command output changes,
+plugins, MCP, IDE, Auto Flow, or publication work unless repeated local usage
+exposes a concrete blocker.
 
 It should not chase a new benchmark variant, installed CLI, plugin, MCP, IDE,
 runtime integration, provider request, schema-v2 work, hosted service, or
