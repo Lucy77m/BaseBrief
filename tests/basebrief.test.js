@@ -1751,6 +1751,12 @@ test("v1.0.0 delta handoff RC hardening exposes local-first delta without expand
   assert.match(receiverAcceptanceDogfooding, /live repository state/);
   assert.match(receiverAcceptanceDogfooding, /inherited handoff facts/);
   assert.match(receiverAcceptanceDogfooding, /difference_found/);
+  assert.match(receiverAcceptanceDogfooding, /Local Dry-Run Result/);
+  assert.match(receiverAcceptanceDogfooding, /handoff_acceptance: difference_found/);
+  assert.match(receiverAcceptanceDogfooding, /handoff_acceptance: pass/);
+  assert.match(receiverAcceptanceDogfooding, /commits_in_range: 3/);
+  assert.match(receiverAcceptanceDogfooding, /worktreeChangedFiles: \[\]/);
+  assert.match(receiverAcceptanceDogfooding, /no baseline advance/);
   assert.match(receiverAcceptanceDogfooding, /No provider request/);
   assert.match(receiverAcceptanceDogfooding, /No runtime integration/);
   assert.match(receiverAcceptanceDogfooding, /No plugin, MCP, IDE/);

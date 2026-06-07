@@ -1735,6 +1735,12 @@ function checkContentContracts() {
   assert(deltaReceiverAcceptanceDoc.includes("live repository state"), "Delta receiver acceptance doc must require live repository state");
   assert(deltaReceiverAcceptanceDoc.includes("inherited handoff facts"), "Delta receiver acceptance doc must separate inherited facts");
   assert(deltaReceiverAcceptanceDoc.includes("difference_found"), "Delta receiver acceptance doc must define difference handling");
+  assert(deltaReceiverAcceptanceDoc.includes("Local Dry-Run Result"), "Delta receiver acceptance doc must record dry-run result");
+  assert(deltaReceiverAcceptanceDoc.includes("handoff_acceptance: difference_found"), "Delta receiver acceptance doc must record stale-handoff difference");
+  assert(deltaReceiverAcceptanceDoc.includes("handoff_acceptance: pass"), "Delta receiver acceptance doc must record refreshed-handoff pass");
+  assert(deltaReceiverAcceptanceDoc.includes("commits_in_range: 3"), "Delta receiver acceptance doc must record refreshed commit count");
+  assert(deltaReceiverAcceptanceDoc.includes("worktreeChangedFiles: []"), "Delta receiver acceptance doc must record clean refreshed worktree");
+  assert(deltaReceiverAcceptanceDoc.includes("no baseline advance"), "Delta receiver acceptance doc must keep baseline unadvanced");
   assert(deltaReceiverAcceptanceDoc.includes("No provider request"), "Delta receiver acceptance doc must reject provider scope");
   assert(deltaReceiverAcceptanceDoc.includes("No runtime integration"), "Delta receiver acceptance doc must reject runtime scope");
   assert(deltaReceiverAcceptanceDoc.includes("No plugin, MCP, IDE"), "Delta receiver acceptance doc must reject plugin/MCP/IDE scope");

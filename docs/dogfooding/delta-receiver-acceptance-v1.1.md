@@ -1,11 +1,11 @@
 # Delta Receiver Acceptance Dogfooding v1.1
 
 This public-safe record defines the first v1.1 receiver acceptance exercise for
-the BaseBrief Delta Handoff line.
+the BaseBrief Delta Handoff line and records the first local dry-run result.
 
-It records expected receiver behavior only. It does not copy raw receiver
-output, private absolute paths, provider details, secrets, `.env` content, API
-keys, tokens, or credentials.
+It records expected receiver behavior and public-safe local facts only. It does
+not copy raw receiver output, private absolute paths, provider details,
+secrets, `.env` content, API keys, tokens, or credentials.
 
 ## Goal
 
@@ -27,6 +27,58 @@ The receiver should inspect only:
 The receiver should not rerun source-window test suites unless the current user
 explicitly asks for validation. Source-window validation results should be
 reported as inherited facts, not as receiver-window rechecks.
+
+## Local Dry-Run Result
+
+The first receiver acceptance dry-run intentionally compared the existing local
+delta handoff against live repository state.
+
+First pass result:
+
+```text
+receiver_task_status: completed
+repository_state_status: difference_found
+handoff_acceptance: difference_found
+blocking_or_repair_notes: delta-handoff.md was stale against live repo state
+```
+
+Public-safe interpretation:
+
+- The inherited handoff facts still pointed at the earlier v1.0 delta candidate.
+- Live repository state had advanced to the v1.1 receiver acceptance planning
+  commit.
+- The working tree was clean, while the stale handoff still listed older
+  worktree changed files.
+- The receiver contract correctly rejected `pass` until the local delta handoff
+  was refreshed.
+
+The local delta handoff was then regenerated without advancing the baseline:
+
+```text
+node scripts/basebrief.js delta --repo . --output-dir .basebrief/out/v1.0-delta --json
+node scripts/basebrief.js check --input .basebrief/out/v1.0-delta --json
+```
+
+Observed refreshed delta facts:
+
+- regenerated ignored local output only
+- no baseline advance
+- live head matched the refreshed delta handoff head
+- `commits_in_range: 3`
+- `worktreeChangedFiles: []`
+- artifact check passed with zero errors and zero warnings
+
+Second pass result:
+
+```text
+receiver_task_status: completed
+repository_state_status: match
+handoff_acceptance: pass
+blocking_or_repair_notes: none
+```
+
+This pass records receiver-window rechecks only. It does not claim that the
+source-window test suite was rerun in the receiver step.
 
 ## Acceptance Checklist
 
