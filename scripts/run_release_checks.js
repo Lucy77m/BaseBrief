@@ -93,6 +93,7 @@ function checkRequiredFiles() {
     "docs/dogfooding/delta-handoff-fresh-receiver-v1.0.md",
     "docs/dogfooding/delta-handoff-baseline-advance-v1.0.md",
     "docs/dogfooding/delta-receiver-acceptance-v1.1.md",
+    "docs/dogfooding/delta-receiver-report-kit-v1.2.md",
     "docs/integrations.md",
     "docs/adapters.md",
     "docs/walkthrough.md",
@@ -141,6 +142,7 @@ function checkRequiredFiles() {
     "docs/releases/v1.0.1.md",
     "docs/releases/v1.1.0.md",
     "docs/releases/v1.1.0-plan.md",
+    "docs/releases/v1.2.0-plan.md",
     "docs/specs/delta-handoff.md",
     "docs/testing-v0.4.x-test-matrix.md",
     "docs/testing-v0.6.x-test-matrix.md",
@@ -222,6 +224,8 @@ function checkRequiredFiles() {
     "examples/receiver/blocked/blocked-result.json",
     "examples/receiver/language-routing/README.md",
     "examples/receiver/language-routing/receiver-report.md",
+    "examples/receiver/delta-report-pass/README.md",
+    "examples/receiver/delta-report-difference-found/README.md",
     "examples/receiver-flow/clean-repo/README.md",
     "examples/receiver-flow/clean-repo/flow-summary.json",
     "examples/receiver-flow/clean-repo/receiver-check.json",
@@ -297,6 +301,7 @@ function checkContentContracts() {
   const deltaHandoffFreshReceiverDoc = readText("docs/dogfooding/delta-handoff-fresh-receiver-v1.0.md");
   const deltaHandoffBaselineAdvanceDoc = readText("docs/dogfooding/delta-handoff-baseline-advance-v1.0.md");
   const deltaReceiverAcceptanceDoc = readText("docs/dogfooding/delta-receiver-acceptance-v1.1.md");
+  const deltaReceiverReportKitDoc = readText("docs/dogfooding/delta-receiver-report-kit-v1.2.md");
   const testingDoc = readText("docs/testing.md");
   const usabilityFeedbackTemplate = readText(".github/ISSUE_TEMPLATE/usability_feedback.md");
   const adaptersDoc = readText("docs/adapters.md");
@@ -341,6 +346,7 @@ function checkContentContracts() {
   const v101ReleaseDoc = readText("docs/releases/v1.0.1.md");
   const v110ReleaseDoc = readText("docs/releases/v1.1.0.md");
   const v110PlanDoc = readText("docs/releases/v1.1.0-plan.md");
+  const v120PlanDoc = readText("docs/releases/v1.2.0-plan.md");
   const deltaHandoffSpecDoc = readText("docs/specs/delta-handoff.md");
   const postReleaseBaselineDoc = readText("docs/baselines/v0.4.0-post-release-baseline.md");
   const v060PostReleaseBaselineDoc = readText("docs/baselines/v0.6.0-post-release-baseline.md");
@@ -374,6 +380,8 @@ function checkContentContracts() {
   const goldenPathExampleFirstPass = readText("examples/golden-path/first-pass-receiver-report.md");
   const goldenPathExampleFollowUp = readText("examples/golden-path/follow-up-receiver-report.md");
   const goldenPathExampleBoundary = readText("examples/golden-path/sidecar-output-boundary.md");
+  const deltaReportPassExample = readText("examples/receiver/delta-report-pass/README.md");
+  const deltaReportDifferenceExample = readText("examples/receiver/delta-report-difference-found/README.md");
   const fullTemplate = readText("templates/zh-CN/BASEBRIEF.md");
   const liteTemplate = readText("templates/zh-CN/BASEBRIEF_LITE.md");
   const nextChatTemplate = readText("templates/zh-CN/NEXT_CHAT_PROMPT.md");
@@ -619,6 +627,10 @@ function checkContentContracts() {
   assert(docsIndex.includes("../examples/receiver/difference-found/README.md"), "Docs index should link receiver difference example");
   assert(docsIndex.includes("../examples/receiver/blocked/README.md"), "Docs index should link receiver blocked example");
   assert(docsIndex.includes("../examples/receiver/language-routing/README.md"), "Docs index should link receiver language routing example");
+  assert(docsIndex.includes("releases/v1.2.0-plan.md"), "Docs index must link v1.2.0 report kit plan");
+  assert(docsIndex.includes("dogfooding/delta-receiver-report-kit-v1.2.md"), "Docs index must link v1.2 report kit dogfooding");
+  assert(docsIndex.includes("../examples/receiver/delta-report-pass/README.md"), "Docs index should link delta receiver pass report example");
+  assert(docsIndex.includes("../examples/receiver/delta-report-difference-found/README.md"), "Docs index should link delta receiver difference report example");
   assert(docsIndex.includes("../examples/receiver-flow/clean-repo/README.md"), "Docs index should link receiver-flow clean repo example");
   assert(docsIndex.includes("../examples/receiver-flow/dirty-repo/README.md"), "Docs index should link receiver-flow dirty repo example");
   assert(docsIndex.includes("../examples/receiver-flow/visible-output/README.md"), "Docs index should link receiver-flow visible output example");
@@ -959,6 +971,37 @@ function checkContentContracts() {
   assert(v110PlanDoc.includes("No schema-v2 work"), "v1.1.0 plan must reject schema-v2 scope");
   assert(v110PlanDoc.includes("No new CLI command"), "v1.1.0 plan must avoid new CLI commands");
   assert(v110PlanDoc.includes("provider_probe_status=skipped"), "v1.1.0 plan must preserve skipped provider gate");
+  assert(v120PlanDoc.includes("v1.2.0 Delta Receiver Report Kit Plan"), "v1.2.0 plan must have stable title");
+  assert(v120PlanDoc.includes("Delta Receiver Report Kit"), "v1.2.0 plan must name the report kit");
+  assert(v120PlanDoc.includes("Markdown/text reporting aid"), "v1.2.0 plan must define the kit as text reporting");
+  assert(v120PlanDoc.includes("not a JSON schema"), "v1.2.0 plan must reject report schema scope");
+  assert(v120PlanDoc.includes("not a push, tag, release"), "v1.2.0 plan must avoid publication claims");
+  assert(v120PlanDoc.includes("receiver_task_status"), "v1.2.0 plan must require receiver task status");
+  assert(v120PlanDoc.includes("repository_state_status"), "v1.2.0 plan must require repository state status");
+  assert(v120PlanDoc.includes("handoff_acceptance"), "v1.2.0 plan must require handoff acceptance");
+  assert(v120PlanDoc.includes("blocking_or_repair_notes"), "v1.2.0 plan must require repair notes");
+  assert(v120PlanDoc.includes("current_goal"), "v1.2.0 plan must require current goal");
+  assert(v120PlanDoc.includes("live_repo_state"), "v1.2.0 plan must require live repo state");
+  assert(v120PlanDoc.includes("inherited_fact_differences"), "v1.2.0 plan must require inherited fact differences");
+  assert(v120PlanDoc.includes("hard_boundaries"), "v1.2.0 plan must require hard boundaries");
+  assert(v120PlanDoc.includes("next_narrow_slice"), "v1.2.0 plan must require next narrow slice");
+  assert(v120PlanDoc.includes("source-window inherited facts"), "v1.2.0 plan must separate source-window facts");
+  assert(v120PlanDoc.includes("receiver-window\nrechecks"), "v1.2.0 plan must separate receiver-window rechecks");
+  assert(v120PlanDoc.includes("handoff_acceptance: pass"), "v1.2.0 plan must define pass");
+  assert(v120PlanDoc.includes("handoff_acceptance: difference_found"), "v1.2.0 plan must define difference_found");
+  assert(v120PlanDoc.includes("handoff_acceptance: blocked"), "v1.2.0 plan must define blocked");
+  assert(v120PlanDoc.includes("historical count drift as non-blocking"), "v1.2.0 plan must explain non-blocking historical count drift");
+  assert(v120PlanDoc.includes("basebrief-project-state-v1"), "v1.2.0 plan must preserve project-state schema");
+  assert(v120PlanDoc.includes("basebrief-delta-handoff-v1"), "v1.2.0 plan must preserve delta handoff schema");
+  assert(v120PlanDoc.includes("basebrief-delta-baseline-v1"), "v1.2.0 plan must preserve delta baseline schema");
+  assert(v120PlanDoc.includes("No provider request"), "v1.2.0 plan must reject provider scope");
+  assert(v120PlanDoc.includes("No runtime integration"), "v1.2.0 plan must reject runtime scope");
+  assert(v120PlanDoc.includes("No plugin, MCP, IDE"), "v1.2.0 plan must reject plugin/MCP/IDE scope");
+  assert(v120PlanDoc.includes("No schema-v2 work"), "v1.2.0 plan must reject schema-v2 scope");
+  assert(v120PlanDoc.includes("No new CLI command"), "v1.2.0 plan must avoid new CLI commands");
+  assert(v120PlanDoc.includes("No machine-readable JSON schema"), "v1.2.0 plan must avoid report schema work");
+  assert(v120PlanDoc.includes("No command output format change"), "v1.2.0 plan must avoid command output changes");
+  assert(v120PlanDoc.includes("provider_probe_status=skipped"), "v1.2.0 plan must preserve skipped provider gate");
   assert(deltaHandoffSpecDoc.includes("basebrief-delta-baseline-v1"), "delta spec must define baseline schema");
   assert(deltaHandoffSpecDoc.includes("reviewed"), "delta spec must define reviewed semantics");
   assert(deltaHandoffSpecDoc.includes("needs-review"), "delta spec must define needs-review semantics");
@@ -1781,6 +1824,59 @@ function checkContentContracts() {
   assert(deltaReceiverAcceptanceDoc.includes("No plugin, MCP, IDE"), "Delta receiver acceptance doc must reject plugin/MCP/IDE scope");
   assert(deltaReceiverAcceptanceDoc.includes("No schema-v2 work"), "Delta receiver acceptance doc must reject schema-v2 scope");
   assert(deltaReceiverAcceptanceDoc.includes("provider_probe_status=skipped"), "Delta receiver acceptance doc must preserve skipped provider gate");
+  assert(deltaReceiverReportKitDoc.includes("Delta Receiver Report Kit Dogfooding v1.2"), "Delta receiver report kit doc must have stable title");
+  assert(deltaReceiverReportKitDoc.includes("receiver_task_status"), "Delta receiver report kit doc must require receiver task status");
+  assert(deltaReceiverReportKitDoc.includes("repository_state_status"), "Delta receiver report kit doc must require repository state status");
+  assert(deltaReceiverReportKitDoc.includes("handoff_acceptance"), "Delta receiver report kit doc must require handoff acceptance");
+  assert(deltaReceiverReportKitDoc.includes("blocking_or_repair_notes"), "Delta receiver report kit doc must require repair notes");
+  assert(deltaReceiverReportKitDoc.includes("current_goal"), "Delta receiver report kit doc must require current goal");
+  assert(deltaReceiverReportKitDoc.includes("live_repo_state"), "Delta receiver report kit doc must require live repo state");
+  assert(deltaReceiverReportKitDoc.includes("inherited_fact_differences"), "Delta receiver report kit doc must require inherited fact differences");
+  assert(deltaReceiverReportKitDoc.includes("hard_boundaries"), "Delta receiver report kit doc must require hard boundaries");
+  assert(deltaReceiverReportKitDoc.includes("next_narrow_slice"), "Delta receiver report kit doc must require next narrow slice");
+  assert(deltaReceiverReportKitDoc.includes("source-window inherited facts"), "Delta receiver report kit doc must separate inherited facts");
+  assert(deltaReceiverReportKitDoc.includes("receiver-window rechecks"), "Delta receiver report kit doc must separate receiver rechecks");
+  assert(deltaReceiverReportKitDoc.includes("blocking differences versus non-blocking differences"), "Delta receiver report kit doc must distinguish blocking from non-blocking differences");
+  assert(deltaReceiverReportKitDoc.includes("examples/receiver/delta-report-pass/README.md"), "Delta receiver report kit doc must link pass example");
+  assert(deltaReceiverReportKitDoc.includes("examples/receiver/delta-report-difference-found/README.md"), "Delta receiver report kit doc must link difference example");
+  assert(deltaReceiverReportKitDoc.includes("handoff_acceptance: pass"), "Delta receiver report kit doc must define pass");
+  assert(deltaReceiverReportKitDoc.includes("handoff_acceptance: difference_found"), "Delta receiver report kit doc must define difference_found");
+  assert(deltaReceiverReportKitDoc.includes("It is not an agent failure"), "Delta receiver report kit doc must state difference_found is not agent failure");
+  assert(deltaReceiverReportKitDoc.includes("handoff_acceptance: blocked"), "Delta receiver report kit doc must define blocked");
+  assert(deltaReceiverReportKitDoc.includes("historical count drift"), "Delta receiver report kit doc must explain historical count drift");
+  assert(deltaReceiverReportKitDoc.includes("No provider request"), "Delta receiver report kit doc must reject provider scope");
+  assert(deltaReceiverReportKitDoc.includes("No runtime integration"), "Delta receiver report kit doc must reject runtime scope");
+  assert(deltaReceiverReportKitDoc.includes("No plugin, MCP, IDE"), "Delta receiver report kit doc must reject plugin/MCP/IDE scope");
+  assert(deltaReceiverReportKitDoc.includes("No schema-v2 work"), "Delta receiver report kit doc must reject schema-v2 scope");
+  assert(deltaReceiverReportKitDoc.includes("No new CLI command"), "Delta receiver report kit doc must avoid new CLI commands");
+  assert(deltaReceiverReportKitDoc.includes("No machine-readable JSON schema"), "Delta receiver report kit doc must avoid report schema work");
+  assert(deltaReceiverReportKitDoc.includes("No command output format change"), "Delta receiver report kit doc must avoid command output changes");
+  assert(deltaReceiverReportKitDoc.includes("provider_probe_status=skipped"), "Delta receiver report kit doc must preserve skipped provider gate");
+  for (const reportExample of [deltaReportPassExample, deltaReportDifferenceExample]) {
+    assert(reportExample.includes("receiver_task_status"), "Delta report examples must include receiver task status");
+    assert(reportExample.includes("repository_state_status"), "Delta report examples must include repository state status");
+    assert(reportExample.includes("handoff_acceptance"), "Delta report examples must include handoff acceptance");
+    assert(reportExample.includes("blocking_or_repair_notes"), "Delta report examples must include repair notes");
+    assert(reportExample.includes("current_goal"), "Delta report examples must include current goal");
+    assert(reportExample.includes("live_repo_state"), "Delta report examples must include live repo state");
+    assert(reportExample.includes("inherited_fact_differences"), "Delta report examples must include inherited fact differences");
+    assert(reportExample.includes("hard_boundaries"), "Delta report examples must include hard boundaries");
+    assert(reportExample.includes("next_narrow_slice"), "Delta report examples must include next narrow slice");
+    assert(reportExample.includes("No provider request"), "Delta report examples must reject provider scope");
+    assert(reportExample.includes("No runtime integration"), "Delta report examples must reject runtime scope");
+    assert(reportExample.includes("No plugin, MCP, IDE"), "Delta report examples must reject plugin/MCP/IDE scope");
+    assert(reportExample.includes("No schema-v2 work"), "Delta report examples must reject schema-v2 scope");
+    assert(reportExample.includes("provider_probe_status=skipped"), "Delta report examples must preserve skipped provider gate");
+  }
+  assert(deltaReportPassExample.includes("Delta Receiver Report Example: pass"), "Delta pass report example must have stable title");
+  assert(deltaReportPassExample.includes("repository_state_status: match"), "Delta pass report example must show matching repo state");
+  assert(deltaReportPassExample.includes("handoff_acceptance: pass"), "Delta pass report example must show pass acceptance");
+  assert(deltaReportPassExample.includes("Historical dry-run `commits_in_range` values may differ"), "Delta pass report example must explain historical count drift");
+  assert(deltaReportDifferenceExample.includes("Delta Receiver Report Example: difference_found"), "Delta difference report example must have stable title");
+  assert(deltaReportDifferenceExample.includes("repository_state_status: difference_found"), "Delta difference report example must show difference state");
+  assert(deltaReportDifferenceExample.includes("handoff_acceptance: difference_found"), "Delta difference report example must show difference acceptance");
+  assert(deltaReportDifferenceExample.includes("does not mean the agent failed"), "Delta difference report example must preserve difference semantics");
+  assert(deltaReportDifferenceExample.includes("blocking: yes"), "Delta difference report example must identify blocking stale HEAD");
   assert(v08xTestMatrixDoc.includes("v0.8.x Sidecar Test Matrix"), "v0.8.x matrix must have stable title");
   assert(v08xTestMatrixDoc.includes("sidecar-build"), "v0.8.x matrix must document sidecar-build");
   assert(v08xTestMatrixDoc.includes("sidecar-check"), "v0.8.x matrix must document sidecar-check");
@@ -1973,6 +2069,8 @@ function checkExamples() {
     "examples/receiver/blocked/blocked-result.json",
     "examples/receiver/language-routing/README.md",
     "examples/receiver/language-routing/receiver-report.md",
+    "examples/receiver/delta-report-pass/README.md",
+    "examples/receiver/delta-report-difference-found/README.md",
     "examples/receiver-flow/clean-repo/README.md",
     "examples/receiver-flow/clean-repo/flow-summary.json",
     "examples/receiver-flow/clean-repo/receiver-check.json",
@@ -2076,6 +2174,7 @@ function checkArtifactChecker() {
     "docs/releases/v1.0.1.md",
     "docs/releases/v1.1.0.md",
     "docs/releases/v1.1.0-plan.md",
+    "docs/releases/v1.2.0-plan.md",
     "docs/testing-v0.9.x-test-matrix.md",
     "docs/dogfooding/sidecar-external-receiver-smoke-v0.8.4.md",
     "docs/dogfooding/sidecar-manual-receiver-smoke-v0.8.5.md",
@@ -2084,10 +2183,13 @@ function checkArtifactChecker() {
     "docs/dogfooding/delta-handoff-fresh-receiver-v1.0.md",
     "docs/dogfooding/delta-handoff-baseline-advance-v1.0.md",
     "docs/dogfooding/delta-receiver-acceptance-v1.1.md",
+    "docs/dogfooding/delta-receiver-report-kit-v1.2.md",
     "examples/receiver-check-config.json",
     "examples/receiver/difference-found",
     "examples/receiver/blocked",
     "examples/receiver/language-routing",
+    "examples/receiver/delta-report-pass",
+    "examples/receiver/delta-report-difference-found",
     "examples/receiver-flow/clean-repo",
     "examples/receiver-flow/dirty-repo",
     "examples/receiver-flow/visible-output",

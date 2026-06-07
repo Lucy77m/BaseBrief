@@ -177,6 +177,24 @@ Expected release-check output without provider env remains:
 provider_probe_status=skipped
 ```
 
+## v1.2 Delta Receiver Report Kit Plan
+
+`v1.2.0` keeps the Delta Receiver line local-first and review-based by turning
+the v1.1 acceptance discipline into a small Markdown/text report kit. It does
+not add a CLI command, JSON schema, command output format, provider request,
+runtime integration, plugin, MCP, IDE, Auto Flow behavior, hosted service,
+global CLI, or npm publishing.
+
+The report kit records the fixed receiver report fields, `pass` and
+`difference_found` examples, source-window inherited facts versus
+receiver-window rechecks, and non-blocking historical `commits_in_range` drift.
+
+Expected release-check output without provider env remains:
+
+```text
+provider_probe_status=skipped
+```
+
 ## v0.4.1 Stabilization Candidate
 
 `v0.4.1` is a stabilization-only cycle after the `v0.4.0` public release. It uses

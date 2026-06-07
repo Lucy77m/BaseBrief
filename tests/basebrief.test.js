@@ -1632,12 +1632,16 @@ test("v1.0.0 delta handoff RC hardening exposes local-first delta without expand
   const v101Release = readText("docs/releases/v1.0.1.md");
   const v110Release = readText("docs/releases/v1.1.0.md");
   const v110Plan = readText("docs/releases/v1.1.0-plan.md");
+  const v120Plan = readText("docs/releases/v1.2.0-plan.md");
   const plan = readText("docs/releases/v1.0.0-plan.md");
   const rcReview = readText("docs/releases/v1.0.0-rc-review.md");
   const spec = readText("docs/specs/delta-handoff.md");
   const dogfooding = readText("docs/dogfooding/delta-handoff-fresh-receiver-v1.0.md");
   const baselineAdvanceDogfooding = readText("docs/dogfooding/delta-handoff-baseline-advance-v1.0.md");
   const receiverAcceptanceDogfooding = readText("docs/dogfooding/delta-receiver-acceptance-v1.1.md");
+  const receiverReportKitDogfooding = readText("docs/dogfooding/delta-receiver-report-kit-v1.2.md");
+  const deltaReportPass = readText("examples/receiver/delta-report-pass/README.md");
+  const deltaReportDifference = readText("examples/receiver/delta-report-difference-found/README.md");
   const example = readText("examples/delta-handoff.md");
 
   assert.match(readme, /docs\/releases\/v1\.0\.0\.md/);
@@ -1663,16 +1667,23 @@ test("v1.0.0 delta handoff RC hardening exposes local-first delta without expand
   assert.match(docsIndex, /releases\/v1\.0\.1\.md/);
   assert.match(docsIndex, /releases\/v1\.1\.0\.md/);
   assert.match(docsIndex, /releases\/v1\.1\.0-plan\.md/);
+  assert.match(docsIndex, /releases\/v1\.2\.0-plan\.md/);
   assert.match(docsIndex, /specs\/delta-handoff\.md/);
   assert.match(docsIndex, /\.\.\/examples\/delta-handoff\.md/);
   assert.match(docsIndex, /dogfooding\/delta-handoff-fresh-receiver-v1\.0\.md/);
   assert.match(docsIndex, /dogfooding\/delta-handoff-baseline-advance-v1\.0\.md/);
   assert.match(docsIndex, /dogfooding\/delta-receiver-acceptance-v1\.1\.md/);
+  assert.match(docsIndex, /dogfooding\/delta-receiver-report-kit-v1\.2\.md/);
+  assert.match(docsIndex, /\.\.\/examples\/receiver\/delta-report-pass\/README\.md/);
+  assert.match(docsIndex, /\.\.\/examples\/receiver\/delta-report-difference-found\/README\.md/);
 
   assert.match(testing, /v1\.0 Delta Handoff RC Candidate/);
   assert.match(testing, /v1\.0 Delta Handoff Fresh Receiver Dogfooding/);
   assert.match(testing, /v1\.0 Delta Handoff Baseline-Advance Dogfooding/);
   assert.match(testing, /v1\.1 Delta Receiver Acceptance Local Closeout/);
+  assert.match(testing, /v1\.2 Delta Receiver Report Kit Plan/);
+  assert.match(testing, /Markdown\/text report kit/);
+  assert.match(testing, /non-blocking historical `commits_in_range` drift/);
   assert.match(testing, /basebrief-project-state-v1` unchanged/);
   assert.match(testing, /provider_probe_status=skipped/);
 
@@ -1759,6 +1770,36 @@ test("v1.0.0 delta handoff RC hardening exposes local-first delta without expand
   assert.match(v110Plan, /No schema-v2 work/);
   assert.match(v110Plan, /No new CLI command/);
   assert.match(v110Plan, /provider_probe_status=skipped/);
+  assert.match(v120Plan, /v1\.2\.0 Delta Receiver Report Kit Plan/);
+  assert.match(v120Plan, /Delta Receiver Report Kit/);
+  assert.match(v120Plan, /Markdown\/text reporting aid/);
+  assert.match(v120Plan, /not a JSON schema/);
+  assert.match(v120Plan, /receiver_task_status/);
+  assert.match(v120Plan, /repository_state_status/);
+  assert.match(v120Plan, /handoff_acceptance/);
+  assert.match(v120Plan, /blocking_or_repair_notes/);
+  assert.match(v120Plan, /current_goal/);
+  assert.match(v120Plan, /live_repo_state/);
+  assert.match(v120Plan, /inherited_fact_differences/);
+  assert.match(v120Plan, /hard_boundaries/);
+  assert.match(v120Plan, /next_narrow_slice/);
+  assert.match(v120Plan, /source-window inherited facts/);
+  assert.match(v120Plan, /receiver-window\s+rechecks/);
+  assert.match(v120Plan, /handoff_acceptance: pass/);
+  assert.match(v120Plan, /handoff_acceptance: difference_found/);
+  assert.match(v120Plan, /handoff_acceptance: blocked/);
+  assert.match(v120Plan, /historical count drift as non-blocking/);
+  assert.match(v120Plan, /basebrief-project-state-v1/);
+  assert.match(v120Plan, /basebrief-delta-handoff-v1/);
+  assert.match(v120Plan, /basebrief-delta-baseline-v1/);
+  assert.match(v120Plan, /No provider request/);
+  assert.match(v120Plan, /No runtime integration/);
+  assert.match(v120Plan, /No plugin, MCP, IDE/);
+  assert.match(v120Plan, /No schema-v2 work/);
+  assert.match(v120Plan, /No new CLI command/);
+  assert.match(v120Plan, /No machine-readable JSON schema/);
+  assert.match(v120Plan, /No command output format change/);
+  assert.match(v120Plan, /provider_probe_status=skipped/);
   assert.match(spec, /basebrief-delta-baseline-v1/);
   assert.match(spec, /needs-review/);
   assert.match(dogfooding, /handoff_acceptance: pass/);
@@ -1801,6 +1842,59 @@ test("v1.0.0 delta handoff RC hardening exposes local-first delta without expand
   assert.match(receiverAcceptanceDogfooding, /No plugin, MCP, IDE/);
   assert.match(receiverAcceptanceDogfooding, /No schema-v2 work/);
   assert.match(receiverAcceptanceDogfooding, /provider_probe_status=skipped/);
+  assert.match(receiverReportKitDogfooding, /Delta Receiver Report Kit Dogfooding v1\.2/);
+  assert.match(receiverReportKitDogfooding, /receiver_task_status/);
+  assert.match(receiverReportKitDogfooding, /repository_state_status/);
+  assert.match(receiverReportKitDogfooding, /handoff_acceptance/);
+  assert.match(receiverReportKitDogfooding, /blocking_or_repair_notes/);
+  assert.match(receiverReportKitDogfooding, /current_goal/);
+  assert.match(receiverReportKitDogfooding, /live_repo_state/);
+  assert.match(receiverReportKitDogfooding, /inherited_fact_differences/);
+  assert.match(receiverReportKitDogfooding, /hard_boundaries/);
+  assert.match(receiverReportKitDogfooding, /next_narrow_slice/);
+  assert.match(receiverReportKitDogfooding, /source-window inherited facts/);
+  assert.match(receiverReportKitDogfooding, /receiver-window rechecks/);
+  assert.match(receiverReportKitDogfooding, /blocking differences versus non-blocking differences/);
+  assert.match(receiverReportKitDogfooding, /examples\/receiver\/delta-report-pass\/README\.md/);
+  assert.match(receiverReportKitDogfooding, /examples\/receiver\/delta-report-difference-found\/README\.md/);
+  assert.match(receiverReportKitDogfooding, /handoff_acceptance: pass/);
+  assert.match(receiverReportKitDogfooding, /handoff_acceptance: difference_found/);
+  assert.match(receiverReportKitDogfooding, /It is not an agent failure/);
+  assert.match(receiverReportKitDogfooding, /handoff_acceptance: blocked/);
+  assert.match(receiverReportKitDogfooding, /historical count drift/);
+  assert.match(receiverReportKitDogfooding, /No provider request/);
+  assert.match(receiverReportKitDogfooding, /No runtime integration/);
+  assert.match(receiverReportKitDogfooding, /No plugin, MCP, IDE/);
+  assert.match(receiverReportKitDogfooding, /No schema-v2 work/);
+  assert.match(receiverReportKitDogfooding, /No new CLI command/);
+  assert.match(receiverReportKitDogfooding, /No machine-readable JSON schema/);
+  assert.match(receiverReportKitDogfooding, /No command output format change/);
+  assert.match(receiverReportKitDogfooding, /provider_probe_status=skipped/);
+  for (const reportExample of [deltaReportPass, deltaReportDifference]) {
+    assert.match(reportExample, /receiver_task_status/);
+    assert.match(reportExample, /repository_state_status/);
+    assert.match(reportExample, /handoff_acceptance/);
+    assert.match(reportExample, /blocking_or_repair_notes/);
+    assert.match(reportExample, /current_goal/);
+    assert.match(reportExample, /live_repo_state/);
+    assert.match(reportExample, /inherited_fact_differences/);
+    assert.match(reportExample, /hard_boundaries/);
+    assert.match(reportExample, /next_narrow_slice/);
+    assert.match(reportExample, /No provider request/);
+    assert.match(reportExample, /No runtime integration/);
+    assert.match(reportExample, /No plugin, MCP, IDE/);
+    assert.match(reportExample, /No schema-v2 work/);
+    assert.match(reportExample, /provider_probe_status=skipped/);
+  }
+  assert.match(deltaReportPass, /Delta Receiver Report Example: pass/);
+  assert.match(deltaReportPass, /repository_state_status: match/);
+  assert.match(deltaReportPass, /handoff_acceptance: pass/);
+  assert.match(deltaReportPass, /Historical dry-run `commits_in_range` values may differ/);
+  assert.match(deltaReportDifference, /Delta Receiver Report Example: difference_found/);
+  assert.match(deltaReportDifference, /repository_state_status: difference_found/);
+  assert.match(deltaReportDifference, /handoff_acceptance: difference_found/);
+  assert.match(deltaReportDifference, /does not mean the agent failed/);
+  assert.match(deltaReportDifference, /blocking: yes/);
   assert.match(example, /schemaVersion: basebrief-delta-handoff-v1/);
   assert.match(example, /## How To Read This Delta/);
   assert.match(example, /baseline_source: \.basebrief\/delta-baseline\.json/);
@@ -1821,11 +1915,15 @@ test("v1.0.0 delta handoff RC hardening exposes local-first delta without expand
     "docs/releases/v1.0.1.md",
     "docs/releases/v1.1.0.md",
     "docs/releases/v1.1.0-plan.md",
+    "docs/releases/v1.2.0-plan.md",
     "docs/specs/delta-handoff.md",
     "docs/dogfooding/delta-handoff-fresh-receiver-v1.0.md",
     "docs/dogfooding/delta-handoff-baseline-advance-v1.0.md",
     "docs/dogfooding/delta-receiver-acceptance-v1.1.md",
+    "docs/dogfooding/delta-receiver-report-kit-v1.2.md",
     "examples/delta-handoff.md",
+    "examples/receiver/delta-report-pass",
+    "examples/receiver/delta-report-difference-found",
   ]) {
     const result = checkArtifacts({ inputPath: path.join(repoRoot, relativePath) });
     assert.equal(result.status, "passed", relativePath);
