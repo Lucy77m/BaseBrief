@@ -73,6 +73,37 @@ Receiver warnings:
 The receiver checker keeps `difference_found` as a completed verification
 result, not an agent failure.
 
+## Receiver Lint Fixtures
+
+v1.6 adds a public fixture pack for learning the receiver rule families:
+
+```text
+examples/receiver/lint/
+```
+
+Use `clean-pass-receiver-report.md` as the copyable clean reference. The other
+fixtures intentionally trigger one primary error or warning family so authors
+can compare a broken shape with the clean one before copying a report.
+
+v1.7 adds a repair pack for moving from a rule ID to a fixed public-safe shape:
+
+```text
+examples/receiver/lint/repair/
+```
+
+Use the repair pack when a fixture explains what failed but you need the
+smallest correct replacement shape. v1.8 records public-safe dogfooding evidence
+for the fixture and repair packs in
+`docs/dogfooding/delta-receiver-lint-dogfooding-v1.8.md`.
+
+Example:
+
+```text
+node scripts/basebrief.js check --input examples/receiver/lint/clean-pass-receiver-report.md --json
+node scripts/basebrief.js check --input examples/receiver/lint/delta-missing-section-receiver-report.md --json
+node scripts/basebrief.js check --input examples/receiver/lint/repair/fixed-starter-report.md --json
+```
+
 ## Boundary
 
 Use this checker on public examples and generated handoff or adapter artifacts before sharing them. It can catch common BaseBrief publication mistakes, but it cannot prove that an artifact contains no secret, no private project detail, or no misleading claim.

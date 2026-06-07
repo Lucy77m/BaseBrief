@@ -36,7 +36,11 @@ It also keeps the existing human-facing anchors stable:
    `examples/receiver/usage-pack/README.md`.
 4. If you need a starter-facing skeleton, copy
    `examples/receiver/usage-pack/starter-report-outline.md`.
-5. If you need the underlying contract details, read
+5. If a checker rule is unclear, compare against
+   `examples/receiver/lint/README.md`.
+6. If you need the smallest fixed shape for a checker rule, compare against
+   `examples/receiver/lint/repair/README.md`.
+7. If you need the underlying contract details, read
    `docs/dogfooding/delta-receiver-report-kit-v1.2.md`.
 
 ## Decision Matrix
@@ -112,6 +116,14 @@ separation, and contradictory receiver result JSON.
 
 Warnings cover missing `difference_found` semantics explanation and missing
 non-blocking historical `commits_in_range` drift explanation.
+
+For copyable examples of each pass, error, and warning family, use the receiver
+lint fixture pack in `examples/receiver/lint/`.
+
+For fixed replacement shapes after a receiver lint finding, use
+`examples/receiver/lint/repair/`. Public-safe dogfooding evidence for the
+fixture and repair packs is recorded in
+`docs/dogfooding/delta-receiver-lint-dogfooding-v1.8.md`.
 
 ## Boundaries
 

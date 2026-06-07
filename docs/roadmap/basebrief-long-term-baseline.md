@@ -357,6 +357,46 @@ Local v1.5 closeout status:
   `commits_in_range` drift remains non-blocking when refreshed branch, HEAD,
   and worktree facts still match
 
+Planned v1.6 direction:
+
+- `docs/releases/v1.6.0-plan.md` defines the Delta Receiver Lint Fixture Pack
+- `examples/receiver/lint/` should make receiver lint rule families learnable
+  and copyable through public-safe clean, error, and warning fixtures
+- the line should not add new CLI commands, schemas, command output formats,
+  provider requests, runtime integrations, plugins, MCP, IDE, hosted service,
+  Auto Flow behavior, or publication scope
+
+Local v1.6 closeout status:
+
+- `docs/releases/v1.6.0.md` records the local closeout without making a push,
+  tag, release, package publication, platform, provider, command-output,
+  report-schema, or schema-v2 claim
+- `examples/receiver/lint/` contains public-safe clean, error, and warning
+  fixtures for the existing v1.5 receiver lint rule families
+- release checks and independent tests verify expected fixture status,
+  severity, and rule IDs
+
+Local v1.7 closeout status:
+
+- `docs/releases/v1.7.0-plan.md` defines the Delta Receiver Lint Repair Pack
+- `docs/releases/v1.7.0.md` records the local closeout without making a push,
+  tag, release, package publication, platform, provider, command-output,
+  report-schema, schema-v2, or checker-rule claim
+- `examples/receiver/lint/repair/` contains fixed public-safe Delta Markdown,
+  starter Markdown, and receiver result JSON references for existing receiver
+  lint rule families
+
+Local v1.8 closeout status:
+
+- `docs/releases/v1.8.0-plan.md` defines the Delta Receiver Lint Dogfooding
+  Evidence line
+- `docs/releases/v1.8.0.md` records the local closeout without making a push,
+  tag, release, package publication, platform, provider, command-output,
+  report-schema, schema-v2, or checker-rule claim
+- `docs/dogfooding/delta-receiver-lint-dogfooding-v1.8.md` records public-safe
+  dogfooding evidence for v1.6 fixtures, v1.7 repairs, and existing receiver
+  examples
+
 ### Phase 8A: Receiver Workflow
 
 Goal: make receiver acceptance explicit and locally verifiable without turning BaseBrief into an agent runtime.
@@ -448,7 +488,7 @@ A new BB experiment is allowed only when all of the following are true:
 
 ## Near-term Priority Order
 
-1. Keep the locally closed v1.0-v1.5 Delta Handoff / Receiver / Starter / Usage Pack / Lint line reviewable.
+1. Keep the locally closed v1.0-v1.8 Delta Handoff / Receiver / Starter / Usage Pack / Lint / Fixture / Repair / Dogfooding line reviewable.
 2. Keep push, tag, and formal release pending until the user separately approves them.
 3. Choose any later Delta version only from repeated local receiver usage evidence.
 4. Keep installed CLI, plugins, provider experiments, ContextOps expansion, and speculative features frozen unless measured usage creates a concrete blocker.
@@ -477,13 +517,14 @@ BaseBrief is off track if:
 
 ## Current Strategic Decision
 
-The current development cycle has locally closed the v1.0-v1.5 Delta Handoff /
+The current development cycle has locally closed the v1.0-v1.8 Delta Handoff /
 Receiver line: Delta Handoff, Delta Receiver Acceptance, Delta Receiver Report
-Kit, Delta Receiver Starter Integration, Delta Receiver Usage Pack, and Delta
-Receiver Lint Mini. The next cycle should still avoid provider requests,
-runtime integration, new CLI commands, report schemas, command output changes,
-plugins, MCP, IDE, Auto Flow, or publication work unless repeated local usage
-exposes a concrete blocker.
+Kit, Delta Receiver Starter Integration, Delta Receiver Usage Pack, Delta
+Receiver Lint Mini, Delta Receiver Lint Fixture Pack, Delta Receiver Lint
+Repair Pack, and Delta Receiver Lint Dogfooding Evidence. The next cycle
+should still avoid provider requests, runtime integration, new CLI commands,
+report schemas, command output changes, plugins, MCP, IDE, Auto Flow, or
+publication work unless repeated local usage exposes a concrete blocker.
 
 It should not chase a new benchmark variant, installed CLI, plugin, MCP, IDE,
 runtime integration, provider request, schema-v2 work, hosted service, or

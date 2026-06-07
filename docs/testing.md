@@ -350,6 +350,94 @@ Expected release-check output without provider env remains:
 provider_probe_status=skipped
 ```
 
+## v1.6 Delta Receiver Lint Fixture Pack Plan
+
+`v1.6.0` is the recommended next planning direction after v1.5. It should turn
+the receiver lint line into a public fixture pack that is easy to learn, copy,
+and explain without adding commands, schemas, command output changes, provider
+requests, runtime integration, plugins, MCP, IDE work, hosted service, or npm
+publication.
+
+The fixture pack lives in `examples/receiver/lint/` and covers one clean pass,
+five error families, and two warning-only families. Expected release checks
+verify both the clean fixture and the intentionally broken fixtures.
+
+Expected release-check output without provider env remains:
+
+```text
+provider_probe_status=skipped
+```
+
+## v1.6 Delta Receiver Lint Fixture Pack Local Closeout
+
+`v1.6.0` locally closes the Delta Receiver Lint Fixture Pack line. It adds the
+public-safe `examples/receiver/lint/` guide and fixtures without changing
+checker rules, CLI commands, schemas, command output, provider behavior,
+runtime behavior, plugins, MCP, IDE work, hosted service, Auto Flow behavior,
+or publication scope.
+
+The closeout verifies one clean fixture, five error fixtures, and two
+warning-only fixtures through release checks and independent tests. Expected
+release-check output without provider env remains:
+
+```text
+provider_probe_status=skipped
+```
+
+## v1.7 Delta Receiver Lint Repair Pack Plan
+
+`v1.7.0` is the recommended next planning direction after v1.6. It should add
+public-safe repair guidance for receiver lint rule families without changing
+checker rules, CLI commands, schemas, command output, provider behavior,
+runtime behavior, plugins, MCP, IDE work, hosted service, Auto Flow behavior,
+or publication scope.
+
+Expected release-check output without provider env remains:
+
+```text
+provider_probe_status=skipped
+```
+
+## v1.7 Delta Receiver Lint Repair Pack Local Closeout
+
+`v1.7.0` locally closes the Delta Receiver Lint Repair Pack line. It adds
+`examples/receiver/lint/repair/` with fixed Delta Markdown, starter Markdown,
+and receiver result JSON references. The fixed examples must pass Artifact
+Checker with zero findings.
+
+Expected release-check output without provider env remains:
+
+```text
+provider_probe_status=skipped
+```
+
+## v1.8 Delta Receiver Lint Dogfooding Evidence Plan
+
+`v1.8.0` is the recommended next planning direction after v1.7. It should record
+public-safe dogfooding evidence for the receiver lint fixture and repair packs
+without changing checker rules, CLI commands, schemas, command output,
+provider behavior, runtime behavior, plugins, MCP, IDE work, hosted service,
+Auto Flow behavior, or publication scope.
+
+Expected release-check output without provider env remains:
+
+```text
+provider_probe_status=skipped
+```
+
+## v1.8 Delta Receiver Lint Dogfooding Evidence Local Closeout
+
+`v1.8.0` locally closes the Delta Receiver Lint Dogfooding Evidence line. It
+records public-safe command shapes, checker expectations, and friction notes in
+`docs/dogfooding/delta-receiver-lint-dogfooding-v1.8.md` without copying raw
+private output.
+
+Expected release-check output without provider env remains:
+
+```text
+provider_probe_status=skipped
+```
+
 ## v0.4.1 Stabilization Candidate
 
 `v0.4.1` is a stabilization-only cycle after the `v0.4.0` public release. It uses
