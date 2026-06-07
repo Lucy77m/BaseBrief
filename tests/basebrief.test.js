@@ -1630,6 +1630,7 @@ test("v1.0.0 delta handoff RC hardening exposes local-first delta without expand
   const cliLite = readText("docs/cli-lite.md");
   const release = readText("docs/releases/v1.0.0.md");
   const v101Release = readText("docs/releases/v1.0.1.md");
+  const v110Release = readText("docs/releases/v1.1.0.md");
   const v110Plan = readText("docs/releases/v1.1.0-plan.md");
   const plan = readText("docs/releases/v1.0.0-plan.md");
   const rcReview = readText("docs/releases/v1.0.0-rc-review.md");
@@ -1660,6 +1661,7 @@ test("v1.0.0 delta handoff RC hardening exposes local-first delta without expand
   assert.match(docsIndex, /releases\/v1\.0\.0-plan\.md/);
   assert.match(docsIndex, /releases\/v1\.0\.0-rc-review\.md/);
   assert.match(docsIndex, /releases\/v1\.0\.1\.md/);
+  assert.match(docsIndex, /releases\/v1\.1\.0\.md/);
   assert.match(docsIndex, /releases\/v1\.1\.0-plan\.md/);
   assert.match(docsIndex, /specs\/delta-handoff\.md/);
   assert.match(docsIndex, /\.\.\/examples\/delta-handoff\.md/);
@@ -1670,6 +1672,7 @@ test("v1.0.0 delta handoff RC hardening exposes local-first delta without expand
   assert.match(testing, /v1\.0 Delta Handoff RC Candidate/);
   assert.match(testing, /v1\.0 Delta Handoff Fresh Receiver Dogfooding/);
   assert.match(testing, /v1\.0 Delta Handoff Baseline-Advance Dogfooding/);
+  assert.match(testing, /v1\.1 Delta Receiver Acceptance Local Closeout/);
   assert.match(testing, /basebrief-project-state-v1` unchanged/);
   assert.match(testing, /provider_probe_status=skipped/);
 
@@ -1679,6 +1682,8 @@ test("v1.0.0 delta handoff RC hardening exposes local-first delta without expand
   assert.match(roadmap, /basebrief-project-state-v1` remains unchanged/);
   assert.match(roadmap, /Next v1\.1 planning target/);
   assert.match(roadmap, /Delta Receiver Acceptance Kit/);
+  assert.match(roadmap, /Local v1\.1 closeout status/);
+  assert.match(roadmap, /docs\/releases\/v1\.1\.0\.md/);
   assert.doesNotMatch(roadmap, /Current v0\.9\.0 readiness target/);
 
   assert.match(cliLite, /delta --repo <target-repo> --output-dir <dir>/);
@@ -1719,6 +1724,24 @@ test("v1.0.0 delta handoff RC hardening exposes local-first delta without expand
   assert.match(v101Release, /No runtime integration/);
   assert.match(v101Release, /No plugin, MCP, IDE/);
   assert.match(v101Release, /No schema-v2 work/);
+  assert.match(v110Release, /v1\.1\.0 Delta Receiver Acceptance Local Closeout/);
+  assert.match(v110Release, /Delta Receiver Acceptance Kit/);
+  assert.match(v110Release, /docs\/releases\/v1\.1\.0-plan\.md/);
+  assert.match(v110Release, /docs\/dogfooding\/delta-receiver-acceptance-v1\.1\.md/);
+  assert.match(v110Release, /handoff_acceptance: difference_found/);
+  assert.match(v110Release, /handoff_acceptance: pass/);
+  assert.match(v110Release, /commits_in_range: 4/);
+  assert.match(v110Release, /worktreeChangedFiles: \[\]/);
+  assert.match(v110Release, /basebrief-project-state-v1/);
+  assert.match(v110Release, /basebrief-delta-handoff-v1/);
+  assert.match(v110Release, /basebrief-delta-baseline-v1/);
+  assert.match(v110Release, /provider_probe_status=skipped/);
+  assert.match(v110Release, /No provider request/);
+  assert.match(v110Release, /No runtime integration/);
+  assert.match(v110Release, /No plugin, MCP, IDE/);
+  assert.match(v110Release, /No schema-v2 work/);
+  assert.match(v110Release, /No new CLI command/);
+  assert.match(v110Release, /not a push, tag, release/);
   assert.match(v110Plan, /v1\.1\.0 Delta Receiver Acceptance Plan/);
   assert.match(v110Plan, /Delta Receiver Acceptance Kit/);
   assert.match(v110Plan, /live repository state versus inherited handoff facts/);
@@ -1780,6 +1803,7 @@ test("v1.0.0 delta handoff RC hardening exposes local-first delta without expand
     "docs/releases/v1.0.0-plan.md",
     "docs/releases/v1.0.0-rc-review.md",
     "docs/releases/v1.0.1.md",
+    "docs/releases/v1.1.0.md",
     "docs/releases/v1.1.0-plan.md",
     "docs/specs/delta-handoff.md",
     "docs/dogfooding/delta-handoff-fresh-receiver-v1.0.md",

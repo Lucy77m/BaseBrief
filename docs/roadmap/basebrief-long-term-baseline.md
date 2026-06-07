@@ -292,6 +292,15 @@ Next v1.1 planning target:
 - avoid provider requests, runtime integration, plugin, MCP, IDE, hosted,
   Auto Flow, npm publication, and schema-v2 work
 
+Local v1.1 closeout status:
+
+- stale inherited delta handoff facts were correctly reported as
+  `difference_found`
+- refreshed ignored local delta output matched live repository state and
+  reported `handoff_acceptance: pass`
+- `docs/releases/v1.1.0.md` records the local closeout without making a push,
+  tag, release, package publication, platform, or provider claim
+
 ### Phase 8A: Receiver Workflow
 
 Goal: make receiver acceptance explicit and locally verifiable without turning BaseBrief into an agent runtime.

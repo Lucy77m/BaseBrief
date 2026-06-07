@@ -160,6 +160,23 @@ Expected release-check output without provider env remains:
 provider_probe_status=skipped
 ```
 
+## v1.1 Delta Receiver Acceptance Local Closeout
+
+`v1.1.0` closes the local Delta Receiver Acceptance line. It does not add a new
+CLI command, schema, provider request, runtime integration, plugin, MCP, IDE,
+Auto Flow behavior, hosted service, global CLI, or npm publishing.
+
+The closeout records that stale inherited handoff facts produced
+`handoff_acceptance: difference_found`, while a refreshed ignored local
+`delta-handoff.md` matched live repository state and produced
+`handoff_acceptance: pass`.
+
+Expected release-check output without provider env remains:
+
+```text
+provider_probe_status=skipped
+```
+
 ## v0.4.1 Stabilization Candidate
 
 `v0.4.1` is a stabilization-only cycle after the `v0.4.0` public release. It uses

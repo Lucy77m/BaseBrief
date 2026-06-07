@@ -139,6 +139,7 @@ function checkRequiredFiles() {
     "docs/releases/v1.0.0-plan.md",
     "docs/releases/v1.0.0-rc-review.md",
     "docs/releases/v1.0.1.md",
+    "docs/releases/v1.1.0.md",
     "docs/releases/v1.1.0-plan.md",
     "docs/specs/delta-handoff.md",
     "docs/testing-v0.4.x-test-matrix.md",
@@ -338,6 +339,7 @@ function checkContentContracts() {
   const v100PlanDoc = readText("docs/releases/v1.0.0-plan.md");
   const v100RcReviewDoc = readText("docs/releases/v1.0.0-rc-review.md");
   const v101ReleaseDoc = readText("docs/releases/v1.0.1.md");
+  const v110ReleaseDoc = readText("docs/releases/v1.1.0.md");
   const v110PlanDoc = readText("docs/releases/v1.1.0-plan.md");
   const deltaHandoffSpecDoc = readText("docs/specs/delta-handoff.md");
   const postReleaseBaselineDoc = readText("docs/baselines/v0.4.0-post-release-baseline.md");
@@ -922,6 +924,24 @@ function checkContentContracts() {
   assert(v101ReleaseDoc.includes("No runtime integration"), "v1.0.1 release doc must reject runtime scope");
   assert(v101ReleaseDoc.includes("No plugin, MCP, IDE"), "v1.0.1 release doc must reject plugin/MCP/IDE scope");
   assert(v101ReleaseDoc.includes("No schema-v2 work"), "v1.0.1 release doc must reject schema-v2 scope");
+  assert(v110ReleaseDoc.includes("v1.1.0 Delta Receiver Acceptance Local Closeout"), "v1.1.0 closeout doc must have stable title");
+  assert(v110ReleaseDoc.includes("Delta Receiver Acceptance Kit"), "v1.1.0 closeout doc must name receiver acceptance kit");
+  assert(v110ReleaseDoc.includes("docs/releases/v1.1.0-plan.md"), "v1.1.0 closeout doc must link planning baseline");
+  assert(v110ReleaseDoc.includes("docs/dogfooding/delta-receiver-acceptance-v1.1.md"), "v1.1.0 closeout doc must link receiver acceptance evidence");
+  assert(v110ReleaseDoc.includes("handoff_acceptance: difference_found"), "v1.1.0 closeout doc must record stale-handoff difference");
+  assert(v110ReleaseDoc.includes("handoff_acceptance: pass"), "v1.1.0 closeout doc must record refreshed-handoff pass");
+  assert(v110ReleaseDoc.includes("commits_in_range: 4"), "v1.1.0 closeout doc must record current refreshed commit count");
+  assert(v110ReleaseDoc.includes("worktreeChangedFiles: []"), "v1.1.0 closeout doc must record clean refreshed worktree");
+  assert(v110ReleaseDoc.includes("basebrief-project-state-v1"), "v1.1.0 closeout doc must preserve project-state schema");
+  assert(v110ReleaseDoc.includes("basebrief-delta-handoff-v1"), "v1.1.0 closeout doc must preserve delta handoff schema");
+  assert(v110ReleaseDoc.includes("basebrief-delta-baseline-v1"), "v1.1.0 closeout doc must preserve delta baseline schema");
+  assert(v110ReleaseDoc.includes("provider_probe_status=skipped"), "v1.1.0 closeout doc must preserve skipped provider gate");
+  assert(v110ReleaseDoc.includes("No provider request"), "v1.1.0 closeout doc must reject provider scope");
+  assert(v110ReleaseDoc.includes("No runtime integration"), "v1.1.0 closeout doc must reject runtime scope");
+  assert(v110ReleaseDoc.includes("No plugin, MCP, IDE"), "v1.1.0 closeout doc must reject plugin/MCP/IDE scope");
+  assert(v110ReleaseDoc.includes("No schema-v2 work"), "v1.1.0 closeout doc must reject schema-v2 scope");
+  assert(v110ReleaseDoc.includes("No new CLI command"), "v1.1.0 closeout doc must avoid new CLI commands");
+  assert(v110ReleaseDoc.includes("not a push, tag, release"), "v1.1.0 closeout doc must avoid publication claims");
   assert(v110PlanDoc.includes("v1.1.0 Delta Receiver Acceptance Plan"), "v1.1.0 plan must have stable title");
   assert(v110PlanDoc.includes("Delta Receiver Acceptance Kit"), "v1.1.0 plan must name the receiver acceptance kit");
   assert(v110PlanDoc.includes("live repository state versus inherited handoff facts"), "v1.1.0 plan must require live-vs-inherited separation");
@@ -956,6 +976,8 @@ function checkContentContracts() {
   assert(roadmapDoc.includes("Next v1.1 planning target"), "Roadmap must document v1.1 receiver acceptance target");
   assert(roadmapDoc.includes("Delta Receiver Acceptance Kit"), "Roadmap must name v1.1 receiver acceptance kit");
   assert(roadmapDoc.includes("receiver contract, not an"), "Roadmap must keep v1.1 out of runtime scope");
+  assert(roadmapDoc.includes("Local v1.1 closeout status"), "Roadmap must document v1.1 closeout status");
+  assert(roadmapDoc.includes("docs/releases/v1.1.0.md"), "Roadmap must link v1.1 closeout doc");
   assert(contextOpsDoc.includes("not a product surface"), "contextops.md must keep ContextOps out of product surface");
   assert(contextOpsDoc.includes("Current Non-Goals"), "contextops.md must define non-goals");
   assert(contextOpsDoc.includes("hosted service"), "contextops.md must reject hosted-service scope");
@@ -2039,6 +2061,7 @@ function checkArtifactChecker() {
     "docs/releases/v1.0.0-plan.md",
     "docs/releases/v1.0.0-rc-review.md",
     "docs/releases/v1.0.1.md",
+    "docs/releases/v1.1.0.md",
     "docs/releases/v1.1.0-plan.md",
     "docs/testing-v0.9.x-test-matrix.md",
     "docs/dogfooding/sidecar-external-receiver-smoke-v0.8.4.md",
