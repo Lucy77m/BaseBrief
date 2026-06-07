@@ -434,6 +434,22 @@ Local v1.x final closeout status:
   behavior; future work should start a new product line only after the user
   separately approves scope
 
+Local v2.0 Context Pack Lite closeout status:
+
+- `docs/roadmap/basebrief-v2-context-pack-lite.md`,
+  `docs/releases/v2.0.0-plan.md`, and `docs/specs/context-pack-lite.md`
+  record the v2.0-A direction freeze
+- `scripts/basebrief_context_pack.js` and CLI Lite `context-pack` implement the
+  v2.0-B minimal rule-based generator without provider, runtime, plugin, MCP,
+  IDE, schema-v2, Workflow Runner, AI summary, vector, embedding, or repo-dump
+  behavior
+- `examples/context-pack-lite/README.md`,
+  `docs/dogfooding/context-pack-lite-fresh-receiver-v2.0.0.md`, and
+  `docs/releases/v2.0.0.md` close v2.0-C with public-safe examples,
+  dogfooding evidence, and local closeout
+- the next recommended line is v2.1 Context Pack Check; Workflow Runner Lite
+  remains later
+
 ### Phase 8A: Receiver Workflow
 
 Goal: make receiver acceptance explicit and locally verifiable without turning BaseBrief into an agent runtime.
@@ -561,10 +577,14 @@ Receiver Lint Mini, Delta Receiver Lint Fixture Pack, Delta Receiver Lint
 Repair Pack, Delta Receiver Lint Dogfooding Evidence, and Delta Receiver Lint
 Discoverability / Adoption. `docs/releases/v1.9.1.md` and
 `docs/testing-v1.x-delta-receiver-closure-matrix.md` are the final local
-closure records for that line. The next cycle
-should still avoid provider requests, runtime integration, new CLI commands,
-report schemas, command output changes, plugins, MCP, IDE, Auto Flow, or
-publication work unless repeated local usage exposes a concrete blocker.
+closure records for that line. The v2.0 Context Pack Lite line has now started
+and locally closed its first slice: direction freeze, minimal `context-pack`
+generator, public-safe example kit, fresh-receiver dogfooding evidence, and
+`docs/releases/v2.0.0.md` closeout. The next cycle should prefer v2.1 Context
+Pack Check before any Workflow Runner Lite work, and should still avoid
+provider requests, runtime integration, command-output changes, plugins, MCP,
+IDE, Auto Flow, schema-v2, or publication work unless repeated local usage
+exposes a concrete blocker.
 
 It should not chase a new benchmark variant, installed CLI, plugin, MCP, IDE,
 runtime integration, provider request, schema-v2 work, hosted service, or

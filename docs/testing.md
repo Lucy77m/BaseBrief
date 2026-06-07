@@ -513,6 +513,55 @@ Expected release-check output without provider env remains:
 provider_probe_status=skipped
 ```
 
+## v2.0.0 Context Pack Lite Local Closeout
+
+`v2.0.0` opens and locally closes the Context Pack Lite line. It includes the
+v2.0-A direction freeze, v2.0-B minimal `context-pack` generator, and v2.0-C
+example kit, fresh-receiver dogfooding evidence, and closeout record.
+
+The public command surface is:
+
+```text
+node scripts/basebrief.js context-pack --repo <target-repo> --output-dir <dir> [--since <commit>] [--max-files <n>] [--json]
+```
+
+The expected artifact shape is:
+
+```text
+MANIFEST.md
+REPO_MAP.md
+KEY_FILES.md
+RECENT_DELTA.md
+RISK_BOUNDARIES.md
+RECEIVER_STATE.md
+NEXT_WINDOW_STARTER.md
+```
+
+Evidence and examples:
+
+- [Context Pack Lite example kit](../examples/context-pack-lite/README.md)
+- [Context Pack Lite fresh receiver dogfooding v2.0.0](dogfooding/context-pack-lite-fresh-receiver-v2.0.0.md)
+- [v2.0.0 Context Pack Lite Local Closeout](releases/v2.0.0.md)
+
+This closeout adds no new CLI flags, no checker rule family, no schema-v2, no
+provider request, no runtime integration, no plugin, MCP, IDE, hosted service,
+Workflow Runner, AI automatic summary, vector index, embedding, or repo-dump
+behavior.
+
+The local validation gate for this closeout is:
+
+```text
+node scripts/run_release_checks.js
+npm run check
+git diff --check
+```
+
+Expected release-check output without provider env remains:
+
+```text
+provider_probe_status=skipped
+```
+
 ## v0.4.1 Stabilization Candidate
 
 `v0.4.1` is a stabilization-only cycle after the `v0.4.0` public release. It uses

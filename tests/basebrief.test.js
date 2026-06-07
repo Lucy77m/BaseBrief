@@ -4938,6 +4938,79 @@ test("Delta Handoff writes reviewable delta output and advances local baseline o
   }
 }));
 
+test("v2.0.0 Context Pack Lite example and closeout stay public-safe and discoverable", () => {
+  const readme = readText("README.md");
+  const englishReadme = readText("README.en.md");
+  const cliLite = readText("docs/cli-lite.md");
+  const docsIndex = readText("docs/index.md");
+  const testing = readText("docs/testing.md");
+  const roadmap = readText("docs/roadmap/basebrief-long-term-baseline.md");
+  const closeout = readText("docs/releases/v2.0.0.md");
+  const dogfooding = readText("docs/dogfooding/context-pack-lite-fresh-receiver-v2.0.0.md");
+  const exampleReadme = readText("examples/context-pack-lite/README.md");
+  const exampleManifest = readText("examples/context-pack-lite/MANIFEST.md");
+  const exampleReceiverState = readText("examples/context-pack-lite/RECEIVER_STATE.md");
+
+  for (const fileName of [
+    "README.md",
+    "MANIFEST.md",
+    "REPO_MAP.md",
+    "KEY_FILES.md",
+    "RECENT_DELTA.md",
+    "RISK_BOUNDARIES.md",
+    "RECEIVER_STATE.md",
+    "NEXT_WINDOW_STARTER.md",
+  ]) {
+    assert.equal(fs.existsSync(path.join(repoRoot, "examples", "context-pack-lite", fileName)), true, fileName);
+  }
+
+  assert.match(readme, /context-pack/);
+  assert.match(readme, /examples\/context-pack-lite\/README\.md/);
+  assert.match(readme, /docs\/dogfooding\/context-pack-lite-fresh-receiver-v2\.0\.0\.md/);
+  assert.match(englishReadme, /context-pack/);
+  assert.match(englishReadme, /docs\/releases\/v2\.0\.0\.md/);
+  assert.match(cliLite, /context-pack --repo <target-repo> --output-dir <dir>/);
+  assert.match(docsIndex, /releases\/v2\.0\.0\.md/);
+  assert.match(docsIndex, /dogfooding\/context-pack-lite-fresh-receiver-v2\.0\.0\.md/);
+  assert.match(docsIndex, /\.\.\/examples\/context-pack-lite\/README\.md/);
+  assert.match(testing, /v2\.0\.0 Context Pack Lite Local Closeout/);
+  assert.match(testing, /provider_probe_status=skipped/);
+  assert.match(roadmap, /Local v2\.0 Context Pack Lite closeout status/);
+  assert.match(roadmap, /v2\.1 Context Pack Check/);
+
+  assert.match(closeout, /v2\.0-A/);
+  assert.match(closeout, /v2\.0-B/);
+  assert.match(closeout, /v2\.0-C/);
+  assert.match(closeout, /No provider request/);
+  assert.match(closeout, /No runtime integration/);
+  assert.match(closeout, /No schema-v2/);
+  assert.match(closeout, /No Workflow Runner/);
+  assert.match(closeout, /provider_probe_status=skipped/);
+
+  assert.match(dogfooding, /receiver_task_status: completed/);
+  assert.match(dogfooding, /handoff_acceptance: pass/);
+  assert.match(dogfooding, /Observed Friction/);
+  assert.match(dogfooding, /Next Fix Candidate/);
+  assert.match(dogfooding, /No raw private output/);
+  assert.match(dogfooding, /No provider request/);
+
+  assert.match(exampleReadme, /Context Pack Lite Example Kit/);
+  assert.match(exampleManifest, /Review status: generated/);
+  assert.match(exampleReceiverState, /not_available/);
+  assert.match(exampleReceiverState, /not_applicable/);
+
+  for (const relativePath of [
+    "examples/context-pack-lite",
+    "docs/dogfooding/context-pack-lite-fresh-receiver-v2.0.0.md",
+    "docs/releases/v2.0.0.md",
+  ]) {
+    const result = checkArtifacts({ inputPath: path.join(repoRoot, relativePath) });
+    assert.equal(result.status, "passed", relativePath);
+    assert.equal(result.errorCount, 0, relativePath);
+    assert.equal(result.warningCount, 0, relativePath);
+  }
+});
+
 test("Context Pack Lite writes seven reviewable artifacts without expanding scope", () => {
   const repoDir = path.join(repoRoot, "tests", "outputs", "private", `context-pack-repo-${Date.now()}`);
   const outputDir = path.join(repoRoot, "tests", "outputs", "private", `context-pack-output-${Date.now()}`);

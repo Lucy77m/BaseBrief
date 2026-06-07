@@ -164,8 +164,10 @@ function checkRequiredFiles() {
     "docs/releases/v1.9.1.md",
     "docs/specs/delta-handoff.md",
     "docs/releases/v2.0.0-plan.md",
+    "docs/releases/v2.0.0.md",
     "docs/specs/context-pack-lite.md",
     "docs/roadmap/basebrief-v2-context-pack-lite.md",
+    "docs/dogfooding/context-pack-lite-fresh-receiver-v2.0.0.md",
     "docs/testing-v0.4.x-test-matrix.md",
     "docs/testing-v0.6.x-test-matrix.md",
     "docs/testing-v0.7.x-test-matrix.md",
@@ -239,6 +241,14 @@ function checkRequiredFiles() {
     "examples/seal-before-input.json",
     "examples/seal-after-input.json",
     "examples/delta-handoff.md",
+    "examples/context-pack-lite/README.md",
+    "examples/context-pack-lite/MANIFEST.md",
+    "examples/context-pack-lite/REPO_MAP.md",
+    "examples/context-pack-lite/KEY_FILES.md",
+    "examples/context-pack-lite/RECENT_DELTA.md",
+    "examples/context-pack-lite/RISK_BOUNDARIES.md",
+    "examples/context-pack-lite/RECEIVER_STATE.md",
+    "examples/context-pack-lite/NEXT_WINDOW_STARTER.md",
     "examples/next-chat-example.md",
     "examples/receiver-check-config.json",
     "examples/receiver/difference-found/README.md",
@@ -265,6 +275,14 @@ function checkRequiredFiles() {
     "examples/receiver/lint/repair/fixed-delta-receiver-report.md",
     "examples/receiver/lint/repair/fixed-starter-report.md",
     "examples/receiver/lint/repair/fixed-result.json",
+    "examples/context-pack-lite/README.md",
+    "examples/context-pack-lite/MANIFEST.md",
+    "examples/context-pack-lite/REPO_MAP.md",
+    "examples/context-pack-lite/KEY_FILES.md",
+    "examples/context-pack-lite/RECENT_DELTA.md",
+    "examples/context-pack-lite/RISK_BOUNDARIES.md",
+    "examples/context-pack-lite/RECEIVER_STATE.md",
+    "examples/context-pack-lite/NEXT_WINDOW_STARTER.md",
     "examples/receiver-flow/clean-repo/README.md",
     "examples/receiver-flow/clean-repo/flow-summary.json",
     "examples/receiver-flow/clean-repo/receiver-check.json",
@@ -404,8 +422,10 @@ function checkContentContracts() {
   const v191ReleaseDoc = readText("docs/releases/v1.9.1.md");
   const deltaHandoffSpecDoc = readText("docs/specs/delta-handoff.md");
   const v200PlanDoc = readText("docs/releases/v2.0.0-plan.md");
+  const v200ReleaseDoc = readText("docs/releases/v2.0.0.md");
   const contextPackLiteSpecDoc = readText("docs/specs/context-pack-lite.md");
   const v2ContextPackRoadmapDoc = readText("docs/roadmap/basebrief-v2-context-pack-lite.md");
+  const contextPackLiteDogfoodingDoc = readText("docs/dogfooding/context-pack-lite-fresh-receiver-v2.0.0.md");
   const postReleaseBaselineDoc = readText("docs/baselines/v0.4.0-post-release-baseline.md");
   const v060PostReleaseBaselineDoc = readText("docs/baselines/v0.6.0-post-release-baseline.md");
   const projectStateModelDoc = readText("docs/design/project-state-model.md");
@@ -440,6 +460,9 @@ function checkContentContracts() {
   const goldenPathExampleFirstPass = readText("examples/golden-path/first-pass-receiver-report.md");
   const goldenPathExampleFollowUp = readText("examples/golden-path/follow-up-receiver-report.md");
   const goldenPathExampleBoundary = readText("examples/golden-path/sidecar-output-boundary.md");
+  const contextPackLiteExampleReadme = readText("examples/context-pack-lite/README.md");
+  const contextPackLiteExampleManifest = readText("examples/context-pack-lite/MANIFEST.md");
+  const contextPackLiteExampleReceiverState = readText("examples/context-pack-lite/RECEIVER_STATE.md");
   const deltaReportPassExample = readText("examples/receiver/delta-report-pass/README.md");
   const deltaReportDifferenceExample = readText("examples/receiver/delta-report-difference-found/README.md");
   const receiverUsagePackReadme = readText("examples/receiver/usage-pack/README.md");
@@ -524,6 +547,10 @@ function checkContentContracts() {
   assert(readme.includes("docs/releases/v0.9.3.md"), "README.md should link to v0.9.3 closure candidate");
   assert(readme.includes("docs/releases/v1.0.0.md"), "README.md should link to v1.0.0 delta handoff RC");
   assert(readme.includes("docs/releases/v1.9.1.md"), "README.md should link to v1.9.1 final closure");
+  assert(readme.includes("docs/releases/v2.0.0.md"), "README.md should link to v2.0.0 context pack closeout");
+  assert(readme.includes("examples/context-pack-lite/README.md"), "README.md should link to context pack example kit");
+  assert(readme.includes("docs/dogfooding/context-pack-lite-fresh-receiver-v2.0.0.md"), "README.md should link to context pack dogfooding");
+  assert(readme.includes("context-pack"), "README.md should mention context-pack command");
   assert(readme.includes("docs/testing-v1.x-delta-receiver-closure-matrix.md"), "README.md should link to the v1.x delta receiver closure matrix");
   assert(readme.includes("docs/specs/delta-handoff.md"), "README.md should link to delta handoff spec");
   assert(readme.includes("docs/dogfooding/delta-handoff-fresh-receiver-v1.0.md"), "README.md should link to delta fresh receiver dogfooding");
@@ -613,6 +640,10 @@ function checkContentContracts() {
   assert(englishReadme.includes("docs/releases/v0.9.3.md"), "README.en.md should link to v0.9.3 closure candidate");
   assert(englishReadme.includes("docs/releases/v1.0.0.md"), "README.en.md should link to v1.0.0 delta handoff RC");
   assert(englishReadme.includes("docs/releases/v1.9.1.md"), "README.en.md should link to v1.9.1 final closure");
+  assert(englishReadme.includes("docs/releases/v2.0.0.md"), "README.en.md should link to v2.0.0 context pack closeout");
+  assert(englishReadme.includes("examples/context-pack-lite/README.md"), "README.en.md should link to context pack example kit");
+  assert(englishReadme.includes("docs/dogfooding/context-pack-lite-fresh-receiver-v2.0.0.md"), "README.en.md should link to context pack dogfooding");
+  assert(englishReadme.includes("context-pack"), "README.en.md should mention context-pack command");
   assert(englishReadme.includes("docs/testing-v1.x-delta-receiver-closure-matrix.md"), "README.en.md should link to the v1.x delta receiver closure matrix");
   assert(englishReadme.includes("docs/specs/delta-handoff.md"), "README.en.md should link to delta handoff spec");
   assert(englishReadme.includes("docs/dogfooding/delta-handoff-fresh-receiver-v1.0.md"), "README.en.md should link to delta fresh receiver dogfooding");
@@ -907,6 +938,10 @@ function checkContentContracts() {
   assert(testingDoc.includes("v0.9.3 Final Closure / Freeze Candidate"), "Testing docs must document v0.9.3 closure candidate");
   assert(testingDoc.includes("v1.0 Delta Handoff Fresh Receiver Dogfooding"), "Testing docs must document v1.0 delta fresh receiver dogfooding");
   assert(testingDoc.includes("v1.0 Delta Handoff RC Candidate"), "Testing docs must document v1.0 delta RC candidate");
+  assert(testingDoc.includes("v2.0.0 Context Pack Lite Local Closeout"), "Testing docs must document v2.0.0 context pack closeout");
+  assert(testingDoc.includes("context-pack --repo <target-repo>"), "Testing docs must document context-pack command");
+  assert(testingDoc.includes("../examples/context-pack-lite/README.md"), "Testing docs must link context pack example kit");
+  assert(testingDoc.includes("dogfooding/context-pack-lite-fresh-receiver-v2.0.0.md"), "Testing docs must link context pack dogfooding");
   assert(testingDoc.includes("v1.5 Delta Receiver Lint Mini Plan"), "Testing docs must document the v1.5 lint mini plan");
   assert(testingDoc.includes("v1.5 Delta Receiver Lint Mini Local Closeout"), "Testing docs must document the v1.5 lint mini closeout");
   assert(testingDoc.includes("v1.6 Delta Receiver Lint Fixture Pack Plan"), "Testing docs must document the v1.6 lint fixture pack plan");
@@ -986,6 +1021,9 @@ function checkContentContracts() {
   assert(cliLiteDoc.includes("node scripts/basebrief.js delta --repo <target-repo> --output-dir <dir>"), "cli-lite.md must document delta command");
   assert(cliLiteDoc.includes("--advance-baseline"), "cli-lite.md must document delta baseline advance option");
   assert(cliLiteDoc.includes("specs/delta-handoff.md"), "cli-lite.md must link delta handoff spec");
+  assert(cliLiteDoc.includes("node scripts/basebrief.js context-pack --repo <target-repo> --output-dir <dir>"), "cli-lite.md must document context-pack command");
+  assert(cliLiteDoc.includes("examples/context-pack-lite/README.md"), "cli-lite.md must link context pack example kit");
+  assert(cliLiteDoc.includes("releases/v2.0.0.md"), "cli-lite.md must link v2.0.0 closeout");
   assert(cliLiteDoc.includes("node scripts/basebrief.js receiver-flow"), "cli-lite.md must document receiver-flow command");
   assert(cliLiteDoc.includes("--guided"), "cli-lite.md must document receiver-flow guided option");
   assert(cliLiteDoc.includes("--extract --source <draft-or-context.md>"), "cli-lite.md must document receiver-flow extract option");
@@ -1384,7 +1422,10 @@ function checkContentContracts() {
   assert(v191ReleaseDoc.includes("provider_probe_status=skipped"), "v1.9.1 final closure doc must preserve skipped provider gate");
   assert(docsIndex.includes("roadmap/basebrief-v2-context-pack-lite.md"), "Docs index must link v2 context pack roadmap");
   assert(docsIndex.includes("releases/v2.0.0-plan.md"), "Docs index must link v2.0.0 context pack plan");
+  assert(docsIndex.includes("releases/v2.0.0.md"), "Docs index must link v2.0.0 context pack closeout");
   assert(docsIndex.includes("specs/context-pack-lite.md"), "Docs index must link context pack lite spec");
+  assert(docsIndex.includes("dogfooding/context-pack-lite-fresh-receiver-v2.0.0.md"), "Docs index must link context pack dogfooding");
+  assert(docsIndex.includes("../examples/context-pack-lite/README.md"), "Docs index must link context pack example kit");
   assert(v2ContextPackRoadmapDoc.includes("BaseBrief v2.0 is Context Pack Lite"), "v2 roadmap must freeze Context Pack Lite direction");
   assert(v2ContextPackRoadmapDoc.includes("v1.x answers: what changed"), "v2 roadmap must define relationship to v1.x");
   assert(v2ContextPackRoadmapDoc.includes("v2.0 Context Pack Lite"), "v2 roadmap must order Context Pack Lite before later work");
@@ -1406,6 +1447,17 @@ function checkContentContracts() {
   assert(v200PlanDoc.includes("v2.2 Workflow Runner Lite"), "v2 plan must keep runner later");
   assert(v200PlanDoc.includes("not_available"), "v2 plan must define missing input degradation");
   assert(v200PlanDoc.includes("provider_probe_status=skipped"), "v2 plan must preserve skipped provider gate");
+  assert(v200ReleaseDoc.includes("v2.0.0 Context Pack Lite Local Closeout"), "v2 closeout doc must have stable title");
+  assert(v200ReleaseDoc.includes("v2.0-A"), "v2 closeout doc must record direction freeze");
+  assert(v200ReleaseDoc.includes("v2.0-B"), "v2 closeout doc must record minimal generator");
+  assert(v200ReleaseDoc.includes("v2.0-C"), "v2 closeout doc must record example and dogfooding closeout");
+  assert(v200ReleaseDoc.includes("examples/context-pack-lite/"), "v2 closeout doc must mention context pack example kit");
+  assert(v200ReleaseDoc.includes("context-pack-lite-fresh-receiver-v2.0.0.md"), "v2 closeout doc must mention dogfooding evidence");
+  assert(v200ReleaseDoc.includes("No provider request"), "v2 closeout doc must preserve provider boundary");
+  assert(v200ReleaseDoc.includes("No runtime integration"), "v2 closeout doc must preserve runtime boundary");
+  assert(v200ReleaseDoc.includes("No schema-v2"), "v2 closeout doc must preserve schema-v2 boundary");
+  assert(v200ReleaseDoc.includes("No Workflow Runner"), "v2 closeout doc must keep runner out of scope");
+  assert(v200ReleaseDoc.includes("provider_probe_status=skipped"), "v2 closeout doc must preserve skipped provider gate");
   assert(contextPackLiteSpecDoc.includes("MANIFEST.md"), "context pack spec must define manifest artifact");
   assert(contextPackLiteSpecDoc.includes("REPO_MAP.md"), "context pack spec must define repo map artifact");
   assert(contextPackLiteSpecDoc.includes("KEY_FILES.md"), "context pack spec must define key files artifact");
@@ -1421,6 +1473,20 @@ function checkContentContracts() {
   assert(contextPackLiteSpecDoc.includes("stale"), "context pack spec must define stale semantics");
   assert(contextPackLiteSpecDoc.includes("no provider request"), "context pack spec must preserve provider boundary");
   assert(contextPackLiteSpecDoc.includes("no AI automatic summary"), "context pack spec must avoid AI auto-summary");
+  assert(contextPackLiteDogfoodingDoc.includes("Context Pack Lite Fresh Receiver Dogfooding v2.0.0"), "context pack dogfooding doc must have stable title");
+  assert(contextPackLiteDogfoodingDoc.includes("receiver_task_status: completed"), "context pack dogfooding must record completed receiver status");
+  assert(contextPackLiteDogfoodingDoc.includes("handoff_acceptance: pass"), "context pack dogfooding must record pass acceptance");
+  assert(contextPackLiteDogfoodingDoc.includes("Observed Friction"), "context pack dogfooding must record friction");
+  assert(contextPackLiteDogfoodingDoc.includes("Next Fix Candidate"), "context pack dogfooding must record next fix candidate");
+  assert(contextPackLiteDogfoodingDoc.includes("No provider request"), "context pack dogfooding must preserve provider boundary");
+  assert(contextPackLiteDogfoodingDoc.includes("No raw private output"), "context pack dogfooding must reject raw private output");
+  assert(contextPackLiteDogfoodingDoc.includes("No runtime integration"), "context pack dogfooding must preserve runtime boundary");
+  assert(contextPackLiteDogfoodingDoc.includes("provider_probe_status=skipped"), "context pack dogfooding must preserve skipped provider gate");
+  assert(contextPackLiteExampleReadme.includes("Context Pack Lite Example Kit"), "context pack example readme must have stable title");
+  assert(contextPackLiteExampleReadme.includes("context-pack --repo <target-repo>"), "context pack example readme must document command shape");
+  assert(contextPackLiteExampleManifest.includes("MANIFEST.md"), "context pack example manifest must include reading order");
+  assert(contextPackLiteExampleReceiverState.includes("not_available"), "context pack example receiver state must show missing input degradation");
+  assert(contextPackLiteExampleReceiverState.includes("not_applicable"), "context pack example receiver state must show not applicable receiver history");
   assert(deltaHandoffSpecDoc.includes("basebrief-delta-baseline-v1"), "delta spec must define baseline schema");
   assert(deltaHandoffSpecDoc.includes("reviewed"), "delta spec must define reviewed semantics");
   assert(deltaHandoffSpecDoc.includes("needs-review"), "delta spec must define needs-review semantics");
@@ -1480,6 +1546,9 @@ function checkContentContracts() {
   assert(roadmapDoc.includes("docs/releases/v1.9.1.md"), "Roadmap must link v1.9.1 final closure doc");
   assert(roadmapDoc.includes("docs/testing-v1.x-delta-receiver-closure-matrix.md"), "Roadmap must link v1.x delta receiver closure matrix");
   assert(roadmapDoc.includes("locally closed and frozen the v1.x Delta Handoff"), "Roadmap must mark the v1.x Delta line frozen");
+  assert(roadmapDoc.includes("Local v2.0 Context Pack Lite closeout status"), "Roadmap must document v2.0 closeout status");
+  assert(roadmapDoc.includes("docs/releases/v2.0.0.md"), "Roadmap must link v2.0.0 closeout");
+  assert(roadmapDoc.includes("v2.1 Context Pack Check"), "Roadmap must prefer v2.1 context pack check next");
   assert(contextOpsDoc.includes("not a product surface"), "contextops.md must keep ContextOps out of product surface");
   assert(contextOpsDoc.includes("Current Non-Goals"), "contextops.md must define non-goals");
   assert(contextOpsDoc.includes("hosted service"), "contextops.md must reject hosted-service scope");
@@ -2790,6 +2859,9 @@ function checkArtifactChecker() {
     "docs/dogfooding/delta-receiver-acceptance-v1.1.md",
     "docs/dogfooding/delta-receiver-report-kit-v1.2.md",
     "docs/dogfooding/delta-receiver-lint-dogfooding-v1.8.md",
+    "docs/dogfooding/context-pack-lite-fresh-receiver-v2.0.0.md",
+    "docs/releases/v2.0.0.md",
+    "examples/context-pack-lite",
     "examples/receiver-check-config.json",
     "examples/receiver/difference-found",
     "examples/receiver/blocked",

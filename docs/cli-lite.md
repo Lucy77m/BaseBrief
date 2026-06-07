@@ -29,6 +29,7 @@ node scripts/basebrief.js sidecar-check --input tests/outputs/private/sidecar-ge
 node scripts/basebrief.js seal --input examples/seal-before-input.json --output tests/outputs/private/seal-before.json
 node scripts/basebrief.js diff --before examples/seal-before-input.json --after examples/seal-after-input.json --json
 node scripts/basebrief.js delta --repo . --output-dir tests/outputs/private/delta --json
+node scripts/basebrief.js context-pack --repo . --output-dir tests/outputs/private/context-pack --json
 ```
 
 The repository also includes minimal local npm scripts:
@@ -337,6 +338,31 @@ baseline is delta-local and does not change `basebrief-project-state-v1`.
 
 The output separates `reviewed` project-state continuity from `needs-review`
 generated git and diff summaries. See [Delta Handoff Spec](specs/delta-handoff.md).
+
+### context-pack
+
+```text
+node scripts/basebrief.js context-pack --repo <target-repo> --output-dir <dir> [--since <commit>] [--max-files <n>] [--json]
+```
+
+This command writes a seven-file Context Pack Lite bundle:
+
+- `MANIFEST.md`
+- `REPO_MAP.md`
+- `KEY_FILES.md`
+- `RECENT_DELTA.md`
+- `RISK_BOUNDARIES.md`
+- `RECEIVER_STATE.md`
+- `NEXT_WINDOW_STARTER.md`
+
+It reads local git facts, a fixed public-safe file list, and receiver-state
+presence checks. It refuses non-empty output directories and unsafe output
+paths. Missing inputs are represented as `not_available`, `not_applicable`, or
+`needs-review`; the command does not invent receiver history.
+
+See [Context Pack Lite Spec](specs/context-pack-lite.md),
+[Context Pack Lite example kit](../examples/context-pack-lite/README.md), and
+[v2.0.0 Context Pack Lite Local Closeout](releases/v2.0.0.md).
 
 ## JSON Output
 

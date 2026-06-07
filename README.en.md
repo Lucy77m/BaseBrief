@@ -14,7 +14,7 @@ BaseBrief keeps one public skill entry and provides an optional zero-dependency 
 2. [Handoff contract and artifacts](docs/handoff.md)
 3. [Integrated Handoff Golden Path](docs/golden-path.md)
 4. [Seal/Diff phase comparison](docs/seal-diff.md)
-5. [v1.9.1 Delta Receiver Final Closure / Freeze](docs/releases/v1.9.1.md)
+5. [v2.0.0 Context Pack Lite Local Closeout](docs/releases/v2.0.0.md)
 
 See the [documentation index](docs/index.md) for the complete reference and experiment history.
 
@@ -78,6 +78,8 @@ node scripts/basebrief.js sidecar-check --input tests/outputs/private/sidecar-ge
 
 `v1.0.0` opens this line with Delta Handoff RC hardening. It adds the local `delta` command, which turns current Project State, git range facts, changed-file facts, and Seal/Diff state changes into a reviewable `delta-handoff.md`. By `v1.9.1`, the public v1.x Delta Handoff / Receiver line is locally closed and frozen across Delta Handoff, Receiver Acceptance, Report Kit, Starter Integration, Usage Pack, Lint Mini, Fixture Pack, Repair Pack, Dogfooding Evidence, and Discoverability / Adoption. It stays local-first and does not expand into provider, runtime, plugin, MCP, IDE, schema-v2, or platform work; `basebrief-project-state-v1` remains unchanged, and release checks keep `provider_probe_status=skipped` when provider env vars are absent. Entry points: [v1.9.1 Delta Receiver Final Closure / Freeze](docs/releases/v1.9.1.md), [v1.x Delta Receiver Closure Matrix](docs/testing-v1.x-delta-receiver-closure-matrix.md), [v1.0.0 Delta Handoff RC Candidate](docs/releases/v1.0.0.md), [Delta Handoff Spec](docs/specs/delta-handoff.md), [Delta Handoff fresh receiver dogfooding v1.0](docs/dogfooding/delta-handoff-fresh-receiver-v1.0.md), and [Delta Handoff baseline-advance dogfooding v1.0](docs/dogfooding/delta-handoff-baseline-advance-v1.0.md).
 
+`v2.0.0` opens and locally closes Context Pack Lite. It adds the local `context-pack` command, which compiles repo live facts, fixed public-safe entry files, recent git facts, risk boundaries, and receiver-state presence checks into seven reviewable Markdown artifacts. It is not provider, runtime, plugin, MCP, IDE, schema-v2, Workflow Runner, or repo-dump work; missing inputs are marked as `not_available`, `not_applicable`, or `needs-review`. Entry points: [v2.0.0 Context Pack Lite Local Closeout](docs/releases/v2.0.0.md), [Context Pack Lite Spec](docs/specs/context-pack-lite.md), [Context Pack Lite example kit](examples/context-pack-lite/README.md), and [Context Pack Lite fresh receiver dogfooding v2.0.0](docs/dogfooding/context-pack-lite-fresh-receiver-v2.0.0.md).
+
 ## Seal/Diff
 
 Seal/Diff answers: what changed in facts, decisions, risks, and task boundaries between two phases?
@@ -111,7 +113,7 @@ It only processes explicit input files and does not scan or modify other project
 - handoff builder and file-based Codex / Claude adapters
 - artifact checker
 - optional read-only Receiver Safe Check v1
-- zero-dependency CLI Lite: `init`, `build`, `check`, `receiver-init`, `receiver-check`, `receiver-flow`, `review-draft`, `state-init`, `state-read`, `state-status`, `state-validate`, `state-history`, `state-advance`, `sidecar-build`, `sidecar-check`, `seal`, `diff`, `delta`
+- zero-dependency CLI Lite: `init`, `build`, `check`, `receiver-init`, `receiver-check`, `receiver-flow`, `review-draft`, `state-init`, `state-read`, `state-status`, `state-validate`, `state-history`, `state-advance`, `sidecar-build`, `sidecar-check`, `seal`, `diff`, `delta`, `context-pack`
 - Project State Sidecar: builds `generic` / `openclaw` bundles and `new-window-starter.md` from local `basebrief-project-state-v1` state, then checks them with `basebrief-sidecar-v1`
 - local file-based Seal/Diff v1
 
@@ -142,6 +144,10 @@ BaseBrief is not a chat client, agent runtime, hosted platform, secret manager, 
 - [Delta Handoff Spec](docs/specs/delta-handoff.md)
 - [Delta Handoff fresh receiver dogfooding v1.0](docs/dogfooding/delta-handoff-fresh-receiver-v1.0.md)
 - [Delta Handoff baseline-advance dogfooding v1.0](docs/dogfooding/delta-handoff-baseline-advance-v1.0.md)
+- [v2.0.0 Context Pack Lite Local Closeout](docs/releases/v2.0.0.md)
+- [Context Pack Lite Spec](docs/specs/context-pack-lite.md)
+- [Context Pack Lite example kit](examples/context-pack-lite/README.md)
+- [Context Pack Lite fresh receiver dogfooding v2.0.0](docs/dogfooding/context-pack-lite-fresh-receiver-v2.0.0.md)
 - [v0.9.x Integrated Handoff Closure Matrix](docs/testing-v0.9.x-test-matrix.md)
 - [v0.8.x sidecar test matrix](docs/testing-v0.8.x-test-matrix.md)
 - [v0.8.7 Copyable New-Window Starter](docs/releases/v0.8.7.md)
