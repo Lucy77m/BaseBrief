@@ -1620,7 +1620,7 @@ test("v0.9.3 final closure freeze aligns the whole v0.9.x line for release revie
   assert.match(roadmap, /`v0\.9\.x` closure line is frozen/);
   assert.match(roadmap, /v0\.9\.3 Final Closure \/ Freeze/);
   assert.match(roadmap, /current `v1\.0` line is Delta Handoff RC hardening/);
-  assert.match(roadmap, /Keep the locally closed v1\.0-v1\.3 Delta Handoff \/ Receiver \/ Starter line reviewable/);
+  assert.match(roadmap, /Keep the locally closed v1\.0-v1\.4 Delta Handoff \/ Receiver \/ Starter \/ Usage Pack line reviewable/);
   assert.doesNotMatch(roadmap, /Current v0\.9\.0 readiness target/);
 
   for (const relativePath of [
@@ -1654,6 +1654,8 @@ test("v1.0.0 delta handoff RC hardening exposes local-first delta without expand
   const v120Plan = readText("docs/releases/v1.2.0-plan.md");
   const v130Release = readText("docs/releases/v1.3.0.md");
   const v130Plan = readText("docs/releases/v1.3.0-plan.md");
+  const v140Release = readText("docs/releases/v1.4.0.md");
+  const v140Plan = readText("docs/releases/v1.4.0-plan.md");
   const plan = readText("docs/releases/v1.0.0-plan.md");
   const rcReview = readText("docs/releases/v1.0.0-rc-review.md");
   const spec = readText("docs/specs/delta-handoff.md");
@@ -1661,8 +1663,11 @@ test("v1.0.0 delta handoff RC hardening exposes local-first delta without expand
   const baselineAdvanceDogfooding = readText("docs/dogfooding/delta-handoff-baseline-advance-v1.0.md");
   const receiverAcceptanceDogfooding = readText("docs/dogfooding/delta-receiver-acceptance-v1.1.md");
   const receiverReportKitDogfooding = readText("docs/dogfooding/delta-receiver-report-kit-v1.2.md");
+  const receiverUsagePackDoc = readText("docs/receiver-usage-pack.md");
   const deltaReportPass = readText("examples/receiver/delta-report-pass/README.md");
   const deltaReportDifference = readText("examples/receiver/delta-report-difference-found/README.md");
+  const receiverUsagePackReadme = readText("examples/receiver/usage-pack/README.md");
+  const receiverUsagePackOutline = readText("examples/receiver/usage-pack/starter-report-outline.md");
   const example = readText("examples/delta-handoff.md");
 
   assert.match(readme, /docs\/releases\/v1\.0\.0\.md/);
@@ -1692,6 +1697,9 @@ test("v1.0.0 delta handoff RC hardening exposes local-first delta without expand
   assert.match(docsIndex, /releases\/v1\.2\.0\.md/);
   assert.match(docsIndex, /releases\/v1\.3\.0\.md/);
   assert.match(docsIndex, /releases\/v1\.3\.0-plan\.md/);
+  assert.match(docsIndex, /receiver-usage-pack\.md/);
+  assert.match(docsIndex, /releases\/v1\.4\.0\.md/);
+  assert.match(docsIndex, /releases\/v1\.4\.0-plan\.md/);
   assert.match(docsIndex, /specs\/delta-handoff\.md/);
   assert.match(docsIndex, /\.\.\/examples\/delta-handoff\.md/);
   assert.match(docsIndex, /dogfooding\/delta-handoff-fresh-receiver-v1\.0\.md/);
@@ -1700,6 +1708,7 @@ test("v1.0.0 delta handoff RC hardening exposes local-first delta without expand
   assert.match(docsIndex, /dogfooding\/delta-receiver-report-kit-v1\.2\.md/);
   assert.match(docsIndex, /\.\.\/examples\/receiver\/delta-report-pass\/README\.md/);
   assert.match(docsIndex, /\.\.\/examples\/receiver\/delta-report-difference-found\/README\.md/);
+  assert.match(docsIndex, /\.\.\/examples\/receiver\/usage-pack\/README\.md/);
 
   assert.match(testing, /v1\.0 Delta Handoff RC Candidate/);
   assert.match(testing, /v1\.0 Delta Handoff Fresh Receiver Dogfooding/);
@@ -1709,8 +1718,12 @@ test("v1.0.0 delta handoff RC hardening exposes local-first delta without expand
   assert.match(testing, /v1\.2 Delta Receiver Report Kit Local Closeout/);
   assert.match(testing, /v1\.3 Delta Receiver Starter Integration Plan/);
   assert.match(testing, /v1\.3 Delta Receiver Starter Integration Local Closeout/);
+  assert.match(testing, /v1\.4 Delta Receiver Usage Pack Plan/);
+  assert.match(testing, /v1\.4 Delta Receiver Usage Pack Local Closeout/);
   assert.match(testing, /Markdown\/text report kit/);
   assert.match(testing, /non-blocking historical `commits_in_range` drift/);
+  assert.match(testing, /docs\/receiver-usage-pack\.md/);
+  assert.match(testing, /examples\/receiver\/usage-pack\/README\.md/);
   assert.match(testing, /basebrief-project-state-v1` unchanged/);
   assert.match(testing, /provider_probe_status=skipped/);
 
@@ -1728,7 +1741,11 @@ test("v1.0.0 delta handoff RC hardening exposes local-first delta without expand
   assert.match(roadmap, /docs\/releases\/v1\.3\.0\.md/);
   assert.match(roadmap, /Delta Receiver Starter Integration/);
   assert.match(roadmap, /v1\.2 report kit/);
-  assert.match(roadmap, /v1\.0-v1\.3 Delta Handoff \/ Receiver \/ Starter line reviewable/);
+  assert.match(roadmap, /Local v1\.4 closeout status/);
+  assert.match(roadmap, /docs\/releases\/v1\.4\.0\.md/);
+  assert.match(roadmap, /docs\/receiver-usage-pack\.md/);
+  assert.match(roadmap, /Delta Receiver Usage Pack/);
+  assert.match(roadmap, /v1\.0-v1\.4 Delta Handoff \/ Receiver \/ Starter \/ Usage Pack line reviewable/);
   assert.match(roadmap, /repeated local receiver usage evidence/);
   assert.doesNotMatch(roadmap, /Next v1\.3 planning target/);
   assert.doesNotMatch(roadmap, /Current v0\.9\.0 readiness target/);
@@ -1914,6 +1931,44 @@ test("v1.0.0 delta handoff RC hardening exposes local-first delta without expand
   assert.match(v130Plan, /No command output format change/);
   assert.match(v130Plan, /Thin command exploration/);
   assert.match(v130Plan, /provider_probe_status=skipped/);
+  assert.match(v140Plan, /v1\.4\.0 Delta Receiver Usage Pack Plan/);
+  assert.match(v140Plan, /Delta Receiver Usage Pack/);
+  assert.match(v140Plan, /public usage guide/);
+  assert.match(v140Plan, /example router/);
+  assert.match(v140Plan, /copyable starter outline/);
+  assert.match(v140Plan, /difference_found/);
+  assert.match(v140Plan, /blocked/);
+  assert.match(v140Plan, /source-window inherited facts/);
+  assert.match(v140Plan, /live repo facts/);
+  assert.match(v140Plan, /receiver-window\s+rechecks/);
+  assert.match(v140Plan, /historical `commits_in_range` drift/);
+  assert.match(v140Plan, /No provider request/);
+  assert.match(v140Plan, /No runtime integration/);
+  assert.match(v140Plan, /No plugin, MCP, IDE/);
+  assert.match(v140Plan, /No schema-v2 work/);
+  assert.match(v140Plan, /No new CLI command/);
+  assert.match(v140Plan, /No machine-readable JSON schema/);
+  assert.match(v140Plan, /No command output format change/);
+  assert.match(v140Plan, /provider_probe_status=skipped/);
+  assert.match(v140Release, /v1\.4\.0 Delta Receiver Usage Pack Local Closeout/);
+  assert.match(v140Release, /Delta Receiver Usage Pack/);
+  assert.match(v140Release, /docs\/releases\/v1\.4\.0-plan\.md/);
+  assert.match(v140Release, /docs\/receiver-usage-pack\.md/);
+  assert.match(v140Release, /examples\/receiver\/usage-pack\/README\.md/);
+  assert.match(v140Release, /examples\/receiver\/usage-pack\/starter-report-outline\.md/);
+  assert.match(v140Release, /pass\/fail/);
+  assert.match(v140Release, /wait for user confirmation/);
+  assert.match(v140Release, /difference_found/);
+  assert.match(v140Release, /blocked/);
+  assert.match(v140Release, /historical `commits_in_range` drift remains non-blocking/);
+  assert.match(v140Release, /No provider request/);
+  assert.match(v140Release, /No runtime integration/);
+  assert.match(v140Release, /No plugin, MCP, IDE/);
+  assert.match(v140Release, /No schema-v2 work/);
+  assert.match(v140Release, /No new CLI command/);
+  assert.match(v140Release, /No machine-readable JSON schema/);
+  assert.match(v140Release, /No command output format change/);
+  assert.match(v140Release, /provider_probe_status=skipped/);
   assert.match(spec, /basebrief-delta-baseline-v1/);
   assert.match(spec, /needs-review/);
   assert.match(dogfooding, /handoff_acceptance: pass/);
@@ -1984,6 +2039,50 @@ test("v1.0.0 delta handoff RC hardening exposes local-first delta without expand
   assert.match(receiverReportKitDogfooding, /No machine-readable JSON schema/);
   assert.match(receiverReportKitDogfooding, /No command output format change/);
   assert.match(receiverReportKitDogfooding, /provider_probe_status=skipped/);
+  assert.match(receiverUsagePackDoc, /Delta Receiver Usage Pack/);
+  assert.match(receiverUsagePackDoc, /Minimum Read Order/);
+  assert.match(receiverUsagePackDoc, /Decision Matrix/);
+  assert.match(receiverUsagePackDoc, /pass\/fail/);
+  assert.match(receiverUsagePackDoc, /difference_found/);
+  assert.match(receiverUsagePackDoc, /blocked/);
+  assert.match(receiverUsagePackDoc, /Human-facing `fail` can coexist with machine `difference_found`/);
+  assert.match(receiverUsagePackDoc, /source-window inherited facts/);
+  assert.match(receiverUsagePackDoc, /live repo facts/);
+  assert.match(receiverUsagePackDoc, /receiver-window rechecks/);
+  assert.match(receiverUsagePackDoc, /Historical `commits_in_range` drift remains non-blocking/);
+  assert.match(receiverUsagePackDoc, /docs\/dogfooding\/delta-receiver-report-kit-v1\.2\.md/);
+  assert.match(receiverUsagePackDoc, /examples\/golden-path\/first-pass-receiver-report\.md/);
+  assert.match(receiverUsagePackDoc, /examples\/golden-path\/follow-up-receiver-report\.md/);
+  assert.match(receiverUsagePackDoc, /No provider request/);
+  assert.match(receiverUsagePackDoc, /No runtime integration/);
+  assert.match(receiverUsagePackDoc, /No plugin, MCP, IDE/);
+  assert.match(receiverUsagePackDoc, /No schema-v2 work/);
+  assert.match(receiverUsagePackDoc, /No new CLI command/);
+  assert.match(receiverUsagePackDoc, /No machine-readable JSON schema/);
+  assert.match(receiverUsagePackDoc, /No command output format change/);
+  assert.match(receiverUsagePackDoc, /provider_probe_status=skipped/);
+  assert.match(receiverUsagePackReadme, /Receiver Usage Pack Example Router/);
+  assert.match(receiverUsagePackReadme, /\.\.\/delta-report-pass\/README\.md/);
+  assert.match(receiverUsagePackReadme, /\.\.\/delta-report-difference-found\/README\.md/);
+  assert.match(receiverUsagePackReadme, /\.\.\/blocked\/README\.md/);
+  assert.match(receiverUsagePackReadme, /\.\.\/language-routing\/README\.md/);
+  assert.match(receiverUsagePackReadme, /\.\.\/\.\.\/golden-path\/first-pass-receiver-report\.md/);
+  assert.match(receiverUsagePackReadme, /\.\.\/\.\.\/golden-path\/follow-up-receiver-report\.md/);
+  assert.match(receiverUsagePackReadme, /starter-report-outline\.md/);
+  assert.match(receiverUsagePackReadme, /difference_found/);
+  assert.match(receiverUsagePackReadme, /historical `commits_in_range` drift remains non-blocking/);
+  assert.match(receiverUsagePackReadme, /pass\/fail/);
+  assert.match(receiverUsagePackReadme, /provider_probe_status=skipped/);
+  assert.match(receiverUsagePackOutline, /source-window inherited facts/);
+  assert.match(receiverUsagePackOutline, /live_repo_state/);
+  assert.match(receiverUsagePackOutline, /receiver_window_rechecks/);
+  assert.match(receiverUsagePackOutline, /inherited_fact_differences/);
+  assert.match(receiverUsagePackOutline, /hard_boundaries/);
+  assert.match(receiverUsagePackOutline, /next_narrow_slice/);
+  assert.match(receiverUsagePackOutline, /wait for user confirmation/);
+  assert.match(receiverUsagePackOutline, /declared_checks_status/);
+  assert.match(receiverUsagePackOutline, /difference_found/);
+  assert.match(receiverUsagePackOutline, /non-blocking/);
   for (const reportExample of [deltaReportPass, deltaReportDifference]) {
     assert.match(reportExample, /receiver_task_status/);
     assert.match(reportExample, /repository_state_status/);
@@ -2033,6 +2132,9 @@ test("v1.0.0 delta handoff RC hardening exposes local-first delta without expand
     "docs/releases/v1.2.0-plan.md",
     "docs/releases/v1.3.0.md",
     "docs/releases/v1.3.0-plan.md",
+    "docs/releases/v1.4.0.md",
+    "docs/releases/v1.4.0-plan.md",
+    "docs/receiver-usage-pack.md",
     "docs/specs/delta-handoff.md",
     "docs/dogfooding/delta-handoff-fresh-receiver-v1.0.md",
     "docs/dogfooding/delta-handoff-baseline-advance-v1.0.md",
@@ -2041,6 +2143,7 @@ test("v1.0.0 delta handoff RC hardening exposes local-first delta without expand
     "examples/delta-handoff.md",
     "examples/receiver/delta-report-pass",
     "examples/receiver/delta-report-difference-found",
+    "examples/receiver/usage-pack",
   ]) {
     const result = checkArtifacts({ inputPath: path.join(repoRoot, relativePath) });
     assert.equal(result.status, "passed", relativePath);

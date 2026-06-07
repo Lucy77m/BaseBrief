@@ -247,6 +247,62 @@ Expected release-check output without provider env remains:
 provider_probe_status=skipped
 ```
 
+## v1.4 Delta Receiver Usage Pack Plan
+
+`v1.4.0` is the recommended next planning direction after v1.3. It should
+collect the Delta Receiver line into one public usage guide, one example
+router, and one copyable starter outline without adding a CLI command, JSON
+schema, command output format, provider request, runtime integration, plugin,
+MCP, IDE, Auto Flow behavior, hosted service, or npm publication.
+
+The plan keeps `receiver_task_status`, `repository_state_status`,
+`declared_checks_status`, and `handoff_acceptance` stable while preserving
+`pass/fail`, `wait for user confirmation`, source-window inherited facts, live
+repo facts, receiver-window rechecks, and non-blocking historical
+`commits_in_range` drift.
+
+Expected release-check output without provider env remains:
+
+```text
+provider_probe_status=skipped
+```
+
+## v1.4 Delta Receiver Usage Pack Local Closeout
+
+`v1.4.0` locally closes the Delta Receiver Usage Pack line. It keeps the work
+as a public-facing guide, example router, and copyable outline without adding a
+CLI command, JSON schema, command output format, provider request, runtime
+integration, plugin, MCP, IDE, Auto Flow behavior, hosted service, or npm
+publication.
+
+The closeout adds `docs/receiver-usage-pack.md`,
+`examples/receiver/usage-pack/README.md`, and
+`examples/receiver/usage-pack/starter-report-outline.md`. It routes receivers
+between Delta `pass`, Delta `difference_found`, `blocked`, language-routing,
+and golden-path first-pass or follow-up examples without duplicating raw
+example bodies.
+
+The local validation gate for this closeout is:
+
+```text
+node scripts/basebrief.js check --input docs/receiver-usage-pack.md --json
+node scripts/basebrief.js check --input examples/receiver/usage-pack --json
+node scripts/run_release_checks.js
+npm run check
+git diff --check
+```
+
+Historical `commits_in_range` drift remains non-blocking when refreshed branch,
+HEAD, and worktree facts still match live repository state. Human-facing `fail`
+can coexist with machine `difference_found` when the receiver completed entry
+verification and accurately reported a mismatch.
+
+Expected release-check output without provider env remains:
+
+```text
+provider_probe_status=skipped
+```
+
 ## v0.4.1 Stabilization Candidate
 
 `v0.4.1` is a stabilization-only cycle after the `v0.4.0` public release. It uses

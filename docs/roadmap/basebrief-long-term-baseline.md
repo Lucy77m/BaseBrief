@@ -326,6 +326,24 @@ Local v1.3 closeout status:
 - historical `commits_in_range` drift remains non-blocking when refreshed
   branch, HEAD, and worktree facts match live repository state
 
+Local v1.4 closeout status:
+
+- `docs/releases/v1.4.0-plan.md` defines the Delta Receiver Usage Pack
+- `docs/receiver-usage-pack.md` gives one concentrated receiver entry guide for
+  reading order, routing, and acceptance outcomes
+- `examples/receiver/usage-pack/README.md` and
+  `examples/receiver/usage-pack/starter-report-outline.md` route receivers to
+  public-safe examples without duplicating raw example bodies
+- `docs/releases/v1.4.0.md` records the local closeout without making a push,
+  tag, release, package publication, platform, provider, command-output, report
+  schema, or schema-v2 claim
+- `difference_found` remains a completed verification result and may coexist
+  with human-facing `fail`
+- source-window inherited facts, live repo facts, and receiver-window rechecks
+  remain separate in usage-pack guidance
+- historical `commits_in_range` drift remains non-blocking when refreshed
+  branch, HEAD, and worktree facts match live repository state
+
 ### Phase 8A: Receiver Workflow
 
 Goal: make receiver acceptance explicit and locally verifiable without turning BaseBrief into an agent runtime.
@@ -417,7 +435,7 @@ A new BB experiment is allowed only when all of the following are true:
 
 ## Near-term Priority Order
 
-1. Keep the locally closed v1.0-v1.3 Delta Handoff / Receiver / Starter line reviewable.
+1. Keep the locally closed v1.0-v1.4 Delta Handoff / Receiver / Starter / Usage Pack line reviewable.
 2. Keep push, tag, and formal release pending until the user separately approves them.
 3. Choose any later Delta version only from repeated local receiver usage evidence.
 4. Keep installed CLI, plugins, provider experiments, ContextOps expansion, and speculative features frozen unless measured usage creates a concrete blocker.
@@ -446,12 +464,13 @@ BaseBrief is off track if:
 
 ## Current Strategic Decision
 
-The current development cycle has locally closed the v1.0-v1.3 Delta Handoff /
+The current development cycle has locally closed the v1.0-v1.4 Delta Handoff /
 Receiver line: Delta Handoff, Delta Receiver Acceptance, Delta Receiver Report
-Kit, and Delta Receiver Starter Integration. The next cycle should still avoid
-provider requests, runtime integration, new CLI commands, report schemas,
-command output changes, plugins, MCP, IDE, Auto Flow, or publication work
-unless repeated local usage exposes a concrete blocker.
+Kit, Delta Receiver Starter Integration, and Delta Receiver Usage Pack. The
+next cycle should still avoid provider requests, runtime integration, new CLI
+commands, report schemas, command output changes, plugins, MCP, IDE, Auto
+Flow, or publication work unless repeated local usage exposes a concrete
+blocker.
 
 It should not chase a new benchmark variant, installed CLI, plugin, MCP, IDE,
 runtime integration, provider request, schema-v2 work, hosted service, or
