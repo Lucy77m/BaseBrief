@@ -195,6 +195,36 @@ Expected release-check output without provider env remains:
 provider_probe_status=skipped
 ```
 
+## v1.2 Delta Receiver Report Kit Local Closeout
+
+`v1.2.0` locally closes the Delta Receiver Report Kit line. It keeps the work as
+a Markdown/text report kit and does not add a CLI command, JSON schema, command
+output format, provider request, runtime integration, plugin, MCP, IDE, Auto
+Flow behavior, hosted service, global CLI, or npm publishing.
+
+The closeout keeps the fixed receiver report fields, public-safe `pass` and
+`difference_found` examples, source-window inherited facts versus
+receiver-window rechecks, and non-blocking historical `commits_in_range` drift.
+
+Expected release-check output without provider env remains:
+
+```text
+provider_probe_status=skipped
+```
+
+## v1.3 Delta Receiver Starter Integration Plan
+
+`v1.3.0` is the recommended next planning direction after v1.2. It should
+connect the v1.2 report kit into starter-facing docs and examples without adding
+provider requests, runtime integration, plugins, MCP, IDE, schema-v2 work, new
+CLI commands, JSON schemas, command output changes, or Auto Flow behavior.
+
+Expected release-check output without provider env remains:
+
+```text
+provider_probe_status=skipped
+```
+
 ## v0.4.1 Stabilization Candidate
 
 `v0.4.1` is a stabilization-only cycle after the `v0.4.0` public release. It uses

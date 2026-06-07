@@ -261,7 +261,7 @@ Goal: help a fresh coding-agent window understand what changed since the last
 accepted continuity point without widening BaseBrief into provider, runtime,
 plugin, MCP, IDE, hosted, or schema-v2 work.
 
-Current v1.0 RC target:
+Closed v1.0-v1.2 Delta line:
 
 - `delta` reads current Project State, git range facts, changed-file facts, and
   Seal/Diff state changes
@@ -280,7 +280,7 @@ Exit criteria:
   evidence
 - `provider_probe_status=skipped` remains the correct no-provider gate
 
-Next v1.1 planning target:
+v1.1 receiver acceptance closure:
 
 - keep the v1.0 Delta Handoff line local-first and review-based
 - define the Delta Receiver Acceptance Kit as a receiver contract, not an
@@ -300,6 +300,25 @@ Local v1.1 closeout status:
   reported `handoff_acceptance: pass`
 - `docs/releases/v1.1.0.md` records the local closeout without making a push,
   tag, release, package publication, platform, or provider claim
+
+Local v1.2 closeout status:
+
+- `docs/releases/v1.2.0-plan.md` defines the Delta Receiver Report Kit
+- `docs/dogfooding/delta-receiver-report-kit-v1.2.md` records the public-safe
+  report-kit dogfooding contract
+- `examples/receiver/delta-report-pass/README.md` and
+  `examples/receiver/delta-report-difference-found/README.md` give copyable
+  report examples
+- `docs/releases/v1.2.0.md` records the local closeout without making a push,
+  tag, release, package publication, platform, provider, command-output, report
+  schema, or schema-v2 claim
+
+Next v1.3 planning target:
+
+- integrate the v1.2 report kit into starter-facing docs and examples
+- keep the line local-first, review-based, and Markdown/text oriented
+- defer thin command exploration, external receiver smoke, provider tests, and
+  runtime integration until repeated local usage shows a concrete blocker
 
 ### Phase 8A: Receiver Workflow
 
@@ -392,9 +411,9 @@ A new BB experiment is allowed only when all of the following are true:
 
 ## Near-term Priority Order
 
-1. Complete the `v1.0` Delta Handoff RC hardening line for explicit user review.
+1. Keep the locally closed v1.0-v1.2 Delta Handoff / Receiver line reviewable.
 2. Keep push, tag, and formal release pending until the user separately approves them.
-3. Use the v1.1 Delta Receiver Acceptance Kit to observe whether Delta Handoff plus the existing Project State -> Sidecar -> receiver first-response line prevents real handoff mistakes.
+3. Use the v1.3 Delta Receiver Starter Integration plan to connect the v1.2 report kit to starter-facing docs.
 4. Keep installed CLI, plugins, provider experiments, ContextOps expansion, and speculative features frozen unless measured usage creates a concrete blocker.
 5. Choose later versions only from repeated, measured usage evidence.
 
@@ -421,9 +440,12 @@ BaseBrief is off track if:
 
 ## Current Strategic Decision
 
-The current development cycle should complete the v1.0 Delta Handoff RC
-hardening line: adopted plan, delta spec, public example, CLI Lite `delta`,
-fresh receiver evidence, and release-check coverage.
+The current development cycle has locally closed the v1.0-v1.2 Delta Handoff /
+Receiver line: Delta Handoff, Delta Receiver Acceptance, and Delta Receiver
+Report Kit. The recommended next cycle is v1.3 Delta Receiver Starter
+Integration, still without provider requests, runtime integration, new CLI
+commands, report schemas, command output changes, plugins, MCP, IDE, Auto Flow,
+or publication work.
 
 It should not chase a new benchmark variant, installed CLI, plugin, MCP, IDE,
 runtime integration, provider request, schema-v2 work, hosted service, or

@@ -142,7 +142,9 @@ function checkRequiredFiles() {
     "docs/releases/v1.0.1.md",
     "docs/releases/v1.1.0.md",
     "docs/releases/v1.1.0-plan.md",
+    "docs/releases/v1.2.0.md",
     "docs/releases/v1.2.0-plan.md",
+    "docs/releases/v1.3.0-plan.md",
     "docs/specs/delta-handoff.md",
     "docs/testing-v0.4.x-test-matrix.md",
     "docs/testing-v0.6.x-test-matrix.md",
@@ -346,7 +348,9 @@ function checkContentContracts() {
   const v101ReleaseDoc = readText("docs/releases/v1.0.1.md");
   const v110ReleaseDoc = readText("docs/releases/v1.1.0.md");
   const v110PlanDoc = readText("docs/releases/v1.1.0-plan.md");
+  const v120ReleaseDoc = readText("docs/releases/v1.2.0.md");
   const v120PlanDoc = readText("docs/releases/v1.2.0-plan.md");
+  const v130PlanDoc = readText("docs/releases/v1.3.0-plan.md");
   const deltaHandoffSpecDoc = readText("docs/specs/delta-handoff.md");
   const postReleaseBaselineDoc = readText("docs/baselines/v0.4.0-post-release-baseline.md");
   const v060PostReleaseBaselineDoc = readText("docs/baselines/v0.6.0-post-release-baseline.md");
@@ -628,6 +632,8 @@ function checkContentContracts() {
   assert(docsIndex.includes("../examples/receiver/blocked/README.md"), "Docs index should link receiver blocked example");
   assert(docsIndex.includes("../examples/receiver/language-routing/README.md"), "Docs index should link receiver language routing example");
   assert(docsIndex.includes("releases/v1.2.0-plan.md"), "Docs index must link v1.2.0 report kit plan");
+  assert(docsIndex.includes("releases/v1.2.0.md"), "Docs index must link v1.2.0 report kit closeout");
+  assert(docsIndex.includes("releases/v1.3.0-plan.md"), "Docs index must link v1.3.0 starter integration plan");
   assert(docsIndex.includes("dogfooding/delta-receiver-report-kit-v1.2.md"), "Docs index must link v1.2 report kit dogfooding");
   assert(docsIndex.includes("../examples/receiver/delta-report-pass/README.md"), "Docs index should link delta receiver pass report example");
   assert(docsIndex.includes("../examples/receiver/delta-report-difference-found/README.md"), "Docs index should link delta receiver difference report example");
@@ -1002,6 +1008,55 @@ function checkContentContracts() {
   assert(v120PlanDoc.includes("No machine-readable JSON schema"), "v1.2.0 plan must avoid report schema work");
   assert(v120PlanDoc.includes("No command output format change"), "v1.2.0 plan must avoid command output changes");
   assert(v120PlanDoc.includes("provider_probe_status=skipped"), "v1.2.0 plan must preserve skipped provider gate");
+  assert(v120ReleaseDoc.includes("v1.2.0 Delta Receiver Report Kit Local Closeout"), "v1.2.0 closeout doc must have stable title");
+  assert(v120ReleaseDoc.includes("Delta Receiver Report Kit"), "v1.2.0 closeout doc must name the report kit");
+  assert(v120ReleaseDoc.includes("docs/releases/v1.2.0-plan.md"), "v1.2.0 closeout doc must link planning baseline");
+  assert(v120ReleaseDoc.includes("docs/dogfooding/delta-receiver-report-kit-v1.2.md"), "v1.2.0 closeout doc must link dogfooding record");
+  assert(v120ReleaseDoc.includes("examples/receiver/delta-report-pass/README.md"), "v1.2.0 closeout doc must link pass example");
+  assert(v120ReleaseDoc.includes("examples/receiver/delta-report-difference-found/README.md"), "v1.2.0 closeout doc must link difference example");
+  assert(v120ReleaseDoc.includes("receiver_task_status"), "v1.2.0 closeout doc must require receiver task status");
+  assert(v120ReleaseDoc.includes("repository_state_status"), "v1.2.0 closeout doc must require repository state status");
+  assert(v120ReleaseDoc.includes("handoff_acceptance"), "v1.2.0 closeout doc must require handoff acceptance");
+  assert(v120ReleaseDoc.includes("blocking_or_repair_notes"), "v1.2.0 closeout doc must require repair notes");
+  assert(v120ReleaseDoc.includes("current_goal"), "v1.2.0 closeout doc must require current goal");
+  assert(v120ReleaseDoc.includes("live_repo_state"), "v1.2.0 closeout doc must require live repo state");
+  assert(v120ReleaseDoc.includes("inherited_fact_differences"), "v1.2.0 closeout doc must require inherited fact differences");
+  assert(v120ReleaseDoc.includes("hard_boundaries"), "v1.2.0 closeout doc must require hard boundaries");
+  assert(v120ReleaseDoc.includes("next_narrow_slice"), "v1.2.0 closeout doc must require next narrow slice");
+  assert(v120ReleaseDoc.includes("source-window inherited facts"), "v1.2.0 closeout doc must separate source-window facts");
+  assert(v120ReleaseDoc.includes("receiver-window\nrechecks"), "v1.2.0 closeout doc must separate receiver-window rechecks");
+  assert(v120ReleaseDoc.includes("handoff_acceptance: pass"), "v1.2.0 closeout doc must define pass");
+  assert(v120ReleaseDoc.includes("handoff_acceptance: difference_found"), "v1.2.0 closeout doc must define difference_found");
+  assert(v120ReleaseDoc.includes("handoff_acceptance: blocked"), "v1.2.0 closeout doc must define blocked");
+  assert(v120ReleaseDoc.includes("It is not an agent failure"), "v1.2.0 closeout doc must preserve difference_found semantics");
+  assert(v120ReleaseDoc.includes("historical count drift is non-blocking"), "v1.2.0 closeout doc must explain non-blocking historical count drift");
+  assert(v120ReleaseDoc.includes("basebrief-project-state-v2"), "v1.2.0 closeout doc must reject project-state v2");
+  assert(v120ReleaseDoc.includes("No provider request"), "v1.2.0 closeout doc must reject provider scope");
+  assert(v120ReleaseDoc.includes("No runtime integration"), "v1.2.0 closeout doc must reject runtime scope");
+  assert(v120ReleaseDoc.includes("No plugin, MCP, IDE"), "v1.2.0 closeout doc must reject plugin/MCP/IDE scope");
+  assert(v120ReleaseDoc.includes("No schema-v2 work"), "v1.2.0 closeout doc must reject schema-v2 scope");
+  assert(v120ReleaseDoc.includes("No new CLI command"), "v1.2.0 closeout doc must avoid new CLI commands");
+  assert(v120ReleaseDoc.includes("No machine-readable JSON schema"), "v1.2.0 closeout doc must avoid report schema work");
+  assert(v120ReleaseDoc.includes("No command output format change"), "v1.2.0 closeout doc must avoid command output changes");
+  assert(v120ReleaseDoc.includes("provider_probe_status=skipped"), "v1.2.0 closeout doc must preserve skipped provider gate");
+  assert(v130PlanDoc.includes("v1.3.0 Delta Receiver Starter Integration Plan"), "v1.3.0 plan must have stable title");
+  assert(v130PlanDoc.includes("Delta Receiver Starter Integration"), "v1.3.0 plan must name starter integration");
+  assert(v130PlanDoc.includes("v1.2 report kit"), "v1.3.0 plan must build on the v1.2 report kit");
+  assert(/starter-facing docs\s+and\s+examples/.test(v130PlanDoc), "v1.3.0 plan must stay starter-facing");
+  assert(v130PlanDoc.includes("The goal is not to create a new runtime or command"), "v1.3.0 plan must reject runtime and command scope");
+  assert(v130PlanDoc.includes("source-window inherited facts"), "v1.3.0 plan must preserve inherited facts separation");
+  assert(v130PlanDoc.includes("receiver-window rechecks"), "v1.3.0 plan must preserve receiver rechecks");
+  assert(v130PlanDoc.includes("difference_found"), "v1.3.0 plan must preserve difference_found semantics");
+  assert(v130PlanDoc.includes("historical `commits_in_range` drift"), "v1.3.0 plan must preserve historical count drift guidance");
+  assert(v130PlanDoc.includes("No provider request"), "v1.3.0 plan must reject provider scope");
+  assert(v130PlanDoc.includes("No runtime integration"), "v1.3.0 plan must reject runtime scope");
+  assert(v130PlanDoc.includes("No plugin, MCP, IDE"), "v1.3.0 plan must reject plugin/MCP/IDE scope");
+  assert(v130PlanDoc.includes("No schema-v2 work"), "v1.3.0 plan must reject schema-v2 scope");
+  assert(v130PlanDoc.includes("No new CLI command"), "v1.3.0 plan must avoid new CLI commands");
+  assert(v130PlanDoc.includes("No machine-readable JSON schema"), "v1.3.0 plan must avoid report schema work");
+  assert(v130PlanDoc.includes("No command output format change"), "v1.3.0 plan must avoid command output changes");
+  assert(v130PlanDoc.includes("Thin command exploration"), "v1.3.0 plan must defer command exploration");
+  assert(v130PlanDoc.includes("provider_probe_status=skipped"), "v1.3.0 plan must preserve skipped provider gate");
   assert(deltaHandoffSpecDoc.includes("basebrief-delta-baseline-v1"), "delta spec must define baseline schema");
   assert(deltaHandoffSpecDoc.includes("reviewed"), "delta spec must define reviewed semantics");
   assert(deltaHandoffSpecDoc.includes("needs-review"), "delta spec must define needs-review semantics");
@@ -1015,15 +1070,20 @@ function checkContentContracts() {
   assert(deltaHandoffExample.includes("stateDiff.status: unchanged"), "delta example must explain unchanged state diffs");
   assert(deltaHandoffExample.includes("Worktree Changed Files"), "delta example must keep worktree changes visible");
   assert(deltaHandoffExample.includes("No provider request"), "delta example must preserve provider boundary");
-  assert(roadmapDoc.includes("current `v1.0` line is Delta Handoff RC hardening"), "Roadmap must identify current v1.0 Delta Handoff RC line");
+  assert(roadmapDoc.includes("Closed v1.0-v1.2 Delta line"), "Roadmap must identify the closed v1.0-v1.2 Delta line");
   assert(roadmapDoc.includes("Phase 8B: Delta Handoff"), "Roadmap must document Delta Handoff phase");
   assert(roadmapDoc.includes("fresh receiver dogfooding has reported `handoff_acceptance: pass`"), "Roadmap must record fresh receiver pass");
   assert(roadmapDoc.includes("basebrief-project-state-v1` remains unchanged"), "Roadmap must preserve project-state schema in v1.0");
-  assert(roadmapDoc.includes("Next v1.1 planning target"), "Roadmap must document v1.1 receiver acceptance target");
+  assert(roadmapDoc.includes("v1.1 receiver acceptance closure"), "Roadmap must document v1.1 receiver acceptance closure");
   assert(roadmapDoc.includes("Delta Receiver Acceptance Kit"), "Roadmap must name v1.1 receiver acceptance kit");
   assert(roadmapDoc.includes("receiver contract, not an"), "Roadmap must keep v1.1 out of runtime scope");
   assert(roadmapDoc.includes("Local v1.1 closeout status"), "Roadmap must document v1.1 closeout status");
   assert(roadmapDoc.includes("docs/releases/v1.1.0.md"), "Roadmap must link v1.1 closeout doc");
+  assert(roadmapDoc.includes("Local v1.2 closeout status"), "Roadmap must document v1.2 closeout status");
+  assert(roadmapDoc.includes("docs/releases/v1.2.0.md"), "Roadmap must link v1.2 closeout doc");
+  assert(roadmapDoc.includes("Next v1.3 planning target"), "Roadmap must document v1.3 planning target");
+  assert(roadmapDoc.includes("Delta Receiver Starter Integration"), "Roadmap must name v1.3 starter integration");
+  assert(roadmapDoc.includes("v1.2 report kit"), "Roadmap must connect v1.3 to the v1.2 report kit");
   assert(contextOpsDoc.includes("not a product surface"), "contextops.md must keep ContextOps out of product surface");
   assert(contextOpsDoc.includes("Current Non-Goals"), "contextops.md must define non-goals");
   assert(contextOpsDoc.includes("hosted service"), "contextops.md must reject hosted-service scope");
@@ -1034,10 +1094,10 @@ function checkContentContracts() {
   assert(structuredLiteExample.includes("BASEBRIEF_HANDOFF_JSON_BEGIN"), "structured lite example must include handoff JSON begin marker");
   assert(structuredLiteExample.includes("BASEBRIEF_HANDOFF_JSON_END"), "structured lite example must include handoff JSON end marker");
   assert(structuredLiteExample.includes('"open_questions"'), "structured lite example must include open questions");
-  assert(roadmapDoc.includes("Current v0.9.x closure line"), "Roadmap must name the current v0.9.x closure line");
+  assert(roadmapDoc.includes("The `v0.9.x` closure line is frozen"), "Roadmap must name the frozen v0.9.x closure line");
   assert(roadmapDoc.includes("v0.9.3 Final Closure / Freeze"), "Roadmap must include the v0.9.3 closure stage");
   assert(roadmapDoc.includes("`v0.9.x` closure line is frozen"), "Roadmap must preserve the frozen v0.9.x closure line");
-  assert(roadmapDoc.includes("Complete the `v1.0` Delta Handoff RC hardening line for explicit user review"), "Roadmap must make v1.0 RC hardening the first near-term priority");
+  assert(roadmapDoc.includes("Keep the locally closed v1.0-v1.2 Delta Handoff / Receiver line reviewable"), "Roadmap must make the closed Delta line the first near-term priority");
   assert(roadmapDoc.includes("provider requests, runtime integration, schema changes"), "Roadmap must keep v0.9.x out of runtime/provider/schema scope");
   assert(goldenPathDoc.includes("Integrated Handoff Golden Path"), "golden-path.md must have a stable title");
   assert(goldenPathDoc.includes("receiver-ready.md -> state-init/state-advance -> sidecar-build -> sidecar-check -> new-window-starter.md -> receiver first response"), "golden-path.md must define the integrated path");
@@ -2174,7 +2234,9 @@ function checkArtifactChecker() {
     "docs/releases/v1.0.1.md",
     "docs/releases/v1.1.0.md",
     "docs/releases/v1.1.0-plan.md",
+    "docs/releases/v1.2.0.md",
     "docs/releases/v1.2.0-plan.md",
+    "docs/releases/v1.3.0-plan.md",
     "docs/testing-v0.9.x-test-matrix.md",
     "docs/dogfooding/sidecar-external-receiver-smoke-v0.8.4.md",
     "docs/dogfooding/sidecar-manual-receiver-smoke-v0.8.5.md",
