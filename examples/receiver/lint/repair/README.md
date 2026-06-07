@@ -16,6 +16,19 @@ node scripts/basebrief.js check --input examples/receiver/lint/repair/fixed-star
 node scripts/basebrief.js check --input examples/receiver/lint/repair/fixed-result.json --json
 ```
 
+## After Repair
+
+The fixed files in this directory are compact references. After choosing the
+smallest repair shape, return to `../README.md` for the rule family and
+`../../usage-pack/README.md` for the final public receiver example:
+
+- Delta `pass`: `../../delta-report-pass/README.md`
+- Delta `difference_found`: `../../delta-report-difference-found/README.md`
+- blocked receiver: `../../blocked/README.md`
+- language routing: `../../language-routing/README.md`
+- starter-facing continuity: `../../../golden-path/first-pass-receiver-report.md`
+  or `../../../golden-path/follow-up-receiver-report.md`
+
 ## Rule Repairs
 
 | Rule | Repair action | Fixed reference |

@@ -159,12 +159,16 @@ function checkRequiredFiles() {
     "docs/releases/v1.7.0-plan.md",
     "docs/releases/v1.8.0.md",
     "docs/releases/v1.8.0-plan.md",
+    "docs/releases/v1.9.0.md",
+    "docs/releases/v1.9.0-plan.md",
+    "docs/releases/v1.9.1.md",
     "docs/specs/delta-handoff.md",
     "docs/testing-v0.4.x-test-matrix.md",
     "docs/testing-v0.6.x-test-matrix.md",
     "docs/testing-v0.7.x-test-matrix.md",
     "docs/testing-v0.8.x-test-matrix.md",
     "docs/testing-v0.9.x-test-matrix.md",
+    "docs/testing-v1.x-delta-receiver-closure-matrix.md",
     "docs/cli-lite.md",
     "docs/golden-path.md",
     "docs/seal-diff.md",
@@ -391,6 +395,9 @@ function checkContentContracts() {
   const v170PlanDoc = readText("docs/releases/v1.7.0-plan.md");
   const v180ReleaseDoc = readText("docs/releases/v1.8.0.md");
   const v180PlanDoc = readText("docs/releases/v1.8.0-plan.md");
+  const v190ReleaseDoc = readText("docs/releases/v1.9.0.md");
+  const v190PlanDoc = readText("docs/releases/v1.9.0-plan.md");
+  const v191ReleaseDoc = readText("docs/releases/v1.9.1.md");
   const deltaHandoffSpecDoc = readText("docs/specs/delta-handoff.md");
   const postReleaseBaselineDoc = readText("docs/baselines/v0.4.0-post-release-baseline.md");
   const v060PostReleaseBaselineDoc = readText("docs/baselines/v0.6.0-post-release-baseline.md");
@@ -403,6 +410,7 @@ function checkContentContracts() {
   const v07xTestMatrixDoc = readText("docs/testing-v0.7.x-test-matrix.md");
   const v08xTestMatrixDoc = readText("docs/testing-v0.8.x-test-matrix.md");
   const v09xTestMatrixDoc = readText("docs/testing-v0.9.x-test-matrix.md");
+  const v1xDeltaReceiverMatrixDoc = readText("docs/testing-v1.x-delta-receiver-closure-matrix.md");
   const cliLiteDoc = readText("docs/cli-lite.md");
   const receiverUsagePackDoc = readText("docs/receiver-usage-pack.md");
   const sealDiffDoc = readText("docs/seal-diff.md");
@@ -508,9 +516,12 @@ function checkContentContracts() {
   assert(readme.includes("docs/releases/v0.9.2.md"), "README.md should link to v0.9.2 golden-path example candidate");
   assert(readme.includes("docs/releases/v0.9.3.md"), "README.md should link to v0.9.3 closure candidate");
   assert(readme.includes("docs/releases/v1.0.0.md"), "README.md should link to v1.0.0 delta handoff RC");
+  assert(readme.includes("docs/releases/v1.9.1.md"), "README.md should link to v1.9.1 final closure");
+  assert(readme.includes("docs/testing-v1.x-delta-receiver-closure-matrix.md"), "README.md should link to the v1.x delta receiver closure matrix");
   assert(readme.includes("docs/specs/delta-handoff.md"), "README.md should link to delta handoff spec");
   assert(readme.includes("docs/dogfooding/delta-handoff-fresh-receiver-v1.0.md"), "README.md should link to delta fresh receiver dogfooding");
-  assert(readme.includes("Delta Handoff RC hardening"), "README.md should describe v1.0 Delta Handoff RC hardening");
+  assert(readme.includes("v1.x Delta Handoff / Receiver line 已本地收口并冻结"), "README.md should describe the v1.x line as locally frozen");
+  assert(readme.includes("Delta Handoff RC hardening"), "README.md should preserve the v1.0 opening context");
   assert(readme.includes("basebrief-project-state-v1` 保持不变"), "README.md should preserve project-state schema for v1.0");
   assert(readme.includes("docs/testing-v0.9.x-test-matrix.md"), "README.md should link to v0.9.x closure matrix");
   assert(readme.includes("Integrated Handoff Readiness"), "README.md should define v0.9.0 readiness");
@@ -594,9 +605,12 @@ function checkContentContracts() {
   assert(englishReadme.includes("docs/releases/v0.9.2.md"), "README.en.md should link to v0.9.2 golden-path example candidate");
   assert(englishReadme.includes("docs/releases/v0.9.3.md"), "README.en.md should link to v0.9.3 closure candidate");
   assert(englishReadme.includes("docs/releases/v1.0.0.md"), "README.en.md should link to v1.0.0 delta handoff RC");
+  assert(englishReadme.includes("docs/releases/v1.9.1.md"), "README.en.md should link to v1.9.1 final closure");
+  assert(englishReadme.includes("docs/testing-v1.x-delta-receiver-closure-matrix.md"), "README.en.md should link to the v1.x delta receiver closure matrix");
   assert(englishReadme.includes("docs/specs/delta-handoff.md"), "README.en.md should link to delta handoff spec");
   assert(englishReadme.includes("docs/dogfooding/delta-handoff-fresh-receiver-v1.0.md"), "README.en.md should link to delta fresh receiver dogfooding");
-  assert(englishReadme.includes("Delta Handoff RC hardening"), "README.en.md should describe v1.0 Delta Handoff RC hardening");
+  assert(englishReadme.includes("public v1.x Delta Handoff / Receiver line is locally closed and frozen"), "README.en.md should describe the v1.x line as locally frozen");
+  assert(englishReadme.includes("Delta Handoff RC hardening"), "README.en.md should preserve the v1.0 opening context");
   assert(englishReadme.includes("basebrief-project-state-v1` remains unchanged"), "README.en.md should preserve project-state schema for v1.0");
   assert(englishReadme.includes("docs/testing-v0.9.x-test-matrix.md"), "README.en.md should link to v0.9.x closure matrix");
   assert(englishReadme.includes("Integrated Handoff Readiness"), "README.en.md should define v0.9.0 readiness");
@@ -692,6 +706,10 @@ function checkContentContracts() {
   assert(docsIndex.includes("releases/v1.7.0-plan.md"), "Docs index must link v1.7.0 lint repair pack plan");
   assert(docsIndex.includes("releases/v1.8.0.md"), "Docs index must link v1.8.0 lint dogfooding closeout");
   assert(docsIndex.includes("releases/v1.8.0-plan.md"), "Docs index must link v1.8.0 lint dogfooding plan");
+  assert(docsIndex.includes("releases/v1.9.0-plan.md"), "Docs index must link v1.9.0 lint adoption plan");
+  assert(docsIndex.includes("releases/v1.9.0.md"), "Docs index must link v1.9.0 lint adoption closeout");
+  assert(docsIndex.includes("releases/v1.9.1.md"), "Docs index must link v1.9.1 final closure");
+  assert(docsIndex.includes("testing-v1.x-delta-receiver-closure-matrix.md"), "Docs index must link v1.x delta receiver closure matrix");
   assert(docsIndex.includes("dogfooding/delta-receiver-report-kit-v1.2.md"), "Docs index must link v1.2 report kit dogfooding");
   assert(docsIndex.includes("dogfooding/delta-receiver-lint-dogfooding-v1.8.md"), "Docs index must link v1.8 receiver lint dogfooding");
   assert(docsIndex.includes("../examples/receiver/delta-report-pass/README.md"), "Docs index should link delta receiver pass report example");
@@ -890,6 +908,11 @@ function checkContentContracts() {
   assert(testingDoc.includes("v1.7 Delta Receiver Lint Repair Pack Local Closeout"), "Testing docs must document the v1.7 lint repair pack closeout");
   assert(testingDoc.includes("v1.8 Delta Receiver Lint Dogfooding Evidence Plan"), "Testing docs must document the v1.8 lint dogfooding plan");
   assert(testingDoc.includes("v1.8 Delta Receiver Lint Dogfooding Evidence Local Closeout"), "Testing docs must document the v1.8 lint dogfooding closeout");
+  assert(testingDoc.includes("v1.9 Delta Receiver Lint Discoverability / Adoption Plan"), "Testing docs must document the v1.9 lint adoption plan");
+  assert(testingDoc.includes("v1.9 Delta Receiver Lint Discoverability / Adoption Local Closeout"), "Testing docs must document the v1.9 lint adoption closeout");
+  assert(testingDoc.includes("v1.9.1 Delta Receiver Final Closure / Freeze"), "Testing docs must document the v1.9.1 final closure");
+  assert(testingDoc.includes("testing-v1.x-delta-receiver-closure-matrix.md"), "Testing docs must link the v1.x delta receiver closure matrix");
+  assert(testingDoc.includes("existing receiver examples"), "Testing docs must preserve v1.9 adoption path");
   assert(testingDoc.includes("receiver-specific rule families"), "Testing docs must describe v1.5 receiver rule families");
   assert(testingDoc.includes("basebrief-receiver-check-result-v1"), "Testing docs must mention receiver result JSON coverage");
   assert(testingDoc.includes("basebrief-project-state-v1` unchanged"), "Testing docs must preserve v1.0 project-state schema");
@@ -944,6 +967,8 @@ function checkContentContracts() {
   assert(checksDoc.includes("examples/receiver/lint/"), "checks.md must link receiver lint fixtures");
   assert(checksDoc.includes("examples/receiver/lint/repair/"), "checks.md must link receiver lint repairs");
   assert(checksDoc.includes("delta-receiver-lint-dogfooding-v1.8.md"), "checks.md must link receiver lint dogfooding evidence");
+  assert(checksDoc.includes("Receiver Lint Adoption Path"), "checks.md must describe receiver lint adoption path");
+  assert(checksDoc.includes("docs/releases/v1.9.0-plan.md"), "checks.md must link v1.9 lint adoption plan");
   assert(cliLiteDoc.includes("scripts/basebrief.js"), "cli-lite.md must document CLI Lite script");
   assert(cliLiteDoc.includes("not a published npm package"), "cli-lite.md must state CLI Lite is not a published npm package");
   assert(cliLiteDoc.includes("v0.4.0"), "cli-lite.md must describe v0.4.0 local toolchain boundary");
@@ -1308,6 +1333,48 @@ function checkContentContracts() {
   assert(v180ReleaseDoc.includes("fixed-result.json"), "v1.8.0 closeout doc must link fixed result validation");
   assert(v180ReleaseDoc.includes("No checker rule change"), "v1.8.0 closeout doc must avoid checker rule changes");
   assert(v180ReleaseDoc.includes("provider_probe_status=skipped"), "v1.8.0 closeout doc must preserve skipped provider gate");
+  assert(v190PlanDoc.includes("v1.9.0 Delta Receiver Lint Discoverability / Adoption Plan"), "v1.9.0 plan must have stable title");
+  assert(v190PlanDoc.includes("Make the existing receiver lint public surface easier to find"), "v1.9.0 plan must define discoverability goal");
+  assert(v190PlanDoc.includes("examples/receiver/usage-pack/README.md"), "v1.9.0 plan must route through usage-pack examples");
+  assert(v190PlanDoc.includes("examples/receiver/lint/README.md"), "v1.9.0 plan must route through lint fixtures");
+  assert(v190PlanDoc.includes("examples/receiver/lint/repair/README.md"), "v1.9.0 plan must route through lint repairs");
+  assert(v190PlanDoc.includes("examples/receiver/delta-report-difference-found/README.md"), "v1.9.0 plan must map to existing difference_found example");
+  assert(v190PlanDoc.includes("No checker rule change"), "v1.9.0 plan must avoid checker rule changes");
+  assert(v190PlanDoc.includes("No new rule family"), "v1.9.0 plan must avoid new rule families");
+  assert(v190PlanDoc.includes("No new CLI command"), "v1.9.0 plan must avoid new CLI commands");
+  assert(v190PlanDoc.includes("No machine-readable JSON schema"), "v1.9.0 plan must avoid schema work");
+  assert(v190PlanDoc.includes("No command output format change"), "v1.9.0 plan must avoid command output changes");
+  assert(v190PlanDoc.includes("provider_probe_status=skipped"), "v1.9.0 plan must preserve skipped provider gate");
+  assert(v190ReleaseDoc.includes("v1.9.0 Delta Receiver Lint Discoverability / Adoption Local Closeout"), "v1.9.0 closeout doc must have stable title");
+  assert(v190ReleaseDoc.includes("docs/releases/v1.9.0-plan.md"), "v1.9.0 closeout doc must link planning baseline");
+  assert(v190ReleaseDoc.includes("docs/receiver-usage-pack.md"), "v1.9.0 closeout doc must link usage-pack guide");
+  assert(v190ReleaseDoc.includes("examples/receiver/usage-pack/README.md"), "v1.9.0 closeout doc must link usage-pack router");
+  assert(v190ReleaseDoc.includes("examples/receiver/lint/README.md"), "v1.9.0 closeout doc must link lint fixture guide");
+  assert(v190ReleaseDoc.includes("examples/receiver/lint/repair/README.md"), "v1.9.0 closeout doc must link lint repair guide");
+  assert(v190ReleaseDoc.includes("examples/receiver/delta-report-difference-found/README.md"), "v1.9.0 closeout doc must link existing difference_found example");
+  assert(v190ReleaseDoc.includes("Intentional failing fixtures remain learning inputs"), "v1.9.0 closeout doc must warn against copying broken fixtures");
+  assert(v190ReleaseDoc.includes("difference_found` remains a completed verification result"), "v1.9.0 closeout doc must preserve difference_found semantics");
+  assert(v190ReleaseDoc.includes("Historical `commits_in_range` drift remains non-blocking"), "v1.9.0 closeout doc must preserve drift semantics");
+  assert(v190ReleaseDoc.includes("Receiver lint remains explicit-shape based"), "v1.9.0 closeout doc must preserve receiver lint detection scope");
+  assert(v190ReleaseDoc.includes("No checker rule change"), "v1.9.0 closeout doc must avoid checker rule changes");
+  assert(v190ReleaseDoc.includes("No new rule family"), "v1.9.0 closeout doc must avoid new rule families");
+  assert(v190ReleaseDoc.includes("No new CLI command"), "v1.9.0 closeout doc must avoid new CLI commands");
+  assert(v190ReleaseDoc.includes("No machine-readable JSON schema"), "v1.9.0 closeout doc must avoid schema work");
+  assert(v190ReleaseDoc.includes("No command output format change"), "v1.9.0 closeout doc must avoid command output changes");
+  assert(v190ReleaseDoc.includes("provider_probe_status=skipped"), "v1.9.0 closeout doc must preserve skipped provider gate");
+  assert(v191ReleaseDoc.includes("v1.9.1 Delta Receiver Final Closure / Freeze"), "v1.9.1 final closure doc must have stable title");
+  assert(v191ReleaseDoc.includes("docs/testing-v1.x-delta-receiver-closure-matrix.md"), "v1.9.1 final closure doc must link aggregate matrix");
+  assert(v191ReleaseDoc.includes("v1.x Delta Receiver line is frozen"), "v1.9.1 final closure doc must define the freeze contract");
+  assert(v191ReleaseDoc.includes("difference_found` remains a completed verification result"), "v1.9.1 final closure doc must preserve difference_found semantics");
+  assert(v191ReleaseDoc.includes("Historical `commits_in_range` drift remains non-blocking"), "v1.9.1 final closure doc must preserve drift semantics");
+  assert(v191ReleaseDoc.includes("Receiver lint remains explicit-shape based"), "v1.9.1 final closure doc must preserve lint detection scope");
+  assert(v191ReleaseDoc.includes("No checker rule change"), "v1.9.1 final closure doc must avoid checker rule changes");
+  assert(v191ReleaseDoc.includes("No new rule family"), "v1.9.1 final closure doc must avoid new rule families");
+  assert(v191ReleaseDoc.includes("No new CLI command"), "v1.9.1 final closure doc must avoid new CLI commands");
+  assert(v191ReleaseDoc.includes("No machine-readable JSON schema"), "v1.9.1 final closure doc must avoid schema work");
+  assert(v191ReleaseDoc.includes("No command output format change"), "v1.9.1 final closure doc must avoid command output changes");
+  assert(v191ReleaseDoc.includes("No v1.10 feature line"), "v1.9.1 final closure doc must avoid opening v1.10");
+  assert(v191ReleaseDoc.includes("provider_probe_status=skipped"), "v1.9.1 final closure doc must preserve skipped provider gate");
   assert(deltaHandoffSpecDoc.includes("basebrief-delta-baseline-v1"), "delta spec must define baseline schema");
   assert(deltaHandoffSpecDoc.includes("reviewed"), "delta spec must define reviewed semantics");
   assert(deltaHandoffSpecDoc.includes("needs-review"), "delta spec must define needs-review semantics");
@@ -1356,6 +1423,17 @@ function checkContentContracts() {
   assert(roadmapDoc.includes("Local v1.8 closeout status"), "Roadmap must document v1.8 closeout status");
   assert(roadmapDoc.includes("docs/releases/v1.8.0.md"), "Roadmap must link v1.8 closeout doc");
   assert(roadmapDoc.includes("delta-receiver-lint-dogfooding-v1.8.md"), "Roadmap must link receiver lint dogfooding evidence");
+  assert(roadmapDoc.includes("Planned v1.9 direction"), "Roadmap must document v1.9 planning direction");
+  assert(roadmapDoc.includes("docs/releases/v1.9.0-plan.md"), "Roadmap must link v1.9 adoption plan");
+  assert(roadmapDoc.includes("map fixture -> repair -> existing receiver examples"), "Roadmap must preserve v1.9 adoption scope");
+  assert(roadmapDoc.includes("Local v1.9 closeout status"), "Roadmap must document v1.9 closeout status");
+  assert(roadmapDoc.includes("docs/releases/v1.9.0.md"), "Roadmap must link v1.9 closeout doc");
+  assert(roadmapDoc.includes("usage pack -> usage-pack router -> lint fixture"), "Roadmap must preserve v1.9 public read order");
+  assert(roadmapDoc.includes("closed and frozen the v1.x Delta Handoff"), "Roadmap must update current cycle through the v1.x final closure");
+  assert(roadmapDoc.includes("Local v1.x final closeout status"), "Roadmap must document v1.x final closeout status");
+  assert(roadmapDoc.includes("docs/releases/v1.9.1.md"), "Roadmap must link v1.9.1 final closure doc");
+  assert(roadmapDoc.includes("docs/testing-v1.x-delta-receiver-closure-matrix.md"), "Roadmap must link v1.x delta receiver closure matrix");
+  assert(roadmapDoc.includes("locally closed and frozen the v1.x Delta Handoff"), "Roadmap must mark the v1.x Delta line frozen");
   assert(contextOpsDoc.includes("not a product surface"), "contextops.md must keep ContextOps out of product surface");
   assert(contextOpsDoc.includes("Current Non-Goals"), "contextops.md must define non-goals");
   assert(contextOpsDoc.includes("hosted service"), "contextops.md must reject hosted-service scope");
@@ -1369,7 +1447,7 @@ function checkContentContracts() {
   assert(roadmapDoc.includes("The `v0.9.x` closure line is frozen"), "Roadmap must name the frozen v0.9.x closure line");
   assert(roadmapDoc.includes("v0.9.3 Final Closure / Freeze"), "Roadmap must include the v0.9.3 closure stage");
   assert(roadmapDoc.includes("`v0.9.x` closure line is frozen"), "Roadmap must preserve the frozen v0.9.x closure line");
-  assert(roadmapDoc.includes("Keep the locally closed v1.0-v1.8 Delta Handoff / Receiver / Starter / Usage Pack / Lint / Fixture / Repair / Dogfooding line reviewable"), "Roadmap must make the closed Delta line the first near-term priority");
+  assert(roadmapDoc.includes("Keep the locally closed and frozen v1.x Delta Handoff / Receiver / Starter / Usage Pack / Lint / Fixture / Repair / Dogfooding / Adoption line reviewable"), "Roadmap must make the closed Delta line the first near-term priority");
   assert(roadmapDoc.includes("provider requests, runtime integration, schema changes"), "Roadmap must keep v0.9.x out of runtime/provider/schema scope");
   assert(goldenPathDoc.includes("Integrated Handoff Golden Path"), "golden-path.md must have a stable title");
   assert(goldenPathDoc.includes("receiver-ready.md -> state-init/state-advance -> sidecar-build -> sidecar-check -> new-window-starter.md -> receiver first response"), "golden-path.md must define the integrated path");
@@ -1471,6 +1549,17 @@ function checkContentContracts() {
   assert(v09xTestMatrixDoc.includes("provider_probe_status=skipped"), "v0.9.x matrix must preserve skipped provider gate");
   assert(v09xTestMatrixDoc.includes("No provider request"), "v0.9.x matrix must reject provider requests");
   assert(v09xTestMatrixDoc.includes("No raw private output"), "v0.9.x matrix must reject raw private output");
+  assert(v1xDeltaReceiverMatrixDoc.includes("v1.x Delta Receiver Closure Matrix"), "v1.x delta receiver matrix must have a stable title");
+  assert(v1xDeltaReceiverMatrixDoc.includes("delta-handoff.md -> receiver usage pack"), "v1.x delta receiver matrix must define the shared path");
+  assert(v1xDeltaReceiverMatrixDoc.includes("v1.0 Delta Handoff"), "v1.x delta receiver matrix must include v1.0");
+  assert(v1xDeltaReceiverMatrixDoc.includes("v1.9 Delta Receiver Lint Discoverability / Adoption"), "v1.x delta receiver matrix must include v1.9 adoption");
+  assert(v1xDeltaReceiverMatrixDoc.includes("v1.9.1 Final Closure / Freeze"), "v1.x delta receiver matrix must include v1.9.1 final closure");
+  assert(v1xDeltaReceiverMatrixDoc.includes("difference_found` remains a completed verification result"), "v1.x delta receiver matrix must preserve difference_found semantics");
+  assert(v1xDeltaReceiverMatrixDoc.includes("Historical `commits_in_range` drift remains non-blocking"), "v1.x delta receiver matrix must preserve drift semantics");
+  assert(v1xDeltaReceiverMatrixDoc.includes("provider_probe_status=skipped"), "v1.x delta receiver matrix must preserve skipped provider gate");
+  assert(v1xDeltaReceiverMatrixDoc.includes("No provider request"), "v1.x delta receiver matrix must reject provider requests");
+  assert(v1xDeltaReceiverMatrixDoc.includes("No checker rule change"), "v1.x delta receiver matrix must reject checker rule changes");
+  assert(v1xDeltaReceiverMatrixDoc.includes("No new rule family"), "v1.x delta receiver matrix must reject new rule families");
   assert(v09xTestMatrixDoc.includes("No runtime integration"), "v0.9.x matrix must reject runtime integration");
   assert(v09xTestMatrixDoc.includes("No schema change"), "v0.9.x matrix must reject schema changes");
   assert(v09xTestMatrixDoc.includes("No Auto Flow"), "v0.9.x matrix must reject Auto Flow");
@@ -2239,6 +2328,8 @@ function checkContentContracts() {
   assert(receiverUsagePackDoc.includes("examples/receiver/lint/"), "Receiver usage-pack doc must point to lint fixtures");
   assert(receiverUsagePackDoc.includes("examples/receiver/lint/repair/"), "Receiver usage-pack doc must point to lint repairs");
   assert(receiverUsagePackDoc.includes("delta-receiver-lint-dogfooding-v1.8.md"), "Receiver usage-pack doc must point to lint dogfooding evidence");
+  assert(receiverUsagePackDoc.includes("Fixture To Repair To Example Path"), "Receiver usage-pack doc must define fixture to repair to example path");
+  assert(receiverUsagePackDoc.includes("docs/releases/v1.9.0-plan.md"), "Receiver usage-pack doc must point to v1.9 adoption plan");
   assert(receiverUsagePackDoc.includes("No provider request"), "Receiver usage-pack doc must reject provider scope");
   assert(receiverUsagePackDoc.includes("No runtime integration"), "Receiver usage-pack doc must reject runtime scope");
   assert(receiverUsagePackDoc.includes("No plugin, MCP, IDE"), "Receiver usage-pack doc must reject plugin/MCP/IDE scope");
@@ -2255,6 +2346,9 @@ function checkContentContracts() {
   assert(receiverUsagePackReadme.includes("../../golden-path/first-pass-receiver-report.md"), "Receiver usage-pack router must link golden-path first-pass example");
   assert(receiverUsagePackReadme.includes("../../golden-path/follow-up-receiver-report.md"), "Receiver usage-pack router must link golden-path follow-up example");
   assert(receiverUsagePackReadme.includes("starter-report-outline.md"), "Receiver usage-pack router must link starter outline");
+  assert(receiverUsagePackReadme.includes("If A Receiver Lint Finding Sent You Here"), "Receiver usage-pack router must route lint findings");
+  assert(receiverUsagePackReadme.includes("../lint/README.md"), "Receiver usage-pack router must link lint fixtures");
+  assert(receiverUsagePackReadme.includes("../lint/repair/README.md"), "Receiver usage-pack router must link lint repairs");
   assert(receiverUsagePackReadme.includes("difference_found"), "Receiver usage-pack router must preserve difference_found semantics");
   assert(receiverUsagePackReadme.includes("historical `commits_in_range` drift remains non-blocking"), "Receiver usage-pack router must explain historical count drift");
   assert(receiverUsagePackReadme.includes("pass/fail"), "Receiver usage-pack router must preserve starter pass/fail anchor");
@@ -2273,9 +2367,13 @@ function checkContentContracts() {
   assert(receiverLintReadme.includes("receiver.missing-report-section"), "Receiver lint README must document missing-report-section fixture");
   assert(receiverLintReadme.includes("receiver.invalid-result-consistency"), "Receiver lint README must document JSON consistency fixture");
   assert(receiverLintReadme.includes("receiver.missing-drift-semantics"), "Receiver lint README must document drift warning fixture");
+  assert(receiverLintReadme.includes("Public Read Order"), "Receiver lint README must document public read order");
+  assert(receiverLintReadme.includes("../usage-pack/README.md"), "Receiver lint README must route back to usage-pack examples");
   assert(receiverLintRepairReadme.includes("fixed-delta-receiver-report.md"), "Receiver lint repair README must link fixed Delta report");
   assert(receiverLintRepairReadme.includes("fixed-result.json"), "Receiver lint repair README must link fixed result JSON");
   assert(receiverLintRepairReadme.includes("receiver.missing-human-anchor"), "Receiver lint repair README must document missing-human-anchor repair");
+  assert(receiverLintRepairReadme.includes("After Repair"), "Receiver lint repair README must route after repair");
+  assert(receiverLintRepairReadme.includes("../../delta-report-difference-found/README.md"), "Receiver lint repair README must link existing difference_found example");
   assert(receiverLintDogfoodingDoc.includes("Delta Receiver Lint Dogfooding v1.8"), "Receiver lint dogfooding doc must have stable title");
   assert(receiverLintDogfoodingDoc.includes("provider_request_performed: false"), "Receiver lint dogfooding doc must reject provider requests");
   assert(receiverLintDogfoodingDoc.includes("raw_private_output_copied: false"), "Receiver lint dogfooding doc must reject raw private output");
@@ -2631,8 +2729,12 @@ function checkArtifactChecker() {
     "docs/releases/v1.7.0-plan.md",
     "docs/releases/v1.8.0.md",
     "docs/releases/v1.8.0-plan.md",
+    "docs/releases/v1.9.0.md",
+    "docs/releases/v1.9.0-plan.md",
+    "docs/releases/v1.9.1.md",
     "docs/receiver-usage-pack.md",
     "docs/testing-v0.9.x-test-matrix.md",
+    "docs/testing-v1.x-delta-receiver-closure-matrix.md",
     "docs/dogfooding/sidecar-external-receiver-smoke-v0.8.4.md",
     "docs/dogfooding/sidecar-manual-receiver-smoke-v0.8.5.md",
     "docs/dogfooding/sidecar-manual-receiver-smoke-v0.8.6.md",

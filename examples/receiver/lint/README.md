@@ -13,6 +13,14 @@ node scripts/basebrief.js check --input examples/receiver/lint/clean-pass-receiv
 The intentionally broken fixtures are supposed to report findings. They are
 examples of what the checker catches, not examples to copy into a handoff.
 
+## Public Read Order
+
+1. Use `clean-pass-receiver-report.md` only as the compact clean lint reference.
+2. Use the failing or warning fixtures to learn a rule family.
+3. Open `repair/README.md` for the fixed replacement shape.
+4. Return to `../usage-pack/README.md` to choose the final public receiver
+   example to copy.
+
 ## Fixtures
 
 | Fixture | Expected status | Primary rule |
@@ -30,6 +38,8 @@ examples of what the checker catches, not examples to copy into a handoff.
 
 - Start from the clean fixture when writing a new receiver report.
 - Compare a failing fixture with the clean fixture when a rule name is unclear.
+- Copy final reports from `repair/README.md` or existing receiver examples,
+  not from intentionally broken fixtures.
 - Keep source-window inherited facts, live repo facts, and receiver-window
   rechecks separate.
 - Treat `difference_found` as a completed verification result, not an agent

@@ -6,6 +6,9 @@ copyable public-safe shape.
 
 ## Which One Should I Copy Now?
 
+- If you are unsure which receiver family applies, start with
+  [the public usage guide](../../../docs/receiver-usage-pack.md), then return
+  here for the copy target.
 - If live branch, HEAD, and worktree facts match refreshed Delta facts, copy
   [Delta Receiver pass report](../delta-report-pass/README.md).
 - If verification completed and a live mismatch was found, copy
@@ -23,6 +26,15 @@ copyable public-safe shape.
   [Golden Path follow-up receiver report](../../golden-path/follow-up-receiver-report.md).
 - If you need a blank starter skeleton instead of a full example, copy
   [Starter report outline](starter-report-outline.md).
+
+## If A Receiver Lint Finding Sent You Here
+
+1. Open [Receiver Lint Fixture Pack](../lint/README.md) to understand the rule
+   family. The broken fixtures are learning inputs, not copy targets.
+2. Open [Receiver Lint Repair Pack](../lint/repair/README.md) to find the
+   smallest fixed Delta, starter, or result JSON reference.
+3. Return to the route list above and copy the existing public receiver example
+   that matches the final outcome.
 
 ## Route Notes
 

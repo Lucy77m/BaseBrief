@@ -438,6 +438,81 @@ Expected release-check output without provider env remains:
 provider_probe_status=skipped
 ```
 
+## v1.9 Delta Receiver Lint Discoverability / Adoption Plan
+
+`v1.9.0` is the recommended next planning direction after v1.8. It should make
+the existing fixture, repair, dogfooding, and receiver example surfaces easier
+to find and copy in the right order without adding checker rules, rule
+families, CLI commands, schemas, command output changes, provider behavior,
+runtime behavior, plugins, MCP, IDE work, hosted service, Auto Flow behavior,
+or publication scope.
+
+The adoption path is:
+
+```text
+docs/receiver-usage-pack.md
+examples/receiver/usage-pack/README.md
+examples/receiver/lint/README.md
+examples/receiver/lint/repair/README.md
+existing receiver examples
+```
+
+Expected release-check output without provider env remains:
+
+```text
+provider_probe_status=skipped
+```
+
+## v1.9 Delta Receiver Lint Discoverability / Adoption Local Closeout
+
+`v1.9.0` locally closes the Delta Receiver Lint Discoverability / Adoption
+line. It records the public read order from usage pack to example router to
+lint fixtures to repair references to existing receiver examples.
+
+The closeout keeps this as navigation and adoption polish only: no checker
+rules, rule families, CLI commands, schemas, command output changes, provider
+behavior, runtime behavior, plugins, MCP, IDE work, hosted service, Auto Flow
+behavior, or publication scope.
+
+The local validation gate for this closeout is:
+
+```text
+node scripts/run_release_checks.js
+npm run check
+git diff --check
+```
+
+Expected release-check output without provider env remains:
+
+```text
+provider_probe_status=skipped
+```
+
+## v1.9.1 Delta Receiver Final Closure / Freeze
+
+`v1.9.1` closes and freezes the public v1.x Delta Handoff / Receiver line for
+local release review. It adds
+[the v1.x Delta Receiver Closure Matrix](testing-v1.x-delta-receiver-closure-matrix.md)
+as the aggregate local acceptance record for `v1.0` through `v1.9.1`.
+
+This closure adds no checker rules, rule families, CLI commands, schemas,
+command output changes, provider behavior, runtime behavior, plugins, MCP, IDE
+work, hosted service, Auto Flow behavior, or publication scope.
+
+The local validation gate for this final closeout is:
+
+```text
+node scripts/run_release_checks.js
+npm run check
+git diff --check
+```
+
+Expected release-check output without provider env remains:
+
+```text
+provider_probe_status=skipped
+```
+
 ## v0.4.1 Stabilization Candidate
 
 `v0.4.1` is a stabilization-only cycle after the `v0.4.0` public release. It uses

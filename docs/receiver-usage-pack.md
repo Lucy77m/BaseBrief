@@ -43,6 +43,21 @@ It also keeps the existing human-facing anchors stable:
 7. If you need the underlying contract details, read
    `docs/dogfooding/delta-receiver-report-kit-v1.2.md`.
 
+## Fixture To Repair To Example Path
+
+For receiver lint adoption, keep the public reading path in this order:
+
+| Step | Use this when | Public entry |
+| --- | --- | --- |
+| Choose route | You need to decide pass, `difference_found`, blocked, language routing, or starter-facing continuity. | `examples/receiver/usage-pack/README.md` |
+| Learn rule | A checker finding names a receiver lint rule and the broken shape is unclear. | `examples/receiver/lint/README.md` |
+| Repair shape | You need the smallest fixed Delta, starter, or result JSON reference. | `examples/receiver/lint/repair/README.md` |
+| Copy final report | You know the receiver outcome and need the closest public-safe example. | `examples/receiver/delta-report-pass/README.md`, `examples/receiver/delta-report-difference-found/README.md`, `examples/receiver/blocked/README.md`, `examples/receiver/language-routing/README.md`, or `examples/golden-path/` reports |
+
+Do not copy intentionally broken lint fixtures into a handoff. Use them to
+understand what the checker catches, then copy from a repair reference or an
+existing receiver example.
+
 ## Decision Matrix
 
 - Use `handoff_acceptance: pass` when entry verification completed and live
@@ -124,6 +139,9 @@ For fixed replacement shapes after a receiver lint finding, use
 `examples/receiver/lint/repair/`. Public-safe dogfooding evidence for the
 fixture and repair packs is recorded in
 `docs/dogfooding/delta-receiver-lint-dogfooding-v1.8.md`.
+
+The v1.9 discoverability/adoption plan records this public navigation contract
+in `docs/releases/v1.9.0-plan.md`.
 
 ## Boundaries
 

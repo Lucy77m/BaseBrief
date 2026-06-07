@@ -104,6 +104,25 @@ node scripts/basebrief.js check --input examples/receiver/lint/delta-missing-sec
 node scripts/basebrief.js check --input examples/receiver/lint/repair/fixed-starter-report.md --json
 ```
 
+## Receiver Lint Adoption Path
+
+Use this path when a public receiver author is unsure what to open next:
+
+1. Route through `docs/receiver-usage-pack.md` and
+   `examples/receiver/usage-pack/README.md`.
+2. Use `examples/receiver/lint/README.md` to learn the failing or warning rule.
+3. Use `examples/receiver/lint/repair/README.md` to find the fixed reference.
+4. Copy the final report shape from the existing receiver examples:
+   `examples/receiver/delta-report-pass/README.md`,
+   `examples/receiver/delta-report-difference-found/README.md`,
+   `examples/receiver/blocked/README.md`,
+   `examples/receiver/language-routing/README.md`, or
+   `examples/golden-path/`.
+
+The v1.9 discoverability/adoption plan lives in
+`docs/releases/v1.9.0-plan.md`. It does not add checker behavior, rule
+families, schemas, CLI commands, or command output changes.
+
 ## Boundary
 
 Use this checker on public examples and generated handoff or adapter artifacts before sharing them. It can catch common BaseBrief publication mistakes, but it cannot prove that an artifact contains no secret, no private project detail, or no misleading claim.

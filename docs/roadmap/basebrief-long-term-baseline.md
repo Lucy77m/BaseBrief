@@ -8,7 +8,7 @@ This document is the planning baseline for the next stages of BaseBrief. It is n
 
 BaseBrief should continue as one public skill entry with internal modes and supporting tools.
 
-Version `v0.2.0` completed the first local toolchain: structured handoff, provider profile metadata, file-based adapters, artifact checks, CLI Lite, and Seal/Diff v1. The receiver line then added Receiver Safe Check, Receiver Flow Draft, review-draft gates, and public receiver examples. The Project State line added local `.basebrief/state.json`, lifecycle inspection, and reviewed-state advancement; `v0.6.0` established that local Project State directory without changing `basebrief-project-state-v1`. The `v0.8.x` Sidecar line now consumes Project State into `generic` / `openclaw` bundles, validates `basebrief-sidecar-v1`, writes `new-window-starter.md`, preserves `pass/fail` receiver acceptance, and closes the public-safe OpenClaw/Hermes manual first-response gap. The `v0.9.x` closure line is frozen: v0.9.0 Integrated Handoff Readiness defines the local line, v0.9.1 Golden Path Closure explains it, v0.9.2 Golden Path Example Closure adds public-safe examples, and v0.9.3 Final Closure / Freeze closes the line without provider requests, runtime integration, schema changes, Auto Flow, plugins, or platform work. The current `v1.0` line is Delta Handoff RC hardening: a local `delta` command compiles Project State, git facts, changed-file facts, and Seal/Diff state changes into reviewable `delta-handoff.md` while keeping `basebrief-project-state-v1` unchanged.
+Version `v0.2.0` completed the first local toolchain: structured handoff, provider profile metadata, file-based adapters, artifact checks, CLI Lite, and Seal/Diff v1. The receiver line then added Receiver Safe Check, Receiver Flow Draft, review-draft gates, and public receiver examples. The Project State line added local `.basebrief/state.json`, lifecycle inspection, and reviewed-state advancement; `v0.6.0` established that local Project State directory without changing `basebrief-project-state-v1`. The `v0.8.x` Sidecar line now consumes Project State into `generic` / `openclaw` bundles, validates `basebrief-sidecar-v1`, writes `new-window-starter.md`, preserves `pass/fail` receiver acceptance, and closes the public-safe OpenClaw/Hermes manual first-response gap. The `v0.9.x` closure line is frozen: v0.9.0 Integrated Handoff Readiness defines the local line, v0.9.1 Golden Path Closure explains it, v0.9.2 Golden Path Example Closure adds public-safe examples, and v0.9.3 Final Closure / Freeze closes the line without provider requests, runtime integration, schema changes, Auto Flow, plugins, or platform work. The public v1.x Delta Receiver line opened with `v1.0` Delta Handoff RC hardening: a local `delta` command compiles Project State, git facts, changed-file facts, and Seal/Diff state changes into reviewable `delta-handoff.md` while keeping `basebrief-project-state-v1` unchanged. That line is now locally closed and frozen through `v1.9.1`.
 
 The useful product shape is no longer "choose a cache-ready mode for normal work." The stronger direction is:
 
@@ -397,6 +397,43 @@ Local v1.8 closeout status:
   dogfooding evidence for v1.6 fixtures, v1.7 repairs, and existing receiver
   examples
 
+Planned v1.9 direction:
+
+- `docs/releases/v1.9.0-plan.md` defines the Delta Receiver Lint
+  Discoverability / Adoption line
+- keep the work to public navigation and copy-order clarity across
+  `docs/receiver-usage-pack.md`, `docs/checks.md`, `docs/testing.md`,
+  `docs/index.md`, `examples/receiver/usage-pack/README.md`,
+  `examples/receiver/lint/README.md`, and
+  `examples/receiver/lint/repair/README.md`
+- map fixture -> repair -> existing receiver examples without changing checker
+  behavior, rule families, CLI commands, schemas, command output, provider
+  behavior, runtime behavior, plugin, MCP, IDE, hosted, Auto Flow, or
+  publication scope
+
+Local v1.9 closeout status:
+
+- `docs/releases/v1.9.0.md` records the local closeout without making a push,
+  tag, release, package publication, platform, provider, command-output,
+  report-schema, schema-v2, checker-rule, or new-rule-family claim
+- the public read order is usage pack -> usage-pack router -> lint fixture
+  guide -> repair guide -> existing receiver examples
+- release checks and independent tests verify the v1.9 adoption path while
+  preserving `difference_found`, historical drift, and
+  `provider_probe_status=skipped` semantics
+
+Local v1.x final closeout status:
+
+- `docs/releases/v1.9.1.md` records the final local closure / freeze without
+  making a push, tag, release, package publication, platform, provider,
+  command-output, report-schema, schema-v2, checker-rule, new-rule-family, or
+  v1.10 feature-line claim
+- `docs/testing-v1.x-delta-receiver-closure-matrix.md` records the aggregate
+  v1.0-v1.9.1 Delta Receiver closure matrix for release review
+- the v1.x Delta Receiver line is now frozen at local-first, review-based
+  behavior; future work should start a new product line only after the user
+  separately approves scope
+
 ### Phase 8A: Receiver Workflow
 
 Goal: make receiver acceptance explicit and locally verifiable without turning BaseBrief into an agent runtime.
@@ -488,7 +525,7 @@ A new BB experiment is allowed only when all of the following are true:
 
 ## Near-term Priority Order
 
-1. Keep the locally closed v1.0-v1.8 Delta Handoff / Receiver / Starter / Usage Pack / Lint / Fixture / Repair / Dogfooding line reviewable.
+1. Keep the locally closed and frozen v1.x Delta Handoff / Receiver / Starter / Usage Pack / Lint / Fixture / Repair / Dogfooding / Adoption line reviewable.
 2. Keep push, tag, and formal release pending until the user separately approves them.
 3. Choose any later Delta version only from repeated local receiver usage evidence.
 4. Keep installed CLI, plugins, provider experiments, ContextOps expansion, and speculative features frozen unless measured usage creates a concrete blocker.
@@ -517,11 +554,14 @@ BaseBrief is off track if:
 
 ## Current Strategic Decision
 
-The current development cycle has locally closed the v1.0-v1.8 Delta Handoff /
+The current development cycle has locally closed and frozen the v1.x Delta Handoff /
 Receiver line: Delta Handoff, Delta Receiver Acceptance, Delta Receiver Report
 Kit, Delta Receiver Starter Integration, Delta Receiver Usage Pack, Delta
 Receiver Lint Mini, Delta Receiver Lint Fixture Pack, Delta Receiver Lint
-Repair Pack, and Delta Receiver Lint Dogfooding Evidence. The next cycle
+Repair Pack, Delta Receiver Lint Dogfooding Evidence, and Delta Receiver Lint
+Discoverability / Adoption. `docs/releases/v1.9.1.md` and
+`docs/testing-v1.x-delta-receiver-closure-matrix.md` are the final local
+closure records for that line. The next cycle
 should still avoid provider requests, runtime integration, new CLI commands,
 report schemas, command output changes, plugins, MCP, IDE, Auto Flow, or
 publication work unless repeated local usage exposes a concrete blocker.

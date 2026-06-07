@@ -1625,8 +1625,8 @@ test("v0.9.3 final closure freeze aligns the whole v0.9.x line for release revie
 
   assert.match(roadmap, /`v0\.9\.x` closure line is frozen/);
   assert.match(roadmap, /v0\.9\.3 Final Closure \/ Freeze/);
-  assert.match(roadmap, /current `v1\.0` line is Delta Handoff RC hardening/);
-  assert.match(roadmap, /Keep the locally closed v1\.0-v1\.8 Delta Handoff \/ Receiver \/ Starter \/ Usage Pack \/ Lint \/ Fixture \/ Repair \/ Dogfooding line reviewable/);
+  assert.match(roadmap, /public v1\.x Delta Receiver line opened with `v1\.0` Delta Handoff RC hardening/);
+  assert.match(roadmap, /Keep the locally closed and frozen v1\.x Delta Handoff \/ Receiver \/ Starter \/ Usage Pack \/ Lint \/ Fixture \/ Repair \/ Dogfooding \/ Adoption line reviewable/);
   assert.doesNotMatch(roadmap, /Current v0\.9\.0 readiness target/);
 
   for (const relativePath of [
@@ -1670,6 +1670,10 @@ test("v1.0.0 delta handoff RC hardening exposes local-first delta without expand
   const v170Plan = readText("docs/releases/v1.7.0-plan.md");
   const v180Release = readText("docs/releases/v1.8.0.md");
   const v180Plan = readText("docs/releases/v1.8.0-plan.md");
+  const v190Release = readText("docs/releases/v1.9.0.md");
+  const v190Plan = readText("docs/releases/v1.9.0-plan.md");
+  const v191Release = readText("docs/releases/v1.9.1.md");
+  const v1xDeltaReceiverMatrix = readText("docs/testing-v1.x-delta-receiver-closure-matrix.md");
   const plan = readText("docs/releases/v1.0.0-plan.md");
   const rcReview = readText("docs/releases/v1.0.0-rc-review.md");
   const checksDoc = readText("docs/checks.md");
@@ -1693,6 +1697,9 @@ test("v1.0.0 delta handoff RC hardening exposes local-first delta without expand
   assert.match(readme, /docs\/specs\/delta-handoff\.md/);
   assert.match(readme, /docs\/dogfooding\/delta-handoff-fresh-receiver-v1\.0\.md/);
   assert.match(readme, /docs\/dogfooding\/delta-handoff-baseline-advance-v1\.0\.md/);
+  assert.match(readme, /docs\/releases\/v1\.9\.1\.md/);
+  assert.match(readme, /docs\/testing-v1\.x-delta-receiver-closure-matrix\.md/);
+  assert.match(readme, /v1\.x Delta Handoff \/ Receiver line 已本地收口并冻结/);
   assert.match(readme, /Delta Handoff RC hardening/);
   assert.match(readme, /basebrief-project-state-v1` 保持不变/);
   assert.match(readme, /provider_probe_status=skipped/);
@@ -1702,6 +1709,9 @@ test("v1.0.0 delta handoff RC hardening exposes local-first delta without expand
   assert.match(englishReadme, /docs\/specs\/delta-handoff\.md/);
   assert.match(englishReadme, /docs\/dogfooding\/delta-handoff-fresh-receiver-v1\.0\.md/);
   assert.match(englishReadme, /docs\/dogfooding\/delta-handoff-baseline-advance-v1\.0\.md/);
+  assert.match(englishReadme, /docs\/releases\/v1\.9\.1\.md/);
+  assert.match(englishReadme, /docs\/testing-v1\.x-delta-receiver-closure-matrix\.md/);
+  assert.match(englishReadme, /public v1\.x Delta Handoff \/ Receiver line is locally closed and frozen/);
   assert.match(englishReadme, /Delta Handoff RC hardening/);
   assert.match(englishReadme, /basebrief-project-state-v1` remains unchanged/);
   assert.match(englishReadme, /provider_probe_status=skipped/);
@@ -1727,6 +1737,10 @@ test("v1.0.0 delta handoff RC hardening exposes local-first delta without expand
   assert.match(docsIndex, /releases\/v1\.7\.0-plan\.md/);
   assert.match(docsIndex, /releases\/v1\.8\.0\.md/);
   assert.match(docsIndex, /releases\/v1\.8\.0-plan\.md/);
+  assert.match(docsIndex, /releases\/v1\.9\.0\.md/);
+  assert.match(docsIndex, /releases\/v1\.9\.0-plan\.md/);
+  assert.match(docsIndex, /releases\/v1\.9\.1\.md/);
+  assert.match(docsIndex, /testing-v1\.x-delta-receiver-closure-matrix\.md/);
   assert.match(docsIndex, /specs\/delta-handoff\.md/);
   assert.match(docsIndex, /\.\.\/examples\/delta-handoff\.md/);
   assert.match(docsIndex, /dogfooding\/delta-handoff-fresh-receiver-v1\.0\.md/);
@@ -1758,6 +1772,10 @@ test("v1.0.0 delta handoff RC hardening exposes local-first delta without expand
   assert.match(testing, /v1\.7 Delta Receiver Lint Repair Pack Local Closeout/);
   assert.match(testing, /v1\.8 Delta Receiver Lint Dogfooding Evidence Plan/);
   assert.match(testing, /v1\.8 Delta Receiver Lint Dogfooding Evidence Local Closeout/);
+  assert.match(testing, /v1\.9 Delta Receiver Lint Discoverability \/ Adoption Plan/);
+  assert.match(testing, /v1\.9 Delta Receiver Lint Discoverability \/ Adoption Local Closeout/);
+  assert.match(testing, /v1\.9\.1 Delta Receiver Final Closure \/ Freeze/);
+  assert.match(testing, /testing-v1\.x-delta-receiver-closure-matrix\.md/);
   assert.match(testing, /receiver-specific rule families/);
   assert.match(testing, /Markdown\/text report kit/);
   assert.match(testing, /non-blocking historical `commits_in_range` drift/);
@@ -1775,6 +1793,8 @@ test("v1.0.0 delta handoff RC hardening exposes local-first delta without expand
   assert.match(checksDoc, /examples\/receiver\/lint\//);
   assert.match(checksDoc, /examples\/receiver\/lint\/repair\//);
   assert.match(checksDoc, /delta-receiver-lint-dogfooding-v1\.8\.md/);
+  assert.match(checksDoc, /Receiver Lint Adoption Path/);
+  assert.match(checksDoc, /docs\/releases\/v1\.9\.0-plan\.md/);
   assert.match(receiverCheckDoc, /Artifact Checker Compatibility/);
   assert.match(receiverCheckDoc, /examples\/receiver\/difference-found\/receiver-check-result\.json/);
   assert.match(receiverCheckDoc, /basebrief-receiver-check-result-v1/);
@@ -1815,7 +1835,11 @@ test("v1.0.0 delta handoff RC hardening exposes local-first delta without expand
   assert.match(roadmap, /Local v1\.8 closeout status/);
   assert.match(roadmap, /docs\/releases\/v1\.8\.0\.md/);
   assert.match(roadmap, /delta-receiver-lint-dogfooding-v1\.8\.md/);
-  assert.match(roadmap, /v1\.0-v1\.8 Delta Handoff \/ Receiver \/ Starter \/ Usage Pack \/ Lint \/ Fixture \/ Repair \/ Dogfooding line reviewable/);
+  assert.match(roadmap, /Local v1\.x final closeout status/);
+  assert.match(roadmap, /docs\/releases\/v1\.9\.1\.md/);
+  assert.match(roadmap, /docs\/testing-v1\.x-delta-receiver-closure-matrix\.md/);
+  assert.match(roadmap, /locally closed and frozen the v1\.x Delta Handoff/);
+  assert.match(roadmap, /locally closed and frozen v1\.x Delta Handoff \/ Receiver \/ Starter \/ Usage Pack \/ Lint \/ Fixture \/ Repair \/ Dogfooding \/ Adoption line reviewable/);
   assert.match(roadmap, /repeated local receiver usage evidence/);
   assert.doesNotMatch(roadmap, /Next v1\.3 planning target/);
   assert.doesNotMatch(roadmap, /Current v0\.9\.0 readiness target/);
@@ -2134,6 +2158,59 @@ test("v1.0.0 delta handoff RC hardening exposes local-first delta without expand
   assert.match(v180Release, /fixed-result\.json/);
   assert.match(v180Release, /No checker rule change/);
   assert.match(v180Release, /provider_probe_status=skipped/);
+  assert.match(v190Plan, /v1\.9\.0 Delta Receiver Lint Discoverability \/ Adoption Plan/);
+  assert.match(v190Plan, /Make the existing receiver lint public surface easier to find/);
+  assert.match(v190Plan, /examples\/receiver\/usage-pack\/README\.md/);
+  assert.match(v190Plan, /examples\/receiver\/lint\/README\.md/);
+  assert.match(v190Plan, /examples\/receiver\/lint\/repair\/README\.md/);
+  assert.match(v190Plan, /examples\/receiver\/delta-report-difference-found\/README\.md/);
+  assert.match(v190Plan, /No checker rule change/);
+  assert.match(v190Plan, /No new rule family/);
+  assert.match(v190Plan, /No new CLI command/);
+  assert.match(v190Plan, /No machine-readable JSON schema/);
+  assert.match(v190Plan, /No command output format change/);
+  assert.match(v190Plan, /provider_probe_status=skipped/);
+  assert.match(v190Release, /v1\.9\.0 Delta Receiver Lint Discoverability \/ Adoption Local Closeout/);
+  assert.match(v190Release, /docs\/releases\/v1\.9\.0-plan\.md/);
+  assert.match(v190Release, /docs\/receiver-usage-pack\.md/);
+  assert.match(v190Release, /examples\/receiver\/usage-pack\/README\.md/);
+  assert.match(v190Release, /examples\/receiver\/lint\/README\.md/);
+  assert.match(v190Release, /examples\/receiver\/lint\/repair\/README\.md/);
+  assert.match(v190Release, /examples\/receiver\/delta-report-difference-found\/README\.md/);
+  assert.match(v190Release, /Intentional failing fixtures remain learning inputs/);
+  assert.match(v190Release, /difference_found` remains a completed verification result/);
+  assert.match(v190Release, /Historical `commits_in_range` drift remains non-blocking/);
+  assert.match(v190Release, /Receiver lint remains explicit-shape based/);
+  assert.match(v190Release, /No checker rule change/);
+  assert.match(v190Release, /No new rule family/);
+  assert.match(v190Release, /No new CLI command/);
+  assert.match(v190Release, /No machine-readable JSON schema/);
+  assert.match(v190Release, /No command output format change/);
+  assert.match(v190Release, /provider_probe_status=skipped/);
+  assert.match(v191Release, /v1\.9\.1 Delta Receiver Final Closure \/ Freeze/);
+  assert.match(v191Release, /docs\/testing-v1\.x-delta-receiver-closure-matrix\.md/);
+  assert.match(v191Release, /v1\.x Delta Receiver line is frozen/);
+  assert.match(v191Release, /difference_found` remains a completed verification result/);
+  assert.match(v191Release, /Historical `commits_in_range` drift remains non-blocking/);
+  assert.match(v191Release, /Receiver lint remains explicit-shape based/);
+  assert.match(v191Release, /No checker rule change/);
+  assert.match(v191Release, /No new rule family/);
+  assert.match(v191Release, /No new CLI command/);
+  assert.match(v191Release, /No machine-readable JSON schema/);
+  assert.match(v191Release, /No command output format change/);
+  assert.match(v191Release, /No v1\.10 feature line/);
+  assert.match(v191Release, /provider_probe_status=skipped/);
+  assert.match(v1xDeltaReceiverMatrix, /v1\.x Delta Receiver Closure Matrix/);
+  assert.match(v1xDeltaReceiverMatrix, /delta-handoff\.md -> receiver usage pack/);
+  assert.match(v1xDeltaReceiverMatrix, /v1\.0 Delta Handoff/);
+  assert.match(v1xDeltaReceiverMatrix, /v1\.9 Delta Receiver Lint Discoverability \/ Adoption/);
+  assert.match(v1xDeltaReceiverMatrix, /v1\.9\.1 Final Closure \/ Freeze/);
+  assert.match(v1xDeltaReceiverMatrix, /difference_found` remains a completed verification result/);
+  assert.match(v1xDeltaReceiverMatrix, /Historical `commits_in_range` drift remains non-blocking/);
+  assert.match(v1xDeltaReceiverMatrix, /provider_probe_status=skipped/);
+  assert.match(v1xDeltaReceiverMatrix, /No provider request/);
+  assert.match(v1xDeltaReceiverMatrix, /No checker rule change/);
+  assert.match(v1xDeltaReceiverMatrix, /No new rule family/);
   assert.match(spec, /basebrief-delta-baseline-v1/);
   assert.match(spec, /needs-review/);
   assert.match(dogfooding, /handoff_acceptance: pass/);
@@ -2251,13 +2328,22 @@ test("v1.0.0 delta handoff RC hardening exposes local-first delta without expand
   assert.match(receiverUsagePackDoc, /examples\/receiver\/lint\//);
   assert.match(receiverUsagePackDoc, /examples\/receiver\/lint\/repair\//);
   assert.match(receiverUsagePackDoc, /delta-receiver-lint-dogfooding-v1\.8\.md/);
+  assert.match(receiverUsagePackDoc, /Fixture To Repair To Example Path/);
+  assert.match(receiverUsagePackDoc, /docs\/releases\/v1\.9\.0-plan\.md/);
+  assert.match(receiverUsagePackReadme, /If A Receiver Lint Finding Sent You Here/);
+  assert.match(receiverUsagePackReadme, /\.\.\/lint\/README\.md/);
+  assert.match(receiverUsagePackReadme, /\.\.\/lint\/repair\/README\.md/);
   assert.match(receiverLintReadme, /clean-pass-receiver-report\.md/);
   assert.match(receiverLintReadme, /receiver\.missing-report-section/);
   assert.match(receiverLintReadme, /receiver\.invalid-result-consistency/);
   assert.match(receiverLintReadme, /receiver\.missing-drift-semantics/);
+  assert.match(receiverLintReadme, /Public Read Order/);
+  assert.match(receiverLintReadme, /\.\.\/usage-pack\/README\.md/);
   assert.match(receiverLintRepairReadme, /fixed-delta-receiver-report\.md/);
   assert.match(receiverLintRepairReadme, /fixed-result\.json/);
   assert.match(receiverLintRepairReadme, /receiver\.missing-human-anchor/);
+  assert.match(receiverLintRepairReadme, /After Repair/);
+  assert.match(receiverLintRepairReadme, /\.\.\/\.\.\/delta-report-difference-found\/README\.md/);
   assert.match(receiverLintDogfooding, /Delta Receiver Lint Dogfooding v1\.8/);
   assert.match(receiverLintDogfooding, /provider_request_performed: false/);
   assert.match(receiverLintDogfooding, /raw_private_output_copied: false/);
@@ -2324,7 +2410,11 @@ test("v1.0.0 delta handoff RC hardening exposes local-first delta without expand
     "docs/releases/v1.7.0-plan.md",
     "docs/releases/v1.8.0.md",
     "docs/releases/v1.8.0-plan.md",
+    "docs/releases/v1.9.0.md",
+    "docs/releases/v1.9.0-plan.md",
+    "docs/releases/v1.9.1.md",
     "docs/receiver-usage-pack.md",
+    "docs/testing-v1.x-delta-receiver-closure-matrix.md",
     "docs/specs/delta-handoff.md",
     "docs/dogfooding/delta-handoff-fresh-receiver-v1.0.md",
     "docs/dogfooding/delta-handoff-baseline-advance-v1.0.md",

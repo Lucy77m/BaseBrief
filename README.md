@@ -14,7 +14,7 @@ English README: [README.en.md](README.en.md)
 2. [Handoff 契约与产物](docs/handoff.md)
 3. [Integrated Handoff Golden Path](docs/golden-path.md)
 4. [Seal/Diff 阶段变化对比](docs/seal-diff.md)
-5. [v1.0 Delta Handoff RC](docs/releases/v1.0.0.md)
+5. [v1.9.1 Delta Receiver Final Closure / Freeze](docs/releases/v1.9.1.md)
 
 完整文档与实验历史见 [文档索引](docs/index.md)。
 
@@ -76,7 +76,7 @@ node scripts/basebrief.js sidecar-check --input tests/outputs/private/sidecar-ge
 `v0.9.2` 再补上一套 public-safe 的 [Golden Path example kit](examples/golden-path/README.md)，让用户不只知道该走哪条路径，也拿得到 first-pass / follow-up 的公开样例闭环。见 [v0.9.2 Golden Path Example Closure Candidate](docs/releases/v0.9.2.md)。
 `v0.9.3` 最后把 `v0.9.x` 收成一条可发布前审看的 local closure/freeze line：`v0.9.0` 定义，`v0.9.1` 指路，`v0.9.2` 给样例，`v0.9.3` 收口冻结。它只补聚合测试矩阵、路线文案和最终 release doc，不新增命令、不改 schema，也不引入 runtime/provider 行为。见 [v0.9.x Integrated Handoff Closure Matrix](docs/testing-v0.9.x-test-matrix.md) 与 [v0.9.3 Final Closure / Freeze Candidate](docs/releases/v0.9.3.md)。
 
-`v1.0.0` 开启 Delta Handoff RC hardening：新增本地 `delta` 命令，把当前 Project State、git range facts、changed-file facts 和 Seal/Diff 状态变化整理成 reviewable `delta-handoff.md`。它保持 local-first，不推进 provider、runtime、plugin、MCP、IDE、schema-v2 或平台化工作；`basebrief-project-state-v1` 保持不变，未注入 provider 环境变量时 release checks 仍保持 `provider_probe_status=skipped`。入口见 [v1.0.0 Delta Handoff RC Candidate](docs/releases/v1.0.0.md)、[Delta Handoff Spec](docs/specs/delta-handoff.md)、[Delta Handoff fresh receiver dogfooding v1.0](docs/dogfooding/delta-handoff-fresh-receiver-v1.0.md) 与 [Delta Handoff baseline-advance dogfooding v1.0](docs/dogfooding/delta-handoff-baseline-advance-v1.0.md)。
+`v1.0.0` 用 Delta Handoff RC hardening 开启这条线：新增本地 `delta` 命令，把当前 Project State、git range facts、changed-file facts 和 Seal/Diff 状态变化整理成 reviewable `delta-handoff.md`。到 `v1.9.1`，这条 public v1.x Delta Handoff / Receiver line 已本地收口并冻结，覆盖 Delta Handoff、Receiver Acceptance、Report Kit、Starter Integration、Usage Pack、Lint Mini、Fixture Pack、Repair Pack、Dogfooding Evidence 和 Discoverability / Adoption。它始终保持 local-first，不推进 provider、runtime、plugin、MCP、IDE、schema-v2 或平台化工作；`basebrief-project-state-v1` 保持不变，未注入 provider 环境变量时 release checks 仍保持 `provider_probe_status=skipped`。入口见 [v1.9.1 Delta Receiver Final Closure / Freeze](docs/releases/v1.9.1.md)、[v1.x Delta Receiver Closure Matrix](docs/testing-v1.x-delta-receiver-closure-matrix.md)、[v1.0.0 Delta Handoff RC Candidate](docs/releases/v1.0.0.md)、[Delta Handoff Spec](docs/specs/delta-handoff.md)、[Delta Handoff fresh receiver dogfooding v1.0](docs/dogfooding/delta-handoff-fresh-receiver-v1.0.md) 与 [Delta Handoff baseline-advance dogfooding v1.0](docs/dogfooding/delta-handoff-baseline-advance-v1.0.md)。
 
 ## Seal/Diff
 
@@ -136,6 +136,8 @@ BaseBrief 不是聊天客户端、Agent runtime、托管平台、密钥管理器
 - [v0.9.1 Golden Path Closure Candidate](docs/releases/v0.9.1.md)
 - [v0.9.2 Golden Path Example Closure Candidate](docs/releases/v0.9.2.md)
 - [v0.9.3 Final Closure / Freeze Candidate](docs/releases/v0.9.3.md)
+- [v1.9.1 Delta Receiver Final Closure / Freeze](docs/releases/v1.9.1.md)
+- [v1.x Delta Receiver Closure Matrix](docs/testing-v1.x-delta-receiver-closure-matrix.md)
 - [v1.0.0 Delta Handoff RC Candidate](docs/releases/v1.0.0.md)
 - [Delta Handoff Spec](docs/specs/delta-handoff.md)
 - [Delta Handoff fresh receiver dogfooding v1.0](docs/dogfooding/delta-handoff-fresh-receiver-v1.0.md)
