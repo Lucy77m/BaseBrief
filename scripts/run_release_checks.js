@@ -144,6 +144,7 @@ function checkRequiredFiles() {
     "docs/releases/v1.1.0-plan.md",
     "docs/releases/v1.2.0.md",
     "docs/releases/v1.2.0-plan.md",
+    "docs/releases/v1.3.0.md",
     "docs/releases/v1.3.0-plan.md",
     "docs/specs/delta-handoff.md",
     "docs/testing-v0.4.x-test-matrix.md",
@@ -350,6 +351,7 @@ function checkContentContracts() {
   const v110PlanDoc = readText("docs/releases/v1.1.0-plan.md");
   const v120ReleaseDoc = readText("docs/releases/v1.2.0.md");
   const v120PlanDoc = readText("docs/releases/v1.2.0-plan.md");
+  const v130ReleaseDoc = readText("docs/releases/v1.3.0.md");
   const v130PlanDoc = readText("docs/releases/v1.3.0-plan.md");
   const deltaHandoffSpecDoc = readText("docs/specs/delta-handoff.md");
   const postReleaseBaselineDoc = readText("docs/baselines/v0.4.0-post-release-baseline.md");
@@ -633,6 +635,7 @@ function checkContentContracts() {
   assert(docsIndex.includes("../examples/receiver/language-routing/README.md"), "Docs index should link receiver language routing example");
   assert(docsIndex.includes("releases/v1.2.0-plan.md"), "Docs index must link v1.2.0 report kit plan");
   assert(docsIndex.includes("releases/v1.2.0.md"), "Docs index must link v1.2.0 report kit closeout");
+  assert(docsIndex.includes("releases/v1.3.0.md"), "Docs index must link v1.3.0 starter integration closeout");
   assert(docsIndex.includes("releases/v1.3.0-plan.md"), "Docs index must link v1.3.0 starter integration plan");
   assert(docsIndex.includes("dogfooding/delta-receiver-report-kit-v1.2.md"), "Docs index must link v1.2 report kit dogfooding");
   assert(docsIndex.includes("../examples/receiver/delta-report-pass/README.md"), "Docs index should link delta receiver pass report example");
@@ -1057,6 +1060,36 @@ function checkContentContracts() {
   assert(v130PlanDoc.includes("No command output format change"), "v1.3.0 plan must avoid command output changes");
   assert(v130PlanDoc.includes("Thin command exploration"), "v1.3.0 plan must defer command exploration");
   assert(v130PlanDoc.includes("provider_probe_status=skipped"), "v1.3.0 plan must preserve skipped provider gate");
+  assert(v130ReleaseDoc.includes("v1.3.0 Delta Receiver Starter Integration Local Closeout"), "v1.3.0 closeout doc must have stable title");
+  assert(v130ReleaseDoc.includes("Delta Receiver Starter Integration"), "v1.3.0 closeout doc must name starter integration");
+  assert(v130ReleaseDoc.includes("docs/releases/v1.3.0-plan.md"), "v1.3.0 closeout doc must link planning baseline");
+  assert(v130ReleaseDoc.includes("docs/quickstart-5min.md"), "v1.3.0 closeout doc must link quickstart update");
+  assert(v130ReleaseDoc.includes("docs/golden-path.md"), "v1.3.0 closeout doc must link golden-path update");
+  assert(v130ReleaseDoc.includes("examples/golden-path/README.md"), "v1.3.0 closeout doc must link example README");
+  assert(v130ReleaseDoc.includes("examples/golden-path/first-pass-receiver-report.md"), "v1.3.0 closeout doc must link first-pass example");
+  assert(v130ReleaseDoc.includes("examples/golden-path/follow-up-receiver-report.md"), "v1.3.0 closeout doc must link follow-up example");
+  assert(v130ReleaseDoc.includes("templates/zh-CN/NEXT_CHAT_PROMPT.md"), "v1.3.0 closeout doc must link starter template update");
+  assert(v130ReleaseDoc.includes("pass/fail"), "v1.3.0 closeout doc must preserve pass/fail anchor");
+  assert(v130ReleaseDoc.includes("wait for user confirmation"), "v1.3.0 closeout doc must preserve confirmation anchor");
+  assert(v130ReleaseDoc.includes("declared_checks_status"), "v1.3.0 closeout doc must preserve declared checks status");
+  assert(v130ReleaseDoc.includes("current_goal"), "v1.3.0 closeout doc must include current_goal");
+  assert(v130ReleaseDoc.includes("live_repo_state"), "v1.3.0 closeout doc must include live_repo_state");
+  assert(v130ReleaseDoc.includes("inherited_fact_differences"), "v1.3.0 closeout doc must include inherited_fact_differences");
+  assert(v130ReleaseDoc.includes("hard_boundaries"), "v1.3.0 closeout doc must include hard_boundaries");
+  assert(v130ReleaseDoc.includes("next_narrow_slice"), "v1.3.0 closeout doc must include next_narrow_slice");
+  assert(v130ReleaseDoc.includes("source-window inherited facts"), "v1.3.0 closeout doc must separate inherited facts");
+  assert(v130ReleaseDoc.includes("live repo\nfacts"), "v1.3.0 closeout doc must separate live repo facts");
+  assert(v130ReleaseDoc.includes("receiver-window rechecks"), "v1.3.0 closeout doc must separate receiver rechecks");
+  assert(v130ReleaseDoc.includes("difference_found"), "v1.3.0 closeout doc must preserve difference_found semantics");
+  assert(v130ReleaseDoc.includes("historical count drift is non-blocking"), "v1.3.0 closeout doc must explain non-blocking historical count drift");
+  assert(v130ReleaseDoc.includes("No provider request"), "v1.3.0 closeout doc must reject provider scope");
+  assert(v130ReleaseDoc.includes("No runtime integration"), "v1.3.0 closeout doc must reject runtime scope");
+  assert(v130ReleaseDoc.includes("No plugin, MCP, IDE"), "v1.3.0 closeout doc must reject plugin/MCP/IDE scope");
+  assert(v130ReleaseDoc.includes("No schema-v2 work"), "v1.3.0 closeout doc must reject schema-v2 scope");
+  assert(v130ReleaseDoc.includes("No new CLI command"), "v1.3.0 closeout doc must avoid new CLI commands");
+  assert(v130ReleaseDoc.includes("No machine-readable JSON schema"), "v1.3.0 closeout doc must avoid report schema work");
+  assert(v130ReleaseDoc.includes("No command output format change"), "v1.3.0 closeout doc must avoid command output changes");
+  assert(v130ReleaseDoc.includes("provider_probe_status=skipped"), "v1.3.0 closeout doc must preserve skipped provider gate");
   assert(deltaHandoffSpecDoc.includes("basebrief-delta-baseline-v1"), "delta spec must define baseline schema");
   assert(deltaHandoffSpecDoc.includes("reviewed"), "delta spec must define reviewed semantics");
   assert(deltaHandoffSpecDoc.includes("needs-review"), "delta spec must define needs-review semantics");
@@ -1070,7 +1103,7 @@ function checkContentContracts() {
   assert(deltaHandoffExample.includes("stateDiff.status: unchanged"), "delta example must explain unchanged state diffs");
   assert(deltaHandoffExample.includes("Worktree Changed Files"), "delta example must keep worktree changes visible");
   assert(deltaHandoffExample.includes("No provider request"), "delta example must preserve provider boundary");
-  assert(roadmapDoc.includes("Closed v1.0-v1.2 Delta line"), "Roadmap must identify the closed v1.0-v1.2 Delta line");
+  assert(roadmapDoc.includes("Closed v1.0-v1.2 Delta line"), "Roadmap must preserve the v1.0-v1.2 closure history");
   assert(roadmapDoc.includes("Phase 8B: Delta Handoff"), "Roadmap must document Delta Handoff phase");
   assert(roadmapDoc.includes("fresh receiver dogfooding has reported `handoff_acceptance: pass`"), "Roadmap must record fresh receiver pass");
   assert(roadmapDoc.includes("basebrief-project-state-v1` remains unchanged"), "Roadmap must preserve project-state schema in v1.0");
@@ -1081,7 +1114,8 @@ function checkContentContracts() {
   assert(roadmapDoc.includes("docs/releases/v1.1.0.md"), "Roadmap must link v1.1 closeout doc");
   assert(roadmapDoc.includes("Local v1.2 closeout status"), "Roadmap must document v1.2 closeout status");
   assert(roadmapDoc.includes("docs/releases/v1.2.0.md"), "Roadmap must link v1.2 closeout doc");
-  assert(roadmapDoc.includes("Next v1.3 planning target"), "Roadmap must document v1.3 planning target");
+  assert(roadmapDoc.includes("Local v1.3 closeout status"), "Roadmap must document v1.3 closeout status");
+  assert(roadmapDoc.includes("docs/releases/v1.3.0.md"), "Roadmap must link v1.3 closeout doc");
   assert(roadmapDoc.includes("Delta Receiver Starter Integration"), "Roadmap must name v1.3 starter integration");
   assert(roadmapDoc.includes("v1.2 report kit"), "Roadmap must connect v1.3 to the v1.2 report kit");
   assert(contextOpsDoc.includes("not a product surface"), "contextops.md must keep ContextOps out of product surface");
@@ -1097,7 +1131,7 @@ function checkContentContracts() {
   assert(roadmapDoc.includes("The `v0.9.x` closure line is frozen"), "Roadmap must name the frozen v0.9.x closure line");
   assert(roadmapDoc.includes("v0.9.3 Final Closure / Freeze"), "Roadmap must include the v0.9.3 closure stage");
   assert(roadmapDoc.includes("`v0.9.x` closure line is frozen"), "Roadmap must preserve the frozen v0.9.x closure line");
-  assert(roadmapDoc.includes("Keep the locally closed v1.0-v1.2 Delta Handoff / Receiver line reviewable"), "Roadmap must make the closed Delta line the first near-term priority");
+  assert(roadmapDoc.includes("Keep the locally closed v1.0-v1.3 Delta Handoff / Receiver / Starter line reviewable"), "Roadmap must make the closed Delta line the first near-term priority");
   assert(roadmapDoc.includes("provider requests, runtime integration, schema changes"), "Roadmap must keep v0.9.x out of runtime/provider/schema scope");
   assert(goldenPathDoc.includes("Integrated Handoff Golden Path"), "golden-path.md must have a stable title");
   assert(goldenPathDoc.includes("receiver-ready.md -> state-init/state-advance -> sidecar-build -> sidecar-check -> new-window-starter.md -> receiver first response"), "golden-path.md must define the integrated path");
@@ -1144,6 +1178,13 @@ function checkContentContracts() {
   assert(goldenPathExampleReadme.includes("sidecar-build --repo <target-repo>"), "golden-path example README must document sidecar-build");
   assert(goldenPathExampleReadme.includes("sidecar-check --input <sidecar-dir>"), "golden-path example README must document sidecar-check");
   assert(goldenPathExampleReadme.includes("new-window-starter.md"), "golden-path example README must mention the copyable starter");
+  assert(goldenPathExampleReadme.includes("v1.2 Delta Receiver Report Kit"), "golden-path example README must link starter reports to the v1.2 report kit");
+  assert(goldenPathExampleReadme.includes("live_repo_state"), "golden-path example README must mention live_repo_state");
+  assert(goldenPathExampleReadme.includes("inherited_fact_differences"), "golden-path example README must mention inherited_fact_differences");
+  assert(goldenPathExampleReadme.includes("hard_boundaries"), "golden-path example README must mention hard_boundaries");
+  assert(goldenPathExampleReadme.includes("next_narrow_slice"), "golden-path example README must mention next_narrow_slice");
+  assert(goldenPathExampleReadme.includes("receiver-window rechecks"), "golden-path example README must distinguish receiver rechecks");
+  assert(goldenPathExampleReadme.includes("difference_found"), "golden-path example README must preserve difference_found semantics");
   assert(goldenPathExampleReady.includes("handoff_status: ready_for_receiver"), "golden-path receiver-ready sample must stay reviewed");
   assert(goldenPathExampleReady.includes("No provider request"), "golden-path receiver-ready sample must keep no-provider boundary");
   assert(goldenPathExampleReady.includes("No raw private output"), "golden-path receiver-ready sample must keep no-raw-output boundary");
@@ -1155,9 +1196,19 @@ function checkContentContracts() {
   assert(goldenPathExampleFirstPass.includes("pass"), "first-pass receiver sample must report pass/fail outcome");
   assert(goldenPathExampleFirstPass.includes("wait"), "first-pass receiver sample must wait for confirmation");
   assert(goldenPathExampleFirstPass.includes("state-init"), "first-pass receiver sample must identify state-init branch");
+  assert(goldenPathExampleFirstPass.includes("live_repo_state"), "first-pass receiver sample must include live_repo_state");
+  assert(goldenPathExampleFirstPass.includes("inherited_fact_differences"), "first-pass receiver sample must include inherited_fact_differences");
+  assert(goldenPathExampleFirstPass.includes("hard_boundaries"), "first-pass receiver sample must include hard_boundaries");
+  assert(goldenPathExampleFirstPass.includes("next_narrow_slice"), "first-pass receiver sample must include next_narrow_slice");
+  assert(goldenPathExampleFirstPass.includes("difference_found"), "first-pass receiver sample must preserve difference_found semantics");
   assert(goldenPathExampleFollowUp.includes("pass"), "follow-up receiver sample must report pass/fail outcome");
   assert(goldenPathExampleFollowUp.includes("wait"), "follow-up receiver sample must wait for confirmation");
   assert(goldenPathExampleFollowUp.includes("state-advance"), "follow-up receiver sample must identify state-advance branch");
+  assert(goldenPathExampleFollowUp.includes("live_repo_state"), "follow-up receiver sample must include live_repo_state");
+  assert(goldenPathExampleFollowUp.includes("inherited_fact_differences"), "follow-up receiver sample must include inherited_fact_differences");
+  assert(goldenPathExampleFollowUp.includes("hard_boundaries"), "follow-up receiver sample must include hard_boundaries");
+  assert(goldenPathExampleFollowUp.includes("next_narrow_slice"), "follow-up receiver sample must include next_narrow_slice");
+  assert(goldenPathExampleFollowUp.includes("difference_found"), "follow-up receiver sample must preserve difference_found semantics");
   assert(goldenPathExampleBoundary.includes("No provider request"), "golden-path boundary note must reject provider requests");
   assert(goldenPathExampleBoundary.includes("No raw private output"), "golden-path boundary note must reject raw private output");
   assert(goldenPathExampleBoundary.includes("No runtime integration"), "golden-path boundary note must reject runtime integration");
@@ -1278,11 +1329,26 @@ function checkContentContracts() {
   assert(nextChatTemplate.includes("新增、缺失或意外文件"), "NEXT_CHAT_PROMPT.md must require exact changed-file comparison");
   assert(nextChatTemplate.includes("不等于 Agent 执行失败"), "NEXT_CHAT_PROMPT.md must distinguish difference_found from execution failure");
   assert(nextChatTemplate.includes("receiver-check --config <receiver_check_config> --repo <target-repo> --json"), "NEXT_CHAT_PROMPT.md must use the fixed receiver-check command");
+  assert(nextChatTemplate.includes("pass/fail"), "NEXT_CHAT_PROMPT.md must preserve human-facing pass/fail");
+  assert(nextChatTemplate.includes("等待用户确认"), "NEXT_CHAT_PROMPT.md must preserve wait-for-confirmation behavior");
+  assert(nextChatTemplate.includes("live_repo_state"), "NEXT_CHAT_PROMPT.md must mention live_repo_state");
+  assert(nextChatTemplate.includes("inherited_fact_differences"), "NEXT_CHAT_PROMPT.md must mention inherited_fact_differences");
+  assert(nextChatTemplate.includes("hard_boundaries"), "NEXT_CHAT_PROMPT.md must mention hard_boundaries");
+  assert(nextChatTemplate.includes("next_narrow_slice"), "NEXT_CHAT_PROMPT.md must mention next_narrow_slice");
+  assert(nextChatTemplate.includes("source-window inherited facts"), "NEXT_CHAT_PROMPT.md must distinguish source-window inherited facts");
+  assert(nextChatTemplate.includes("receiver-window rechecks"), "NEXT_CHAT_PROMPT.md must distinguish receiver-window rechecks");
+  assert(nextChatTemplate.includes("historical drift"), "NEXT_CHAT_PROMPT.md must explain historical drift handling");
   assert(quickstartDoc.includes("receiver_entry_task"), "Quickstart must explain receiver entry task");
   assert(quickstartDoc.includes("post_acceptance_next_action"), "Quickstart must explain post-acceptance next action");
   assert(quickstartDoc.includes("match_latest_user_message"), "Quickstart must explain response language routing");
   assert(quickstartDoc.includes("expected_changed_files"), "Quickstart must explain exact changed-file comparison");
   assert(quickstartDoc.includes("handoff_acceptance"), "Quickstart must explain receiver acceptance status");
+  assert(quickstartDoc.includes("v1.2 Delta Receiver Report Kit"), "Quickstart must point starter readers to the v1.2 report kit");
+  assert(quickstartDoc.includes("live_repo_state"), "Quickstart must mention live_repo_state");
+  assert(quickstartDoc.includes("inherited_fact_differences"), "Quickstart must mention inherited_fact_differences");
+  assert(quickstartDoc.includes("hard_boundaries"), "Quickstart must mention hard_boundaries");
+  assert(quickstartDoc.includes("next_narrow_slice"), "Quickstart must mention next_narrow_slice");
+  assert(quickstartDoc.includes("historical count drift"), "Quickstart must explain historical count drift");
   assert(knownLimitationsDoc.includes("does not automatically switch"), "Known limitations must state working-directory boundary");
   assert(knownLimitationsDoc.includes("Platform-generated tool traces"), "Known limitations must state language-routing boundary");
   assert(quickstartDoc.includes("receiver_check_config"), "Quickstart must explain optional Receiver Safe Check");
@@ -2236,6 +2302,7 @@ function checkArtifactChecker() {
     "docs/releases/v1.1.0-plan.md",
     "docs/releases/v1.2.0.md",
     "docs/releases/v1.2.0-plan.md",
+    "docs/releases/v1.3.0.md",
     "docs/releases/v1.3.0-plan.md",
     "docs/testing-v0.9.x-test-matrix.md",
     "docs/dogfooding/sidecar-external-receiver-smoke-v0.8.4.md",

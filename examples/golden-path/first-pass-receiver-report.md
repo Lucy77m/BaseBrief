@@ -22,6 +22,44 @@ declared_checks_status: skipped
 handoff_acceptance: pass
 ```
 
+`source_window_inherited_facts`:
+
+- `current_goal`、`receiver_entry_task` 和 `risk_boundaries` 继承自 reviewed handoff。
+- 本例假设 first-pass continuity branch 是 `state-init -> sidecar-build -> sidecar-check -> new-window-starter.md`。
+- 本例不重跑来源窗口完整测试。
+
+`live_repo_state`:
+
+- cwd_vs_target_repo: match
+- starter_branch_path: `state-init`
+- sidecar_bundle_stage: `sidecar-build` and `sidecar-check` already completed before this starter reply
+- raw_git_output_copied: no
+
+`receiver_window_rechecks`:
+
+- starter contract was read in the current receiver window
+- `declared_checks_status: skipped` because no Safe Check was supplied in this public-safe example
+- human-facing `pass/fail` was reported before project work continues
+
+`inherited_fact_differences`:
+
+- none
+- if live facts no longer matched the inherited handoff, `handoff_acceptance` would become `difference_found`, not an execution failure
+- historical `commits_in_range` drift: not_applicable in this sidecar starter example
+
+`hard_boundaries`:
+
+- No provider request
+- No raw private output
+- No runtime integration
+- No schema change
+- No Auto Flow
+- wait for user confirmation before implementation
+
+`next_narrow_slice`:
+
+- After user confirmation, continue the reviewed `state-init` continuity branch without widening scope.
+
 ```text
 actual_handoff_friction:
 - cwd_match: yes

@@ -39,3 +39,17 @@ node scripts/basebrief.js state-history --repo <target-repo> --json
 Both receiver first-response samples assume that `sidecar-build` wrote
 `new-window-starter.md` and that the receiver must report `pass/fail` before
 any project work continues.
+
+They also keep `wait for user confirmation` and show how a starter-facing
+receiver report can borrow the v1.2 Delta Receiver Report Kit fields:
+`current_goal`, `live_repo_state`, `inherited_fact_differences`,
+`hard_boundaries`, and `next_narrow_slice`.
+
+The samples keep source-window inherited facts separate from live repo facts
+and receiver-window rechecks. If live facts stop matching the inherited
+handoff, human-facing `fail` can coexist with
+`handoff_acceptance: difference_found`; that is a completed receiver outcome,
+not an execution failure.
+
+For the full report contract, see
+[v1.2 Delta Receiver Report Kit dogfooding](../../docs/dogfooding/delta-receiver-report-kit-v1.2.md).

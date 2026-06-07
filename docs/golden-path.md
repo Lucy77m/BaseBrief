@@ -81,11 +81,23 @@ node scripts/basebrief.js state-history --repo <target-repo> --json
 response must:
 
 - restate the key fields from the bundle
-- report `pass/fail`
+- keep the human-facing `pass/fail` anchor
+- reuse the v1.2 report-kit fields `current_goal`, `live_repo_state`,
+  `inherited_fact_differences`, `hard_boundaries`, and `next_narrow_slice`
+  when a stable starter report shape is useful
+- keep source-window inherited facts, live repo facts, and receiver-window
+  rechecks separate
+- preserve `declared_checks_status` when Receiver Safe Check is used
 - wait for user confirmation before advancing the work
 
 This keeps the public handoff line human-auditable. It does not create a
 receiver thread automatically and does not auto-advance the workflow.
+
+If live facts no longer match the inherited handoff, human-facing `fail` can
+coexist with `handoff_acceptance: difference_found`; that is a completed
+receiver outcome, not an execution failure. Historical `commits_in_range`
+drift stays non-blocking when refreshed branch, HEAD, and worktree facts match
+live repository state.
 
 ## Example Kit
 
@@ -98,6 +110,7 @@ The kit includes:
 - a reviewed `receiver-ready.md` sample
 - a first-pass receiver first response sample for `state-init`
 - a follow-up receiver first response sample for `state-advance`
+- a starter-facing bridge to the v1.2 Delta Receiver Report Kit field shape
 - a Project State shape reference that points back to the existing public-safe
   state example
 - a boundary note explaining why raw Sidecar output stays in ignored private
@@ -121,6 +134,7 @@ the Receiver Safe Check contract, existing CLI command names, and the
 - [CLI Lite](cli-lite.md)
 - [5-minute quickstart](quickstart-5min.md)
 - [Golden Path example kit](../examples/golden-path/README.md)
+- [v1.2 Delta Receiver Report Kit dogfooding](dogfooding/delta-receiver-report-kit-v1.2.md)
 - [v0.9.0 Integrated Handoff Readiness](releases/v0.9.0.md)
 - [v0.9.1 Golden Path Closure Candidate](releases/v0.9.1.md)
 - [v0.9.2 Golden Path Example Closure Candidate](releases/v0.9.2.md)

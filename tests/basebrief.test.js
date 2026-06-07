@@ -1506,6 +1506,13 @@ test("v0.9.2 golden path example closure provides a public-safe first-pass and f
   assert.match(kitReadme, /sidecar-build --repo <target-repo>/);
   assert.match(kitReadme, /sidecar-check --input <sidecar-dir>/);
   assert.match(kitReadme, /new-window-starter\.md/);
+  assert.match(kitReadme, /v1\.2 Delta Receiver Report Kit/);
+  assert.match(kitReadme, /live_repo_state/);
+  assert.match(kitReadme, /inherited_fact_differences/);
+  assert.match(kitReadme, /hard_boundaries/);
+  assert.match(kitReadme, /next_narrow_slice/);
+  assert.match(kitReadme, /receiver-window rechecks/);
+  assert.match(kitReadme, /difference_found/);
 
   assert.match(ready, /handoff_status: ready_for_receiver/);
   assert.match(ready, /No provider request/);
@@ -1523,6 +1530,11 @@ test("v0.9.2 golden path example closure provides a public-safe first-pass and f
   assert.match(firstPass, /No provider request/);
   assert.match(firstPass, /No raw private output/);
   assert.match(firstPass, /No runtime integration/);
+  assert.match(firstPass, /live_repo_state/);
+  assert.match(firstPass, /inherited_fact_differences/);
+  assert.match(firstPass, /hard_boundaries/);
+  assert.match(firstPass, /next_narrow_slice/);
+  assert.match(firstPass, /difference_found/);
 
   assert.match(followUp, /pass/);
   assert.match(followUp, /wait/);
@@ -1530,6 +1542,11 @@ test("v0.9.2 golden path example closure provides a public-safe first-pass and f
   assert.match(followUp, /No provider request/);
   assert.match(followUp, /No raw private output/);
   assert.match(followUp, /No runtime integration/);
+  assert.match(followUp, /live_repo_state/);
+  assert.match(followUp, /inherited_fact_differences/);
+  assert.match(followUp, /hard_boundaries/);
+  assert.match(followUp, /next_narrow_slice/);
+  assert.match(followUp, /difference_found/);
 
   assert.match(boundary, /No provider request/);
   assert.match(boundary, /No raw private output/);
@@ -1603,7 +1620,7 @@ test("v0.9.3 final closure freeze aligns the whole v0.9.x line for release revie
   assert.match(roadmap, /`v0\.9\.x` closure line is frozen/);
   assert.match(roadmap, /v0\.9\.3 Final Closure \/ Freeze/);
   assert.match(roadmap, /current `v1\.0` line is Delta Handoff RC hardening/);
-  assert.match(roadmap, /Keep the locally closed v1\.0-v1\.2 Delta Handoff \/ Receiver line reviewable/);
+  assert.match(roadmap, /Keep the locally closed v1\.0-v1\.3 Delta Handoff \/ Receiver \/ Starter line reviewable/);
   assert.doesNotMatch(roadmap, /Current v0\.9\.0 readiness target/);
 
   for (const relativePath of [
@@ -1635,6 +1652,7 @@ test("v1.0.0 delta handoff RC hardening exposes local-first delta without expand
   const v110Plan = readText("docs/releases/v1.1.0-plan.md");
   const v120Release = readText("docs/releases/v1.2.0.md");
   const v120Plan = readText("docs/releases/v1.2.0-plan.md");
+  const v130Release = readText("docs/releases/v1.3.0.md");
   const v130Plan = readText("docs/releases/v1.3.0-plan.md");
   const plan = readText("docs/releases/v1.0.0-plan.md");
   const rcReview = readText("docs/releases/v1.0.0-rc-review.md");
@@ -1672,6 +1690,7 @@ test("v1.0.0 delta handoff RC hardening exposes local-first delta without expand
   assert.match(docsIndex, /releases\/v1\.1\.0-plan\.md/);
   assert.match(docsIndex, /releases\/v1\.2\.0-plan\.md/);
   assert.match(docsIndex, /releases\/v1\.2\.0\.md/);
+  assert.match(docsIndex, /releases\/v1\.3\.0\.md/);
   assert.match(docsIndex, /releases\/v1\.3\.0-plan\.md/);
   assert.match(docsIndex, /specs\/delta-handoff\.md/);
   assert.match(docsIndex, /\.\.\/examples\/delta-handoff\.md/);
@@ -1689,6 +1708,7 @@ test("v1.0.0 delta handoff RC hardening exposes local-first delta without expand
   assert.match(testing, /v1\.2 Delta Receiver Report Kit Plan/);
   assert.match(testing, /v1\.2 Delta Receiver Report Kit Local Closeout/);
   assert.match(testing, /v1\.3 Delta Receiver Starter Integration Plan/);
+  assert.match(testing, /v1\.3 Delta Receiver Starter Integration Local Closeout/);
   assert.match(testing, /Markdown\/text report kit/);
   assert.match(testing, /non-blocking historical `commits_in_range` drift/);
   assert.match(testing, /basebrief-project-state-v1` unchanged/);
@@ -1704,9 +1724,13 @@ test("v1.0.0 delta handoff RC hardening exposes local-first delta without expand
   assert.match(roadmap, /docs\/releases\/v1\.1\.0\.md/);
   assert.match(roadmap, /Local v1\.2 closeout status/);
   assert.match(roadmap, /docs\/releases\/v1\.2\.0\.md/);
-  assert.match(roadmap, /Next v1\.3 planning target/);
+  assert.match(roadmap, /Local v1\.3 closeout status/);
+  assert.match(roadmap, /docs\/releases\/v1\.3\.0\.md/);
   assert.match(roadmap, /Delta Receiver Starter Integration/);
   assert.match(roadmap, /v1\.2 report kit/);
+  assert.match(roadmap, /v1\.0-v1\.3 Delta Handoff \/ Receiver \/ Starter line reviewable/);
+  assert.match(roadmap, /repeated local receiver usage evidence/);
+  assert.doesNotMatch(roadmap, /Next v1\.3 planning target/);
   assert.doesNotMatch(roadmap, /Current v0\.9\.0 readiness target/);
 
   assert.match(cliLite, /delta --repo <target-repo> --output-dir <dir>/);
@@ -1842,6 +1866,36 @@ test("v1.0.0 delta handoff RC hardening exposes local-first delta without expand
   assert.match(v120Release, /No machine-readable JSON schema/);
   assert.match(v120Release, /No command output format change/);
   assert.match(v120Release, /provider_probe_status=skipped/);
+  assert.match(v130Release, /v1\.3\.0 Delta Receiver Starter Integration Local Closeout/);
+  assert.match(v130Release, /Delta Receiver Starter Integration/);
+  assert.match(v130Release, /docs\/releases\/v1\.3\.0-plan\.md/);
+  assert.match(v130Release, /docs\/quickstart-5min\.md/);
+  assert.match(v130Release, /docs\/golden-path\.md/);
+  assert.match(v130Release, /examples\/golden-path\/README\.md/);
+  assert.match(v130Release, /examples\/golden-path\/first-pass-receiver-report\.md/);
+  assert.match(v130Release, /examples\/golden-path\/follow-up-receiver-report\.md/);
+  assert.match(v130Release, /templates\/zh-CN\/NEXT_CHAT_PROMPT\.md/);
+  assert.match(v130Release, /pass\/fail/);
+  assert.match(v130Release, /wait for user confirmation/);
+  assert.match(v130Release, /declared_checks_status/);
+  assert.match(v130Release, /current_goal/);
+  assert.match(v130Release, /live_repo_state/);
+  assert.match(v130Release, /inherited_fact_differences/);
+  assert.match(v130Release, /hard_boundaries/);
+  assert.match(v130Release, /next_narrow_slice/);
+  assert.match(v130Release, /source-window inherited facts/);
+  assert.match(v130Release, /live repo\s+facts/);
+  assert.match(v130Release, /receiver-window rechecks/);
+  assert.match(v130Release, /difference_found/);
+  assert.match(v130Release, /historical count drift is non-blocking/);
+  assert.match(v130Release, /No provider request/);
+  assert.match(v130Release, /No runtime integration/);
+  assert.match(v130Release, /No plugin, MCP, IDE/);
+  assert.match(v130Release, /No schema-v2 work/);
+  assert.match(v130Release, /No new CLI command/);
+  assert.match(v130Release, /No machine-readable JSON schema/);
+  assert.match(v130Release, /No command output format change/);
+  assert.match(v130Release, /provider_probe_status=skipped/);
   assert.match(v130Plan, /v1\.3\.0 Delta Receiver Starter Integration Plan/);
   assert.match(v130Plan, /Delta Receiver Starter Integration/);
   assert.match(v130Plan, /v1\.2 report kit/);
@@ -1977,6 +2031,7 @@ test("v1.0.0 delta handoff RC hardening exposes local-first delta without expand
     "docs/releases/v1.1.0-plan.md",
     "docs/releases/v1.2.0.md",
     "docs/releases/v1.2.0-plan.md",
+    "docs/releases/v1.3.0.md",
     "docs/releases/v1.3.0-plan.md",
     "docs/specs/delta-handoff.md",
     "docs/dogfooding/delta-handoff-fresh-receiver-v1.0.md",
@@ -5126,10 +5181,19 @@ test("receiver-ready templates and examples separate entry verification from pro
   assert.match(nextChatTemplate, /receiver-check --config <receiver_check_config> --repo <target-repo> --json/);
   assert.match(nextChatTemplate, /不等同于重跑来源窗口完整测试/);
   assert.match(nextChatTemplate, /新增、缺失或意外文件/);
+  assert.match(nextChatTemplate, /pass\/fail/);
+  assert.match(nextChatTemplate, /等待用户确认/);
   assert.match(nextChatTemplate, /receiver_task_status/);
   assert.match(nextChatTemplate, /repository_state_status/);
   assert.match(nextChatTemplate, /declared_checks_status/);
   assert.match(nextChatTemplate, /handoff_acceptance/);
+  assert.match(nextChatTemplate, /live_repo_state/);
+  assert.match(nextChatTemplate, /inherited_fact_differences/);
+  assert.match(nextChatTemplate, /hard_boundaries/);
+  assert.match(nextChatTemplate, /next_narrow_slice/);
+  assert.match(nextChatTemplate, /source-window inherited facts/);
+  assert.match(nextChatTemplate, /receiver-window rechecks/);
+  assert.match(nextChatTemplate, /historical drift/);
   assert.match(nextChatTemplate, /difference_found.*不等于 Agent 执行失败/s);
 });
 

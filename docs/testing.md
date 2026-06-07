@@ -225,6 +225,28 @@ Expected release-check output without provider env remains:
 provider_probe_status=skipped
 ```
 
+## v1.3 Delta Receiver Starter Integration Local Closeout
+
+`v1.3.0` locally closes the Delta Receiver Starter Integration line. It keeps
+the work in starter-facing docs, golden-path examples, and the copyable
+receiver starter contract without adding provider requests, runtime integration,
+plugins, MCP, IDE, schema-v2 work, new CLI commands, JSON schemas, command
+output changes, or Auto Flow behavior.
+
+The closeout keeps human-facing `pass/fail`, `wait for user confirmation`, and
+`declared_checks_status`, while connecting the v1.2 report-kit fields
+`current_goal`, `live_repo_state`, `inherited_fact_differences`,
+`hard_boundaries`, and `next_narrow_slice` to starter-facing examples. It also
+keeps source-window inherited facts, live repo facts, and receiver-window
+rechecks separate, and treats historical `commits_in_range` drift as
+non-blocking when refreshed branch, HEAD, and worktree facts still match.
+
+Expected release-check output without provider env remains:
+
+```text
+provider_probe_status=skipped
+```
+
 ## v0.4.1 Stabilization Candidate
 
 `v0.4.1` is a stabilization-only cycle after the `v0.4.0` public release. It uses

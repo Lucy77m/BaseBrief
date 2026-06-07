@@ -107,6 +107,7 @@ node scripts/basebrief.js receiver-check --config tests/outputs/private/quicksta
 直接执行 receiver_entry_task，不要再次建议开启新窗口。
 入口核验完成后给出 post_acceptance_next_action，并单独记录实际接力摩擦。
 最后输出 receiver_task_status、repository_state_status、declared_checks_status 和 handoff_acceptance；未启用 Safe Check 时 declared_checks_status 为 skipped。
+如需更稳定的 starter 报告形状，可沿用 v1.2 Delta Receiver Report Kit 的固定字段：current_goal、live_repo_state、inherited_fact_differences、hard_boundaries、next_narrow_slice；同时保留人类可读的 pass/fail 锚点，并把来源窗口继承事实、live repo facts、接收窗口本轮 rechecks 分开写。
 如果事实已经变化，先指出差异，不要猜。
 ```
 
@@ -124,11 +125,13 @@ node scripts/basebrief.js receiver-check --config <receiver_check_config> --repo
 - `handoff_acceptance: difference_found`：入口任务正确完成，并准确报告状态差异；这不是 Agent 执行失败。
 - `handoff_acceptance: blocked`：无法读取交接、定位目标或完成必要核验。
 - `declared_checks_status`：声明检查为 `passed | difference_found | skipped | blocked`；未启用 Safe Check 时为 `skipped`。
+- 历史 dry-run / pre-commit 的 `commits_in_range` 数字可能与当前 ignored delta 不同；只要 refreshed branch、HEAD 和 worktree facts 与 live repo state 一致，这种 historical count drift 默认按 non-blocking 解释。
 
 ## 下一步
 
 - [Handoff 契约](handoff.md)
 - [Integrated Handoff Golden Path](golden-path.md)
+- [v1.2 Delta Receiver Report Kit dogfooding](dogfooding/delta-receiver-report-kit-v1.2.md)
 - [Seal/Diff](seal-diff.md)
 - [模式选择](mode-selection.md)
 - [完整文档索引](index.md)
