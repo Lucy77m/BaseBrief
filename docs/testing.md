@@ -986,6 +986,24 @@ Expected release-check output without provider env remains:
 provider_probe_status=skipped
 ```
 
+## v2.6.10 Context Pack Pre-Release Bundle Audit
+
+`v2.6.10` is a local bundle audit, not a release closeout or new feature line.
+It reviews the ahead-7 local adoption bundle from starter wording repair through
+the v2.6.9 decision checkpoint.
+
+The evidence is recorded in
+[Context Pack Pre-Release Bundle Audit v2.6.10](dogfooding/context-pack-pre-release-bundle-audit-v2.6.10.md).
+It confirms the bundle is docs/examples/release-check/adoption polish only, with
+no CLI behavior change, no Status command, no Workflow Runner, and no JSON
+contract change.
+
+Expected release-check output without provider env remains:
+
+```text
+provider_probe_status=skipped
+```
+
 ## v0.4.1 Stabilization Candidate
 
 `v0.4.1` is a stabilization-only cycle after the `v0.4.0` public release. It uses

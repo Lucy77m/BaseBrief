@@ -446,6 +446,11 @@ incubation. Current evidence does not justify Status, Workflow Runner Lite,
 v3 Continuation Harness, provider/runtime integration, MCP server/tools,
 schema-v2, hosted memory, daemon, watcher, or new public fixture generation.
 
+`docs/dogfooding/context-pack-pre-release-bundle-audit-v2.6.10.md` audits the
+ahead-7 local adoption bundle before any push, tag, release, or pull request.
+It confirms the bundle is docs/examples/release-check/adoption polish only.
+It is not a release closeout, feature implementation, CLI behavior change, Status command, Workflow Runner, or JSON contract change.
+
 ### Later Workflow Runner Lite
 
 Only after Context Pack Lite, Context Pack Check, One-command Resume,

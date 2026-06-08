@@ -194,6 +194,7 @@ function checkRequiredFiles() {
     "docs/dogfooding/context-pack-first-run-rehearsal-audit-v2.6.7.md",
     "docs/dogfooding/context-pack-first-run-friction-repair-v2.6.8.md",
     "docs/dogfooding/context-pack-adoption-decision-checkpoint-v2.6.9.md",
+    "docs/dogfooding/context-pack-pre-release-bundle-audit-v2.6.10.md",
     "docs/testing-v0.4.x-test-matrix.md",
     "docs/testing-v0.6.x-test-matrix.md",
     "docs/testing-v0.7.x-test-matrix.md",
@@ -491,6 +492,7 @@ function checkContentContracts() {
   const contextPackFirstRunRehearsalAuditV267Doc = readText("docs/dogfooding/context-pack-first-run-rehearsal-audit-v2.6.7.md");
   const contextPackFirstRunFrictionRepairV268Doc = readText("docs/dogfooding/context-pack-first-run-friction-repair-v2.6.8.md");
   const contextPackAdoptionDecisionCheckpointV269Doc = readText("docs/dogfooding/context-pack-adoption-decision-checkpoint-v2.6.9.md");
+  const contextPackPreReleaseBundleAuditV2610Doc = readText("docs/dogfooding/context-pack-pre-release-bundle-audit-v2.6.10.md");
   const postReleaseBaselineDoc = readText("docs/baselines/v0.4.0-post-release-baseline.md");
   const v060PostReleaseBaselineDoc = readText("docs/baselines/v0.6.0-post-release-baseline.md");
   const projectStateModelDoc = readText("docs/design/project-state-model.md");
@@ -1012,6 +1014,9 @@ function checkContentContracts() {
   assert(testingDoc.includes("v2.6.9 Context Pack Adoption Decision Checkpoint"), "Testing docs must document v2.6.9 decision checkpoint");
   assert(testingDoc.includes("dogfooding/context-pack-adoption-decision-checkpoint-v2.6.9.md"), "Testing docs must link v2.6.9 decision checkpoint");
   assert(testingDoc.includes("v2.6.x local adoption incubation") && testingDoc.includes("current evidence does not justify Status"), "Testing docs must summarize v2.6.9 decision");
+  assert(testingDoc.includes("v2.6.10 Context Pack Pre-Release Bundle Audit"), "Testing docs must document v2.6.10 bundle audit");
+  assert(testingDoc.includes("dogfooding/context-pack-pre-release-bundle-audit-v2.6.10.md"), "Testing docs must link v2.6.10 bundle audit");
+  assert(testingDoc.includes("ahead-7 local adoption bundle") && testingDoc.includes("docs/examples/release-check/adoption polish only"), "Testing docs must summarize v2.6.10 bundle scope");
   assert(testingDoc.includes("checker_error_propagation_status: pass"), "Testing docs must record checker-error propagation");
   assert(testingDoc.includes("context-pack --repo <target-repo>"), "Testing docs must document context-pack command");
   assert(testingDoc.includes("resume --input <context-pack-dir>"), "Testing docs must document resume command");
@@ -1543,6 +1548,7 @@ function checkContentContracts() {
   assert(docsIndex.includes("dogfooding/context-pack-first-run-rehearsal-audit-v2.6.7.md"), "Docs index must link v2.6.7 rehearsal audit");
   assert(docsIndex.includes("dogfooding/context-pack-first-run-friction-repair-v2.6.8.md"), "Docs index must link v2.6.8 friction repair");
   assert(docsIndex.includes("dogfooding/context-pack-adoption-decision-checkpoint-v2.6.9.md"), "Docs index must link v2.6.9 decision checkpoint");
+  assert(docsIndex.includes("dogfooding/context-pack-pre-release-bundle-audit-v2.6.10.md"), "Docs index must link v2.6.10 bundle audit");
   assert(docsIndex.includes("specs/context-pack-lite.md"), "Docs index must link context pack lite spec");
   assert(docsIndex.includes("specs/context-pack-resume.md"), "Docs index must link context pack resume spec");
   assert(docsIndex.includes("specs/basebrief-format.md"), "Docs index must link basebrief format spec");
@@ -1608,6 +1614,9 @@ function checkContentContracts() {
   assert(v2ContextPackRoadmapDoc.includes("docs/dogfooding/context-pack-adoption-decision-checkpoint-v2.6.9.md"), "v2 roadmap must link v2.6.9 decision checkpoint");
   assert(v2ContextPackRoadmapDoc.includes("continue v2.6.x local adoption") && v2ContextPackRoadmapDoc.includes("Current evidence does not justify Status"), "v2 roadmap must summarize v2.6.9 decision");
   assert(v2ContextPackRoadmapDoc.includes("v3 Continuation Harness") && v2ContextPackRoadmapDoc.includes("new public fixture generation"), "v2 roadmap must keep v2.6.9 feature gates closed");
+  assert(v2ContextPackRoadmapDoc.includes("docs/dogfooding/context-pack-pre-release-bundle-audit-v2.6.10.md"), "v2 roadmap must link v2.6.10 bundle audit");
+  assert(v2ContextPackRoadmapDoc.includes("ahead-7 local adoption bundle") && v2ContextPackRoadmapDoc.includes("not a release closeout"), "v2 roadmap must summarize v2.6.10 bundle audit");
+  assert(v2ContextPackRoadmapDoc.includes("docs/examples/release-check/adoption polish only") && v2ContextPackRoadmapDoc.includes("not a release closeout, feature implementation, CLI behavior change"), "v2 roadmap must keep v2.6.10 out of behavior scope");
   assert(v2ContextPackRoadmapDoc.includes("exports/manifest.json"), "v2 roadmap must define export manifest");
   assert(v2ContextPackRoadmapDoc.includes("exports/context-pack.md"), "v2 roadmap must define readable export");
   assert(v2ContextPackRoadmapDoc.includes("exports/context.json"), "v2 roadmap must define machine-readable export");
@@ -2043,6 +2052,41 @@ function checkContentContracts() {
   assert(contextPackAdoptionDecisionCheckpointV269Doc.includes("provider_probe_status=skipped"), "v2.6.9 decision checkpoint must preserve skipped provider gate");
   assert(!/(^|[^A-Za-z])[A-Za-z]:[\\/]/.test(contextPackAdoptionDecisionCheckpointV269Doc), "v2.6.9 decision checkpoint must not expose drive-letter absolute paths");
   assert(!/\\\\/.test(contextPackAdoptionDecisionCheckpointV269Doc), "v2.6.9 decision checkpoint must not expose UNC paths");
+  assert(contextPackPreReleaseBundleAuditV2610Doc.includes("Context Pack Pre-Release Bundle Audit v2.6.10"), "v2.6.10 bundle audit doc must have stable title");
+  assert(contextPackPreReleaseBundleAuditV2610Doc.includes("local adoption bundle audit, not a release closeout"), "v2.6.10 bundle audit must avoid release closeout claims");
+  assert(contextPackPreReleaseBundleAuditV2610Doc.includes("ahead-7 local sedimentation"), "v2.6.10 bundle audit must preserve ahead-7 semantics");
+  assert(contextPackPreReleaseBundleAuditV2610Doc.includes("starter wording repair"), "v2.6.10 bundle audit must include starter wording repair");
+  assert(contextPackPreReleaseBundleAuditV2610Doc.includes("v2.6.4 reference notes"), "v2.6.10 bundle audit must include v2.6.4 reference notes");
+  assert(contextPackPreReleaseBundleAuditV2610Doc.includes("v2.6.5 scenario matrix"), "v2.6.10 bundle audit must include v2.6.5 scenario matrix");
+  assert(contextPackPreReleaseBundleAuditV2610Doc.includes("v2.6.6 fixture lab"), "v2.6.10 bundle audit must include v2.6.6 fixture lab");
+  assert(contextPackPreReleaseBundleAuditV2610Doc.includes("v2.6.7 rehearsal audit"), "v2.6.10 bundle audit must include v2.6.7 rehearsal audit");
+  assert(contextPackPreReleaseBundleAuditV2610Doc.includes("v2.6.8 friction repair"), "v2.6.10 bundle audit must include v2.6.8 friction repair");
+  assert(contextPackPreReleaseBundleAuditV2610Doc.includes("v2.6.9 decision checkpoint"), "v2.6.10 bundle audit must include v2.6.9 decision checkpoint");
+  assert(contextPackPreReleaseBundleAuditV2610Doc.includes("bundle_status: local_adoption_bundle"), "v2.6.10 bundle audit must record local bundle status");
+  assert(contextPackPreReleaseBundleAuditV2610Doc.includes("release_closeout_status: not_started"), "v2.6.10 bundle audit must keep release closeout not started");
+  assert(contextPackPreReleaseBundleAuditV2610Doc.includes("push_status: not_started"), "v2.6.10 bundle audit must keep push not started");
+  assert(contextPackPreReleaseBundleAuditV2610Doc.includes("tag_status: not_started"), "v2.6.10 bundle audit must keep tag not started");
+  assert(contextPackPreReleaseBundleAuditV2610Doc.includes("release_status: not_started"), "v2.6.10 bundle audit must keep release not started");
+  assert(contextPackPreReleaseBundleAuditV2610Doc.includes("docs/examples/release-check/adoption polish"), "v2.6.10 bundle audit must scope bundle as adoption polish");
+  assert(contextPackPreReleaseBundleAuditV2610Doc.includes("does not introduce CLI behavior"), "v2.6.10 bundle audit must reject CLI behavior changes");
+  assert(contextPackPreReleaseBundleAuditV2610Doc.includes("does not add a new command"), "v2.6.10 bundle audit must reject new commands");
+  assert(contextPackPreReleaseBundleAuditV2610Doc.includes("does not change any public JSON contract"), "v2.6.10 bundle audit must reject JSON contract changes");
+  assert(contextPackPreReleaseBundleAuditV2610Doc.includes("Context Pack seven-file structure"), "v2.6.10 bundle audit must preserve seven-file structure");
+  assert(contextPackPreReleaseBundleAuditV2610Doc.includes("`check --input <dir> --json` top-level shape"), "v2.6.10 bundle audit must preserve checker JSON shape");
+  assert(contextPackPreReleaseBundleAuditV2610Doc.includes("Resume JSON contract"), "v2.6.10 bundle audit must preserve resume JSON contract");
+  assert(contextPackPreReleaseBundleAuditV2610Doc.includes("Doctor JSON contract"), "v2.6.10 bundle audit must preserve doctor JSON contract");
+  assert(contextPackPreReleaseBundleAuditV2610Doc.includes("Export JSON contract"), "v2.6.10 bundle audit must preserve export JSON contract");
+  assert(contextPackPreReleaseBundleAuditV2610Doc.includes("does not implement Status"), "v2.6.10 bundle audit must reject status implementation");
+  assert(contextPackPreReleaseBundleAuditV2610Doc.includes("Workflow Runner"), "v2.6.10 bundle audit must reject workflow runner scope");
+  assert(contextPackPreReleaseBundleAuditV2610Doc.includes("Continuation Harness Lite"), "v2.6.10 bundle audit must keep continuation harness as future-only");
+  assert(contextPackPreReleaseBundleAuditV2610Doc.includes("provider request"), "v2.6.10 bundle audit must reject provider request scope");
+  assert(contextPackPreReleaseBundleAuditV2610Doc.includes("runtime integration"), "v2.6.10 bundle audit must reject runtime scope");
+  assert(contextPackPreReleaseBundleAuditV2610Doc.includes("MCP server/tools"), "v2.6.10 bundle audit must reject MCP scope");
+  assert(contextPackPreReleaseBundleAuditV2610Doc.includes("schema-v2"), "v2.6.10 bundle audit must reject schema-v2");
+  assert(contextPackPreReleaseBundleAuditV2610Doc.includes("hosted memory"), "v2.6.10 bundle audit must reject hosted memory");
+  assert(contextPackPreReleaseBundleAuditV2610Doc.includes("provider_probe_status=skipped"), "v2.6.10 bundle audit must preserve skipped provider gate");
+  assert(!/(^|[^A-Za-z])[A-Za-z]:[\\/]/.test(contextPackPreReleaseBundleAuditV2610Doc), "v2.6.10 bundle audit must not expose drive-letter absolute paths");
+  assert(!/\\\\/.test(contextPackPreReleaseBundleAuditV2610Doc), "v2.6.10 bundle audit must not expose UNC paths");
   assert(contextPackDoctorDogfoodingDoc.includes("Context Pack Doctor Dogfooding v2.5.0"), "doctor dogfooding doc must have stable title");
   assert(contextPackDoctorDogfoodingDoc.includes("doctor_contract_version: basebrief-doctor-v1"), "doctor dogfooding must record contract version");
   assert(contextPackDoctorDogfoodingDoc.includes("doctor_command_status: warning"), "doctor dogfooding must record warning status");
