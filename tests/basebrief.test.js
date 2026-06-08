@@ -10,6 +10,7 @@ const { generateCapsuleFromObject } = require("../scripts/generate_cache_ready_c
 const { generateAnchorFromObject } = require("../scripts/generate_cache_ready_anchor");
 const { generateBb9HandoffFromObject, getProviderProfile } = require("../scripts/generate_bb9_handoff");
 const { EXPORT_FILES, FILE_EXPORT_CONTRACT_VERSION, runExport } = require("../scripts/basebrief_export");
+const { DOCTOR_CONTRACT_VERSION, runDoctor } = require("../scripts/basebrief_doctor");
 const {
   buildHandoffArtifacts,
   extractHandoffJsonBlock,
@@ -17,7 +18,7 @@ const {
 } = require("../scripts/basebrief_build_handoff");
 const { buildAdapterArtifacts, normalizeTargets } = require("../scripts/basebrief_build_adapters");
 const { checkArtifacts } = require("../scripts/basebrief_check_artifacts");
-const { HELP_TEXT, commandBuild, commandCheck, commandContextPack, commandDelta, commandDiff, commandExport, commandInit, commandReceiverCheck, commandReceiverFlow, commandReceiverInit, commandResume, commandReviewDraft, commandSidecarBuild, commandSidecarCheck, commandStateAdvance, commandStateHistory, commandStateInit, commandStateRead, commandStateStatus, commandStateValidate, commandSeal, formatHuman, run, starterInput } = require("../scripts/basebrief");
+const { HELP_TEXT, commandBuild, commandCheck, commandContextPack, commandDelta, commandDiff, commandDoctor, commandExport, commandInit, commandReceiverCheck, commandReceiverFlow, commandReceiverInit, commandResume, commandReviewDraft, commandSidecarBuild, commandSidecarCheck, commandStateAdvance, commandStateHistory, commandStateInit, commandStateRead, commandStateStatus, commandStateValidate, commandSeal, formatHuman, run, starterInput } = require("../scripts/basebrief");
 const {
   CONFIG_SCHEMA_VERSION: RECEIVER_CHECK_SCHEMA_VERSION,
   RESULT_SCHEMA_VERSION: RECEIVER_CHECK_RESULT_SCHEMA_VERSION,
@@ -5434,6 +5435,122 @@ test("v2.4.0 File-only Export stays docs-first and MCP-friendly only", () => {
   }
 });
 
+test("v2.5.0 Context Pack Doctor stays read-only and local-only", () => {
+  const readme = readText("README.md");
+  const englishReadme = readText("README.en.md");
+  const docsIndex = readText("docs/index.md");
+  const cliLite = readText("docs/cli-lite.md");
+  const testing = readText("docs/testing.md");
+  const v2Roadmap = readText("docs/roadmap/basebrief-v2-context-pack-lite.md");
+  const plan = readText("docs/releases/v2.5.0-plan.md");
+  const closeout = readText("docs/releases/v2.5.0.md");
+  const spec = readText("docs/specs/context-pack-doctor.md");
+  const dogfooding = readText("docs/dogfooding/context-pack-doctor-v2.5.0.md");
+  const exampleReadme = readText("examples/context-pack-doctor/README.md");
+
+  assert.match(readme, /doctor --repo <target-repo> --context-pack <context-pack-dir>/);
+  assert.match(readme, /docs\/releases\/v2\.5\.0-plan\.md/);
+  assert.match(readme, /docs\/releases\/v2\.5\.0\.md/);
+  assert.match(readme, /docs\/specs\/context-pack-doctor\.md/);
+  assert.match(readme, /docs\/dogfooding\/context-pack-doctor-v2\.5\.0\.md/);
+  assert.match(readme, /examples\/context-pack-doctor\/README\.md/);
+  assert.match(englishReadme, /doctor --repo <target-repo> --context-pack <context-pack-dir>/);
+  assert.match(englishReadme, /docs\/releases\/v2\.5\.0-plan\.md/);
+  assert.match(englishReadme, /docs\/releases\/v2\.5\.0\.md/);
+  assert.match(englishReadme, /docs\/specs\/context-pack-doctor\.md/);
+  assert.match(englishReadme, /docs\/dogfooding\/context-pack-doctor-v2\.5\.0\.md/);
+  assert.match(englishReadme, /examples\/context-pack-doctor\/README\.md/);
+  assert.match(docsIndex, /releases\/v2\.5\.0-plan\.md/);
+  assert.match(docsIndex, /releases\/v2\.5\.0\.md/);
+  assert.match(docsIndex, /specs\/context-pack-doctor\.md/);
+  assert.match(docsIndex, /dogfooding\/context-pack-doctor-v2\.5\.0\.md/);
+  assert.match(docsIndex, /\.\.\/examples\/context-pack-doctor\/README\.md/);
+  assert.match(cliLite, /doctor --repo <target-repo> --context-pack <context-pack-dir>/);
+  assert.match(cliLite, /basebrief-doctor-v1/);
+  assert.match(cliLite, /read-only/);
+  assert.match(cliLite, /dogfooding\/context-pack-doctor-v2\.5\.0\.md/);
+  assert.match(cliLite, /\.\.\/examples\/context-pack-doctor\/README\.md/);
+  assert.match(testing, /v2\.5\.0 Context Pack Doctor/);
+  assert.match(testing, /doctor_contract_version: basebrief-doctor-v1/);
+  assert.match(testing, /checker_error_propagation_status: pass/);
+  assert.match(testing, /provider_probe_status=skipped/);
+  assert.match(v2Roadmap, /v2\.5 Context Pack Doctor/);
+  assert.match(v2Roadmap, /state-status` already/);
+  assert.match(v2Roadmap, /examples\/context-pack-doctor\//);
+  assert.match(v2Roadmap, /no MCP server\/tools/);
+
+  assert.match(plan, /v2\.5\.0 Context Pack Doctor Plan/);
+  assert.match(plan, /Status: v2\.5-A contract freeze/);
+  assert.match(plan, /basebrief-doctor-v1/);
+  assert.match(plan, /doctor\.worktree-dirty/);
+  assert.match(plan, /doctor\.pack-head-stale/);
+  assert.match(plan, /doctor\.pack-check-error/);
+  assert.match(plan, /doctor\.live-recheck-required/);
+  assert.match(plan, /No `status` command in v2\.5/);
+  assert.match(plan, /No provider request/);
+  assert.match(plan, /No MCP server/);
+  assert.match(plan, /No MCP tools/);
+  assert.match(plan, /No schema-v2/);
+  assert.match(plan, /No Workflow Runner/);
+  assert.match(plan, /provider_probe_status=skipped/);
+
+  assert.match(spec, /Context Pack Doctor Spec/);
+  assert.match(spec, /Status: v2\.5-A contract freeze/);
+  assert.match(spec, /basebrief-doctor-v1/);
+  assert.match(spec, /"command": "doctor"/);
+  assert.match(spec, /"severity": "error\|warning\|info"/);
+  assert.match(spec, /doctor\.pack-branch-mismatch/);
+  assert.match(spec, /Context Pack Check JSON top-level shape/);
+  assert.match(spec, /not a Workflow Runner/);
+  assert.match(spec, /MCP tools/);
+
+  assert.match(closeout, /v2\.5\.0 Context Pack Doctor Local Closeout/);
+  assert.match(closeout, /scripts\/basebrief_doctor\.js/);
+  assert.match(closeout, /doctor --repo <target-repo> --context-pack <context-pack-dir>/);
+  assert.match(closeout, /No `status` command in v2\.5/);
+  assert.match(closeout, /No `export --input <context-pack-dir> --output-dir <dir>` contract change/);
+  assert.match(closeout, /provider_probe_status=skipped/);
+
+  assert.match(dogfooding, /Context Pack Doctor Dogfooding v2\.5\.0/);
+  assert.match(dogfooding, /doctor_contract_version: basebrief-doctor-v1/);
+  assert.match(dogfooding, /doctor_command_status: warning/);
+  assert.match(dogfooding, /checker_error_propagation_status: pass/);
+  assert.match(dogfooding, /public_safety_status: pass/);
+  assert.match(dogfooding, /read_only_status: pass/);
+  assert.match(dogfooding, /provider_probe_status=skipped/);
+  assert.match(dogfooding, /No `status` command/);
+  assert.match(dogfooding, /No MCP server/);
+  assert.match(dogfooding, /No Workflow Runner/);
+
+  assert.match(exampleReadme, /Context Pack Doctor Example Kit/);
+  assert.match(exampleReadme, /basebrief-doctor-v1/);
+  assert.match(exampleReadme, /"repo": "examples\/example-repo"/);
+  assert.match(exampleReadme, /"contextPack": "examples\/context-pack-lite"/);
+  assert.match(exampleReadme, /doctor\.pack-head-stale/);
+  assert.match(exampleReadme, /doctor\.live-recheck-required/);
+  assert.match(exampleReadme, /No provider request/);
+  assert.match(exampleReadme, /No MCP server/);
+  assert.match(exampleReadme, /No MCP tools/);
+  assert.match(exampleReadme, /No Workflow Runner/);
+  assert.match(exampleReadme, /provider_probe_status=skipped/);
+  assert.doesNotMatch(exampleReadme, /[A-Za-z]:[\\/]/);
+  assert.doesNotMatch(exampleReadme, /\\\\/);
+  assert.doesNotMatch(exampleReadme, /tests\/outputs\/private/);
+
+  for (const relativePath of [
+    "docs/releases/v2.5.0-plan.md",
+    "docs/releases/v2.5.0.md",
+    "docs/specs/context-pack-doctor.md",
+    "docs/dogfooding/context-pack-doctor-v2.5.0.md",
+    "examples/context-pack-doctor/README.md",
+  ]) {
+    const result = checkArtifacts({ inputPath: path.join(repoRoot, relativePath) });
+    assert.equal(result.status, "passed", relativePath);
+    assert.equal(result.errorCount, 0, relativePath);
+    assert.equal(result.warningCount, 0, relativePath);
+  }
+});
+
 test("File-only Export writes four public-safe files from checked context-pack input", () => {
   const tempRoot = path.join(repoRoot, "tests", "outputs", "private", `file-export-${Date.now()}`);
   const repoDir = path.join(tempRoot, "repo");
@@ -5571,6 +5688,115 @@ test("File-only Export writes four public-safe files from checked context-pack i
     );
     assert.throws(
       () => runExport({ input: path.join(tempRoot, "missing-pack"), "output-dir": path.join(tempRoot, "bad") }),
+      /Context pack input does not exist/,
+    );
+  } finally {
+    fs.rmSync(tempRoot, { recursive: true, force: true });
+  }
+});
+
+test("Context Pack Doctor reports conservative read-only diagnostics", () => {
+  const tempRoot = path.join(repoRoot, "tests", "outputs", "private", `context-pack-doctor-${Date.now()}`);
+  const repoDir = path.join(tempRoot, "repo");
+  const packDir = path.join(tempRoot, "pack");
+  const stalePackDir = path.join(tempRoot, "stale-pack");
+  const dirtyPackDir = path.join(tempRoot, "dirty-pack");
+  const brokenPackDir = path.join(tempRoot, "broken-pack");
+  try {
+    fs.mkdirSync(path.join(repoDir, "docs"), { recursive: true });
+    fs.writeFileSync(path.join(repoDir, "README.md"), "# Doctor Fixture\n", "utf8");
+    fs.writeFileSync(path.join(repoDir, "docs", "index.md"), "# Docs\n", "utf8");
+    git(repoDir, ["init"]);
+    git(repoDir, ["config", "user.email", "basebrief@example.invalid"]);
+    git(repoDir, ["config", "user.name", "BaseBrief Doctor Test"]);
+    git(repoDir, ["add", "."]);
+    git(repoDir, ["commit", "-m", "doctor fixture"]);
+
+    buildContextPack({ repoPath: repoDir, outputDir: packDir, maxFiles: 4 });
+    fs.appendFileSync(path.join(packDir, "RISK_BOUNDARIES.md"), "\n- No Workflow Runner.\n", "utf8");
+    fs.appendFileSync(path.join(packDir, "NEXT_WINDOW_STARTER.md"), "\n- No Workflow Runner.\n", "utf8");
+
+    const clean = runDoctor({ repo: repoDir, "context-pack": packDir });
+    assert.equal(clean.command, "doctor");
+    assert.equal(clean.contractVersion, DOCTOR_CONTRACT_VERSION);
+    assert.equal(clean.status, "passed");
+    assert.equal(clean.summary.errorCount, 0);
+    assert.equal(clean.summary.warningCount, 0);
+    assert.equal(clean.summary.infoCount, 1);
+    assert(clean.findings.some((finding) => finding.ruleId === "doctor.live-recheck-required"));
+
+    fs.cpSync(packDir, stalePackDir, { recursive: true });
+    fs.writeFileSync(path.join(repoDir, "README.md"), "# Doctor Fixture\n\nUpdated.\n", "utf8");
+    git(repoDir, ["add", "."]);
+    git(repoDir, ["commit", "-m", "doctor stale fixture"]);
+    const stale = runDoctor({ repo: repoDir, "context-pack": stalePackDir });
+    assert.equal(stale.status, "warning");
+    assert(stale.findings.some((finding) => finding.ruleId === "doctor.pack-head-stale"));
+
+    buildContextPack({ repoPath: repoDir, outputDir: dirtyPackDir, maxFiles: 4 });
+    fs.appendFileSync(path.join(dirtyPackDir, "RISK_BOUNDARIES.md"), "\n- No Workflow Runner.\n", "utf8");
+    fs.appendFileSync(path.join(dirtyPackDir, "NEXT_WINDOW_STARTER.md"), "\n- No Workflow Runner.\n", "utf8");
+    fs.writeFileSync(path.join(repoDir, "dirty-note.md"), "dirty\n", "utf8");
+    const dirty = runDoctor({ repo: repoDir, "context-pack": dirtyPackDir });
+    assert.equal(dirty.status, "warning");
+    assert(dirty.findings.some((finding) => finding.ruleId === "doctor.worktree-dirty"));
+
+    fs.cpSync(dirtyPackDir, brokenPackDir, { recursive: true });
+    fs.rmSync(path.join(brokenPackDir, "KEY_FILES.md"));
+    const broken = runDoctor({ repo: repoDir, "context-pack": brokenPackDir });
+    assert.equal(broken.status, "failed");
+    assert(broken.findings.some((finding) => finding.ruleId === "doctor.pack-check-error"));
+    assert(broken.findings.some((finding) => finding.evidence.includes("context-pack.missing-file")));
+
+    const boundary = runDoctor({ repo: repoDir, "context-pack": dirtyPackDir });
+    assert.equal(boundary.findings.some((finding) => finding.ruleId === "doctor.no-provider-boundary"), false);
+    const missingBoundaryDir = path.join(tempRoot, "missing-boundary-pack");
+    fs.cpSync(dirtyPackDir, missingBoundaryDir, { recursive: true });
+    fs.writeFileSync(
+      path.join(missingBoundaryDir, "RISK_BOUNDARIES.md"),
+      fs.readFileSync(path.join(missingBoundaryDir, "RISK_BOUNDARIES.md"), "utf8").replace(/^- No Workflow Runner\.\r?\n/m, ""),
+      "utf8",
+    );
+    fs.writeFileSync(
+      path.join(missingBoundaryDir, "NEXT_WINDOW_STARTER.md"),
+      fs.readFileSync(path.join(missingBoundaryDir, "NEXT_WINDOW_STARTER.md"), "utf8").replace(/^- No Workflow Runner\.\r?\n/m, ""),
+      "utf8",
+    );
+    const missingBoundary = runDoctor({ repo: repoDir, "context-pack": missingBoundaryDir });
+    assert(missingBoundary.findings.some((finding) => finding.ruleId === "doctor.no-provider-boundary"));
+
+    assert.match(formatHuman(commandDoctor({ repo: repoDir, "context-pack": dirtyPackDir })), /BaseBrief doctor warning/);
+    assert.match(HELP_TEXT, /doctor --repo <target-repo> --context-pack <context-pack-dir>/);
+    assert.equal(run(["node", "scripts/basebrief.js", "doctor", "--repo", repoDir, "--context-pack", dirtyPackDir]).command, "doctor");
+
+    const cli = spawnSync(process.execPath, [
+      "scripts/basebrief.js",
+      "doctor",
+      "--repo",
+      repoDir,
+      "--context-pack",
+      dirtyPackDir,
+      "--json",
+    ], { cwd: repoRoot, encoding: "utf8" });
+    assert.equal(cli.status, 0, cli.stderr);
+    const cliResult = JSON.parse(cli.stdout);
+    assert.equal(cliResult.command, "doctor");
+    assert.equal(cliResult.contractVersion, DOCTOR_CONTRACT_VERSION);
+    assert.equal(cliResult.repo.startsWith("tests"), true);
+    assert.equal(cliResult.contextPack.startsWith("tests"), true);
+    assert.doesNotMatch(JSON.stringify(cliResult), /[A-Za-z]:[\\/]/);
+    assert.doesNotMatch(JSON.stringify(cliResult), /\\\\/);
+
+    assert.throws(
+      () => runDoctor({ repo: repoDir, "context-pack": path.join(tempRoot, ".env", "pack") }),
+      /must not use an \.env path/,
+    );
+    assert.throws(
+      () => runDoctor({ repo: path.join(repoDir, ".git"), "context-pack": dirtyPackDir }),
+      /must not use a \.git path/,
+    );
+    assert.throws(
+      () => runDoctor({ repo: repoDir, "context-pack": path.join(tempRoot, "missing-pack") }),
       /Context pack input does not exist/,
     );
   } finally {

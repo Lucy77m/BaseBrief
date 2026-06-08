@@ -25,6 +25,7 @@ const { runDelta } = require("./basebrief_delta");
 const { buildContextPack } = require("./basebrief_context_pack");
 const { runResume } = require("./basebrief_resume");
 const { runExport } = require("./basebrief_export");
+const { runDoctor } = require("./basebrief_doctor");
 
 const STARTER_FILE = "basebrief-handoff-input.json";
 const HELP_TEXT = [
@@ -53,6 +54,7 @@ const HELP_TEXT = [
   "  node scripts/basebrief.js context-pack --repo <target-repo> --output-dir <dir> [--since <commit>] [--max-files <n>] [--json]",
   "  node scripts/basebrief.js resume --input <context-pack-dir> [--json]",
   "  node scripts/basebrief.js export --input <context-pack-dir> --output-dir <dir> [--json]",
+  "  node scripts/basebrief.js doctor --repo <target-repo> --context-pack <context-pack-dir> [--json]",
   "",
   "Start here:",
   "  docs/quickstart-5min.md",
@@ -377,6 +379,13 @@ function commandExport(options) {
   });
 }
 
+function commandDoctor(options) {
+  return runDoctor({
+    repo: options.repo,
+    "context-pack": options["context-pack"],
+  });
+}
+
 function run(argv) {
   const command = argv[2];
   if (!command || command === "--help" || command === "-h") return { command: "help" };
@@ -405,6 +414,7 @@ function run(argv) {
   if (command === "context-pack") return commandContextPack(options);
   if (command === "resume") return commandResume(options);
   if (command === "export") return commandExport(options);
+  if (command === "doctor") return commandDoctor(options);
   throw new Error(`Unknown command: ${command}`);
 }
 
@@ -554,6 +564,13 @@ function toPublicResult(result) {
       input: publicPath(result.input, cwd),
       outputDir: publicPath(result.outputDir, cwd),
       outputFiles: toRelativeMap(result.outputFiles, cwd),
+    };
+  }
+  if (result.command === "doctor") {
+    return {
+      ...result,
+      repo: publicPath(result.repo, cwd).replace(/\\/g, "/"),
+      contextPack: publicPath(result.contextPack, cwd).replace(/\\/g, "/"),
     };
   }
   return result;
@@ -745,6 +762,13 @@ function formatHuman(result) {
       "",
     ].join(os.EOL);
   }
+  if (result.command === "doctor") {
+    return [
+      `BaseBrief doctor ${result.status}: errors=${result.summary.errorCount}, warnings=${result.summary.warningCount}, info=${result.summary.infoCount}`,
+      ...result.findings.map((finding) => `${finding.severity} ${finding.ruleId} ${finding.source} ${finding.evidence} ${finding.message}`),
+      "",
+    ].join(os.EOL);
+  }
   return `${JSON.stringify(result, null, 2)}${os.EOL}`;
 }
 
@@ -816,6 +840,7 @@ module.exports = {
   commandContextPack,
   commandResume,
   commandExport,
+  commandDoctor,
   formatFindingLines,
   formatHuman,
   parseOptions,

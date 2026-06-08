@@ -174,14 +174,18 @@ function checkRequiredFiles() {
     "docs/releases/v2.3.0-plan.md",
     "docs/releases/v2.4.0-plan.md",
     "docs/releases/v2.4.0.md",
+    "docs/releases/v2.5.0-plan.md",
+    "docs/releases/v2.5.0.md",
     "docs/specs/context-pack-resume.md",
     "docs/specs/basebrief-format.md",
     "docs/specs/file-only-export.md",
+    "docs/specs/context-pack-doctor.md",
     "docs/roadmap/basebrief-v2-context-pack-lite.md",
     "docs/dogfooding/context-pack-lite-fresh-receiver-v2.0.0.md",
     "docs/dogfooding/context-pack-check-acceptance-v2.1.0.md",
     "docs/dogfooding/context-pack-resume-v2.2.0.md",
     "docs/dogfooding/file-only-export-v2.4.0.md",
+    "docs/dogfooding/context-pack-doctor-v2.5.0.md",
     "docs/testing-v0.4.x-test-matrix.md",
     "docs/testing-v0.6.x-test-matrix.md",
     "docs/testing-v0.7.x-test-matrix.md",
@@ -228,6 +232,7 @@ function checkRequiredFiles() {
     "scripts/basebrief_delta.js",
     "scripts/basebrief_context_pack.js",
     "scripts/basebrief_export.js",
+    "scripts/basebrief_doctor.js",
     "scripts/basebrief_resume.js",
     "scripts/bb9_provider_profiles.json",
     "schemas/bb9-handoff.schema.json",
@@ -270,6 +275,7 @@ function checkRequiredFiles() {
     "examples/file-only-export/exports/context-pack.md",
     "examples/file-only-export/exports/context.json",
     "examples/file-only-export/exports/adapter-notes.md",
+    "examples/context-pack-doctor/README.md",
     "examples/next-chat-example.md",
     "examples/receiver-check-config.json",
     "examples/receiver/difference-found/README.md",
@@ -453,16 +459,21 @@ function checkContentContracts() {
   const v230PlanDoc = readText("docs/releases/v2.3.0-plan.md");
   const v240PlanDoc = readText("docs/releases/v2.4.0-plan.md");
   const v240ReleaseDoc = readText("docs/releases/v2.4.0.md");
+  const v250PlanDoc = readText("docs/releases/v2.5.0-plan.md");
+  const v250ReleaseDoc = readText("docs/releases/v2.5.0.md");
   const contextPackResumeSpecDoc = readText("docs/specs/context-pack-resume.md");
   const basebriefFormatSpecDoc = readText("docs/specs/basebrief-format.md");
   const fileOnlyExportSpecDoc = readText("docs/specs/file-only-export.md");
+  const contextPackDoctorSpecDoc = readText("docs/specs/context-pack-doctor.md");
   const basebriefCliScript = readText("scripts/basebrief.js");
   const basebriefExportScript = readText("scripts/basebrief_export.js");
+  const basebriefDoctorScript = readText("scripts/basebrief_doctor.js");
   const v2ContextPackRoadmapDoc = readText("docs/roadmap/basebrief-v2-context-pack-lite.md");
   const contextPackLiteDogfoodingDoc = readText("docs/dogfooding/context-pack-lite-fresh-receiver-v2.0.0.md");
   const contextPackCheckDogfoodingDoc = readText("docs/dogfooding/context-pack-check-acceptance-v2.1.0.md");
   const contextPackResumeDogfoodingDoc = readText("docs/dogfooding/context-pack-resume-v2.2.0.md");
   const fileOnlyExportDogfoodingDoc = readText("docs/dogfooding/file-only-export-v2.4.0.md");
+  const contextPackDoctorDogfoodingDoc = readText("docs/dogfooding/context-pack-doctor-v2.5.0.md");
   const postReleaseBaselineDoc = readText("docs/baselines/v0.4.0-post-release-baseline.md");
   const v060PostReleaseBaselineDoc = readText("docs/baselines/v0.6.0-post-release-baseline.md");
   const projectStateModelDoc = readText("docs/design/project-state-model.md");
@@ -505,6 +516,7 @@ function checkContentContracts() {
   const fileOnlyExportExampleContext = readJson("examples/file-only-export/exports/context.json");
   const fileOnlyExportExampleContextPack = readText("examples/file-only-export/exports/context-pack.md");
   const fileOnlyExportExampleAdapterNotes = readText("examples/file-only-export/exports/adapter-notes.md");
+  const contextPackDoctorExampleReadme = readText("examples/context-pack-doctor/README.md");
   const fileOnlyExportExpectedSourceFiles = [
     "MANIFEST.md",
     "REPO_MAP.md",
@@ -621,6 +633,12 @@ function checkContentContracts() {
   assert(readme.includes("docs/dogfooding/file-only-export-v2.4.0.md"), "README.md should link to v2.4 file-only export dogfooding");
   assert(readme.includes("examples/file-only-export/README.md"), "README.md should link to file-only export example kit");
   assert(readme.includes("export --input <context-pack-dir> --output-dir <dir>"), "README.md should mention export command");
+  assert(readme.includes("docs/releases/v2.5.0-plan.md"), "README.md should link to v2.5 doctor plan");
+  assert(readme.includes("docs/releases/v2.5.0.md"), "README.md should link to v2.5 doctor closeout");
+  assert(readme.includes("docs/specs/context-pack-doctor.md"), "README.md should link to context pack doctor spec");
+  assert(readme.includes("docs/dogfooding/context-pack-doctor-v2.5.0.md"), "README.md should link to v2.5 doctor dogfooding");
+  assert(readme.includes("examples/context-pack-doctor/README.md"), "README.md should link to context pack doctor example kit");
+  assert(readme.includes("doctor --repo <target-repo> --context-pack <context-pack-dir>"), "README.md should mention doctor command");
   assert(readme.includes("resume --input <context-pack-dir>"), "README.md should mention resume command");
   assert(readme.includes("examples/context-pack-lite/README.md"), "README.md should link to context pack example kit");
   assert(readme.includes("docs/dogfooding/context-pack-lite-fresh-receiver-v2.0.0.md"), "README.md should link to context pack dogfooding");
@@ -731,6 +749,12 @@ function checkContentContracts() {
   assert(englishReadme.includes("docs/dogfooding/file-only-export-v2.4.0.md"), "README.en.md should link to v2.4 file-only export dogfooding");
   assert(englishReadme.includes("examples/file-only-export/README.md"), "README.en.md should link to file-only export example kit");
   assert(englishReadme.includes("export --input <context-pack-dir> --output-dir <dir>"), "README.en.md should mention export command");
+  assert(englishReadme.includes("docs/releases/v2.5.0-plan.md"), "README.en.md should link to v2.5 doctor plan");
+  assert(englishReadme.includes("docs/releases/v2.5.0.md"), "README.en.md should link to v2.5 doctor closeout");
+  assert(englishReadme.includes("docs/specs/context-pack-doctor.md"), "README.en.md should link to context pack doctor spec");
+  assert(englishReadme.includes("docs/dogfooding/context-pack-doctor-v2.5.0.md"), "README.en.md should link to v2.5 doctor dogfooding");
+  assert(englishReadme.includes("examples/context-pack-doctor/README.md"), "README.en.md should link to context pack doctor example kit");
+  assert(englishReadme.includes("doctor --repo <target-repo> --context-pack <context-pack-dir>"), "README.en.md should mention doctor command");
   assert(englishReadme.includes("resume --input <context-pack-dir>"), "README.en.md should mention resume command");
   assert(englishReadme.includes("examples/context-pack-lite/README.md"), "README.en.md should link to context pack example kit");
   assert(englishReadme.includes("docs/dogfooding/context-pack-lite-fresh-receiver-v2.0.0.md"), "README.en.md should link to context pack dogfooding");
@@ -1037,6 +1061,12 @@ function checkContentContracts() {
   assert(testingDoc.includes("../examples/file-only-export/README.md"), "Testing docs must link file-only export example kit");
   assert(testingDoc.includes("examples/file-only-export/exports/` is a recommended example output directory"), "Testing docs must clarify example export directory naming");
   assert(testingDoc.includes("receiver_style_acceptance: pass"), "Testing docs must record v2.4 export receiver-style acceptance");
+  assert(testingDoc.includes("v2.5.0 Context Pack Doctor"), "Testing docs must document v2.5 context pack doctor");
+  assert(testingDoc.includes("doctor --repo <target-repo> --context-pack <context-pack-dir>"), "Testing docs must document doctor command");
+  assert(testingDoc.includes("Context Pack Doctor Dogfooding v2.5.0"), "Testing docs must link v2.5 doctor dogfooding");
+  assert(testingDoc.includes("../examples/context-pack-doctor/README.md"), "Testing docs must link context pack doctor example kit");
+  assert(testingDoc.includes("doctor_contract_version: basebrief-doctor-v1"), "Testing docs must record doctor contract version");
+  assert(testingDoc.includes("checker_error_propagation_status: pass"), "Testing docs must record checker-error propagation");
   assert(testingDoc.includes("context-pack --repo <target-repo>"), "Testing docs must document context-pack command");
   assert(testingDoc.includes("resume --input <context-pack-dir>"), "Testing docs must document resume command");
   assert(testingDoc.includes("context-pack.md"), "Testing docs must mention context-pack.md");
@@ -1127,6 +1157,7 @@ function checkContentContracts() {
   assert(cliLiteDoc.includes("node scripts/basebrief.js context-pack --repo <target-repo> --output-dir <dir>"), "cli-lite.md must document context-pack command");
   assert(cliLiteDoc.includes("node scripts/basebrief.js resume --input <context-pack-dir>"), "cli-lite.md must document resume command");
   assert(cliLiteDoc.includes("node scripts/basebrief.js export --input <context-pack-dir> --output-dir <dir>"), "cli-lite.md must document export command");
+  assert(cliLiteDoc.includes("node scripts/basebrief.js doctor --repo <target-repo> --context-pack <context-pack-dir>"), "cli-lite.md must document doctor command");
   assert(cliLiteDoc.includes("manifest.json"), "cli-lite.md must document export manifest");
   assert(cliLiteDoc.includes("context-pack.md"), "cli-lite.md must document readable export file");
   assert(cliLiteDoc.includes("context.json"), "cli-lite.md must document machine-readable export file");
@@ -1138,6 +1169,11 @@ function checkContentContracts() {
   assert(cliLiteDoc.includes("specs/file-only-export.md"), "cli-lite.md must link file-only export spec");
   assert(cliLiteDoc.includes("dogfooding/file-only-export-v2.4.0.md"), "cli-lite.md must link file-only export dogfooding");
   assert(cliLiteDoc.includes("../examples/file-only-export/README.md"), "cli-lite.md must link file-only export example kit");
+  assert(cliLiteDoc.includes("releases/v2.5.0-plan.md"), "cli-lite.md must link v2.5.0 doctor plan");
+  assert(cliLiteDoc.includes("releases/v2.5.0.md"), "cli-lite.md must link v2.5.0 doctor closeout");
+  assert(cliLiteDoc.includes("specs/context-pack-doctor.md"), "cli-lite.md must link context pack doctor spec");
+  assert(cliLiteDoc.includes("dogfooding/context-pack-doctor-v2.5.0.md"), "cli-lite.md must link context pack doctor dogfooding");
+  assert(cliLiteDoc.includes("../examples/context-pack-doctor/README.md"), "cli-lite.md must link context pack doctor example kit");
   assert(cliLiteDoc.includes("auto-created nested directory"), "cli-lite.md must clarify export directory naming");
   assert(cliLiteDoc.includes("examples/context-pack-lite/README.md"), "cli-lite.md must link context pack example kit");
   assert(cliLiteDoc.includes("releases/v2.0.0.md"), "cli-lite.md must link v2.0.0 closeout");
@@ -1548,6 +1584,11 @@ function checkContentContracts() {
   assert(docsIndex.includes("releases/v2.4.0.md"), "Docs index must link v2.4.0 file-only export closeout");
   assert(docsIndex.includes("dogfooding/file-only-export-v2.4.0.md"), "Docs index must link v2.4.0 file-only export dogfooding");
   assert(docsIndex.includes("../examples/file-only-export/README.md"), "Docs index must link file-only export example kit");
+  assert(docsIndex.includes("releases/v2.5.0-plan.md"), "Docs index must link v2.5.0 doctor plan");
+  assert(docsIndex.includes("releases/v2.5.0.md"), "Docs index must link v2.5.0 doctor closeout");
+  assert(docsIndex.includes("specs/context-pack-doctor.md"), "Docs index must link context pack doctor spec");
+  assert(docsIndex.includes("dogfooding/context-pack-doctor-v2.5.0.md"), "Docs index must link v2.5.0 doctor dogfooding");
+  assert(docsIndex.includes("../examples/context-pack-doctor/README.md"), "Docs index must link context pack doctor example kit");
   assert(docsIndex.includes("specs/context-pack-lite.md"), "Docs index must link context pack lite spec");
   assert(docsIndex.includes("specs/context-pack-resume.md"), "Docs index must link context pack resume spec");
   assert(docsIndex.includes("specs/basebrief-format.md"), "Docs index must link basebrief format spec");
@@ -1577,6 +1618,14 @@ function checkContentContracts() {
   assert(v2ContextPackRoadmapDoc.includes("v2.4-D is example-kit and contract-wording polish"), "v2 roadmap must name v2.4-D example polish");
   assert(v2ContextPackRoadmapDoc.includes("examples/file-only-export/"), "v2 roadmap must link file-only export example kit");
   assert(v2ContextPackRoadmapDoc.includes("not an auto-created nested directory"), "v2 roadmap must clarify export directory naming");
+  assert(v2ContextPackRoadmapDoc.includes("v2.5 Context Pack Doctor"), "v2 roadmap must reserve doctor for v2.5");
+  assert(v2ContextPackRoadmapDoc.includes("docs/releases/v2.5.0-plan.md"), "v2 roadmap must link v2.5 plan");
+  assert(v2ContextPackRoadmapDoc.includes("docs/releases/v2.5.0.md"), "v2 roadmap must link v2.5 closeout");
+  assert(v2ContextPackRoadmapDoc.includes("docs/specs/context-pack-doctor.md"), "v2 roadmap must link doctor spec");
+  assert(v2ContextPackRoadmapDoc.includes("docs/dogfooding/context-pack-doctor-v2.5.0.md"), "v2 roadmap must link doctor dogfooding");
+  assert(v2ContextPackRoadmapDoc.includes("examples/context-pack-doctor/"), "v2 roadmap must link doctor example kit");
+  assert(v2ContextPackRoadmapDoc.includes("state-status` already"), "v2 roadmap must explain why doctor precedes broader status");
+  assert(v2ContextPackRoadmapDoc.includes("basebrief-doctor-v1"), "v2 roadmap must name doctor contract version");
   assert(v2ContextPackRoadmapDoc.includes("exports/manifest.json"), "v2 roadmap must define export manifest");
   assert(v2ContextPackRoadmapDoc.includes("exports/context-pack.md"), "v2 roadmap must define readable export");
   assert(v2ContextPackRoadmapDoc.includes("exports/context.json"), "v2 roadmap must define machine-readable export");
@@ -1759,6 +1808,65 @@ function checkContentContracts() {
   assert(basebriefExportScript.includes('basebrief-file-export-v1'), "export script must declare contract version");
   assert(basebriefExportScript.includes('Context pack check failed'), "export script must block errored packs");
   assert(basebriefExportScript.includes('manifest.json'), "export script must write manifest.json");
+  assert(v250PlanDoc.includes("v2.5.0 Context Pack Doctor Plan"), "v2.5 plan must have stable title");
+  assert(v250PlanDoc.includes("Status: v2.5-A contract freeze"), "v2.5 plan must mark contract freeze status");
+  assert(v250PlanDoc.includes("doctor --repo <target-repo> --context-pack <context-pack-dir>"), "v2.5 plan must document doctor command");
+  assert(v250PlanDoc.includes("basebrief-doctor-v1"), "v2.5 plan must name doctor contract version");
+  assert(v250PlanDoc.includes("doctor.worktree-dirty"), "v2.5 plan must define dirty worktree rule");
+  assert(v250PlanDoc.includes("doctor.pack-head-stale"), "v2.5 plan must define stale HEAD rule");
+  assert(v250PlanDoc.includes("doctor.pack-check-error"), "v2.5 plan must define checker error rule");
+  assert(v250PlanDoc.includes("doctor.live-recheck-required"), "v2.5 plan must define live recheck rule");
+  assert(v250PlanDoc.includes("No `status` command in v2.5"), "v2.5 plan must leave broader status out of scope");
+  assert(v250PlanDoc.includes("No provider request"), "v2.5 plan must preserve provider boundary");
+  assert(v250PlanDoc.includes("No MCP server"), "v2.5 plan must reject MCP server scope");
+  assert(v250PlanDoc.includes("No MCP tools"), "v2.5 plan must reject MCP tools scope");
+  assert(v250PlanDoc.includes("No schema-v2"), "v2.5 plan must reject schema-v2");
+  assert(v250PlanDoc.includes("No Workflow Runner"), "v2.5 plan must keep runner out of scope");
+  assert(v250PlanDoc.includes("provider_probe_status=skipped"), "v2.5 plan must preserve skipped provider gate");
+  assert(contextPackDoctorSpecDoc.includes("Context Pack Doctor Spec"), "doctor spec must have stable title");
+  assert(contextPackDoctorSpecDoc.includes("Status: v2.5-A contract freeze"), "doctor spec must mark contract freeze status");
+  assert(contextPackDoctorSpecDoc.includes("basebrief-doctor-v1"), "doctor spec must name contract version");
+  assert(contextPackDoctorSpecDoc.includes('"command": "doctor"'), "doctor spec must define command field");
+  assert(contextPackDoctorSpecDoc.includes('"severity": "error|warning|info"'), "doctor spec must define severity field");
+  assert(contextPackDoctorSpecDoc.includes("doctor.pack-branch-mismatch"), "doctor spec must define branch mismatch rule");
+  assert(contextPackDoctorSpecDoc.includes("Context Pack Check JSON top-level shape"), "doctor spec must preserve checker JSON shape");
+  assert(contextPackDoctorSpecDoc.includes("not a Workflow Runner"), "doctor spec must reject runner scope");
+  assert(contextPackDoctorSpecDoc.includes("MCP tools"), "doctor spec must reject MCP tools scope");
+  assert(v250ReleaseDoc.includes("v2.5.0 Context Pack Doctor Local Closeout"), "v2.5 closeout doc must have stable title");
+  assert(v250ReleaseDoc.includes("scripts/basebrief_doctor.js"), "v2.5 closeout doc must mention doctor module");
+  assert(v250ReleaseDoc.includes("doctor --repo <target-repo> --context-pack <context-pack-dir>"), "v2.5 closeout doc must document doctor command");
+  assert(v250ReleaseDoc.includes("No `status` command in v2.5"), "v2.5 closeout doc must leave broader status out of scope");
+  assert(v250ReleaseDoc.includes("No `export --input <context-pack-dir> --output-dir <dir>` contract change"), "v2.5 closeout doc must preserve export contract");
+  assert(v250ReleaseDoc.includes("provider_probe_status=skipped"), "v2.5 closeout doc must preserve skipped provider gate");
+  assert(contextPackDoctorDogfoodingDoc.includes("Context Pack Doctor Dogfooding v2.5.0"), "doctor dogfooding doc must have stable title");
+  assert(contextPackDoctorDogfoodingDoc.includes("doctor_contract_version: basebrief-doctor-v1"), "doctor dogfooding must record contract version");
+  assert(contextPackDoctorDogfoodingDoc.includes("doctor_command_status: warning"), "doctor dogfooding must record warning status");
+  assert(contextPackDoctorDogfoodingDoc.includes("checker_error_propagation_status: pass"), "doctor dogfooding must record checker-error propagation");
+  assert(contextPackDoctorDogfoodingDoc.includes("public_safety_status: pass"), "doctor dogfooding must record public safety");
+  assert(contextPackDoctorDogfoodingDoc.includes("read_only_status: pass"), "doctor dogfooding must record read-only status");
+  assert(contextPackDoctorDogfoodingDoc.includes("provider_probe_status=skipped"), "doctor dogfooding must preserve skipped provider gate");
+  assert(contextPackDoctorDogfoodingDoc.includes("No `status` command"), "doctor dogfooding must reject status scope");
+  assert(contextPackDoctorDogfoodingDoc.includes("No MCP server"), "doctor dogfooding must reject MCP server scope");
+  assert(contextPackDoctorDogfoodingDoc.includes("No Workflow Runner"), "doctor dogfooding must keep runner out of scope");
+  assert(basebriefCliScript.includes('node scripts/basebrief.js doctor --repo <target-repo> --context-pack <context-pack-dir> [--json]'), "CLI help must expose doctor command");
+  assert(basebriefCliScript.includes('if (command === "doctor") return commandDoctor(options);'), "CLI must route doctor command");
+  assert(basebriefDoctorScript.includes('basebrief-doctor-v1'), "doctor script must declare contract version");
+  assert(basebriefDoctorScript.includes('doctor.pack-check-error'), "doctor script must propagate checker errors");
+  assert(basebriefDoctorScript.includes('doctor.live-recheck-required'), "doctor script must emit live recheck info");
+  assert(contextPackDoctorExampleReadme.includes("Context Pack Doctor Example Kit"), "doctor example readme must have stable title");
+  assert(contextPackDoctorExampleReadme.includes("basebrief-doctor-v1"), "doctor example must show contract version");
+  assert(contextPackDoctorExampleReadme.includes('"repo": "examples/example-repo"'), "doctor example must use relative repo path");
+  assert(contextPackDoctorExampleReadme.includes('"contextPack": "examples/context-pack-lite"'), "doctor example must use relative context pack path");
+  assert(contextPackDoctorExampleReadme.includes("doctor.pack-head-stale"), "doctor example must include stale HEAD finding");
+  assert(contextPackDoctorExampleReadme.includes("doctor.live-recheck-required"), "doctor example must include live recheck finding");
+  assert(contextPackDoctorExampleReadme.includes("No provider request"), "doctor example must preserve provider boundary");
+  assert(contextPackDoctorExampleReadme.includes("No MCP server"), "doctor example must reject MCP server scope");
+  assert(contextPackDoctorExampleReadme.includes("No MCP tools"), "doctor example must reject MCP tools scope");
+  assert(contextPackDoctorExampleReadme.includes("No Workflow Runner"), "doctor example must keep runner out of scope");
+  assert(contextPackDoctorExampleReadme.includes("provider_probe_status=skipped"), "doctor example must preserve skipped provider gate");
+  assert(!/[A-Za-z]:[\\/]/.test(contextPackDoctorExampleReadme), "doctor example must not contain drive-letter absolute paths");
+  assert(!/\\\\/.test(contextPackDoctorExampleReadme), "doctor example must not contain UNC paths");
+  assert(!contextPackDoctorExampleReadme.includes("tests/outputs/private"), "doctor example must not contain private output paths");
   assert(contextPackLiteDogfoodingDoc.includes("Context Pack Lite Fresh Receiver Dogfooding v2.0.0"), "context pack dogfooding doc must have stable title");
   assert(contextPackLiteDogfoodingDoc.includes("receiver_task_status: completed"), "context pack dogfooding must record completed receiver status");
   assert(contextPackLiteDogfoodingDoc.includes("handoff_acceptance: pass"), "context pack dogfooding must record pass acceptance");
@@ -3059,6 +3167,7 @@ function checkExamples() {
     "examples/file-only-export/exports/context-pack.md",
     "examples/file-only-export/exports/context.json",
     "examples/file-only-export/exports/adapter-notes.md",
+    "examples/context-pack-doctor/README.md",
     "examples/next-chat-example.md",
     "examples/receiver-check-config.json",
     "examples/receiver/difference-found/README.md",
@@ -3404,6 +3513,7 @@ function checkCliLite() {
     assert(helpStdout.includes("sidecar-check --input <sidecar-dir>"), "CLI help must expose Sidecar check");
     assert(helpStdout.includes("context-pack --repo <target-repo> --output-dir <dir>"), "CLI help must expose Context Pack Lite");
     assert(helpStdout.includes("resume --input <context-pack-dir>"), "CLI help must expose Context Pack Resume");
+    assert(helpStdout.includes("doctor --repo <target-repo> --context-pack <context-pack-dir>"), "CLI help must expose Context Pack Doctor");
     assert(!helpStdout.includes("context-pack-check"), "CLI help must not add a context-pack-check command");
 
     const noCommandStdout = execFileSync(process.execPath, [
@@ -3853,6 +3963,30 @@ function checkCliLite() {
       !contextPackCheckResult.check.findings.some((finding) => finding.ruleId.startsWith("context-pack.")),
       "CLI context pack check must report no context-pack findings for clean pack",
     );
+
+    const doctorStdout = execFileSync(process.execPath, [
+      "scripts/basebrief.js",
+      "doctor",
+      "--repo",
+      receiverRepo,
+      "--context-pack",
+      contextPackDir,
+      "--json",
+    ], {
+      cwd: repoRoot,
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "pipe"],
+      env: process.env,
+    });
+    const doctorResult = JSON.parse(doctorStdout);
+    assert(doctorResult.command === "doctor", "CLI doctor must return command metadata");
+    assert(doctorResult.contractVersion === "basebrief-doctor-v1", "CLI doctor must return doctor contract version");
+    assert(doctorResult.repo.startsWith("tests"), "CLI doctor must return a public-safe repo path");
+    assert(doctorResult.contextPack.startsWith("tests"), "CLI doctor must return a public-safe context pack path");
+    assert(doctorResult.summary.errorCount === 0, "CLI doctor must report zero errors for generated pack smoke");
+    assert(doctorResult.findings.some((finding) => finding.ruleId === "doctor.live-recheck-required"), "CLI doctor must emit live recheck info");
+    assert(!/[A-Za-z]:[\\/]/.test(JSON.stringify(doctorResult)), "CLI doctor JSON must not expose drive-letter absolute paths");
+    assert(!/\\\\/.test(JSON.stringify(doctorResult)), "CLI doctor JSON must not expose UNC paths");
 
     const resumeStdout = execFileSync(process.execPath, [
       "scripts/basebrief.js",

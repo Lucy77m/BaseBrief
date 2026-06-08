@@ -32,6 +32,7 @@ node scripts/basebrief.js delta --repo . --output-dir tests/outputs/private/delt
 node scripts/basebrief.js context-pack --repo . --output-dir tests/outputs/private/context-pack --json
 node scripts/basebrief.js resume --input examples/context-pack-lite --json
 node scripts/basebrief.js export --input examples/context-pack-lite --output-dir tests/outputs/private/file-export --json
+node scripts/basebrief.js doctor --repo . --context-pack examples/context-pack-lite --json
 ```
 
 The repository also includes minimal local npm scripts:
@@ -418,6 +419,31 @@ See [v2.4.0 File-only Adapter / MCP-friendly Export Plan](releases/v2.4.0-plan.m
 [File-only Export Dogfooding v2.4.0](dogfooding/file-only-export-v2.4.0.md).
 For a public-safe bundle shape, see
 [File-only Export example kit](../examples/file-only-export/README.md).
+
+### doctor
+
+```text
+node scripts/basebrief.js doctor --repo <target-repo> --context-pack <context-pack-dir> [--json]
+```
+
+This command reads a live repository and an explicit Context Pack Lite
+directory, then reports conservative diagnostics under
+`basebrief-doctor-v1`.
+
+Doctor is read-only. It does not write files, repair files, generate a new
+pack, auto-discover inputs, call providers, create sessions, start a watcher,
+run a daemon, or change Project State.
+
+The first rule set reports dirty worktrees, stale pack HEADs, branch
+mismatches, Context Pack Check errors and warnings, missing local-only boundary
+wording, and a live recheck reminder.
+
+See [v2.5.0 Context Pack Doctor Plan](releases/v2.5.0-plan.md),
+[v2.5.0 Context Pack Doctor Local Closeout](releases/v2.5.0.md),
+[Context Pack Doctor Spec](specs/context-pack-doctor.md), and
+[Context Pack Doctor Dogfooding v2.5.0](dogfooding/context-pack-doctor-v2.5.0.md).
+For a public-safe sample output, see
+[Context Pack Doctor example kit](../examples/context-pack-doctor/README.md).
 
 ## JSON Output
 

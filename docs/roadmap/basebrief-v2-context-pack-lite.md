@@ -72,7 +72,7 @@ v2.1 Context Pack Check
 v2.2 One-command Resume / New-window Prompt
 v2.3 BaseBrief Format
 v2.4 File-only Adapter / MCP-friendly Export
-v2.5 Status / Doctor / Change-sensing Lite
+v2.5 Context Pack Doctor
 v3.x Workflow Runner Lite or watcher/dashboard work, only after local usage proves need
 ```
 
@@ -356,9 +356,28 @@ explicit `--output-dir`.
 
 ### v2.5 Status / Doctor / Change-sensing Lite
 
-Add manual diagnostics such as status or doctor checks only after the pack,
-check, resume, and format surfaces are stable. This should be manually
-triggered, conservative, source-backed, and read-only by default.
+Add manual diagnostics only after the pack, check, resume, format, and
+file-only export surfaces are stable. v2.5 chooses `doctor` first and leaves a
+broader `status` command for a later slice because `state-status` already
+belongs to Project State.
+
+v2.5 is closed in `docs/releases/v2.5.0.md`, with contract docs in
+`docs/releases/v2.5.0-plan.md` and `docs/specs/context-pack-doctor.md`,
+dogfooding evidence in `docs/dogfooding/context-pack-doctor-v2.5.0.md`, and a
+public-safe sample in `examples/context-pack-doctor/`.
+
+The local command is:
+
+```text
+node scripts/basebrief.js doctor --repo <target-repo> --context-pack <context-pack-dir> [--json]
+```
+
+Doctor is manually triggered, conservative, source-backed, and read-only. It
+reports dirty worktrees, stale pack HEADs, branch mismatches, Context Pack
+Check findings, missing local-only boundary wording, and live-recheck reminders.
+It does not write files, auto-fix, auto-discover packs, call providers, create
+a watcher, run a daemon, add runtime behavior, create plugins, create an MCP
+server/tools, add schema-v2, or become a Workflow Runner.
 
 ### Later Workflow Runner Lite
 
@@ -436,4 +455,21 @@ v2.4-D is acceptable when:
 - docs clearly state that `exports/` is a recommended explicit output directory
   name, not an auto-created nested directory
 - example JSON uses public file names and fixed example metadata
+- release checks, independent tests, and whitespace checks pass
+
+v2.5-A/B/C/D is acceptable when:
+
+- `docs/releases/v2.5.0-plan.md` freezes the doctor contract and non-goals
+- `docs/specs/context-pack-doctor.md` defines `basebrief-doctor-v1`, top-level
+  JSON shape, finding fields, and rule ids
+- CLI Lite exposes `doctor --repo <target-repo> --context-pack <context-pack-dir>`
+- doctor is read-only and requires explicit repo plus context pack inputs
+- checker errors propagate as doctor errors without changing Context Pack Check
+  JSON shape
+- dirty worktree, stale HEAD, branch mismatch, boundary wording, and live
+  recheck findings are covered
+- public JSON uses relative paths and short public-safe evidence only
+- `examples/context-pack-doctor/` contains a fixed public-safe sample JSON
+- docs preserve no-provider, no-runtime, no-plugin, no MCP server/tools,
+  no schema-v2, and no Workflow Runner boundaries
 - release checks, independent tests, and whitespace checks pass

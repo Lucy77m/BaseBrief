@@ -86,6 +86,7 @@ node scripts/basebrief.js sidecar-check --input tests/outputs/private/sidecar-ge
 `v2.4.0` starts the File-only Adapter / MCP-friendly Export line. It adds the local `export --input <context-pack-dir> --output-dir <dir>` command, which turns a checked Context Pack Lite directory into `manifest.json`, `context-pack.md`, `context.json`, and `adapter-notes.md`. It does not change Context Pack Lite generator output, `check --input <dir> --json`, or `resume`; it does not add provider, runtime, plugin, MCP server, IDE, hosted, cloud-memory, schema-v2, or Workflow Runner behavior. MCP-friendly means future tool-consumable files, not an MCP server or runtime integration. Entry points: [v2.4.0 File-only Adapter / MCP-friendly Export Plan](docs/releases/v2.4.0-plan.md), [v2.4.0 File-only Adapter / MCP-friendly Export Local Closeout](docs/releases/v2.4.0.md), and [File-only Export Spec](docs/specs/file-only-export.md).
 `v2.4.0` dogfooding records that the four-file export bundle is enough for a receiver-style continuation review while still requiring live repo fact rechecks before implementation. Evidence: [File-only Export Dogfooding v2.4.0](docs/dogfooding/file-only-export-v2.4.0.md).
 `v2.4.0` also includes a public-safe [File-only Export example kit](examples/file-only-export/README.md). In that kit, `exports/` is a recommended example output directory name; the CLI writes the four files directly under the explicit `--output-dir` directory.
+`v2.5.0` adds the local read-only `doctor --repo <target-repo> --context-pack <context-pack-dir>` diagnostic. It compares live repo facts with an explicit Context Pack Lite snapshot, propagates Context Pack Check errors and warnings, reports stale HEAD, branch mismatch, dirty worktree, live-recheck, and boundary wording findings, and writes nothing. It does not add `status`, watcher, daemon, auto-fix, provider, runtime, plugin, MCP server/tools, IDE, hosted, cloud-memory, schema-v2, or Workflow Runner behavior. Entry points: [v2.5.0 Context Pack Doctor Plan](docs/releases/v2.5.0-plan.md), [v2.5.0 Context Pack Doctor Local Closeout](docs/releases/v2.5.0.md), [Context Pack Doctor Spec](docs/specs/context-pack-doctor.md), [Context Pack Doctor Dogfooding v2.5.0](docs/dogfooding/context-pack-doctor-v2.5.0.md), and [Context Pack Doctor example kit](examples/context-pack-doctor/README.md).
 
 ## Seal/Diff
 
@@ -168,6 +169,11 @@ BaseBrief 不是聊天客户端、Agent runtime、托管平台、密钥管理器
 - [File-only Export Spec](docs/specs/file-only-export.md)
 - [File-only Export Dogfooding v2.4.0](docs/dogfooding/file-only-export-v2.4.0.md)
 - [File-only Export example kit](examples/file-only-export/README.md)
+- [v2.5.0 Context Pack Doctor Plan](docs/releases/v2.5.0-plan.md)
+- [v2.5.0 Context Pack Doctor Local Closeout](docs/releases/v2.5.0.md)
+- [Context Pack Doctor Spec](docs/specs/context-pack-doctor.md)
+- [Context Pack Doctor Dogfooding v2.5.0](docs/dogfooding/context-pack-doctor-v2.5.0.md)
+- [Context Pack Doctor example kit](examples/context-pack-doctor/README.md)
 - [Context Pack Lite example kit](examples/context-pack-lite/README.md)
 - [Context Pack Lite fresh receiver dogfooding v2.0.0](docs/dogfooding/context-pack-lite-fresh-receiver-v2.0.0.md)
 - [v0.9.x Integrated Handoff Closure Matrix](docs/testing-v0.9.x-test-matrix.md)

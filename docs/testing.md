@@ -762,6 +762,56 @@ public_safety_status: pass
 provider_probe_status=skipped
 ```
 
+## v2.5.0 Context Pack Doctor
+
+`v2.5.0` adds a local read-only doctor command:
+
+```text
+node scripts/basebrief.js doctor --repo <target-repo> --context-pack <context-pack-dir> [--json]
+```
+
+Doctor compares live repository facts with an explicit Context Pack Lite
+snapshot, reuses Context Pack Check, reports stale or dirty maintenance gaps,
+and reminds receivers to recheck live facts before implementation. It does not
+add `status`, watcher, daemon, auto-fix, provider request, runtime integration,
+plugin, MCP server/tools, IDE integration, hosted service, cloud-memory
+behavior, schema-v2, or Workflow Runner.
+
+Evidence and contract docs:
+
+- [v2.5.0 Context Pack Doctor Plan](releases/v2.5.0-plan.md)
+- [v2.5.0 Context Pack Doctor Local Closeout](releases/v2.5.0.md)
+- [Context Pack Doctor Spec](specs/context-pack-doctor.md)
+- [Context Pack Doctor Dogfooding v2.5.0](dogfooding/context-pack-doctor-v2.5.0.md)
+- [Context Pack Doctor example kit](../examples/context-pack-doctor/README.md)
+
+The local validation gate is:
+
+```text
+node scripts/basebrief.js doctor --repo . --context-pack examples/context-pack-lite --json
+node --test tests/basebrief.test.js --test-name-pattern "Doctor|v2.5|Context Pack"
+npm test
+npm run release-check
+git diff --check
+```
+
+The dogfooding gate is:
+
+```text
+node scripts/basebrief.js context-pack --repo . --output-dir tests/outputs/private/v2.5-doctor-dogfooding/context-pack --json
+node scripts/basebrief.js doctor --repo . --context-pack tests/outputs/private/v2.5-doctor-dogfooding/context-pack --json
+```
+
+Expected acceptance summary:
+
+```text
+doctor_contract_version: basebrief-doctor-v1
+checker_error_propagation_status: pass
+public_safety_status: pass
+read_only_status: pass
+provider_probe_status=skipped
+```
+
 ## v0.4.1 Stabilization Candidate
 
 `v0.4.1` is a stabilization-only cycle after the `v0.4.0` public release. It uses
