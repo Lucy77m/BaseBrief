@@ -890,6 +890,25 @@ Expected release-check output without provider env remains:
 provider_probe_status=skipped
 ```
 
+## v2.6.5 Context Pack Adoption Scenario Matrix
+
+`v2.6.5` is local adoption evidence, not a release closeout or new feature
+line. It records a scenario matrix for clean packs, `context-pack.too-thick`
+warnings, stale HEAD doctor findings, broken pack doctor findings,
+`doctor.live-recheck-required`, and starter inherited-context handoff wording.
+
+The evidence is recorded in
+[Context Pack Adoption Scenario Matrix v2.6.5](dogfooding/context-pack-adoption-scenario-matrix-v2.6.5.md).
+It keeps `check` as the pack validity gate, `resume` as the copyable
+next-window prompt surface, and `doctor` as live repo comparison rather than an
+always-on Status command.
+
+Expected release-check output without provider env remains:
+
+```text
+provider_probe_status=skipped
+```
+
 ## v0.4.1 Stabilization Candidate
 
 `v0.4.1` is a stabilization-only cycle after the `v0.4.0` public release. It uses

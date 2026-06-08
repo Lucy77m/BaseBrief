@@ -189,6 +189,7 @@ function checkRequiredFiles() {
     "docs/dogfooding/context-pack-doctor-v2.5.0.md",
     "docs/dogfooding/context-pack-adoption-notes-v2.6.1.md",
     "docs/dogfooding/context-engineering-reference-notes-v2.6.4.md",
+    "docs/dogfooding/context-pack-adoption-scenario-matrix-v2.6.5.md",
     "docs/testing-v0.4.x-test-matrix.md",
     "docs/testing-v0.6.x-test-matrix.md",
     "docs/testing-v0.7.x-test-matrix.md",
@@ -481,6 +482,7 @@ function checkContentContracts() {
   const contextPackDoctorDogfoodingV251Doc = readText("docs/dogfooding/context-pack-doctor-v2.5.1.md");
   const contextPackAdoptionNotesV261Doc = readText("docs/dogfooding/context-pack-adoption-notes-v2.6.1.md");
   const contextEngineeringReferenceNotesV264Doc = readText("docs/dogfooding/context-engineering-reference-notes-v2.6.4.md");
+  const contextPackAdoptionScenarioMatrixV265Doc = readText("docs/dogfooding/context-pack-adoption-scenario-matrix-v2.6.5.md");
   const postReleaseBaselineDoc = readText("docs/baselines/v0.4.0-post-release-baseline.md");
   const v060PostReleaseBaselineDoc = readText("docs/baselines/v0.6.0-post-release-baseline.md");
   const projectStateModelDoc = readText("docs/design/project-state-model.md");
@@ -981,6 +983,10 @@ function checkContentContracts() {
   assert(testingDoc.includes("dogfooding/context-engineering-reference-notes-v2.6.4.md"), "Testing docs must link v2.6.4 reference notes");
   assert(testingDoc.includes("own your") && testingDoc.includes("stateless reducer") && testingDoc.includes("handoff artifact") && testingDoc.includes("memory hygiene") && testingDoc.includes("context compression"), "Testing docs must summarize v2.6.4 external context themes");
   assert(testingDoc.includes("v3 Continuation Harness") && testingDoc.includes("Workflow Runner Lite") && testingDoc.includes("repeated real") && testingDoc.includes("friction"), "Testing docs must keep v3 behind repeated friction");
+  assert(testingDoc.includes("v2.6.5 Context Pack Adoption Scenario Matrix"), "Testing docs must document v2.6.5 scenario matrix");
+  assert(testingDoc.includes("dogfooding/context-pack-adoption-scenario-matrix-v2.6.5.md"), "Testing docs must link v2.6.5 scenario matrix");
+  assert(testingDoc.includes("clean packs") && testingDoc.includes("context-pack.too-thick") && testingDoc.includes("stale HEAD") && testingDoc.includes("broken pack") && testingDoc.includes("doctor.live-recheck-required"), "Testing docs must summarize v2.6.5 scenario coverage");
+  assert(testingDoc.includes("`check` as the pack validity gate") && testingDoc.includes("`resume` as the copyable") && testingDoc.includes("`doctor` as live repo comparison"), "Testing docs must preserve v2.6.5 command roles");
   assert(testingDoc.includes("checker_error_propagation_status: pass"), "Testing docs must record checker-error propagation");
   assert(testingDoc.includes("context-pack --repo <target-repo>"), "Testing docs must document context-pack command");
   assert(testingDoc.includes("resume --input <context-pack-dir>"), "Testing docs must document resume command");
@@ -1507,6 +1513,7 @@ function checkContentContracts() {
   assert(docsIndex.includes("../examples/context-pack-doctor/README.md"), "Docs index must link context pack doctor example kit");
   assert(docsIndex.includes("dogfooding/context-pack-adoption-notes-v2.6.1.md"), "Docs index must link v2.6.1 adoption notes");
   assert(docsIndex.includes("dogfooding/context-engineering-reference-notes-v2.6.4.md"), "Docs index must link v2.6.4 reference notes");
+  assert(docsIndex.includes("dogfooding/context-pack-adoption-scenario-matrix-v2.6.5.md"), "Docs index must link v2.6.5 scenario matrix");
   assert(docsIndex.includes("specs/context-pack-lite.md"), "Docs index must link context pack lite spec");
   assert(docsIndex.includes("specs/context-pack-resume.md"), "Docs index must link context pack resume spec");
   assert(docsIndex.includes("specs/basebrief-format.md"), "Docs index must link basebrief format spec");
@@ -1557,6 +1564,9 @@ function checkContentContracts() {
   assert(v2ContextPackRoadmapDoc.includes("context engineering") && v2ContextPackRoadmapDoc.includes("handoff artifact") && v2ContextPackRoadmapDoc.includes("memory hygiene") && v2ContextPackRoadmapDoc.includes("stateless reducer") && v2ContextPackRoadmapDoc.includes("context compression"), "v2 roadmap must summarize v2.6.4 reference themes");
   assert(v2ContextPackRoadmapDoc.includes("not a new feature line or contract"), "v2 roadmap must keep v2.6.4 out of feature and contract scope");
   assert(v2ContextPackRoadmapDoc.includes("wait until repeated real adoption friction"), "v2 roadmap must keep v3 behind repeated friction");
+  assert(v2ContextPackRoadmapDoc.includes("docs/dogfooding/context-pack-adoption-scenario-matrix-v2.6.5.md"), "v2 roadmap must link v2.6.5 scenario matrix");
+  assert(v2ContextPackRoadmapDoc.includes("check/resume/doctor decision matrix"), "v2 roadmap must describe v2.6.5 matrix purpose");
+  assert(v2ContextPackRoadmapDoc.includes("adoption") && v2ContextPackRoadmapDoc.includes("evidence") && v2ContextPackRoadmapDoc.includes("not a new command line"), "v2 roadmap must keep v2.6.5 out of command scope");
   assert(v2ContextPackRoadmapDoc.includes("exports/manifest.json"), "v2 roadmap must define export manifest");
   assert(v2ContextPackRoadmapDoc.includes("exports/context-pack.md"), "v2 roadmap must define readable export");
   assert(v2ContextPackRoadmapDoc.includes("exports/context.json"), "v2 roadmap must define machine-readable export");
@@ -1846,6 +1856,38 @@ function checkContentContracts() {
   assert(contextEngineeringReferenceNotesV264Doc.includes("provider_probe_status=skipped"), "v2.6.4 reference notes must preserve skipped provider gate");
   assert(!/(^|[^A-Za-z])[A-Za-z]:[\\/]/.test(contextEngineeringReferenceNotesV264Doc), "v2.6.4 reference notes must not expose drive-letter absolute paths");
   assert(!/\\\\/.test(contextEngineeringReferenceNotesV264Doc), "v2.6.4 reference notes must not expose UNC paths");
+  assert(contextPackAdoptionScenarioMatrixV265Doc.includes("Context Pack Adoption Scenario Matrix v2.6.5"), "v2.6.5 scenario matrix doc must have stable title");
+  assert(contextPackAdoptionScenarioMatrixV265Doc.includes("local adoption evidence, not a release closeout"), "v2.6.5 scenario matrix must avoid release closeout claims");
+  assert(contextPackAdoptionScenarioMatrixV265Doc.includes("`check` is the pack validity gate"), "v2.6.5 scenario matrix must define check role");
+  assert(contextPackAdoptionScenarioMatrixV265Doc.includes("`resume` is the copyable next-window prompt surface"), "v2.6.5 scenario matrix must define resume role");
+  assert(contextPackAdoptionScenarioMatrixV265Doc.includes("`doctor` is the live repo comparison surface"), "v2.6.5 scenario matrix must define doctor role");
+  assert(contextPackAdoptionScenarioMatrixV265Doc.includes("Doctor is not an always-on Status command"), "v2.6.5 scenario matrix must reject always-on status scope");
+  assert(contextPackAdoptionScenarioMatrixV265Doc.includes("clean pack"), "v2.6.5 scenario matrix must include clean pack scenario");
+  assert(contextPackAdoptionScenarioMatrixV265Doc.includes("too-thick warning"), "v2.6.5 scenario matrix must include too-thick warning scenario");
+  assert(contextPackAdoptionScenarioMatrixV265Doc.includes("stale HEAD"), "v2.6.5 scenario matrix must include stale HEAD scenario");
+  assert(contextPackAdoptionScenarioMatrixV265Doc.includes("broken pack"), "v2.6.5 scenario matrix must include broken pack scenario");
+  assert(contextPackAdoptionScenarioMatrixV265Doc.includes("doctor live-recheck info"), "v2.6.5 scenario matrix must include live-recheck info scenario");
+  assert(contextPackAdoptionScenarioMatrixV265Doc.includes("starter inherited-context handoff"), "v2.6.5 scenario matrix must include starter handoff scenario");
+  assert(contextPackAdoptionScenarioMatrixV265Doc.includes("context-pack.too-thick"), "v2.6.5 scenario matrix must preserve thickness warning rule id");
+  assert(contextPackAdoptionScenarioMatrixV265Doc.includes("doctor.pack-head-stale"), "v2.6.5 scenario matrix must preserve stale HEAD rule id");
+  assert(contextPackAdoptionScenarioMatrixV265Doc.includes("doctor.pack-branch-mismatch"), "v2.6.5 scenario matrix must preserve branch mismatch rule id");
+  assert(contextPackAdoptionScenarioMatrixV265Doc.includes("doctor.pack-check-error"), "v2.6.5 scenario matrix must preserve pack check error rule id");
+  assert(contextPackAdoptionScenarioMatrixV265Doc.includes("doctor.live-recheck-required"), "v2.6.5 scenario matrix must preserve live recheck info rule id");
+  assert(contextPackAdoptionScenarioMatrixV265Doc.includes("Continuation rules:"), "v2.6.5 scenario matrix must preserve starter continuation rules wording");
+  assert(contextPackAdoptionScenarioMatrixV265Doc.includes("No Status command"), "v2.6.5 scenario matrix must reject status command scope");
+  assert(contextPackAdoptionScenarioMatrixV265Doc.includes("No Workflow Runner"), "v2.6.5 scenario matrix must reject workflow runner scope");
+  assert(contextPackAdoptionScenarioMatrixV265Doc.includes("No provider request"), "v2.6.5 scenario matrix must reject provider requests");
+  assert(contextPackAdoptionScenarioMatrixV265Doc.includes("No runtime integration"), "v2.6.5 scenario matrix must reject runtime integration");
+  assert(contextPackAdoptionScenarioMatrixV265Doc.includes("No MCP server"), "v2.6.5 scenario matrix must reject MCP server scope");
+  assert(contextPackAdoptionScenarioMatrixV265Doc.includes("No MCP tools"), "v2.6.5 scenario matrix must reject MCP tools scope");
+  assert(contextPackAdoptionScenarioMatrixV265Doc.includes("No schema-v2"), "v2.6.5 scenario matrix must reject schema-v2");
+  assert(contextPackAdoptionScenarioMatrixV265Doc.includes("No `check --input <dir> --json` top-level shape change"), "v2.6.5 scenario matrix must preserve checker JSON shape");
+  assert(contextPackAdoptionScenarioMatrixV265Doc.includes("No Resume JSON contract change"), "v2.6.5 scenario matrix must preserve resume JSON contract");
+  assert(contextPackAdoptionScenarioMatrixV265Doc.includes("No Doctor JSON contract change"), "v2.6.5 scenario matrix must preserve doctor JSON contract");
+  assert(contextPackAdoptionScenarioMatrixV265Doc.includes("No Export JSON contract change"), "v2.6.5 scenario matrix must preserve export JSON contract");
+  assert(contextPackAdoptionScenarioMatrixV265Doc.includes("provider_probe_status=skipped"), "v2.6.5 scenario matrix must preserve skipped provider gate");
+  assert(!/(^|[^A-Za-z])[A-Za-z]:[\\/]/.test(contextPackAdoptionScenarioMatrixV265Doc), "v2.6.5 scenario matrix must not expose drive-letter absolute paths");
+  assert(!/\\\\/.test(contextPackAdoptionScenarioMatrixV265Doc), "v2.6.5 scenario matrix must not expose UNC paths");
   assert(contextPackDoctorDogfoodingDoc.includes("Context Pack Doctor Dogfooding v2.5.0"), "doctor dogfooding doc must have stable title");
   assert(contextPackDoctorDogfoodingDoc.includes("doctor_contract_version: basebrief-doctor-v1"), "doctor dogfooding must record contract version");
   assert(contextPackDoctorDogfoodingDoc.includes("doctor_command_status: warning"), "doctor dogfooding must record warning status");

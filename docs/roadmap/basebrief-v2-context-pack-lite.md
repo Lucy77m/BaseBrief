@@ -419,6 +419,10 @@ This is not a new feature line or contract. It is direction-setting evidence for
 later v3 discussion only. v3 Continuation Harness or Workflow Runner Lite should
 wait until repeated real adoption friction points to the same missing capability.
 
+`docs/dogfooding/context-pack-adoption-scenario-matrix-v2.6.5.md` turns the
+adoption notes into a check/resume/doctor decision matrix. It is adoption
+evidence, not a new command line, Status command, Workflow Runner, or contract.
+
 ### Later Workflow Runner Lite
 
 Only after Context Pack Lite, Context Pack Check, One-command Resume,
