@@ -30,6 +30,8 @@ node scripts/basebrief.js seal --input examples/seal-before-input.json --output 
 node scripts/basebrief.js diff --before examples/seal-before-input.json --after examples/seal-after-input.json --json
 node scripts/basebrief.js delta --repo . --output-dir tests/outputs/private/delta --json
 node scripts/basebrief.js context-pack --repo . --output-dir tests/outputs/private/context-pack --json
+node scripts/basebrief.js resume --input examples/context-pack-lite --json
+node scripts/basebrief.js export --input examples/context-pack-lite --output-dir tests/outputs/private/file-export --json
 ```
 
 The repository also includes minimal local npm scripts:
@@ -382,6 +384,40 @@ call AI, run a daemon, or write output files.
 
 See [v2.2.0 One-command Resume / New-window Prompt Plan](releases/v2.2.0-plan.md)
 and [Context Pack Resume Spec](specs/context-pack-resume.md).
+
+### export
+
+```text
+node scripts/basebrief.js export --input <context-pack-dir> --output-dir <dir> [--json]
+```
+
+This command reads a checked Context Pack Lite directory and writes a
+file-only export bundle:
+
+- `manifest.json`
+- `context-pack.md`
+- `context.json`
+- `adapter-notes.md`
+
+The files are written directly under the explicit `--output-dir` directory.
+Documentation and examples use `exports/` as a recommended directory name, not
+as an auto-created nested directory.
+
+Clean packs produce exports. Warning-only packs also produce exports and carry
+the warning findings in `manifest.json`, `context.json`, and
+`adapter-notes.md`. Error findings stop the command before writing files.
+
+The export is local-only and file-only. MCP-friendly means the files are easy
+for future local tools to consume; it does not create an MCP server, plugin,
+runtime integration, IDE integration, hosted connector, cloud-memory behavior,
+schema-v2, provider request, or Workflow Runner.
+
+See [v2.4.0 File-only Adapter / MCP-friendly Export Plan](releases/v2.4.0-plan.md),
+[v2.4.0 File-only Adapter / MCP-friendly Export Local Closeout](releases/v2.4.0.md),
+[File-only Export Spec](specs/file-only-export.md), and
+[File-only Export Dogfooding v2.4.0](dogfooding/file-only-export-v2.4.0.md).
+For a public-safe bundle shape, see
+[File-only Export example kit](../examples/file-only-export/README.md).
 
 ## JSON Output
 

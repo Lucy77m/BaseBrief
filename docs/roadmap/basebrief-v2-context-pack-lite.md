@@ -317,6 +317,43 @@ plugin, MCP, IDE, hosted service, cloud-memory feature, or Workflow Runner.
 Export files that other tools can consume, without implementing plugins,
 runtime integrations, or an MCP server. This is adapter output only.
 
+v2.4-A is docs-first only. It is frozen in
+`docs/releases/v2.4.0-plan.md` and `docs/specs/file-only-export.md`; it does
+not implement a command, generator, exporter, JSON schema file, schema-v2,
+provider request, runtime integration, plugin, MCP server, IDE, hosted service,
+cloud-memory feature, or Workflow Runner.
+
+The planned file-only export family is:
+
+```text
+exports/
+exports/manifest.json
+exports/context-pack.md
+exports/context.json
+exports/adapter-notes.md
+```
+
+v2.4-B is the minimal local implementation. It is closed in
+`docs/releases/v2.4.0.md` and adds only:
+
+```text
+node scripts/basebrief.js export --input <context-pack-dir> --output-dir <dir> [--json]
+```
+
+The command reads checked Context Pack Lite directories and writes file-only
+export artifacts. It does not change Context Pack Lite generator output,
+Context Pack Check JSON shape, or Resume behavior.
+
+v2.4-C is dogfooding evidence. It is recorded in
+`docs/dogfooding/file-only-export-v2.4.0.md` and verifies that the four-file
+export bundle is enough for a receiver-style continuation review while still
+requiring live repo fact rechecks before implementation.
+
+v2.4-D is example-kit and contract-wording polish. It adds
+`examples/file-only-export/` and clarifies that `exports/` is a recommended
+example output directory name, while the CLI writes files directly under the
+explicit `--output-dir`.
+
 ### v2.5 Status / Doctor / Change-sensing Lite
 
 Add manual diagnostics such as status or doctor checks only after the pack,
@@ -325,9 +362,10 @@ triggered, conservative, source-backed, and read-only by default.
 
 ### Later Workflow Runner Lite
 
-Only after Context Pack Lite, Context Pack Check, One-command Resume, and
-BaseBrief Format prove useful in local dogfooding, consider a narrow runner
-that chains state, delta, context pack generation, check, and starter output.
+Only after Context Pack Lite, Context Pack Check, One-command Resume,
+BaseBrief Format, and File-only Export prove useful in local dogfooding,
+consider a narrow runner that chains state, delta, context pack generation,
+check, and starter output.
 
 ## Acceptance Criteria
 
@@ -355,4 +393,47 @@ v2.1-A is acceptable when:
   JSON shape changes
 - v2.2 remains One-command Resume / New-window Prompt, while Workflow Runner
   stays later
+- release checks, independent tests, and whitespace checks pass
+
+v2.4-A is acceptable when:
+
+- `docs/releases/v2.4.0-plan.md` freezes the file-only export contract and
+  non-goals
+- `docs/specs/file-only-export.md` defines the future file-only export family
+  and MCP-friendly boundary
+- docs state that v2.4-A does not implement commands, exporters, JSON schemas,
+  schema-v2, provider requests, runtime integrations, plugins, MCP servers,
+  IDE integrations, hosted services, cloud-memory behavior, or Workflow Runner
+- docs preserve Context Pack Lite generator output, Context Pack Check JSON
+  shape, and existing resume behavior
+- release checks, independent tests, and whitespace checks pass
+
+v2.4-B is acceptable when:
+
+- CLI Lite exposes `export --input <context-pack-dir> --output-dir <dir>`
+- clean packs write exactly `manifest.json`, `context-pack.md`, `context.json`,
+  and `adapter-notes.md`
+- warning-only packs still export and record warnings
+- errored packs stop before export files are written
+- exported JSON contains public file names and check metadata, not private
+  absolute paths
+- release checks, independent tests, and whitespace checks pass
+
+v2.4-C is acceptable when:
+
+- a public-safe dogfooding record summarizes a real current-repo export pass
+- source pack check and export bundle check both pass
+- receiver-style review can recover project identity, reading order, live
+  recheck requirement, warning/error semantics, and risk boundaries from the
+  four exported files
+- docs preserve no-provider, no-runtime, no-plugin, no MCP server, no schema-v2,
+  and no Workflow Runner boundaries
+- release checks, independent tests, and whitespace checks pass
+
+v2.4-D is acceptable when:
+
+- `examples/file-only-export/` contains a public-safe four-file export bundle
+- docs clearly state that `exports/` is a recommended explicit output directory
+  name, not an auto-created nested directory
+- example JSON uses public file names and fixed example metadata
 - release checks, independent tests, and whitespace checks pass

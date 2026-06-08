@@ -1,0 +1,37 @@
+{
+  "contractVersion": "basebrief-file-export-v1",
+  "sourceKind": "context-pack-lite",
+  "generatedAt": "2026-06-08T00:00:00.000Z",
+  "sourceFiles": [
+    "MANIFEST.md",
+    "REPO_MAP.md",
+    "KEY_FILES.md",
+    "RECENT_DELTA.md",
+    "RISK_BOUNDARIES.md",
+    "RECEIVER_STATE.md",
+    "NEXT_WINDOW_STARTER.md"
+  ],
+  "outputFiles": {
+    "manifest": "manifest.json",
+    "contextPack": "context-pack.md",
+    "context": "context.json",
+    "adapterNotes": "adapter-notes.md"
+  },
+  "check": {
+    "status": "passed",
+    "errorCount": 0,
+    "warningCount": 0,
+    "findings": []
+  },
+  "review": {
+    "status": "generated",
+    "warningOnly": false,
+    "liveRepoRecheckRequired": true,
+    "missingInputSemantics": [
+      "not_available",
+      "not_applicable",
+      "needs-review",
+      "stale"
+    ]
+  }
+}

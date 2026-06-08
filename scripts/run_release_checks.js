@@ -172,12 +172,16 @@ function checkRequiredFiles() {
     "docs/releases/v2.2.0-plan.md",
     "docs/releases/v2.2.0.md",
     "docs/releases/v2.3.0-plan.md",
+    "docs/releases/v2.4.0-plan.md",
+    "docs/releases/v2.4.0.md",
     "docs/specs/context-pack-resume.md",
     "docs/specs/basebrief-format.md",
+    "docs/specs/file-only-export.md",
     "docs/roadmap/basebrief-v2-context-pack-lite.md",
     "docs/dogfooding/context-pack-lite-fresh-receiver-v2.0.0.md",
     "docs/dogfooding/context-pack-check-acceptance-v2.1.0.md",
     "docs/dogfooding/context-pack-resume-v2.2.0.md",
+    "docs/dogfooding/file-only-export-v2.4.0.md",
     "docs/testing-v0.4.x-test-matrix.md",
     "docs/testing-v0.6.x-test-matrix.md",
     "docs/testing-v0.7.x-test-matrix.md",
@@ -223,6 +227,7 @@ function checkRequiredFiles() {
     "scripts/basebrief_seal.js",
     "scripts/basebrief_delta.js",
     "scripts/basebrief_context_pack.js",
+    "scripts/basebrief_export.js",
     "scripts/basebrief_resume.js",
     "scripts/bb9_provider_profiles.json",
     "schemas/bb9-handoff.schema.json",
@@ -260,6 +265,11 @@ function checkRequiredFiles() {
     "examples/context-pack-lite/RISK_BOUNDARIES.md",
     "examples/context-pack-lite/RECEIVER_STATE.md",
     "examples/context-pack-lite/NEXT_WINDOW_STARTER.md",
+    "examples/file-only-export/README.md",
+    "examples/file-only-export/exports/manifest.json",
+    "examples/file-only-export/exports/context-pack.md",
+    "examples/file-only-export/exports/context.json",
+    "examples/file-only-export/exports/adapter-notes.md",
     "examples/next-chat-example.md",
     "examples/receiver-check-config.json",
     "examples/receiver/difference-found/README.md",
@@ -441,12 +451,18 @@ function checkContentContracts() {
   const v220PlanDoc = readText("docs/releases/v2.2.0-plan.md");
   const v220ReleaseDoc = readText("docs/releases/v2.2.0.md");
   const v230PlanDoc = readText("docs/releases/v2.3.0-plan.md");
+  const v240PlanDoc = readText("docs/releases/v2.4.0-plan.md");
+  const v240ReleaseDoc = readText("docs/releases/v2.4.0.md");
   const contextPackResumeSpecDoc = readText("docs/specs/context-pack-resume.md");
   const basebriefFormatSpecDoc = readText("docs/specs/basebrief-format.md");
+  const fileOnlyExportSpecDoc = readText("docs/specs/file-only-export.md");
+  const basebriefCliScript = readText("scripts/basebrief.js");
+  const basebriefExportScript = readText("scripts/basebrief_export.js");
   const v2ContextPackRoadmapDoc = readText("docs/roadmap/basebrief-v2-context-pack-lite.md");
   const contextPackLiteDogfoodingDoc = readText("docs/dogfooding/context-pack-lite-fresh-receiver-v2.0.0.md");
   const contextPackCheckDogfoodingDoc = readText("docs/dogfooding/context-pack-check-acceptance-v2.1.0.md");
   const contextPackResumeDogfoodingDoc = readText("docs/dogfooding/context-pack-resume-v2.2.0.md");
+  const fileOnlyExportDogfoodingDoc = readText("docs/dogfooding/file-only-export-v2.4.0.md");
   const postReleaseBaselineDoc = readText("docs/baselines/v0.4.0-post-release-baseline.md");
   const v060PostReleaseBaselineDoc = readText("docs/baselines/v0.6.0-post-release-baseline.md");
   const projectStateModelDoc = readText("docs/design/project-state-model.md");
@@ -484,6 +500,26 @@ function checkContentContracts() {
   const contextPackLiteExampleReadme = readText("examples/context-pack-lite/README.md");
   const contextPackLiteExampleManifest = readText("examples/context-pack-lite/MANIFEST.md");
   const contextPackLiteExampleReceiverState = readText("examples/context-pack-lite/RECEIVER_STATE.md");
+  const fileOnlyExportExampleReadme = readText("examples/file-only-export/README.md");
+  const fileOnlyExportExampleManifest = readJson("examples/file-only-export/exports/manifest.json");
+  const fileOnlyExportExampleContext = readJson("examples/file-only-export/exports/context.json");
+  const fileOnlyExportExampleContextPack = readText("examples/file-only-export/exports/context-pack.md");
+  const fileOnlyExportExampleAdapterNotes = readText("examples/file-only-export/exports/adapter-notes.md");
+  const fileOnlyExportExpectedSourceFiles = [
+    "MANIFEST.md",
+    "REPO_MAP.md",
+    "KEY_FILES.md",
+    "RECENT_DELTA.md",
+    "RISK_BOUNDARIES.md",
+    "RECEIVER_STATE.md",
+    "NEXT_WINDOW_STARTER.md",
+  ];
+  const fileOnlyExportExpectedOutputFiles = [
+    "adapter-notes.md",
+    "context-pack.md",
+    "context.json",
+    "manifest.json",
+  ];
   const deltaReportPassExample = readText("examples/receiver/delta-report-pass/README.md");
   const deltaReportDifferenceExample = readText("examples/receiver/delta-report-difference-found/README.md");
   const receiverUsagePackReadme = readText("examples/receiver/usage-pack/README.md");
@@ -579,6 +615,12 @@ function checkContentContracts() {
   assert(readme.includes("docs/dogfooding/context-pack-resume-v2.2.0.md"), "README.md should link to v2.2 resume dogfooding");
   assert(readme.includes("docs/releases/v2.3.0-plan.md"), "README.md should link to v2.3 format plan");
   assert(readme.includes("docs/specs/basebrief-format.md"), "README.md should link to basebrief format spec");
+  assert(readme.includes("docs/releases/v2.4.0-plan.md"), "README.md should link to v2.4 file-only export plan");
+  assert(readme.includes("docs/releases/v2.4.0.md"), "README.md should link to v2.4 file-only export closeout");
+  assert(readme.includes("docs/specs/file-only-export.md"), "README.md should link to file-only export spec");
+  assert(readme.includes("docs/dogfooding/file-only-export-v2.4.0.md"), "README.md should link to v2.4 file-only export dogfooding");
+  assert(readme.includes("examples/file-only-export/README.md"), "README.md should link to file-only export example kit");
+  assert(readme.includes("export --input <context-pack-dir> --output-dir <dir>"), "README.md should mention export command");
   assert(readme.includes("resume --input <context-pack-dir>"), "README.md should mention resume command");
   assert(readme.includes("examples/context-pack-lite/README.md"), "README.md should link to context pack example kit");
   assert(readme.includes("docs/dogfooding/context-pack-lite-fresh-receiver-v2.0.0.md"), "README.md should link to context pack dogfooding");
@@ -683,6 +725,12 @@ function checkContentContracts() {
   assert(englishReadme.includes("docs/dogfooding/context-pack-resume-v2.2.0.md"), "README.en.md should link to v2.2 resume dogfooding");
   assert(englishReadme.includes("docs/releases/v2.3.0-plan.md"), "README.en.md should link to v2.3 format plan");
   assert(englishReadme.includes("docs/specs/basebrief-format.md"), "README.en.md should link to basebrief format spec");
+  assert(englishReadme.includes("docs/releases/v2.4.0-plan.md"), "README.en.md should link to v2.4 file-only export plan");
+  assert(englishReadme.includes("docs/releases/v2.4.0.md"), "README.en.md should link to v2.4 file-only export closeout");
+  assert(englishReadme.includes("docs/specs/file-only-export.md"), "README.en.md should link to file-only export spec");
+  assert(englishReadme.includes("docs/dogfooding/file-only-export-v2.4.0.md"), "README.en.md should link to v2.4 file-only export dogfooding");
+  assert(englishReadme.includes("examples/file-only-export/README.md"), "README.en.md should link to file-only export example kit");
+  assert(englishReadme.includes("export --input <context-pack-dir> --output-dir <dir>"), "README.en.md should mention export command");
   assert(englishReadme.includes("resume --input <context-pack-dir>"), "README.en.md should mention resume command");
   assert(englishReadme.includes("examples/context-pack-lite/README.md"), "README.en.md should link to context pack example kit");
   assert(englishReadme.includes("docs/dogfooding/context-pack-lite-fresh-receiver-v2.0.0.md"), "README.en.md should link to context pack dogfooding");
@@ -985,6 +1033,10 @@ function checkContentContracts() {
   assert(testingDoc.includes("v2.1.0 Context Pack Check Local Closeout"), "Testing docs must document v2.1.0 context pack check closeout");
   assert(testingDoc.includes("v2.2.0 One-command Resume / New-window Prompt Plan"), "Testing docs must document v2.2.0 resume plan");
   assert(testingDoc.includes("v2.3.0 BaseBrief Format Plan"), "Testing docs must document v2.3.0 format plan");
+  assert(testingDoc.includes("File-only Export Dogfooding v2.4.0"), "Testing docs must document v2.4 file-only export dogfooding");
+  assert(testingDoc.includes("../examples/file-only-export/README.md"), "Testing docs must link file-only export example kit");
+  assert(testingDoc.includes("examples/file-only-export/exports/` is a recommended example output directory"), "Testing docs must clarify example export directory naming");
+  assert(testingDoc.includes("receiver_style_acceptance: pass"), "Testing docs must record v2.4 export receiver-style acceptance");
   assert(testingDoc.includes("context-pack --repo <target-repo>"), "Testing docs must document context-pack command");
   assert(testingDoc.includes("resume --input <context-pack-dir>"), "Testing docs must document resume command");
   assert(testingDoc.includes("context-pack.md"), "Testing docs must mention context-pack.md");
@@ -1074,8 +1126,19 @@ function checkContentContracts() {
   assert(cliLiteDoc.includes("specs/delta-handoff.md"), "cli-lite.md must link delta handoff spec");
   assert(cliLiteDoc.includes("node scripts/basebrief.js context-pack --repo <target-repo> --output-dir <dir>"), "cli-lite.md must document context-pack command");
   assert(cliLiteDoc.includes("node scripts/basebrief.js resume --input <context-pack-dir>"), "cli-lite.md must document resume command");
+  assert(cliLiteDoc.includes("node scripts/basebrief.js export --input <context-pack-dir> --output-dir <dir>"), "cli-lite.md must document export command");
+  assert(cliLiteDoc.includes("manifest.json"), "cli-lite.md must document export manifest");
+  assert(cliLiteDoc.includes("context-pack.md"), "cli-lite.md must document readable export file");
+  assert(cliLiteDoc.includes("context.json"), "cli-lite.md must document machine-readable export file");
+  assert(cliLiteDoc.includes("adapter-notes.md"), "cli-lite.md must document adapter notes export file");
   assert(cliLiteDoc.includes("releases/v2.2.0-plan.md"), "cli-lite.md must link v2.2.0 resume plan");
   assert(cliLiteDoc.includes("specs/context-pack-resume.md"), "cli-lite.md must link context pack resume spec");
+  assert(cliLiteDoc.includes("releases/v2.4.0-plan.md"), "cli-lite.md must link v2.4.0 export plan");
+  assert(cliLiteDoc.includes("releases/v2.4.0.md"), "cli-lite.md must link v2.4.0 export closeout");
+  assert(cliLiteDoc.includes("specs/file-only-export.md"), "cli-lite.md must link file-only export spec");
+  assert(cliLiteDoc.includes("dogfooding/file-only-export-v2.4.0.md"), "cli-lite.md must link file-only export dogfooding");
+  assert(cliLiteDoc.includes("../examples/file-only-export/README.md"), "cli-lite.md must link file-only export example kit");
+  assert(cliLiteDoc.includes("auto-created nested directory"), "cli-lite.md must clarify export directory naming");
   assert(cliLiteDoc.includes("examples/context-pack-lite/README.md"), "cli-lite.md must link context pack example kit");
   assert(cliLiteDoc.includes("releases/v2.0.0.md"), "cli-lite.md must link v2.0.0 closeout");
   assert(cliLiteDoc.includes("node scripts/basebrief.js receiver-flow"), "cli-lite.md must document receiver-flow command");
@@ -1481,9 +1544,14 @@ function checkContentContracts() {
   assert(docsIndex.includes("releases/v2.2.0-plan.md"), "Docs index must link v2.2.0 resume plan");
   assert(docsIndex.includes("releases/v2.2.0.md"), "Docs index must link v2.2.0 resume closeout");
   assert(docsIndex.includes("releases/v2.3.0-plan.md"), "Docs index must link v2.3.0 format plan");
+  assert(docsIndex.includes("releases/v2.4.0-plan.md"), "Docs index must link v2.4.0 file-only export plan");
+  assert(docsIndex.includes("releases/v2.4.0.md"), "Docs index must link v2.4.0 file-only export closeout");
+  assert(docsIndex.includes("dogfooding/file-only-export-v2.4.0.md"), "Docs index must link v2.4.0 file-only export dogfooding");
+  assert(docsIndex.includes("../examples/file-only-export/README.md"), "Docs index must link file-only export example kit");
   assert(docsIndex.includes("specs/context-pack-lite.md"), "Docs index must link context pack lite spec");
   assert(docsIndex.includes("specs/context-pack-resume.md"), "Docs index must link context pack resume spec");
   assert(docsIndex.includes("specs/basebrief-format.md"), "Docs index must link basebrief format spec");
+  assert(docsIndex.includes("specs/file-only-export.md"), "Docs index must link file-only export spec");
   assert(docsIndex.includes("dogfooding/context-pack-lite-fresh-receiver-v2.0.0.md"), "Docs index must link context pack dogfooding");
   assert(docsIndex.includes("dogfooding/context-pack-check-acceptance-v2.1.0.md"), "Docs index must link v2.1 context pack check dogfooding");
   assert(docsIndex.includes("dogfooding/context-pack-resume-v2.2.0.md"), "Docs index must link v2.2 resume dogfooding");
@@ -1500,6 +1568,19 @@ function checkContentContracts() {
   assert(v2ContextPackRoadmapDoc.includes("context.json"), "v2 roadmap must define context.json");
   assert(v2ContextPackRoadmapDoc.includes("docs/releases/v2.3.0-plan.md"), "v2 roadmap must link v2.3 plan");
   assert(v2ContextPackRoadmapDoc.includes("docs/specs/basebrief-format.md"), "v2 roadmap must link v2.3 spec");
+  assert(v2ContextPackRoadmapDoc.includes("v2.4 File-only Adapter / MCP-friendly Export"), "v2 roadmap must reserve file-only export for v2.4");
+  assert(v2ContextPackRoadmapDoc.includes("docs/releases/v2.4.0-plan.md"), "v2 roadmap must link v2.4 plan");
+  assert(v2ContextPackRoadmapDoc.includes("docs/releases/v2.4.0.md"), "v2 roadmap must link v2.4 closeout");
+  assert(v2ContextPackRoadmapDoc.includes("docs/specs/file-only-export.md"), "v2 roadmap must link file-only export spec");
+  assert(v2ContextPackRoadmapDoc.includes("docs/dogfooding/file-only-export-v2.4.0.md"), "v2 roadmap must link v2.4 dogfooding");
+  assert(v2ContextPackRoadmapDoc.includes("v2.4-C is dogfooding evidence"), "v2 roadmap must name v2.4-C dogfooding");
+  assert(v2ContextPackRoadmapDoc.includes("v2.4-D is example-kit and contract-wording polish"), "v2 roadmap must name v2.4-D example polish");
+  assert(v2ContextPackRoadmapDoc.includes("examples/file-only-export/"), "v2 roadmap must link file-only export example kit");
+  assert(v2ContextPackRoadmapDoc.includes("not an auto-created nested directory"), "v2 roadmap must clarify export directory naming");
+  assert(v2ContextPackRoadmapDoc.includes("exports/manifest.json"), "v2 roadmap must define export manifest");
+  assert(v2ContextPackRoadmapDoc.includes("exports/context-pack.md"), "v2 roadmap must define readable export");
+  assert(v2ContextPackRoadmapDoc.includes("exports/context.json"), "v2 roadmap must define machine-readable export");
+  assert(v2ContextPackRoadmapDoc.includes("exports/adapter-notes.md"), "v2 roadmap must define adapter notes export");
   assert(v2ContextPackRoadmapDoc.includes("Workflow Runner Lite or watcher/dashboard work"), "v2 roadmap must keep runner and watcher work later");
   assert(v2ContextPackRoadmapDoc.includes("MANIFEST.md"), "v2 roadmap must define manifest artifact");
   assert(v2ContextPackRoadmapDoc.includes("REPO_MAP.md"), "v2 roadmap must define repo map artifact");
@@ -1613,6 +1694,71 @@ function checkContentContracts() {
   assert(basebriefFormatSpecDoc.includes("schema-v2"), "basebrief format spec must reject schema-v2");
   assert(basebriefFormatSpecDoc.includes("Workflow Runner"), "basebrief format spec must keep runner out of scope");
   assert(basebriefFormatSpecDoc.includes("Context Pack Lite generator output"), "basebrief format spec must preserve generator output");
+  assert(v240PlanDoc.includes("v2.4.0 File-only Adapter / MCP-friendly Export Plan"), "v2.4 plan must have stable title");
+  assert(v240PlanDoc.includes("Status: v2.4-A contract freeze"), "v2.4 plan must mark contract freeze status");
+  assert(v240PlanDoc.includes("exports/manifest.json"), "v2.4 plan must define export manifest");
+  assert(v240PlanDoc.includes("exports/context-pack.md"), "v2.4 plan must define readable export");
+  assert(v240PlanDoc.includes("exports/context.json"), "v2.4 plan must define machine-readable export");
+  assert(v240PlanDoc.includes("exports/adapter-notes.md"), "v2.4 plan must define adapter notes export");
+  assert(v240PlanDoc.includes("MCP-friendly means file shapes"), "v2.4 plan must define MCP-friendly as file-only");
+  assert(v240PlanDoc.includes("No command."), "v2.4 plan must stay docs-first");
+  assert(v240PlanDoc.includes("No exporter."), "v2.4 plan must avoid exporter implementation");
+  assert(v240PlanDoc.includes("No JSON schema file."), "v2.4 plan must avoid schema-file work");
+  assert(v240PlanDoc.includes("No schema-v2."), "v2.4 plan must avoid schema-v2");
+  assert(v240PlanDoc.includes("No Workflow Runner."), "v2.4 plan must keep runner out of scope");
+  assert(v240PlanDoc.includes("No change to Context Pack Lite generator output."), "v2.4 plan must preserve context-pack generator output");
+  assert(v240PlanDoc.includes("No change to `check --input <dir> --json` top-level shape."), "v2.4 plan must preserve checker JSON shape");
+  assert(v240PlanDoc.includes("No change to existing `resume --input <context-pack-dir>` behavior."), "v2.4 plan must preserve resume behavior");
+  assert(v240PlanDoc.includes("provider_probe_status=skipped"), "v2.4 plan must preserve skipped provider gate");
+  assert(fileOnlyExportSpecDoc.includes("File-only Export Spec"), "file-only export spec must have stable title");
+  assert(fileOnlyExportSpecDoc.includes("Status: v2.4-A contract freeze"), "file-only export spec must mark contract freeze status");
+  assert(fileOnlyExportSpecDoc.includes("exports/manifest.json"), "file-only export spec must define export manifest");
+  assert(fileOnlyExportSpecDoc.includes("exports/context-pack.md"), "file-only export spec must define readable export");
+  assert(fileOnlyExportSpecDoc.includes("exports/context.json"), "file-only export spec must define machine-readable export");
+  assert(fileOnlyExportSpecDoc.includes("exports/adapter-notes.md"), "file-only export spec must define adapter notes export");
+  assert(fileOnlyExportSpecDoc.includes("recommended explicit output directory name"), "file-only export spec must clarify exports directory naming");
+  assert(fileOnlyExportSpecDoc.includes("does not create an additional nested `exports/` directory"), "file-only export spec must reject nested exports auto-creation");
+  assert(fileOnlyExportSpecDoc.includes("Implemented surface:"), "file-only export spec must name implemented surface");
+  assert(fileOnlyExportSpecDoc.includes("export --input <context-pack-dir> --output-dir <dir>"), "file-only export spec must document export command");
+  assert(fileOnlyExportSpecDoc.includes("MCP-friendly means"), "file-only export spec must define MCP-friendly boundary");
+  assert(fileOnlyExportSpecDoc.includes("MCP server"), "file-only export spec must reject MCP server scope");
+  assert(fileOnlyExportSpecDoc.includes("schema-v2"), "file-only export spec must reject schema-v2");
+  assert(fileOnlyExportSpecDoc.includes("Workflow Runner"), "file-only export spec must keep runner out of scope");
+  assert(fileOnlyExportSpecDoc.includes("Context Pack Lite generator output"), "file-only export spec must preserve generator output");
+  assert(v240ReleaseDoc.includes("v2.4.0 File-only Adapter / MCP-friendly Export Local Closeout"), "v2.4 closeout doc must have stable title");
+  assert(v240ReleaseDoc.includes("scripts/basebrief_export.js"), "v2.4 closeout doc must mention export module");
+  assert(v240ReleaseDoc.includes("export --input <context-pack-dir> --output-dir <dir>"), "v2.4 closeout doc must document export command");
+  assert(v240ReleaseDoc.includes("manifest.json"), "v2.4 closeout doc must mention export manifest");
+  assert(v240ReleaseDoc.includes("context-pack.md"), "v2.4 closeout doc must mention readable export");
+  assert(v240ReleaseDoc.includes("context.json"), "v2.4 closeout doc must mention machine-readable export");
+  assert(v240ReleaseDoc.includes("adapter-notes.md"), "v2.4 closeout doc must mention adapter notes export");
+  assert(v240ReleaseDoc.includes("examples/file-only-export/"), "v2.4 closeout doc must mention file-only export example kit");
+  assert(v240ReleaseDoc.includes("recommended example output directory name"), "v2.4 closeout doc must clarify example export directory naming");
+  assert(v240ReleaseDoc.includes("No Context Pack Lite generator output change"), "v2.4 closeout doc must preserve context-pack generator output");
+  assert(v240ReleaseDoc.includes("No `check --input <dir> --json` top-level shape change"), "v2.4 closeout doc must preserve checker JSON shape");
+  assert(v240ReleaseDoc.includes("No `resume --input <context-pack-dir>` behavior change"), "v2.4 closeout doc must preserve resume behavior");
+  assert(v240ReleaseDoc.includes("provider_probe_status=skipped"), "v2.4 closeout doc must preserve skipped provider gate");
+  assert(fileOnlyExportDogfoodingDoc.includes("File-only Export Dogfooding v2.4.0"), "v2.4 export dogfooding doc must have stable title");
+  assert(fileOnlyExportDogfoodingDoc.includes("clean_export_status: pass"), "v2.4 export dogfooding must record clean export acceptance");
+  assert(fileOnlyExportDogfoodingDoc.includes("export_bundle_check_status: pass"), "v2.4 export dogfooding must record export bundle check acceptance");
+  assert(fileOnlyExportDogfoodingDoc.includes("receiver_style_acceptance: pass"), "v2.4 export dogfooding must record receiver-style acceptance");
+  assert(fileOnlyExportDogfoodingDoc.includes("public_safety_status: pass"), "v2.4 export dogfooding must record public safety acceptance");
+  assert(fileOnlyExportDogfoodingDoc.includes("provider_probe_status=skipped"), "v2.4 export dogfooding must preserve skipped provider gate");
+  assert(fileOnlyExportDogfoodingDoc.includes("manifest.json"), "v2.4 export dogfooding must name manifest export");
+  assert(fileOnlyExportDogfoodingDoc.includes("context-pack.md"), "v2.4 export dogfooding must name readable export");
+  assert(fileOnlyExportDogfoodingDoc.includes("context.json"), "v2.4 export dogfooding must name machine-readable export");
+  assert(fileOnlyExportDogfoodingDoc.includes("adapter-notes.md"), "v2.4 export dogfooding must name adapter notes export");
+  assert(fileOnlyExportDogfoodingDoc.includes("basebrief-file-export-v1"), "v2.4 export dogfooding must record contract version");
+  assert(fileOnlyExportDogfoodingDoc.includes("live repo fact recheck requirement"), "v2.4 export dogfooding must preserve live recheck requirement");
+  assert(fileOnlyExportDogfoodingDoc.includes("warning/error distinction"), "v2.4 export dogfooding must preserve warning/error distinction");
+  assert(fileOnlyExportDogfoodingDoc.includes("No provider request"), "v2.4 export dogfooding must preserve provider boundary");
+  assert(fileOnlyExportDogfoodingDoc.includes("No MCP server"), "v2.4 export dogfooding must reject MCP server scope");
+  assert(fileOnlyExportDogfoodingDoc.includes("No Workflow Runner"), "v2.4 export dogfooding must keep runner out of scope");
+  assert(basebriefCliScript.includes('node scripts/basebrief.js export --input <context-pack-dir> --output-dir <dir> [--json]'), "CLI help must expose export command");
+  assert(basebriefCliScript.includes('if (command === "export") return commandExport(options);'), "CLI must route export command");
+  assert(basebriefExportScript.includes('basebrief-file-export-v1'), "export script must declare contract version");
+  assert(basebriefExportScript.includes('Context pack check failed'), "export script must block errored packs");
+  assert(basebriefExportScript.includes('manifest.json'), "export script must write manifest.json");
   assert(contextPackLiteDogfoodingDoc.includes("Context Pack Lite Fresh Receiver Dogfooding v2.0.0"), "context pack dogfooding doc must have stable title");
   assert(contextPackLiteDogfoodingDoc.includes("receiver_task_status: completed"), "context pack dogfooding must record completed receiver status");
   assert(contextPackLiteDogfoodingDoc.includes("handoff_acceptance: pass"), "context pack dogfooding must record pass acceptance");
@@ -1642,6 +1788,57 @@ function checkContentContracts() {
   assert(contextPackLiteExampleManifest.includes("MANIFEST.md"), "context pack example manifest must include reading order");
   assert(contextPackLiteExampleReceiverState.includes("not_available"), "context pack example receiver state must show missing input degradation");
   assert(contextPackLiteExampleReceiverState.includes("not_applicable"), "context pack example receiver state must show not applicable receiver history");
+  assert(fileOnlyExportExampleReadme.includes("File-only Export Example Kit"), "file-only export example readme must have stable title");
+  assert(fileOnlyExportExampleReadme.includes("export --input examples/context-pack-lite --output-dir examples/file-only-export/exports --json"), "file-only export example readme must document command shape");
+  assert(fileOnlyExportExampleReadme.includes("recommended example output directory name"), "file-only export example readme must clarify exports directory naming");
+  assert(fileOnlyExportExampleReadme.includes("directly under the explicit `--output-dir`"), "file-only export example readme must clarify output-dir root semantics");
+  assert(fileOnlyExportExampleReadme.includes("does not create or discover a nested `exports/` directory"), "file-only export example readme must reject nested export discovery");
+  assert(fileOnlyExportExampleReadme.includes("No provider request"), "file-only export example readme must preserve provider boundary");
+  assert(fileOnlyExportExampleReadme.includes("No MCP server"), "file-only export example readme must reject MCP server scope");
+  assert(fileOnlyExportExampleReadme.includes("No Workflow Runner"), "file-only export example readme must keep runner out of scope");
+  assert(fileOnlyExportExampleReadme.includes("provider_probe_status=skipped"), "file-only export example readme must preserve skipped provider gate");
+  const fileOnlyExportExampleFileNames = fs.readdirSync(path.join(repoRoot, "examples/file-only-export/exports")).sort();
+  assert(
+    JSON.stringify(fileOnlyExportExampleFileNames) === JSON.stringify(fileOnlyExportExpectedOutputFiles),
+    "file-only export example must contain exactly four export files",
+  );
+  assert(fileOnlyExportExampleManifest.contractVersion === "basebrief-file-export-v1", "file-only export manifest must use export contract version");
+  assert(fileOnlyExportExampleManifest.sourceKind === "context-pack-lite", "file-only export manifest must record context-pack-lite source kind");
+  assert(fileOnlyExportExampleManifest.generatedAt === "2026-06-08T00:00:00.000Z", "file-only export manifest must use fixed example timestamp");
+  assert(JSON.stringify(fileOnlyExportExampleManifest.sourceFiles) === JSON.stringify(fileOnlyExportExpectedSourceFiles), "file-only export manifest must preserve source reading order");
+  assert(JSON.stringify(Object.values(fileOnlyExportExampleManifest.outputFiles).sort()) === JSON.stringify(fileOnlyExportExpectedOutputFiles), "file-only export manifest must report four public output file names");
+  assert(fileOnlyExportExampleManifest.check.status === "passed", "file-only export manifest must record passed check status");
+  assert(fileOnlyExportExampleManifest.check.errorCount === 0, "file-only export manifest must record zero errors");
+  assert(fileOnlyExportExampleManifest.check.warningCount === 0, "file-only export manifest must record zero warnings");
+  assert(fileOnlyExportExampleManifest.review.liveRepoRecheckRequired === true, "file-only export manifest must preserve live recheck requirement");
+  assert(fileOnlyExportExampleContext.contractVersion === "basebrief-file-export-v1", "file-only export context must use export contract version");
+  assert(fileOnlyExportExampleContext.sourceKind === "context-pack-lite", "file-only export context must record context-pack-lite source kind");
+  assert(fileOnlyExportExampleContext.generatedAt === "2026-06-08T00:00:00.000Z", "file-only export context must use fixed example timestamp");
+  assert(JSON.stringify(fileOnlyExportExampleContext.sourceFiles) === JSON.stringify(fileOnlyExportExpectedSourceFiles), "file-only export context must preserve source reading order");
+  assert(JSON.stringify(Object.values(fileOnlyExportExampleContext.outputFiles).sort()) === JSON.stringify(fileOnlyExportExpectedOutputFiles), "file-only export context must report four public output file names");
+  assert(fileOnlyExportExampleContext.check.status === "passed", "file-only export context must record passed check status");
+  assert(fileOnlyExportExampleContext.check.errorCount === 0, "file-only export context must record zero errors");
+  assert(fileOnlyExportExampleContext.check.warningCount === 0, "file-only export context must record zero warnings");
+  assert(fileOnlyExportExampleContext.review.liveRepoRecheckRequired === true, "file-only export context must preserve live recheck requirement");
+  assert(fileOnlyExportExampleContext.pack.project === "basebrief-example-repo", "file-only export context must preserve example project identity");
+  assert(fileOnlyExportExampleContext.pack.worktreeStatus === "clean", "file-only export context must preserve clean example worktree status");
+  assert(fileOnlyExportExampleContext.pack.worktreeChangedFiles === "0", "file-only export context must preserve changed-file summary");
+  assert(fileOnlyExportExampleContext.boundaries.includes("No provider request."), "file-only export context must preserve provider boundary");
+  assert(fileOnlyExportExampleContext.boundaries.includes("No MCP server."), "file-only export context must reject MCP server scope");
+  assert(fileOnlyExportExampleContext.boundaries.includes("No Workflow Runner."), "file-only export context must keep runner out of scope");
+  fileOnlyExportExpectedSourceFiles.forEach((sourceFile) => {
+    assert(fileOnlyExportExampleContextPack.includes(`BASEBRIEF_SOURCE_FILE: ${sourceFile}`), `file-only export context-pack must preserve source label for ${sourceFile}`);
+  });
+  assert(fileOnlyExportExampleAdapterNotes.includes("No provider request"), "file-only export adapter notes must preserve provider boundary");
+  assert(fileOnlyExportExampleAdapterNotes.includes("No MCP server"), "file-only export adapter notes must reject MCP server scope");
+  assert(fileOnlyExportExampleAdapterNotes.includes("No Workflow Runner"), "file-only export adapter notes must keep runner out of scope");
+  const fileOnlyExportExampleJson = JSON.stringify({
+    manifest: fileOnlyExportExampleManifest,
+    context: fileOnlyExportExampleContext,
+  });
+  assert(!/[A-Za-z]:[\\/]/.test(fileOnlyExportExampleJson), "file-only export example JSON must not contain drive-letter absolute paths");
+  assert(!/\\\\/.test(fileOnlyExportExampleJson), "file-only export example JSON must not contain UNC paths");
+  assert(!fileOnlyExportExampleJson.includes("tests/outputs/private"), "file-only export example JSON must not contain private output paths");
   assert(deltaHandoffSpecDoc.includes("basebrief-delta-baseline-v1"), "delta spec must define baseline schema");
   assert(deltaHandoffSpecDoc.includes("reviewed"), "delta spec must define reviewed semantics");
   assert(deltaHandoffSpecDoc.includes("needs-review"), "delta spec must define needs-review semantics");
@@ -2857,6 +3054,11 @@ function checkExamples() {
     "examples/adapter-claude-project-context.md",
     "examples/seal-before-input.json",
     "examples/seal-after-input.json",
+    "examples/file-only-export/README.md",
+    "examples/file-only-export/exports/manifest.json",
+    "examples/file-only-export/exports/context-pack.md",
+    "examples/file-only-export/exports/context.json",
+    "examples/file-only-export/exports/adapter-notes.md",
     "examples/next-chat-example.md",
     "examples/receiver-check-config.json",
     "examples/receiver/difference-found/README.md",

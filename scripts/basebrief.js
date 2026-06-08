@@ -24,6 +24,7 @@ const { buildSidecarBundle, checkSidecarBundle } = require("./basebrief_sidecar"
 const { runDelta } = require("./basebrief_delta");
 const { buildContextPack } = require("./basebrief_context_pack");
 const { runResume } = require("./basebrief_resume");
+const { runExport } = require("./basebrief_export");
 
 const STARTER_FILE = "basebrief-handoff-input.json";
 const HELP_TEXT = [
@@ -51,6 +52,7 @@ const HELP_TEXT = [
   "  node scripts/basebrief.js delta --repo <target-repo> --output-dir <dir> [--since <commit>] [--advance-baseline] [--json]",
   "  node scripts/basebrief.js context-pack --repo <target-repo> --output-dir <dir> [--since <commit>] [--max-files <n>] [--json]",
   "  node scripts/basebrief.js resume --input <context-pack-dir> [--json]",
+  "  node scripts/basebrief.js export --input <context-pack-dir> --output-dir <dir> [--json]",
   "",
   "Start here:",
   "  docs/quickstart-5min.md",
@@ -368,6 +370,13 @@ function commandResume(options) {
   });
 }
 
+function commandExport(options) {
+  return runExport({
+    input: options.input,
+    "output-dir": options["output-dir"],
+  });
+}
+
 function run(argv) {
   const command = argv[2];
   if (!command || command === "--help" || command === "-h") return { command: "help" };
@@ -395,6 +404,7 @@ function run(argv) {
   if (command === "delta") return commandDelta(options);
   if (command === "context-pack") return commandContextPack(options);
   if (command === "resume") return commandResume(options);
+  if (command === "export") return commandExport(options);
   throw new Error(`Unknown command: ${command}`);
 }
 
@@ -536,6 +546,14 @@ function toPublicResult(result) {
       ...result,
       input: publicInput,
       prompt: result.prompt.replace(absoluteInput, publicInput),
+    };
+  }
+  if (result.command === "export") {
+    return {
+      ...result,
+      input: publicPath(result.input, cwd),
+      outputDir: publicPath(result.outputDir, cwd),
+      outputFiles: toRelativeMap(result.outputFiles, cwd),
     };
   }
   return result;
@@ -717,6 +735,16 @@ function formatHuman(result) {
   if (result.command === "resume") {
     return result.prompt.endsWith(os.EOL) ? result.prompt : `${result.prompt}${os.EOL}`;
   }
+  if (result.command === "export") {
+    return [
+      `BaseBrief file-only export written to ${result.outputDir}`,
+      `contractVersion=${result.contractVersion}`,
+      `check_status=${result.check.status}`,
+      `check_errors=${result.check.errorCount}`,
+      `check_warnings=${result.check.warningCount}`,
+      "",
+    ].join(os.EOL);
+  }
   return `${JSON.stringify(result, null, 2)}${os.EOL}`;
 }
 
@@ -787,6 +815,7 @@ module.exports = {
   commandDelta,
   commandContextPack,
   commandResume,
+  commandExport,
   formatFindingLines,
   formatHuman,
   parseOptions,

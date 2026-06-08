@@ -83,6 +83,9 @@ node scripts/basebrief.js sidecar-check --input tests/outputs/private/sidecar-ge
 `v2.1.0` 本地收口 Context Pack Check：继续复用 `check --input <context-pack-dir>`，对 Context Pack Lite 目录检查 7 文件完整性、共享 review metadata、manifest live facts、风险边界、receiver state 缺输入语义、starter 指令、public safety 与保守厚度 warning。它不新增 `context-pack-check` 顶层命令，不改 CLI JSON 顶层 shape，也不改 `context-pack` generator 输出。入口见 [v2.1.0 Context Pack Check Local Closeout](docs/releases/v2.1.0.md)、[v2.1.0 Context Pack Check Plan](docs/releases/v2.1.0-plan.md)、[Context Pack Check Spec](docs/specs/context-pack-check.md) 与 [Context Pack Check Acceptance v2.1.0](docs/dogfooding/context-pack-check-acceptance-v2.1.0.md)。
 `v2.2.0` starts the docs-first One-command Resume / New-window Prompt line. The narrow surface is `resume --input <context-pack-dir>`: it reuses the existing Context Pack Check result, prints a copyable new-window prompt, carries warning-only findings as review notes, and stops on error findings. It does not change Context Pack Lite generator output or the `check --input <dir> --json` shape, and it does not add provider, runtime, plugin, MCP, IDE, hosted, cloud-memory, schema-v2, or Workflow Runner behavior. Entry points: [v2.2.0 One-command Resume / New-window Prompt Plan](docs/releases/v2.2.0-plan.md) and [Context Pack Resume Spec](docs/specs/context-pack-resume.md).
 `v2.2.0` is locally closed by [v2.2.0 One-command Resume / New-window Prompt Local Closeout](docs/releases/v2.2.0.md) and [Context Pack Resume Dogfooding v2.2.0](docs/dogfooding/context-pack-resume-v2.2.0.md). The next docs-first line is `v2.3.0` BaseBrief Format: it freezes the future local packaging direction around `context-pack/`, `context-pack.md`, and `context.json` without adding a command, generator, JSON schema file, schema-v2, provider, runtime, plugin, MCP, IDE, hosted, cloud-memory, or Workflow Runner behavior. Entry points: [v2.3.0 BaseBrief Format Plan](docs/releases/v2.3.0-plan.md) and [BaseBrief Format Spec](docs/specs/basebrief-format.md).
+`v2.4.0` starts the File-only Adapter / MCP-friendly Export line. It adds the local `export --input <context-pack-dir> --output-dir <dir>` command, which turns a checked Context Pack Lite directory into `manifest.json`, `context-pack.md`, `context.json`, and `adapter-notes.md`. It does not change Context Pack Lite generator output, `check --input <dir> --json`, or `resume`; it does not add provider, runtime, plugin, MCP server, IDE, hosted, cloud-memory, schema-v2, or Workflow Runner behavior. MCP-friendly means future tool-consumable files, not an MCP server or runtime integration. Entry points: [v2.4.0 File-only Adapter / MCP-friendly Export Plan](docs/releases/v2.4.0-plan.md), [v2.4.0 File-only Adapter / MCP-friendly Export Local Closeout](docs/releases/v2.4.0.md), and [File-only Export Spec](docs/specs/file-only-export.md).
+`v2.4.0` dogfooding records that the four-file export bundle is enough for a receiver-style continuation review while still requiring live repo fact rechecks before implementation. Evidence: [File-only Export Dogfooding v2.4.0](docs/dogfooding/file-only-export-v2.4.0.md).
+`v2.4.0` also includes a public-safe [File-only Export example kit](examples/file-only-export/README.md). In that kit, `exports/` is a recommended example output directory name; the CLI writes the four files directly under the explicit `--output-dir` directory.
 
 ## Seal/Diff
 
@@ -117,7 +120,7 @@ node scripts/basebrief.js diff --before tests/outputs/private/quickstart/before.
 - Handoff Builder 与 Codex / Claude 文件型 Adapter
 - Artifact Checker
 - 可选、只读的 Receiver Safe Check v1
-- 零依赖 CLI Lite：`init`、`build`、`check`、`receiver-init`、`receiver-check`、`receiver-flow`、`review-draft`、`state-init`、`state-read`、`state-status`、`state-validate`、`state-history`、`state-advance`、`sidecar-build`、`sidecar-check`、`seal`、`diff`、`delta`、`context-pack`
+- 零依赖 CLI Lite：`init`、`build`、`check`、`receiver-init`、`receiver-check`、`receiver-flow`、`review-draft`、`state-init`、`state-read`、`state-status`、`state-validate`、`state-history`、`state-advance`、`sidecar-build`、`sidecar-check`、`seal`、`diff`、`delta`、`context-pack`、`resume`、`export`
 - Project State Sidecar：从本地 `basebrief-project-state-v1` 生成 `generic` / `openclaw` bundle 和 `new-window-starter.md`，并用 `basebrief-sidecar-v1` 做只读结构验收
 - 本地、文件型 Seal/Diff v1
 
@@ -160,6 +163,11 @@ BaseBrief 不是聊天客户端、Agent runtime、托管平台、密钥管理器
 - [Context Pack Resume Dogfooding v2.2.0](docs/dogfooding/context-pack-resume-v2.2.0.md)
 - [v2.3.0 BaseBrief Format Plan](docs/releases/v2.3.0-plan.md)
 - [BaseBrief Format Spec](docs/specs/basebrief-format.md)
+- [v2.4.0 File-only Adapter / MCP-friendly Export Plan](docs/releases/v2.4.0-plan.md)
+- [v2.4.0 File-only Adapter / MCP-friendly Export Local Closeout](docs/releases/v2.4.0.md)
+- [File-only Export Spec](docs/specs/file-only-export.md)
+- [File-only Export Dogfooding v2.4.0](docs/dogfooding/file-only-export-v2.4.0.md)
+- [File-only Export example kit](examples/file-only-export/README.md)
 - [Context Pack Lite example kit](examples/context-pack-lite/README.md)
 - [Context Pack Lite fresh receiver dogfooding v2.0.0](docs/dogfooding/context-pack-lite-fresh-receiver-v2.0.0.md)
 - [v0.9.x Integrated Handoff Closure Matrix](docs/testing-v0.9.x-test-matrix.md)

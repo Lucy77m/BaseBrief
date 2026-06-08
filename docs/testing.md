@@ -688,6 +688,80 @@ Expected release-check output without provider env remains:
 provider_probe_status=skipped
 ```
 
+## v2.4.0 File-only Adapter / MCP-friendly Export Plan
+
+`v2.4.0` freezes File-only Adapter / MCP-friendly Export as a docs-first
+contract. It defines the future local export family:
+
+```text
+exports/
+exports/manifest.json
+exports/context-pack.md
+exports/context.json
+exports/adapter-notes.md
+```
+
+This line is planning only. It adds no command, generator, exporter, JSON
+schema file, schema-v2, format emission, provider request, runtime integration,
+plugin, MCP server, IDE, hosted service, cloud-memory behavior, or Workflow
+Runner. MCP-friendly means future tool-consumable files, not an MCP server.
+
+Evidence and contract docs:
+
+- [v2.4.0 File-only Adapter / MCP-friendly Export Plan](releases/v2.4.0-plan.md)
+- [v2.4.0 File-only Adapter / MCP-friendly Export Local Closeout](releases/v2.4.0.md)
+- [File-only Export Spec](specs/file-only-export.md)
+- [File-only Export Dogfooding v2.4.0](dogfooding/file-only-export-v2.4.0.md)
+- [File-only Export example kit](../examples/file-only-export/README.md)
+
+The local validation gate for the implementation closeout is:
+
+```text
+node --test tests/basebrief.test.js --test-name-pattern "Export|v2.4"
+node scripts/basebrief.js export --input examples/context-pack-lite --output-dir tests/outputs/private/file-export --json
+node scripts/basebrief.js check --input tests/outputs/private/file-export --json
+node scripts/basebrief.js check --input examples/file-only-export --json
+npm test
+npm run release-check
+git diff --check
+```
+
+Expected release-check output without provider env remains:
+
+```text
+provider_probe_status=skipped
+```
+
+The example kit validation is:
+
+```text
+node scripts/basebrief.js check --input examples/file-only-export --json
+node scripts/basebrief.js export --input examples/context-pack-lite --output-dir tests/outputs/private/v2.4-file-export-example-smoke/exports --json
+node scripts/basebrief.js check --input tests/outputs/private/v2.4-file-export-example-smoke/exports --json
+```
+
+`examples/file-only-export/exports/` is a recommended example output directory
+name. The CLI writes directly under explicit `--output-dir`.
+
+The local dogfooding gate for the receiver-style export acceptance record is:
+
+```text
+node scripts/basebrief.js context-pack --repo . --output-dir tests/outputs/private/v2.4-file-export-dogfooding/context-pack --json
+node scripts/basebrief.js export --input tests/outputs/private/v2.4-file-export-dogfooding/context-pack --output-dir tests/outputs/private/v2.4-file-export-dogfooding/export --json
+node scripts/basebrief.js check --input tests/outputs/private/v2.4-file-export-dogfooding/export --json
+node --test tests/basebrief.test.js --test-name-pattern "Export|v2.4|Dogfooding"
+```
+
+Expected acceptance summary:
+
+```text
+clean_export_status: pass
+export_bundle_check_status: pass
+receiver_style_acceptance: pass
+public_safety_status: pass
+provider_probe_status=skipped
+```
+
 ## v0.4.1 Stabilization Candidate
 
 `v0.4.1` is a stabilization-only cycle after the `v0.4.0` public release. It uses
