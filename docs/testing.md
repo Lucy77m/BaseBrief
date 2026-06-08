@@ -909,6 +909,26 @@ Expected release-check output without provider env remains:
 provider_probe_status=skipped
 ```
 
+## v2.6.6 Context Pack First-Run Fixture Lab
+
+`v2.6.6` is local adoption evidence, not a release closeout or new feature
+line. It maps existing example kits and dogfooding notes into a first-run
+fixture-reading lab for clean packs, `context-pack.too-thick`, stale HEAD,
+branch mismatch, broken pack, `doctor.live-recheck-required`, and
+`Continuation rules:` starter handoff wording.
+
+The evidence is recorded in
+[Context Pack First-Run Fixture Lab v2.6.6](dogfooding/context-pack-first-run-fixture-lab-v2.6.6.md).
+It keeps `check` as the structural review gate, `resume` as the copyable
+next-window prompt, and `doctor` as live repo comparison rather than an
+always-on Status command.
+
+Expected release-check output without provider env remains:
+
+```text
+provider_probe_status=skipped
+```
+
 ## v0.4.1 Stabilization Candidate
 
 `v0.4.1` is a stabilization-only cycle after the `v0.4.0` public release. It uses

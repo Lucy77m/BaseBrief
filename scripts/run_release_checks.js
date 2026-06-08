@@ -190,6 +190,7 @@ function checkRequiredFiles() {
     "docs/dogfooding/context-pack-adoption-notes-v2.6.1.md",
     "docs/dogfooding/context-engineering-reference-notes-v2.6.4.md",
     "docs/dogfooding/context-pack-adoption-scenario-matrix-v2.6.5.md",
+    "docs/dogfooding/context-pack-first-run-fixture-lab-v2.6.6.md",
     "docs/testing-v0.4.x-test-matrix.md",
     "docs/testing-v0.6.x-test-matrix.md",
     "docs/testing-v0.7.x-test-matrix.md",
@@ -483,6 +484,7 @@ function checkContentContracts() {
   const contextPackAdoptionNotesV261Doc = readText("docs/dogfooding/context-pack-adoption-notes-v2.6.1.md");
   const contextEngineeringReferenceNotesV264Doc = readText("docs/dogfooding/context-engineering-reference-notes-v2.6.4.md");
   const contextPackAdoptionScenarioMatrixV265Doc = readText("docs/dogfooding/context-pack-adoption-scenario-matrix-v2.6.5.md");
+  const contextPackFirstRunFixtureLabV266Doc = readText("docs/dogfooding/context-pack-first-run-fixture-lab-v2.6.6.md");
   const postReleaseBaselineDoc = readText("docs/baselines/v0.4.0-post-release-baseline.md");
   const v060PostReleaseBaselineDoc = readText("docs/baselines/v0.6.0-post-release-baseline.md");
   const projectStateModelDoc = readText("docs/design/project-state-model.md");
@@ -987,6 +989,10 @@ function checkContentContracts() {
   assert(testingDoc.includes("dogfooding/context-pack-adoption-scenario-matrix-v2.6.5.md"), "Testing docs must link v2.6.5 scenario matrix");
   assert(testingDoc.includes("clean packs") && testingDoc.includes("context-pack.too-thick") && testingDoc.includes("stale HEAD") && testingDoc.includes("broken pack") && testingDoc.includes("doctor.live-recheck-required"), "Testing docs must summarize v2.6.5 scenario coverage");
   assert(testingDoc.includes("`check` as the pack validity gate") && testingDoc.includes("`resume` as the copyable") && testingDoc.includes("`doctor` as live repo comparison"), "Testing docs must preserve v2.6.5 command roles");
+  assert(testingDoc.includes("v2.6.6 Context Pack First-Run Fixture Lab"), "Testing docs must document v2.6.6 fixture lab");
+  assert(testingDoc.includes("dogfooding/context-pack-first-run-fixture-lab-v2.6.6.md"), "Testing docs must link v2.6.6 fixture lab");
+  assert(testingDoc.includes("branch mismatch") && testingDoc.includes("Continuation rules:"), "Testing docs must summarize v2.6.6 fixture lab coverage");
+  assert(testingDoc.includes("`check` as the structural review gate") && testingDoc.includes("`resume` as the copyable") && testingDoc.includes("`doctor` as live repo comparison"), "Testing docs must preserve v2.6.6 command roles");
   assert(testingDoc.includes("checker_error_propagation_status: pass"), "Testing docs must record checker-error propagation");
   assert(testingDoc.includes("context-pack --repo <target-repo>"), "Testing docs must document context-pack command");
   assert(testingDoc.includes("resume --input <context-pack-dir>"), "Testing docs must document resume command");
@@ -1514,6 +1520,7 @@ function checkContentContracts() {
   assert(docsIndex.includes("dogfooding/context-pack-adoption-notes-v2.6.1.md"), "Docs index must link v2.6.1 adoption notes");
   assert(docsIndex.includes("dogfooding/context-engineering-reference-notes-v2.6.4.md"), "Docs index must link v2.6.4 reference notes");
   assert(docsIndex.includes("dogfooding/context-pack-adoption-scenario-matrix-v2.6.5.md"), "Docs index must link v2.6.5 scenario matrix");
+  assert(docsIndex.includes("dogfooding/context-pack-first-run-fixture-lab-v2.6.6.md"), "Docs index must link v2.6.6 fixture lab");
   assert(docsIndex.includes("specs/context-pack-lite.md"), "Docs index must link context pack lite spec");
   assert(docsIndex.includes("specs/context-pack-resume.md"), "Docs index must link context pack resume spec");
   assert(docsIndex.includes("specs/basebrief-format.md"), "Docs index must link basebrief format spec");
@@ -1567,6 +1574,9 @@ function checkContentContracts() {
   assert(v2ContextPackRoadmapDoc.includes("docs/dogfooding/context-pack-adoption-scenario-matrix-v2.6.5.md"), "v2 roadmap must link v2.6.5 scenario matrix");
   assert(v2ContextPackRoadmapDoc.includes("check/resume/doctor decision matrix"), "v2 roadmap must describe v2.6.5 matrix purpose");
   assert(v2ContextPackRoadmapDoc.includes("adoption") && v2ContextPackRoadmapDoc.includes("evidence") && v2ContextPackRoadmapDoc.includes("not a new command line"), "v2 roadmap must keep v2.6.5 out of command scope");
+  assert(v2ContextPackRoadmapDoc.includes("docs/dogfooding/context-pack-first-run-fixture-lab-v2.6.6.md"), "v2 roadmap must link v2.6.6 fixture lab");
+  assert(v2ContextPackRoadmapDoc.includes("first-run fixture-reading lab"), "v2 roadmap must describe v2.6.6 fixture lab purpose");
+  assert(v2ContextPackRoadmapDoc.includes("not new fixture generation") && v2ContextPackRoadmapDoc.includes("not a JSON contract change"), "v2 roadmap must keep v2.6.6 out of fixture-generation and contract scope");
   assert(v2ContextPackRoadmapDoc.includes("exports/manifest.json"), "v2 roadmap must define export manifest");
   assert(v2ContextPackRoadmapDoc.includes("exports/context-pack.md"), "v2 roadmap must define readable export");
   assert(v2ContextPackRoadmapDoc.includes("exports/context.json"), "v2 roadmap must define machine-readable export");
@@ -1888,6 +1898,38 @@ function checkContentContracts() {
   assert(contextPackAdoptionScenarioMatrixV265Doc.includes("provider_probe_status=skipped"), "v2.6.5 scenario matrix must preserve skipped provider gate");
   assert(!/(^|[^A-Za-z])[A-Za-z]:[\\/]/.test(contextPackAdoptionScenarioMatrixV265Doc), "v2.6.5 scenario matrix must not expose drive-letter absolute paths");
   assert(!/\\\\/.test(contextPackAdoptionScenarioMatrixV265Doc), "v2.6.5 scenario matrix must not expose UNC paths");
+  assert(contextPackFirstRunFixtureLabV266Doc.includes("Context Pack First-Run Fixture Lab v2.6.6"), "v2.6.6 fixture lab doc must have stable title");
+  assert(contextPackFirstRunFixtureLabV266Doc.includes("local adoption evidence, not a release closeout"), "v2.6.6 fixture lab must avoid release closeout claims");
+  assert(contextPackFirstRunFixtureLabV266Doc.includes("examples/context-pack-lite/README.md"), "v2.6.6 fixture lab must link Context Pack Lite example kit");
+  assert(contextPackFirstRunFixtureLabV266Doc.includes("examples/context-pack-doctor/README.md"), "v2.6.6 fixture lab must link Doctor example kit");
+  assert(contextPackFirstRunFixtureLabV266Doc.includes("docs/dogfooding/context-pack-adoption-scenario-matrix-v2.6.5.md"), "v2.6.6 fixture lab must link v2.6.5 matrix");
+  assert(contextPackFirstRunFixtureLabV266Doc.includes("docs/dogfooding/context-pack-check-acceptance-v2.1.0.md"), "v2.6.6 fixture lab must link check acceptance record");
+  assert(contextPackFirstRunFixtureLabV266Doc.includes("docs/dogfooding/context-pack-doctor-v2.5.1.md"), "v2.6.6 fixture lab must link Doctor dogfooding summary");
+  assert(contextPackFirstRunFixtureLabV266Doc.includes("clean pack"), "v2.6.6 fixture lab must include clean pack scenario");
+  assert(contextPackFirstRunFixtureLabV266Doc.includes("context-pack.too-thick"), "v2.6.6 fixture lab must preserve thickness warning rule id");
+  assert(contextPackFirstRunFixtureLabV266Doc.includes("doctor.pack-head-stale"), "v2.6.6 fixture lab must preserve stale HEAD rule id");
+  assert(contextPackFirstRunFixtureLabV266Doc.includes("doctor.pack-branch-mismatch"), "v2.6.6 fixture lab must preserve branch mismatch rule id");
+  assert(contextPackFirstRunFixtureLabV266Doc.includes("doctor.pack-check-error"), "v2.6.6 fixture lab must preserve pack check error rule id");
+  assert(contextPackFirstRunFixtureLabV266Doc.includes("doctor.live-recheck-required"), "v2.6.6 fixture lab must preserve live recheck info rule id");
+  assert(contextPackFirstRunFixtureLabV266Doc.includes("Continuation rules:"), "v2.6.6 fixture lab must preserve starter continuation rules wording");
+  assert(contextPackFirstRunFixtureLabV266Doc.includes("`check` answers whether a Context Pack directory is structurally reviewable"), "v2.6.6 fixture lab must define check role");
+  assert(contextPackFirstRunFixtureLabV266Doc.includes("`resume` produces a copyable next-window prompt"), "v2.6.6 fixture lab must define resume role");
+  assert(contextPackFirstRunFixtureLabV266Doc.includes("`doctor` compares inherited pack facts with live repo facts"), "v2.6.6 fixture lab must define doctor role");
+  assert(contextPackFirstRunFixtureLabV266Doc.includes("Doctor is not an always-on Status command"), "v2.6.6 fixture lab must reject always-on status scope");
+  assert(contextPackFirstRunFixtureLabV266Doc.includes("No Status command"), "v2.6.6 fixture lab must reject status command scope");
+  assert(contextPackFirstRunFixtureLabV266Doc.includes("No Workflow Runner"), "v2.6.6 fixture lab must reject workflow runner scope");
+  assert(contextPackFirstRunFixtureLabV266Doc.includes("No provider request"), "v2.6.6 fixture lab must reject provider requests");
+  assert(contextPackFirstRunFixtureLabV266Doc.includes("No runtime integration"), "v2.6.6 fixture lab must reject runtime integration");
+  assert(contextPackFirstRunFixtureLabV266Doc.includes("No MCP server"), "v2.6.6 fixture lab must reject MCP server scope");
+  assert(contextPackFirstRunFixtureLabV266Doc.includes("No MCP tools"), "v2.6.6 fixture lab must reject MCP tools scope");
+  assert(contextPackFirstRunFixtureLabV266Doc.includes("No schema-v2"), "v2.6.6 fixture lab must reject schema-v2");
+  assert(contextPackFirstRunFixtureLabV266Doc.includes("No `check --input <dir> --json` top-level shape change"), "v2.6.6 fixture lab must preserve checker JSON shape");
+  assert(contextPackFirstRunFixtureLabV266Doc.includes("No Resume JSON contract change"), "v2.6.6 fixture lab must preserve resume JSON contract");
+  assert(contextPackFirstRunFixtureLabV266Doc.includes("No Doctor JSON contract change"), "v2.6.6 fixture lab must preserve doctor JSON contract");
+  assert(contextPackFirstRunFixtureLabV266Doc.includes("No Export JSON contract change"), "v2.6.6 fixture lab must preserve export JSON contract");
+  assert(contextPackFirstRunFixtureLabV266Doc.includes("provider_probe_status=skipped"), "v2.6.6 fixture lab must preserve skipped provider gate");
+  assert(!/(^|[^A-Za-z])[A-Za-z]:[\\/]/.test(contextPackFirstRunFixtureLabV266Doc), "v2.6.6 fixture lab must not expose drive-letter absolute paths");
+  assert(!/\\\\/.test(contextPackFirstRunFixtureLabV266Doc), "v2.6.6 fixture lab must not expose UNC paths");
   assert(contextPackDoctorDogfoodingDoc.includes("Context Pack Doctor Dogfooding v2.5.0"), "doctor dogfooding doc must have stable title");
   assert(contextPackDoctorDogfoodingDoc.includes("doctor_contract_version: basebrief-doctor-v1"), "doctor dogfooding must record contract version");
   assert(contextPackDoctorDogfoodingDoc.includes("doctor_command_status: warning"), "doctor dogfooding must record warning status");

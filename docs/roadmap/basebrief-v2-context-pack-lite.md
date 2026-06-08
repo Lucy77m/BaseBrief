@@ -423,6 +423,11 @@ wait until repeated real adoption friction points to the same missing capability
 adoption notes into a check/resume/doctor decision matrix. It is adoption
 evidence, not a new command line, Status command, Workflow Runner, or contract.
 
+`docs/dogfooding/context-pack-first-run-fixture-lab-v2.6.6.md` maps the
+scenario matrix back to existing public example kits and dogfooding notes. It
+is a first-run fixture-reading lab, not new fixture generation, not a command
+line, and not a JSON contract change.
+
 ### Later Workflow Runner Lite
 
 Only after Context Pack Lite, Context Pack Check, One-command Resume,
