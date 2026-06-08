@@ -176,6 +176,7 @@ function checkRequiredFiles() {
     "docs/releases/v2.4.0.md",
     "docs/releases/v2.5.0-plan.md",
     "docs/releases/v2.5.0.md",
+    "docs/releases/v2.6.0.md",
     "docs/specs/context-pack-resume.md",
     "docs/specs/basebrief-format.md",
     "docs/specs/file-only-export.md",
@@ -461,6 +462,7 @@ function checkContentContracts() {
   const v240ReleaseDoc = readText("docs/releases/v2.4.0.md");
   const v250PlanDoc = readText("docs/releases/v2.5.0-plan.md");
   const v250ReleaseDoc = readText("docs/releases/v2.5.0.md");
+  const v260ReleaseDoc = readText("docs/releases/v2.6.0.md");
   const contextPackResumeSpecDoc = readText("docs/specs/context-pack-resume.md");
   const basebriefFormatSpecDoc = readText("docs/specs/basebrief-format.md");
   const fileOnlyExportSpecDoc = readText("docs/specs/file-only-export.md");
@@ -518,6 +520,7 @@ function checkContentContracts() {
   const fileOnlyExportExampleContextPack = readText("examples/file-only-export/exports/context-pack.md");
   const fileOnlyExportExampleAdapterNotes = readText("examples/file-only-export/exports/adapter-notes.md");
   const contextPackDoctorExampleReadme = readText("examples/context-pack-doctor/README.md");
+  const minimalExampleReadme = readText("examples/minimal/README.md");
   const fileOnlyExportExpectedSourceFiles = [
     "MANIFEST.md",
     "REPO_MAP.md",
@@ -664,12 +667,52 @@ function checkContentContracts() {
   assert(quickstartDoc.includes("路径 B2"), "quickstart must document the reviewed-handoff golden path");
   assert(quickstartDoc.includes("路径 C"), "quickstart must document the Seal/Diff path");
   assert(quickstartDoc.includes("路径 D"), "quickstart must document the Receiver Safe Check path");
+  assert(quickstartDoc.includes("第一次跑通：最短闭环"), "quickstart must put the first-run loop before advanced routes");
+  assert(quickstartDoc.includes("2 到 5 分钟"), "quickstart must preserve the first-run timebox");
+  assert(quickstartDoc.includes("常见失败解释"), "quickstart must explain first-run failure modes");
+  assert(quickstartDoc.includes("receiver_entry_task"), "quickstart must teach receiver entry task semantics");
+  assert(quickstartDoc.includes("post_acceptance_next_action"), "quickstart must teach post-acceptance action semantics");
+  assert(quickstartDoc.includes("不要把它当成每次都必须跑的 status 命令"), "quickstart must keep Doctor out of always-on status scope");
   assert(quickstartDoc.includes("golden-path.md"), "quickstart must link to the golden path guide");
   assert(quickstartDoc.includes("../examples/golden-path/README.md"), "quickstart must link to the golden-path example kit");
+  assert(quickstartDoc.includes("../examples/minimal/README.md"), "quickstart must link to the minimal first-run example");
+  assert(quickstartDoc.includes("../examples/context-pack-doctor/README.md"), "quickstart must link to the doctor example kit");
+  assert(quickstartDoc.includes("context-pack.too-thick"), "quickstart must route users to warning-pack examples");
+  assert(quickstartDoc.includes("doctor.pack-head-stale"), "quickstart must route users to stale-pack doctor examples");
+  assert(quickstartDoc.includes("doctor.pack-check-error"), "quickstart must route users to broken-pack doctor examples");
   assert(quickstartDoc.includes("state-init -> sidecar-build -> sidecar-check"), "quickstart must document first-pass golden path");
   assert(quickstartDoc.includes("state-advance -> sidecar-build -> sidecar-check"), "quickstart must document follow-up golden path");
   assert(quickstartDoc.includes("tests/outputs/private/quickstart/build"), "quickstart build must use the ignored private output directory");
   assert(quickstartDoc.includes("tests/outputs/private/quickstart/before.json"), "quickstart seal must use the ignored private output directory");
+  assert(docsIndex.includes("第一次跑通"), "Docs index must expose a first-run route before archives");
+  assert(docsIndex.includes("常用接续"), "Docs index must group ordinary continuation docs before diagnostics");
+  assert(docsIndex.includes("诊断与修复"), "Docs index must group Context Pack Doctor and checks separately from first-run docs");
+  assert(docsIndex.includes("进阶参考"), "Docs index must keep advanced workflows out of the first-run route");
+  assert(docsIndex.includes("版本档案入口"), "Docs index must push historical archives behind a clear archive heading");
+  assert(docsIndex.includes("不要把历史版本档案当作 first-run 主路径"), "Docs index must keep archives out of the first-run path");
+  assert(docsIndex.indexOf("## 第一次跑通") < docsIndex.indexOf("## 版本档案入口"), "Docs index must place first-run before archives");
+  assert(docsIndex.indexOf("## 常用接续") < docsIndex.indexOf("## 版本档案入口"), "Docs index must place continuation docs before archives");
+  assert(docsIndex.indexOf("## 诊断与修复") < docsIndex.indexOf("## 版本档案入口"), "Docs index must place diagnostic docs before archives");
+  assert(docsIndex.includes("../examples/minimal/README.md"), "Docs index must link the minimal first-run example");
+  assert(minimalExampleReadme.includes("2 分钟读法"), "Minimal example must include a short first-run reading path");
+  assert(minimalExampleReadme.includes("预期闭环"), "Minimal example must document expected first-run loop");
+  assert(minimalExampleReadme.includes("来源窗口已验证"), "Minimal example must separate source-window verification");
+  assert(minimalExampleReadme.includes("接收窗口本轮已验证"), "Minimal example must separate receiver-window rechecks");
+  assert(minimalExampleReadme.includes("difference_found"), "Minimal example must explain difference_found semantics");
+  assert(contextPackLiteExampleReadme.includes("First-run scenarios"), "Context Pack Lite example must document first-run scenarios");
+  assert(contextPackLiteExampleReadme.includes("Clean pack"), "Context Pack Lite example must explain clean pack handling");
+  assert(contextPackLiteExampleReadme.includes("Warning pack"), "Context Pack Lite example must explain warning pack handling");
+  assert(contextPackLiteExampleReadme.includes("Broken pack"), "Context Pack Lite example must explain broken pack handling");
+  assert(contextPackLiteExampleReadme.includes("context-pack.too-thick"), "Context Pack Lite example must mention thickness warning");
+  assert(contextPackLiteExampleReadme.includes("is this pack structurally reviewable"), "Context Pack Lite example must scope check to structural review");
+  assert(contextPackDoctorExampleReadme.includes("Check vs Doctor"), "Doctor example must explain check versus doctor");
+  assert(contextPackDoctorExampleReadme.includes("Clean/current pack"), "Doctor example must explain clean/current result handling");
+  assert(contextPackDoctorExampleReadme.includes("Stale pack"), "Doctor example must explain stale pack handling");
+  assert(contextPackDoctorExampleReadme.includes("Broken pack"), "Doctor example must explain broken pack handling");
+  assert(contextPackDoctorExampleReadme.includes("basebrief-doctor-v1"), "Doctor example must preserve doctor contract version");
+  assert(contextPackDoctorExampleReadme.includes("doctor.pack-head-stale"), "Doctor example must mention stale HEAD finding");
+  assert(contextPackDoctorExampleReadme.includes("doctor.pack-check-error"), "Doctor example must mention pack check error finding");
+  assert(contextPackDoctorExampleReadme.includes("not an always-on `status` command"), "Doctor example must keep Doctor out of always-on status scope");
   assert(knownLimitationsDoc.includes("Free-form Markdown"), "Known Limitations must document free-form Markdown input boundary");
   assert(knownLimitationsDoc.includes("not a Git diff"), "Known Limitations must document Seal/Diff boundary");
   assert(dogfoodingDoc.includes("artifact.missing-open-questions"), "Dogfooding record must document the first-run warning");
@@ -922,6 +965,9 @@ function checkContentContracts() {
   assert(testingDoc.includes("post_commit_doctor_status: passed"), "Testing docs must record v2.5.1 post-commit doctor status");
   assert(testingDoc.includes("no_provider_boundary_warning_status: absent"), "Testing docs must record v2.5.1 boundary warning absence");
   assert(testingDoc.includes("export_bundle_check_status: passed"), "Testing docs must record v2.5.1 export bundle check");
+  assert(testingDoc.includes("v2.6.0 First-Run / Adoption Polish Local Closeout"), "Testing docs must document v2.6 adoption polish closeout");
+  assert(testingDoc.includes("docs/examples/release-check adoption polish"), "Testing docs must scope v2.6 as docs/examples/release-check polish");
+  assert(testingDoc.includes("no always-on status command"), "Testing docs must keep v2.6 out of status scope");
   assert(testingDoc.includes("checker_error_propagation_status: pass"), "Testing docs must record checker-error propagation");
   assert(testingDoc.includes("context-pack --repo <target-repo>"), "Testing docs must document context-pack command");
   assert(testingDoc.includes("resume --input <context-pack-dir>"), "Testing docs must document resume command");
@@ -1442,6 +1488,7 @@ function checkContentContracts() {
   assert(docsIndex.includes("../examples/file-only-export/README.md"), "Docs index must link file-only export example kit");
   assert(docsIndex.includes("releases/v2.5.0-plan.md"), "Docs index must link v2.5.0 doctor plan");
   assert(docsIndex.includes("releases/v2.5.0.md"), "Docs index must link v2.5.0 doctor closeout");
+  assert(docsIndex.includes("releases/v2.6.0.md"), "Docs index must link v2.6.0 adoption polish closeout");
   assert(docsIndex.includes("specs/context-pack-doctor.md"), "Docs index must link context pack doctor spec");
   assert(docsIndex.includes("dogfooding/context-pack-doctor-v2.5.0.md"), "Docs index must link v2.5.0 doctor dogfooding");
   assert(docsIndex.includes("../examples/context-pack-doctor/README.md"), "Docs index must link context pack doctor example kit");
@@ -1482,6 +1529,10 @@ function checkContentContracts() {
   assert(v2ContextPackRoadmapDoc.includes("examples/context-pack-doctor/"), "v2 roadmap must link doctor example kit");
   assert(v2ContextPackRoadmapDoc.includes("state-status` already"), "v2 roadmap must explain why doctor precedes broader status");
   assert(v2ContextPackRoadmapDoc.includes("basebrief-doctor-v1"), "v2 roadmap must name doctor contract version");
+  assert(v2ContextPackRoadmapDoc.includes("v2.6 First-Run / Adoption Polish"), "v2 roadmap must name v2.6 adoption polish");
+  assert(v2ContextPackRoadmapDoc.includes("docs/releases/v2.6.0.md"), "v2 roadmap must link v2.6 closeout");
+  assert(v2ContextPackRoadmapDoc.includes("It is adoption polish only"), "v2 roadmap must scope v2.6 as adoption polish");
+  assert(v2ContextPackRoadmapDoc.includes("does not add a command"), "v2 roadmap must keep v2.6 out of command scope");
   assert(v2ContextPackRoadmapDoc.includes("exports/manifest.json"), "v2 roadmap must define export manifest");
   assert(v2ContextPackRoadmapDoc.includes("exports/context-pack.md"), "v2 roadmap must define readable export");
   assert(v2ContextPackRoadmapDoc.includes("exports/context.json"), "v2 roadmap must define machine-readable export");
@@ -1694,6 +1745,27 @@ function checkContentContracts() {
   assert(v250ReleaseDoc.includes("No `status` command in v2.5"), "v2.5 closeout doc must leave broader status out of scope");
   assert(v250ReleaseDoc.includes("No `export --input <context-pack-dir> --output-dir <dir>` contract change"), "v2.5 closeout doc must preserve export contract");
   assert(v250ReleaseDoc.includes("provider_probe_status=skipped"), "v2.5 closeout doc must preserve skipped provider gate");
+  assert(v260ReleaseDoc.includes("v2.6.0 First-Run / Adoption Polish Local Closeout"), "v2.6 closeout doc must have stable title");
+  assert(v260ReleaseDoc.includes("2-5 minute local-first loop"), "v2.6 closeout doc must document first-run kit");
+  assert(v260ReleaseDoc.includes("clean, warning, and broken Context Pack inputs"), "v2.6 closeout doc must document adoption examples");
+  assert(v260ReleaseDoc.includes("Check vs Doctor"), "v2.6 closeout doc must document Check vs Doctor guidance");
+  assert(v260ReleaseDoc.includes("context-pack.too-thick"), "v2.6 closeout doc must mention thickness warning");
+  assert(v260ReleaseDoc.includes("doctor.pack-head-stale"), "v2.6 closeout doc must mention stale doctor finding");
+  assert(v260ReleaseDoc.includes("doctor.pack-check-error"), "v2.6 closeout doc must mention broken-pack doctor finding");
+  assert(v260ReleaseDoc.includes("documentation map with first-run, continuation"), "v2.6 closeout doc must document docs index IA");
+  assert(v260ReleaseDoc.includes("No `status` command"), "v2.6 closeout doc must reject status scope");
+  assert(v260ReleaseDoc.includes("No `check --input <dir> --json` top-level shape change"), "v2.6 closeout doc must preserve checker JSON shape");
+  assert(v260ReleaseDoc.includes("No provider request"), "v2.6 closeout doc must reject provider requests");
+  assert(v260ReleaseDoc.includes("No MCP server"), "v2.6 closeout doc must reject MCP server scope");
+  assert(v260ReleaseDoc.includes("No MCP tools"), "v2.6 closeout doc must reject MCP tools scope");
+  assert(v260ReleaseDoc.includes("No schema-v2"), "v2.6 closeout doc must reject schema-v2");
+  assert(v260ReleaseDoc.includes("No Workflow Runner"), "v2.6 closeout doc must keep runner out of scope");
+  assert(v260ReleaseDoc.includes("npm test"), "v2.6 closeout doc must include npm test gate");
+  assert(v260ReleaseDoc.includes("npm run release-check"), "v2.6 closeout doc must include release-check gate");
+  assert(v260ReleaseDoc.includes("git diff --check"), "v2.6 closeout doc must include whitespace gate");
+  assert(v260ReleaseDoc.includes("provider_probe_status=skipped"), "v2.6 closeout doc must preserve skipped provider gate");
+  assert(v260ReleaseDoc.includes("docs/examples/release-check polish"), "v2.6 closeout doc must scope release prep as polish");
+  assert(v260ReleaseDoc.includes("does not reopen v2.2 resume scope"), "v2.6 closeout doc must avoid reopening earlier v2 scopes");
   assert(contextPackDoctorDogfoodingDoc.includes("Context Pack Doctor Dogfooding v2.5.0"), "doctor dogfooding doc must have stable title");
   assert(contextPackDoctorDogfoodingDoc.includes("doctor_contract_version: basebrief-doctor-v1"), "doctor dogfooding must record contract version");
   assert(contextPackDoctorDogfoodingDoc.includes("doctor_command_status: warning"), "doctor dogfooding must record warning status");

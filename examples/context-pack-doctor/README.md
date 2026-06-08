@@ -11,6 +11,28 @@ Command shape:
 node scripts/basebrief.js doctor --repo examples/example-repo --context-pack examples/context-pack-lite --json
 ```
 
+## Check vs Doctor
+
+Run `check` first when the question is whether a Context Pack directory is
+complete and structurally reviewable. Run `doctor` when the question is whether
+that pack still matches the live repository facts.
+
+- Clean/current pack: `contractVersion=basebrief-doctor-v1`,
+  `status=passed`, `errorCount=0`, `warningCount=0`, and usually an
+  informational `doctor.live-recheck-required` finding reminding receivers to
+  recheck cwd, branch, HEAD, and worktree status.
+- Stale pack: `status=warning` with findings such as
+  `doctor.pack-head-stale` or `doctor.pack-branch-mismatch`. This means the
+  receiver should report the drift and refresh or regenerate before continuing
+  if the stale fact affects the task.
+- Broken pack: `status=failed` with `doctor.pack-check-error`. This means the
+  underlying Context Pack Check found structural errors; do not use that pack as
+  the receiver handoff input until it is fixed.
+
+Doctor is not an always-on `status` command. It is a read-only diagnostic for a
+specific `--repo` and `--context-pack` pair, and it keeps the v2.5
+`basebrief-doctor-v1` JSON contract.
+
 ## Sample JSON
 
 ```json

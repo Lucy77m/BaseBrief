@@ -824,6 +824,33 @@ export_bundle_check_status: passed
 provider_probe_status=skipped
 ```
 
+## v2.6.0 First-Run / Adoption Polish Local Closeout
+
+`v2.6.0` closes a docs/examples/release-check adoption polish line. It makes
+the first-run path easier to scan, explains clean/warning/broken Context Pack
+inputs, clarifies Check vs Doctor, and turns `docs/index.md` into a
+documentation map before the historical archive.
+
+This closeout is recorded in
+[v2.6.0 First-Run / Adoption Polish Local Closeout](releases/v2.6.0.md). It
+adds no command, no JSON shape change, no provider request, no runtime
+integration, no plugin, no MCP server/tools, no schema-v2, no Workflow Runner,
+and no always-on status command.
+
+The local validation gate for this closeout is:
+
+```text
+npm test
+npm run release-check
+git diff --check
+```
+
+Expected release-check output without provider env remains:
+
+```text
+provider_probe_status=skipped
+```
+
 ## v0.4.1 Stabilization Candidate
 
 `v0.4.1` is a stabilization-only cycle after the `v0.4.0` public release. It uses

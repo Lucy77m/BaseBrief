@@ -379,6 +379,18 @@ It does not write files, auto-fix, auto-discover packs, call providers, create
 a watcher, run a daemon, add runtime behavior, create plugins, create an MCP
 server/tools, add schema-v2, or become a Workflow Runner.
 
+### v2.6 First-Run / Adoption Polish
+
+v2.6 is closed in `docs/releases/v2.6.0.md`. It is adoption polish only:
+quickstart first-run guidance, minimal examples, clean/warning/broken Context
+Pack examples, Check vs Doctor guidance, and documentation-index information
+architecture.
+
+It does not add a command, change Context Pack Lite generator output, change
+`check --input <dir> --json`, change resume/export/doctor contracts, add a
+status command, call providers, add runtime behavior, create plugins, create an
+MCP server/tools, add schema-v2, or become a Workflow Runner.
+
 ### Later Workflow Runner Lite
 
 Only after Context Pack Lite, Context Pack Check, One-command Resume,
