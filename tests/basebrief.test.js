@@ -1,4 +1,4 @@
-const assert = require("node:assert/strict");
+﻿const assert = require("node:assert/strict");
 const { execFileSync, spawnSync } = require("node:child_process");
 const fs = require("node:fs");
 const os = require("node:os");
@@ -211,11 +211,47 @@ test("public docs keep cache-ready as explicit experiment route", () => {
   assert.match(readme, /`cache-ready` 只保留为显式 prompt-cache 实验路线/);
   assert.match(readme, /零依赖 CLI Lite/);
   assert.doesNotMatch(readme, /BaseBrief 当前不是 CLI|暂无 CLI/);
-  assert.match(englishReadme, /normal continuation routes to `full` or `lite`/);
+  assert.match(englishReadme, /normal continuation path routes to `full` or `lite`/);
   assert.match(englishReadme, /zero-dependency CLI Lite/);
   assert.match(skill, /普通项目接续默认只在 `full` 和 `lite` 之间选择/);
   assert.match(modeSelection, /`cache-ready` 是显式实验路线/);
   assert.match(docsIndex, /experiments\/cache-ready-bb12-guard\.md/);
+});
+
+test("README 2-minute homepage stays concise and local-only", () => {
+  const readme = readText("README.md");
+  const englishReadme = readText("README.en.md");
+  const docsIndex = readText("docs/index.md");
+
+  assert.ok(readme.split(/\r?\n/).length <= 85);
+  assert.ok(englishReadme.split(/\r?\n/).length <= 90);
+  assert.ok((readme.match(/\]\(/g) || []).length <= 12);
+  assert.ok((englishReadme.match(/\]\(/g) || []).length <= 12);
+
+  assert.match(readme, /我会带着上下文，一万次回到那个项目现场。/);
+  assert.match(englishReadme, /I’ll return to the project scene with context in hand, every time\./);
+  assert.match(readme, /context-pack --repo <target-repo> --output-dir <dir>/);
+  assert.match(readme, /resume --input <context-pack-dir>/);
+  assert.match(readme, /export --input <context-pack-dir> --output-dir <dir>/);
+  assert.match(readme, /doctor --repo <target-repo> --context-pack <context-pack-dir>/);
+  assert.match(englishReadme, /context-pack --repo <target-repo> --output-dir <dir>/);
+  assert.match(englishReadme, /resume --input <context-pack-dir>/);
+  assert.match(englishReadme, /export --input <context-pack-dir> --output-dir <dir>/);
+  assert.match(englishReadme, /doctor --repo <target-repo> --context-pack <context-pack-dir>/);
+
+  for (const doc of [readme, englishReadme]) {
+    assert.match(doc, /No provider request/);
+    assert.match(doc, /No runtime integration/);
+    assert.match(doc, /No MCP server/);
+    assert.match(doc, /No Workflow Runner/);
+    assert.match(doc, /provider_probe_status=skipped/);
+    assert.doesNotMatch(doc, /sidecar-build/);
+    assert.doesNotMatch(doc, /basebrief-project-state-v1/);
+  }
+
+  assert.match(docsIndex, /project-state\.md/);
+  assert.match(docsIndex, /seal-diff\.md/);
+  assert.match(docsIndex, /specs\/delta-handoff\.md/);
 });
 
 test("v0.3.0 release candidate documents receiver workflow and release boundaries", () => {
@@ -258,9 +294,9 @@ test("v0.3.1 receiver stabilization documents examples, local npm scripts, and r
 
   assert.match(readme, /npm run check/);
   assert.match(readme, /不是发布到 npm 的 package/);
-  assert.match(readme, /docs\/releases\/v0\.3\.1\.md/);
+  assert.match(docsIndex, /releases\/v0\.3\.1\.md/);
   assert.match(englishReadme, /not a published npm package/);
-  assert.match(englishReadme, /docs\/releases\/v0\.3\.1\.md/);
+  assert.match(docsIndex, /releases\/v0\.3\.1\.md/);
   assert.match(cliLite, /not a published npm package/);
   assert.match(cliLite, /npm run check/);
   assert.match(docsIndex, /dogfooding\/receiver-friction-log\.md/);
@@ -332,8 +368,8 @@ test("v0.3.2 receiver flow draft skeleton documents release boundaries", () => {
   const release = readText("docs/releases/v0.3.2.md");
   const receiverFlow = readText("docs/receiver-flow.md");
 
-  assert.match(readme, /docs\/releases\/v0\.3\.2\.md/);
-  assert.match(englishReadme, /docs\/releases\/v0\.3\.2\.md/);
+  assert.match(docsIndex, /releases\/v0\.3\.2\.md/);
+  assert.match(docsIndex, /releases\/v0\.3\.2\.md/);
   assert.match(cliLite, /receiver-flow --repo <target-repo> --output-dir <dir>/);
   assert.match(cliLite, /releases\/v0\.3\.2\.md/);
   assert.match(docsIndex, /releases\/v0\.3\.2\.md/);
@@ -382,10 +418,10 @@ test("v0.3.3 receiver flow dogfooding evidence stays draft-only and public-safe"
   const dirtySummary = readJson("examples/receiver-flow/dirty-repo/flow-summary.json");
   const visibleSummary = readJson("examples/receiver-flow/visible-output/flow-summary.json");
 
-  assert.match(readme, /docs\/dogfooding\/receiver-flow-dogfooding\.md/);
-  assert.match(readme, /docs\/releases\/v0\.3\.3\.md/);
-  assert.match(englishReadme, /docs\/dogfooding\/receiver-flow-dogfooding\.md/);
-  assert.match(englishReadme, /docs\/releases\/v0\.3\.3\.md/);
+  assert.match(docsIndex, /dogfooding\/receiver-flow-dogfooding\.md/);
+  assert.match(docsIndex, /releases\/v0\.3\.3\.md/);
+  assert.match(docsIndex, /dogfooding\/receiver-flow-dogfooding\.md/);
+  assert.match(docsIndex, /releases\/v0\.3\.3\.md/);
   assert.match(cliLite, /releases\/v0\.3\.3\.md/);
   assert.match(docsIndex, /dogfooding\/receiver-flow-dogfooding\.md/);
   assert.match(docsIndex, /releases\/v0\.3\.3\.md/);
@@ -445,8 +481,8 @@ test("v0.4.0 release candidate integrates local toolchain without expanding prod
   const release = readText("docs/releases/v0.4.0.md");
   const packageJson = readJson("package.json");
 
-  assert.match(readme, /docs\/releases\/v0\.4\.0\.md/);
-  assert.match(englishReadme, /docs\/releases\/v0\.4\.0\.md/);
+  assert.match(docsIndex, /releases\/v0\.4\.0\.md/);
+  assert.match(docsIndex, /releases\/v0\.4\.0\.md/);
   assert.match(cliLite, /v0\.4\.0/);
   assert.match(cliLite, /not a published npm package/);
   assert.match(docsIndex, /releases\/v0\.4\.0\.md/);
@@ -496,8 +532,8 @@ test("v0.4.1 stabilization candidate documents scale testing without expanding f
   const matrix = readText("docs/testing-v0.4.x-test-matrix.md");
   const release = readText("docs/releases/v0.4.1.md");
 
-  assert.match(readme, /docs\/releases\/v0\.4\.1\.md/);
-  assert.match(englishReadme, /docs\/releases\/v0\.4\.1\.md/);
+  assert.match(docsIndex, /releases\/v0\.4\.1\.md/);
+  assert.match(docsIndex, /releases\/v0\.4\.1\.md/);
   assert.match(docsIndex, /releases\/v0\.4\.1\.md/);
   assert.match(docsIndex, /baselines\/v0\.4\.0-post-release-baseline\.md/);
   assert.match(docsIndex, /testing-v0\.4\.x-test-matrix\.md/);
@@ -546,8 +582,8 @@ test("v0.5.0 guided receiver flow documents human-input draft boundaries", () =>
   const dogfooding = readText("docs/dogfooding/receiver-flow-guided-dogfooding.md");
   const release = readText("docs/releases/v0.5.0.md");
 
-  assert.match(readme, /docs\/releases\/v0\.5\.0\.md/);
-  assert.match(englishReadme, /docs\/releases\/v0\.5\.0\.md/);
+  assert.match(docsIndex, /releases\/v0\.5\.0\.md/);
+  assert.match(docsIndex, /releases\/v0\.5\.0\.md/);
   assert.match(docsIndex, /releases\/v0\.5\.0\.md/);
   assert.match(docsIndex, /dogfooding\/receiver-flow-guided-dogfooding\.md/);
   assert.match(cliLite, /receiver-flow --repo <target-repo> --output-dir <dir> --guided/);
@@ -591,8 +627,8 @@ test("v0.5.1 review draft gate documents receiver-ready promotion boundaries", (
   const dogfooding = readText("docs/dogfooding/receiver-flow-review-draft-dogfooding.md");
   const release = readText("docs/releases/v0.5.1.md");
 
-  assert.match(readme, /docs\/releases\/v0\.5\.1\.md/);
-  assert.match(englishReadme, /docs\/releases\/v0\.5\.1\.md/);
+  assert.match(docsIndex, /releases\/v0\.5\.1\.md/);
+  assert.match(docsIndex, /releases\/v0\.5\.1\.md/);
   assert.match(docsIndex, /releases\/v0\.5\.1\.md/);
   assert.match(docsIndex, /dogfooding\/receiver-flow-review-draft-dogfooding\.md/);
   assert.match(cliLite, /review-draft --draft <draft-context\.md> --output <receiver-ready\.md>/);
@@ -630,8 +666,8 @@ test("v0.5.2 receiver flow extract documents candidate-only boundaries", () => {
   const dogfooding = readText("docs/dogfooding/receiver-flow-extract-dogfooding.md");
   const release = readText("docs/releases/v0.5.2.md");
 
-  assert.match(readme, /docs\/releases\/v0\.5\.2\.md/);
-  assert.match(englishReadme, /docs\/releases\/v0\.5\.2\.md/);
+  assert.match(docsIndex, /releases\/v0\.5\.2\.md/);
+  assert.match(docsIndex, /releases\/v0\.5\.2\.md/);
   assert.match(docsIndex, /releases\/v0\.5\.2\.md/);
   assert.match(docsIndex, /dogfooding\/receiver-flow-extract-dogfooding\.md/);
   assert.match(cliLite, /receiver-flow --repo <target-repo> --output-dir <dir> --extract --source <draft-or-context\.md>/);
@@ -674,8 +710,8 @@ test("v0.5.3 receiver flow review closure documents accepted and rejected exampl
   const rejectedCandidate = readText("examples/receiver-flow-review/rejected-candidate/draft-context.md");
   const rejectedEmpty = readText("examples/receiver-flow-review/rejected-empty/draft-context.md");
 
-  assert.match(readme, /docs\/releases\/v0\.5\.3\.md/);
-  assert.match(englishReadme, /docs\/releases\/v0\.5\.3\.md/);
+  assert.match(docsIndex, /releases\/v0\.5\.3\.md/);
+  assert.match(docsIndex, /releases\/v0\.5\.3\.md/);
   assert.match(docsIndex, /releases\/v0\.5\.3\.md/);
   assert.match(docsIndex, /dogfooding\/receiver-flow-v0\.5\.x-closure\.md/);
   assert.match(docsIndex, /examples\/receiver-flow-review\/valid-ready\/README\.md/);
@@ -726,10 +762,10 @@ test("v0.6.0 project state documents local state boundaries", () => {
   const schema = readJson("schemas/basebrief-project-state.schema.json");
   const exampleState = readJson("examples/project-state/state.json");
 
-  assert.match(readme, /docs\/project-state\.md/);
-  assert.match(readme, /docs\/releases\/v0\.6\.0\.md/);
-  assert.match(englishReadme, /state-init/);
-  assert.match(englishReadme, /docs\/project-state\.md/);
+  assert.match(docsIndex, /project-state\.md/);
+  assert.match(docsIndex, /releases\/v0\.6\.0\.md/);
+  assert.match(cliLite, /state-init/);
+  assert.match(docsIndex, /project-state\.md/);
   assert.match(docsIndex, /project-state\.md/);
   assert.match(docsIndex, /design\/project-state-model\.md/);
   assert.match(docsIndex, /design\/project-state-validation-rules\.md/);
@@ -806,10 +842,10 @@ test("v0.6.2 self-dogfooding documents exception evidence without new lifecycle 
   const v06xMatrix = readText("docs/testing-v0.6.x-test-matrix.md");
   const release = readText("docs/releases/v0.6.2.md");
 
-  assert.match(readme, /docs\/dogfooding\/project-state-self-dogfooding-v0\.6\.2\.md/);
-  assert.match(readme, /docs\/releases\/v0\.6\.2\.md/);
-  assert.match(englishReadme, /docs\/dogfooding\/project-state-self-dogfooding-v0\.6\.2\.md/);
-  assert.match(englishReadme, /docs\/releases\/v0\.6\.2\.md/);
+  assert.match(docsIndex, /dogfooding\/project-state-self-dogfooding-v0\.6\.2\.md/);
+  assert.match(docsIndex, /releases\/v0\.6\.2\.md/);
+  assert.match(docsIndex, /dogfooding\/project-state-self-dogfooding-v0\.6\.2\.md/);
+  assert.match(docsIndex, /releases\/v0\.6\.2\.md/);
   assert.match(docsIndex, /dogfooding\/project-state-self-dogfooding-v0\.6\.2\.md/);
   assert.match(docsIndex, /releases\/v0\.6\.2\.md/);
 
@@ -863,12 +899,12 @@ test("v0.6.3 lifecycle readiness gate documents criteria without lifecycle comma
   const release = readText("docs/releases/v0.6.3.md");
   const schema = readJson("schemas/basebrief-project-state.schema.json");
 
-  assert.match(readme, /docs\/design\/project-state-lifecycle-readiness\.md/);
-  assert.match(readme, /docs\/dogfooding\/project-state-lifecycle-readiness-v0\.6\.3\.md/);
-  assert.match(readme, /docs\/releases\/v0\.6\.3\.md/);
-  assert.match(englishReadme, /docs\/design\/project-state-lifecycle-readiness\.md/);
-  assert.match(englishReadme, /docs\/dogfooding\/project-state-lifecycle-readiness-v0\.6\.3\.md/);
-  assert.match(englishReadme, /docs\/releases\/v0\.6\.3\.md/);
+  assert.match(docsIndex, /design\/project-state-lifecycle-readiness\.md/);
+  assert.match(docsIndex, /dogfooding\/project-state-lifecycle-readiness-v0\.6\.3\.md/);
+  assert.match(docsIndex, /releases\/v0\.6\.3\.md/);
+  assert.match(docsIndex, /design\/project-state-lifecycle-readiness\.md/);
+  assert.match(docsIndex, /dogfooding\/project-state-lifecycle-readiness-v0\.6\.3\.md/);
+  assert.match(docsIndex, /releases\/v0\.6\.3\.md/);
   assert.match(docsIndex, /design\/project-state-lifecycle-readiness\.md/);
   assert.match(docsIndex, /dogfooding\/project-state-lifecycle-readiness-v0\.6\.3\.md/);
   assert.match(docsIndex, /releases\/v0\.6\.3\.md/);
@@ -924,14 +960,14 @@ test("v0.7.0 project state lifecycle documents commands without schema or provid
   const release = readText("docs/releases/v0.7.0.md");
   const schema = readJson("schemas/basebrief-project-state.schema.json");
 
-  assert.match(readme, /docs\/design\/project-state-lifecycle-model\.md/);
-  assert.match(readme, /docs\/dogfooding\/project-state-lifecycle-v0\.7\.0\.md/);
-  assert.match(readme, /docs\/testing-v0\.7\.x-test-matrix\.md/);
-  assert.match(readme, /docs\/releases\/v0\.7\.0\.md/);
-  assert.match(englishReadme, /state-status/);
-  assert.match(englishReadme, /state-advance/);
-  assert.match(englishReadme, /docs\/design\/project-state-lifecycle-model\.md/);
-  assert.match(englishReadme, /docs\/dogfooding\/project-state-lifecycle-v0\.7\.0\.md/);
+  assert.match(docsIndex, /design\/project-state-lifecycle-model\.md/);
+  assert.match(docsIndex, /dogfooding\/project-state-lifecycle-v0\.7\.0\.md/);
+  assert.match(docsIndex, /testing-v0\.7\.x-test-matrix\.md/);
+  assert.match(docsIndex, /releases\/v0\.7\.0\.md/);
+  assert.match(cliLite, /state-status/);
+  assert.match(cliLite, /state-advance/);
+  assert.match(docsIndex, /design\/project-state-lifecycle-model\.md/);
+  assert.match(docsIndex, /dogfooding\/project-state-lifecycle-v0\.7\.0\.md/);
   assert.match(docsIndex, /design\/project-state-lifecycle-model\.md/);
   assert.match(docsIndex, /dogfooding\/project-state-lifecycle-v0\.7\.0\.md/);
   assert.match(docsIndex, /testing-v0\.7\.x-test-matrix\.md/);
@@ -1100,14 +1136,12 @@ test("v0.8.2 sidecar receiver acceptance evidence stays public-safe", () => {
   }
 });
 
-test("v0.8.3 sidecar discoverability polish links README and docs", () => {
-  const readme = readText("README.md");
-  const englishReadme = readText("README.en.md");
+test("v0.8.3 sidecar discoverability polish links docs index and docs", () => {
   const docsIndex = readText("docs/index.md");
   const matrix = readText("docs/testing-v0.8.x-test-matrix.md");
   const release = readText("docs/releases/v0.8.3.md");
 
-  for (const doc of [readme, englishReadme, matrix, release]) {
+  for (const doc of [matrix, release]) {
     assert.match(doc, /sidecar-build/);
     assert.match(doc, /sidecar-check/);
     assert.match(doc, /generic/);
@@ -1115,7 +1149,7 @@ test("v0.8.3 sidecar discoverability polish links README and docs", () => {
     assert.match(doc, /provider_probe_status=skipped/);
   }
 
-  for (const doc of [readme, englishReadme, release]) {
+  for (const doc of [release]) {
     assert.match(doc, /No provider request/);
     assert.match(doc, /No raw private output/);
     assert.match(doc, /No runtime integration/);
@@ -1124,11 +1158,11 @@ test("v0.8.3 sidecar discoverability polish links README and docs", () => {
     assert.match(doc, /basebrief-sidecar-v1/);
   }
 
-  assert.match(readme, /docs\/releases\/v0\.8\.0\.md/);
-  assert.match(readme, /docs\/releases\/v0\.8\.1\.md/);
-  assert.match(readme, /docs\/releases\/v0\.8\.2\.md/);
-  assert.match(readme, /docs\/releases\/v0\.8\.3\.md/);
-  assert.match(englishReadme, /docs\/testing-v0\.8\.x-test-matrix\.md/);
+  assert.match(docsIndex, /releases\/v0\.8\.0\.md/);
+  assert.match(docsIndex, /releases\/v0\.8\.1\.md/);
+  assert.match(docsIndex, /releases\/v0\.8\.2\.md/);
+  assert.match(docsIndex, /releases\/v0\.8\.3\.md/);
+  assert.match(docsIndex, /testing-v0\.8\.x-test-matrix\.md/);
   assert.match(docsIndex, /releases\/v0\.8\.3\.md/);
   assert.match(matrix, /v0\.8\.3 Discoverability Polish/);
   assert.match(release, /Sidecar Discoverability Polish Candidate/);
@@ -1375,7 +1409,7 @@ test("v0.9.0 readiness line defines integrated handoff hardening without expandi
   const roadmap = readText("docs/roadmap/basebrief-long-term-baseline.md");
   const release = readText("docs/releases/v0.9.0.md");
 
-  for (const doc of [readme, englishReadme, docsIndex, testing, projectState, roadmap, release]) {
+  for (const doc of [docsIndex, testing, projectState, roadmap, release]) {
     assert.match(doc, /v0\.9\.0/);
     assert.match(doc, /Integrated Handoff Readiness/);
   }
@@ -1416,8 +1450,6 @@ test("v0.9.0 readiness line defines integrated handoff hardening without expandi
 });
 
 test("v0.9.1 golden path closure keeps the integrated local handoff line easy to follow", () => {
-  const readme = readText("README.md");
-  const englishReadme = readText("README.en.md");
   const docsIndex = readText("docs/index.md");
   const quickstart = readText("docs/quickstart-5min.md");
   const testing = readText("docs/testing.md");
@@ -1426,7 +1458,7 @@ test("v0.9.1 golden path closure keeps the integrated local handoff line easy to
   const goldenPath = readText("docs/golden-path.md");
   const release = readText("docs/releases/v0.9.1.md");
 
-  for (const doc of [readme, englishReadme, docsIndex, quickstart, projectState, cliLite, goldenPath, release]) {
+  for (const doc of [docsIndex, quickstart, projectState, cliLite, goldenPath, release]) {
     assert.match(doc, /Integrated Handoff Golden Path/);
   }
 
@@ -1489,10 +1521,10 @@ test("v0.9.2 golden path example closure provides a public-safe first-pass and f
   const followUp = readText("examples/golden-path/follow-up-receiver-report.md");
   const boundary = readText("examples/golden-path/sidecar-output-boundary.md");
 
-  assert.match(readme, /examples\/golden-path\/README\.md/);
-  assert.match(readme, /docs\/releases\/v0\.9\.2\.md/);
-  assert.match(englishReadme, /examples\/golden-path\/README\.md/);
-  assert.match(englishReadme, /docs\/releases\/v0\.9\.2\.md/);
+  assert.match(docsIndex, /\.\.\/examples\/golden-path\/README\.md/);
+  assert.match(docsIndex, /releases\/v0\.9\.2\.md/);
+  assert.match(docsIndex, /\.\.\/examples\/golden-path\/README\.md/);
+  assert.match(docsIndex, /releases\/v0\.9\.2\.md/);
   assert.match(docsIndex, /\.\.\/examples\/golden-path\/README\.md/);
   assert.match(docsIndex, /releases\/v0\.9\.2\.md/);
   assert.match(quickstart, /\.\.\/examples\/golden-path\/README\.md/);
@@ -1590,10 +1622,10 @@ test("v0.9.3 final closure freeze aligns the whole v0.9.x line for release revie
   const release = readText("docs/releases/v0.9.3.md");
   const matrix = readText("docs/testing-v0.9.x-test-matrix.md");
 
-  assert.match(readme, /docs\/releases\/v0\.9\.3\.md/);
-  assert.match(readme, /docs\/testing-v0\.9\.x-test-matrix\.md/);
-  assert.match(englishReadme, /docs\/releases\/v0\.9\.3\.md/);
-  assert.match(englishReadme, /docs\/testing-v0\.9\.x-test-matrix\.md/);
+  assert.match(docsIndex, /releases\/v0\.9\.3\.md/);
+  assert.match(docsIndex, /testing-v0\.9\.x-test-matrix\.md/);
+  assert.match(docsIndex, /releases\/v0\.9\.3\.md/);
+  assert.match(docsIndex, /testing-v0\.9\.x-test-matrix\.md/);
   assert.match(docsIndex, /releases\/v0\.9\.3\.md/);
   assert.match(docsIndex, /testing-v0\.9\.x-test-matrix\.md/);
   assert.match(testing, /v0\.9\.3 Final Closure \/ Freeze Candidate/);
@@ -1703,27 +1735,27 @@ test("v1.0.0 delta handoff RC hardening exposes local-first delta without expand
   const receiverLintDogfooding = readText("docs/dogfooding/delta-receiver-lint-dogfooding-v1.8.md");
   const example = readText("examples/delta-handoff.md");
 
-  assert.match(readme, /docs\/releases\/v1\.0\.0\.md/);
-  assert.match(readme, /docs\/specs\/delta-handoff\.md/);
-  assert.match(readme, /docs\/dogfooding\/delta-handoff-fresh-receiver-v1\.0\.md/);
-  assert.match(readme, /docs\/dogfooding\/delta-handoff-baseline-advance-v1\.0\.md/);
-  assert.match(readme, /docs\/releases\/v1\.9\.1\.md/);
-  assert.match(readme, /docs\/testing-v1\.x-delta-receiver-closure-matrix\.md/);
-  assert.match(readme, /v1\.x Delta Handoff \/ Receiver line 已本地收口并冻结/);
-  assert.match(readme, /Delta Handoff RC hardening/);
-  assert.match(readme, /basebrief-project-state-v1` 保持不变/);
+  assert.match(docsIndex, /releases\/v1\.0\.0\.md/);
+  assert.match(docsIndex, /specs\/delta-handoff\.md/);
+  assert.match(docsIndex, /dogfooding\/delta-handoff-fresh-receiver-v1\.0\.md/);
+  assert.match(docsIndex, /dogfooding\/delta-handoff-baseline-advance-v1\.0\.md/);
+  assert.match(docsIndex, /releases\/v1\.9\.1\.md/);
+  assert.match(docsIndex, /testing-v1\.x-delta-receiver-closure-matrix\.md/);
+  assert.match(v191Release, /v1\.x Delta Receiver line is locally closed and frozen/);
+  assert.match(roadmap, /Delta Handoff RC hardening/);
+  assert.match(release, /`basebrief-project-state-v1` remains unchanged/);
   assert.match(readme, /provider_probe_status=skipped/);
-  assert.match(readme, /`delta`/);
+  assert.match(cliLite, /delta --repo/);
 
-  assert.match(englishReadme, /docs\/releases\/v1\.0\.0\.md/);
-  assert.match(englishReadme, /docs\/specs\/delta-handoff\.md/);
-  assert.match(englishReadme, /docs\/dogfooding\/delta-handoff-fresh-receiver-v1\.0\.md/);
-  assert.match(englishReadme, /docs\/dogfooding\/delta-handoff-baseline-advance-v1\.0\.md/);
-  assert.match(englishReadme, /docs\/releases\/v1\.9\.1\.md/);
-  assert.match(englishReadme, /docs\/testing-v1\.x-delta-receiver-closure-matrix\.md/);
-  assert.match(englishReadme, /public v1\.x Delta Handoff \/ Receiver line is locally closed and frozen/);
-  assert.match(englishReadme, /Delta Handoff RC hardening/);
-  assert.match(englishReadme, /basebrief-project-state-v1` remains unchanged/);
+  assert.match(docsIndex, /releases\/v1\.0\.0\.md/);
+  assert.match(docsIndex, /specs\/delta-handoff\.md/);
+  assert.match(docsIndex, /dogfooding\/delta-handoff-fresh-receiver-v1\.0\.md/);
+  assert.match(docsIndex, /dogfooding\/delta-handoff-baseline-advance-v1\.0\.md/);
+  assert.match(docsIndex, /releases\/v1\.9\.1\.md/);
+  assert.match(docsIndex, /testing-v1\.x-delta-receiver-closure-matrix\.md/);
+  assert.match(v191Release, /v1\.x Delta Receiver line is locally closed and frozen/);
+  assert.match(roadmap, /Delta Handoff RC hardening/);
+  assert.match(release, /`basebrief-project-state-v1` remains unchanged/);
   assert.match(englishReadme, /provider_probe_status=skipped/);
 
   assert.match(docsIndex, /releases\/v1\.0\.0\.md/);
@@ -5013,10 +5045,10 @@ test("v2.0.0 Context Pack Lite example and closeout stay public-safe and discove
   }
 
   assert.match(readme, /context-pack/);
-  assert.match(readme, /examples\/context-pack-lite\/README\.md/);
-  assert.match(readme, /docs\/dogfooding\/context-pack-lite-fresh-receiver-v2\.0\.0\.md/);
+  assert.match(docsIndex, /\.\.\/examples\/context-pack-lite\/README\.md/);
+  assert.match(docsIndex, /dogfooding\/context-pack-lite-fresh-receiver-v2\.0\.0\.md/);
   assert.match(englishReadme, /context-pack/);
-  assert.match(englishReadme, /docs\/releases\/v2\.0\.0\.md/);
+  assert.match(docsIndex, /releases\/v2\.0\.0\.md/);
   assert.match(cliLite, /context-pack --repo <target-repo> --output-dir <dir>/);
   assert.match(docsIndex, /releases\/v2\.0\.0\.md/);
   assert.match(docsIndex, /dogfooding\/context-pack-lite-fresh-receiver-v2\.0\.0\.md/);
@@ -5068,10 +5100,10 @@ test("v2.1.0 Context Pack Check closeout stays public-safe and discoverable", ()
   const closeout = readText("docs/releases/v2.1.0.md");
   const dogfooding = readText("docs/dogfooding/context-pack-check-acceptance-v2.1.0.md");
 
-  assert.match(readme, /docs\/releases\/v2\.1\.0\.md/);
-  assert.match(readme, /docs\/dogfooding\/context-pack-check-acceptance-v2\.1\.0\.md/);
-  assert.match(englishReadme, /docs\/releases\/v2\.1\.0\.md/);
-  assert.match(englishReadme, /docs\/dogfooding\/context-pack-check-acceptance-v2\.1\.0\.md/);
+  assert.match(docsIndex, /releases\/v2\.1\.0\.md/);
+  assert.match(docsIndex, /dogfooding\/context-pack-check-acceptance-v2\.1\.0\.md/);
+  assert.match(docsIndex, /releases\/v2\.1\.0\.md/);
+  assert.match(docsIndex, /dogfooding\/context-pack-check-acceptance-v2\.1\.0\.md/);
   assert.match(docsIndex, /releases\/v2\.1\.0\.md/);
   assert.match(docsIndex, /dogfooding\/context-pack-check-acceptance-v2\.1\.0\.md/);
   assert.match(testing, /v2\.1\.0 Context Pack Check Local Closeout/);
@@ -5121,16 +5153,16 @@ test("v2.2.0 Context Pack Resume contract is docs-first and discoverable", () =>
   const spec = readText("docs/specs/context-pack-resume.md");
   const dogfooding = readText("docs/dogfooding/context-pack-resume-v2.2.0.md");
 
-  assert.match(readme, /docs\/releases\/v2\.2\.0-plan\.md/);
-  assert.match(readme, /docs\/releases\/v2\.2\.0\.md/);
-  assert.match(readme, /docs\/specs\/context-pack-resume\.md/);
-  assert.match(readme, /docs\/releases\/v2\.3\.0-plan\.md/);
-  assert.match(readme, /docs\/specs\/basebrief-format\.md/);
-  assert.match(englishReadme, /docs\/releases\/v2\.2\.0-plan\.md/);
-  assert.match(englishReadme, /docs\/releases\/v2\.2\.0\.md/);
-  assert.match(englishReadme, /docs\/specs\/context-pack-resume\.md/);
-  assert.match(englishReadme, /docs\/releases\/v2\.3\.0-plan\.md/);
-  assert.match(englishReadme, /docs\/specs\/basebrief-format\.md/);
+  assert.match(docsIndex, /releases\/v2\.2\.0-plan\.md/);
+  assert.match(docsIndex, /releases\/v2\.2\.0\.md/);
+  assert.match(docsIndex, /specs\/context-pack-resume\.md/);
+  assert.match(docsIndex, /releases\/v2\.3\.0-plan\.md/);
+  assert.match(docsIndex, /specs\/basebrief-format\.md/);
+  assert.match(docsIndex, /releases\/v2\.2\.0-plan\.md/);
+  assert.match(docsIndex, /releases\/v2\.2\.0\.md/);
+  assert.match(docsIndex, /specs\/context-pack-resume\.md/);
+  assert.match(docsIndex, /releases\/v2\.3\.0-plan\.md/);
+  assert.match(docsIndex, /specs\/basebrief-format\.md/);
   assert.match(docsIndex, /releases\/v2\.2\.0-plan\.md/);
   assert.match(docsIndex, /releases\/v2\.2\.0\.md/);
   assert.match(docsIndex, /specs\/context-pack-resume\.md/);
@@ -5207,10 +5239,10 @@ test("v2.3.0 BaseBrief Format stays docs-first and local-only", () => {
   const plan = readText("docs/releases/v2.3.0-plan.md");
   const spec = readText("docs/specs/basebrief-format.md");
 
-  assert.match(readme, /docs\/releases\/v2\.3\.0-plan\.md/);
-  assert.match(readme, /docs\/specs\/basebrief-format\.md/);
-  assert.match(englishReadme, /docs\/releases\/v2\.3\.0-plan\.md/);
-  assert.match(englishReadme, /docs\/specs\/basebrief-format\.md/);
+  assert.match(docsIndex, /releases\/v2\.3\.0-plan\.md/);
+  assert.match(docsIndex, /specs\/basebrief-format\.md/);
+  assert.match(docsIndex, /releases\/v2\.3\.0-plan\.md/);
+  assert.match(docsIndex, /specs\/basebrief-format\.md/);
   assert.match(docsIndex, /releases\/v2\.3\.0-plan\.md/);
   assert.match(docsIndex, /specs\/basebrief-format\.md/);
   assert.match(testing, /v2\.3\.0 BaseBrief Format Plan/);
@@ -5268,18 +5300,18 @@ test("v2.4.0 File-only Export stays docs-first and MCP-friendly only", () => {
   const exampleContextPack = readText("examples/file-only-export/exports/context-pack.md");
   const exampleAdapterNotes = readText("examples/file-only-export/exports/adapter-notes.md");
 
-  assert.match(readme, /docs\/releases\/v2\.4\.0-plan\.md/);
-  assert.match(readme, /docs\/releases\/v2\.4\.0\.md/);
-  assert.match(readme, /docs\/specs\/file-only-export\.md/);
-  assert.match(readme, /docs\/dogfooding\/file-only-export-v2\.4\.0\.md/);
-  assert.match(readme, /examples\/file-only-export\/README\.md/);
+  assert.match(docsIndex, /releases\/v2\.4\.0-plan\.md/);
+  assert.match(docsIndex, /releases\/v2\.4\.0\.md/);
+  assert.match(docsIndex, /specs\/file-only-export\.md/);
+  assert.match(docsIndex, /dogfooding\/file-only-export-v2\.4\.0\.md/);
+  assert.match(docsIndex, /\.\.\/examples\/file-only-export\/README\.md/);
   assert.match(readme, /export --input <context-pack-dir> --output-dir <dir>/);
   assert.match(readme, /MCP-friendly means future tool-consumable files/);
-  assert.match(englishReadme, /docs\/releases\/v2\.4\.0-plan\.md/);
-  assert.match(englishReadme, /docs\/releases\/v2\.4\.0\.md/);
-  assert.match(englishReadme, /docs\/specs\/file-only-export\.md/);
-  assert.match(englishReadme, /docs\/dogfooding\/file-only-export-v2\.4\.0\.md/);
-  assert.match(englishReadme, /examples\/file-only-export\/README\.md/);
+  assert.match(docsIndex, /releases\/v2\.4\.0-plan\.md/);
+  assert.match(docsIndex, /releases\/v2\.4\.0\.md/);
+  assert.match(docsIndex, /specs\/file-only-export\.md/);
+  assert.match(docsIndex, /dogfooding\/file-only-export-v2\.4\.0\.md/);
+  assert.match(docsIndex, /\.\.\/examples\/file-only-export\/README\.md/);
   assert.match(englishReadme, /export --input <context-pack-dir> --output-dir <dir>/);
   assert.match(englishReadme, /MCP-friendly means future tool-consumable files/);
   assert.match(docsIndex, /releases\/v2\.4\.0-plan\.md/);
@@ -5450,17 +5482,17 @@ test("v2.5.0 Context Pack Doctor stays read-only and local-only", () => {
   const exampleReadme = readText("examples/context-pack-doctor/README.md");
 
   assert.match(readme, /doctor --repo <target-repo> --context-pack <context-pack-dir>/);
-  assert.match(readme, /docs\/releases\/v2\.5\.0-plan\.md/);
-  assert.match(readme, /docs\/releases\/v2\.5\.0\.md/);
-  assert.match(readme, /docs\/specs\/context-pack-doctor\.md/);
-  assert.match(readme, /docs\/dogfooding\/context-pack-doctor-v2\.5\.0\.md/);
-  assert.match(readme, /examples\/context-pack-doctor\/README\.md/);
+  assert.match(docsIndex, /releases\/v2\.5\.0-plan\.md/);
+  assert.match(docsIndex, /releases\/v2\.5\.0\.md/);
+  assert.match(docsIndex, /specs\/context-pack-doctor\.md/);
+  assert.match(docsIndex, /dogfooding\/context-pack-doctor-v2\.5\.0\.md/);
+  assert.match(docsIndex, /\.\.\/examples\/context-pack-doctor\/README\.md/);
   assert.match(englishReadme, /doctor --repo <target-repo> --context-pack <context-pack-dir>/);
-  assert.match(englishReadme, /docs\/releases\/v2\.5\.0-plan\.md/);
-  assert.match(englishReadme, /docs\/releases\/v2\.5\.0\.md/);
-  assert.match(englishReadme, /docs\/specs\/context-pack-doctor\.md/);
-  assert.match(englishReadme, /docs\/dogfooding\/context-pack-doctor-v2\.5\.0\.md/);
-  assert.match(englishReadme, /examples\/context-pack-doctor\/README\.md/);
+  assert.match(docsIndex, /releases\/v2\.5\.0-plan\.md/);
+  assert.match(docsIndex, /releases\/v2\.5\.0\.md/);
+  assert.match(docsIndex, /specs\/context-pack-doctor\.md/);
+  assert.match(docsIndex, /dogfooding\/context-pack-doctor-v2\.5\.0\.md/);
+  assert.match(docsIndex, /\.\.\/examples\/context-pack-doctor\/README\.md/);
   assert.match(docsIndex, /releases\/v2\.5\.0-plan\.md/);
   assert.match(docsIndex, /releases\/v2\.5\.0\.md/);
   assert.match(docsIndex, /specs\/context-pack-doctor\.md/);

@@ -1,56 +1,55 @@
 # BaseBrief
 
-BaseBrief is a Chinese-first project baseline and handoff tool for AI-assisted development.
+> I’ll return to the project scene with context in hand, every time.
 
-It solves one specific problem: when you switch chats, models, AI tools, or resume work later, the next agent should know the current project state, verified facts, confirmed decisions, risk boundaries, and next task.
+BaseBrief is a Chinese-first, local-first handoff tool for AI-assisted project work.
 
-BaseBrief keeps one public skill entry and provides an optional zero-dependency CLI Lite; normal continuation routes to `full` or `lite`, while `cache-ready` is reserved for explicit prompt-cache experiments.
+It turns live repo state, verified facts, risk boundaries, and next steps into a reviewable Context Pack so the next AI window, model, or coding agent can continue from the actual project state instead of rediscovering it.
 
-[中文说明](README.md)
+中文 README: [README.md](README.md)
 
-## Start Here
+## When To Use It
 
-1. [5-minute quickstart](docs/quickstart-5min.md)
-2. [Handoff contract and artifacts](docs/handoff.md)
-3. [Integrated Handoff Golden Path](docs/golden-path.md)
-4. [Seal/Diff phase comparison](docs/seal-diff.md)
-5. [v2.2.0 One-command Resume / New-window Prompt Plan](docs/releases/v2.2.0-plan.md)
+- You are continuing work in a new AI window, model, or tool.
+- You want to package the current repo state into a readable Context Pack.
+- You want to check whether an older Context Pack is stale against the live repo.
+- You want risk boundaries written down before the next receiver guesses.
 
-See the [documentation index](docs/index.md) for the complete reference and experiment history.
+BaseBrief keeps one public skill entry and a zero-dependency CLI Lite. The normal continuation path routes to `full` or `lite`; `cache-ready` remains an explicit prompt-cache experiment route.
 
-## Understand It In 30 Seconds
+## Start In 2 Minutes
 
-AI project continuation often loses:
-
-- the current goal and project state
-- verified facts and confirmed decisions
-- assumptions and open questions
-- risk boundaries and forbidden scope
-- the next task and expected output
-
-BaseBrief turns those details into a readable Full or Lite brief. For repeatable local builds, checks, and phase comparison, use the optional CLI Lite.
-
-## Shortest Path
-
-Ask your AI tool to read the BaseBrief skill:
+Ask the AI to read the BaseBrief skill:
 
 ```text
-Please read BaseBrief's skills/basebrief/SKILL.md.
-Choose full or lite for the current task and prepare a project baseline.
-Do not turn assumptions into facts; list open_questions when boundaries are unclear.
+Please read skills/basebrief/SKILL.md.
+Choose full or lite for the current task and produce a project-stage baseline.
+Do not turn assumptions into verified facts; list open_questions when boundaries are unclear.
 ```
 
-Use Lite for a small bounded continuation. Use Full for phase closure, complex work, or unclear risk boundaries.
-
-You can also build local artifacts from the public structured example:
+Or use CLI Lite to generate a Context Pack:
 
 ```text
-node scripts/basebrief.js build --input examples/structured-handoff-lite.md --output-dir tests/outputs/private/quickstart/build --check
+node scripts/basebrief.js context-pack --repo . --output-dir tests/outputs/private/context-pack --json
+node scripts/basebrief.js check --input tests/outputs/private/context-pack --json
+node scripts/basebrief.js resume --input tests/outputs/private/context-pack
 ```
 
-CLI Lite is an optional local script, not an installed CLI, plugin, or provider integration.
+`tests/outputs/private/` is ignored by this repo and is the recommended place for local generated artifacts.
 
-This repository also provides minimal npm scripts as local validation shortcuts:
+## Common Commands
+
+```text
+node scripts/basebrief.js context-pack --repo <target-repo> --output-dir <dir> [--json]
+node scripts/basebrief.js check --input <context-pack-dir> [--json]
+node scripts/basebrief.js resume --input <context-pack-dir> [--json]
+node scripts/basebrief.js export --input <context-pack-dir> --output-dir <dir> [--json]
+node scripts/basebrief.js doctor --repo <target-repo> --context-pack <context-pack-dir> [--json]
+```
+
+The main line is Context Pack / Check / Resume / Export / Doctor. For File-only Export, “MCP-friendly means future tool-consumable files”; it does not mean an MCP server, runtime integration, or provider integration.
+
+## Local Validation
 
 ```text
 npm test
@@ -58,168 +57,28 @@ npm run release-check
 npm run check
 ```
 
-These scripts only wrap local Node commands. BaseBrief is still not a published npm package, global command, plugin, or provider integration.
-
-## Project State Sidecar
-
-When a repository already has a valid `.basebrief/state.json`, Sidecar can package that Project State into a local bundle for the next chat:
-
-```text
-node scripts/basebrief.js sidecar-build --repo . --target generic --starter-language en --output-dir tests/outputs/private/sidecar-generic --json
-node scripts/basebrief.js sidecar-check --input tests/outputs/private/sidecar-generic --json
-```
-
-`sidecar-build` creates a `generic` or `openclaw` handoff bundle and writes a copyable new-window starter at `new-window-starter.md` that asks the receiver to restate key fields, report `pass/fail`, and wait for confirmation; `--starter-language auto|zh-CN|en|ja` controls only the starter shell language, while protocol fields, paths, file names, and English hard-stop anchors stay literal. `sidecar-check` is a read-only structure gate for the bundle, receiver boundaries, and the starter. The v0.8.x Sidecar is a local consumer layer for `basebrief-project-state-v1`; it does not change the schema, is not Auto Flow, does not create sessions, does not call providers, and does not integrate with the OpenClaw/Hermes runtime. Sidecar public boundaries stay No provider request / No raw private output / No runtime integration / No schema change; when provider environment variables are absent, release checks keep `provider_probe_status=skipped`. Public records: [v0.8.0](docs/releases/v0.8.0.md), [v0.8.1](docs/releases/v0.8.1.md), [v0.8.2](docs/releases/v0.8.2.md), [v0.8.3](docs/releases/v0.8.3.md), [v0.8.6](docs/releases/v0.8.6.md), [v0.8.7](docs/releases/v0.8.7.md), [v0.8.8](docs/releases/v0.8.8.md), and the [v0.8.x test matrix](docs/testing-v0.8.x-test-matrix.md).
-
-`v0.9.0` is an Integrated Handoff Readiness / public hardening candidate. It aligns receiver-ready handoff, Project State, Sidecar bundle, and the receiver first response as one local readiness line; it is not provider, runtime, schema, Auto Flow, plugin, platform, or v1.0 work. See [v0.9.0 Integrated Handoff Readiness](docs/releases/v0.9.0.md).
-`v0.9.1` turns that readiness line into a clearer public golden path: `receiver-ready.md -> state-init/state-advance -> sidecar-build -> sidecar-check -> new-window-starter.md -> receiver first response`. It is docs/usability hardening only, with no new command and no schema change. Entry points: [Integrated Handoff Golden Path](docs/golden-path.md) and [v0.9.1 Golden Path Closure Candidate](docs/releases/v0.9.1.md).
-`v0.9.2` adds a public-safe [Golden Path example kit](examples/golden-path/README.md) so users can follow the same line with concrete first-pass and follow-up examples in hand. See [v0.9.2 Golden Path Example Closure Candidate](docs/releases/v0.9.2.md).
-`v0.9.3` closes the `v0.9.x` line as one local closure/freeze candidate for release review: `v0.9.0` defines it, `v0.9.1` explains it, `v0.9.2` adds examples, and `v0.9.3` closes and freezes it. This patch only adds the aggregate matrix, roadmap/control alignment, and the final release doc; it adds no new command, schema, runtime, or provider behavior. See [v0.9.x Integrated Handoff Closure Matrix](docs/testing-v0.9.x-test-matrix.md) and [v0.9.3 Final Closure / Freeze Candidate](docs/releases/v0.9.3.md).
-
-`v1.0.0` opens this line with Delta Handoff RC hardening. It adds the local `delta` command, which turns current Project State, git range facts, changed-file facts, and Seal/Diff state changes into a reviewable `delta-handoff.md`. By `v1.9.1`, the public v1.x Delta Handoff / Receiver line is locally closed and frozen across Delta Handoff, Receiver Acceptance, Report Kit, Starter Integration, Usage Pack, Lint Mini, Fixture Pack, Repair Pack, Dogfooding Evidence, and Discoverability / Adoption. It stays local-first and does not expand into provider, runtime, plugin, MCP, IDE, schema-v2, or platform work; `basebrief-project-state-v1` remains unchanged, and release checks keep `provider_probe_status=skipped` when provider env vars are absent. Entry points: [v1.9.1 Delta Receiver Final Closure / Freeze](docs/releases/v1.9.1.md), [v1.x Delta Receiver Closure Matrix](docs/testing-v1.x-delta-receiver-closure-matrix.md), [v1.0.0 Delta Handoff RC Candidate](docs/releases/v1.0.0.md), [Delta Handoff Spec](docs/specs/delta-handoff.md), [Delta Handoff fresh receiver dogfooding v1.0](docs/dogfooding/delta-handoff-fresh-receiver-v1.0.md), and [Delta Handoff baseline-advance dogfooding v1.0](docs/dogfooding/delta-handoff-baseline-advance-v1.0.md).
-
-`v2.0.0` opens and locally closes Context Pack Lite. It adds the local `context-pack` command, which compiles repo live facts, fixed public-safe entry files, recent git facts, risk boundaries, and receiver-state presence checks into seven reviewable Markdown artifacts. It is not provider, runtime, plugin, MCP, IDE, schema-v2, Workflow Runner, or repo-dump work; missing inputs are marked as `not_available`, `not_applicable`, or `needs-review`. Entry points: [v2.0.0 Context Pack Lite Local Closeout](docs/releases/v2.0.0.md), [Context Pack Lite Spec](docs/specs/context-pack-lite.md), [Context Pack Lite example kit](examples/context-pack-lite/README.md), and [Context Pack Lite fresh receiver dogfooding v2.0.0](docs/dogfooding/context-pack-lite-fresh-receiver-v2.0.0.md).
-
-`v2.1.0` locally closes Context Pack Check. It keeps the existing `check --input <context-pack-dir>` surface and checks seven-file completeness, shared review metadata, manifest live facts, risk boundaries, receiver-state missing-input semantics, starter instructions, public safety, and conservative thickness warnings for Context Pack Lite directories. It does not add a top-level `context-pack-check` command, does not change the CLI JSON top-level shape, and does not change `context-pack` generator output. Entry points: [v2.1.0 Context Pack Check Local Closeout](docs/releases/v2.1.0.md), [v2.1.0 Context Pack Check Plan](docs/releases/v2.1.0-plan.md), [Context Pack Check Spec](docs/specs/context-pack-check.md), and [Context Pack Check Acceptance v2.1.0](docs/dogfooding/context-pack-check-acceptance-v2.1.0.md).
-
-`v2.2.0` starts the docs-first One-command Resume / New-window Prompt line. The narrow surface is `resume --input <context-pack-dir>`: it reuses the existing Context Pack Check result, prints a copyable new-window prompt, carries warning-only findings as review notes, and stops on error findings. It does not change Context Pack Lite generator output or the `check --input <dir> --json` shape, and it does not add provider, runtime, plugin, MCP, IDE, hosted, cloud-memory, schema-v2, or Workflow Runner behavior. Entry points: [v2.2.0 One-command Resume / New-window Prompt Plan](docs/releases/v2.2.0-plan.md) and [Context Pack Resume Spec](docs/specs/context-pack-resume.md).
-
-`v2.2.0` is locally closed by [v2.2.0 One-command Resume / New-window Prompt Local Closeout](docs/releases/v2.2.0.md) and [Context Pack Resume Dogfooding v2.2.0](docs/dogfooding/context-pack-resume-v2.2.0.md). The next docs-first line is `v2.3.0` BaseBrief Format: it freezes the future local packaging direction around `context-pack/`, `context-pack.md`, and `context.json` without adding a command, generator, JSON schema file, schema-v2, provider, runtime, plugin, MCP, IDE, hosted, cloud-memory, or Workflow Runner behavior. Entry points: [v2.3.0 BaseBrief Format Plan](docs/releases/v2.3.0-plan.md) and [BaseBrief Format Spec](docs/specs/basebrief-format.md).
-
-`v2.4.0` starts the File-only Adapter / MCP-friendly Export line. It adds the local `export --input <context-pack-dir> --output-dir <dir>` command, which turns a checked Context Pack Lite directory into `manifest.json`, `context-pack.md`, `context.json`, and `adapter-notes.md`. It does not change Context Pack Lite generator output, `check --input <dir> --json`, or `resume`; it does not add provider, runtime, plugin, MCP server, IDE, hosted, cloud-memory, schema-v2, or Workflow Runner behavior. MCP-friendly means future tool-consumable files, not an MCP server or runtime integration. Entry points: [v2.4.0 File-only Adapter / MCP-friendly Export Plan](docs/releases/v2.4.0-plan.md), [v2.4.0 File-only Adapter / MCP-friendly Export Local Closeout](docs/releases/v2.4.0.md), and [File-only Export Spec](docs/specs/file-only-export.md).
-`v2.4.0` dogfooding records that the four-file export bundle is enough for a receiver-style continuation review while still requiring live repo fact rechecks before implementation. Evidence: [File-only Export Dogfooding v2.4.0](docs/dogfooding/file-only-export-v2.4.0.md).
-`v2.4.0` also includes a public-safe [File-only Export example kit](examples/file-only-export/README.md). In that kit, `exports/` is a recommended example output directory name; the CLI writes the four files directly under the explicit `--output-dir` directory.
-`v2.5.0` adds the local read-only `doctor --repo <target-repo> --context-pack <context-pack-dir>` diagnostic. It compares live repo facts with an explicit Context Pack Lite snapshot, propagates Context Pack Check errors and warnings, reports stale HEAD, branch mismatch, dirty worktree, live-recheck, and boundary wording findings, and writes nothing. It does not add `status`, watcher, daemon, auto-fix, provider, runtime, plugin, MCP server/tools, IDE, hosted, cloud-memory, schema-v2, or Workflow Runner behavior. Entry points: [v2.5.0 Context Pack Doctor Plan](docs/releases/v2.5.0-plan.md), [v2.5.0 Context Pack Doctor Local Closeout](docs/releases/v2.5.0.md), [Context Pack Doctor Spec](docs/specs/context-pack-doctor.md), [Context Pack Doctor Dogfooding v2.5.0](docs/dogfooding/context-pack-doctor-v2.5.0.md), and [Context Pack Doctor example kit](examples/context-pack-doctor/README.md).
-
-## Seal/Diff
-
-Seal/Diff answers: what changed in facts, decisions, risks, and task boundaries between two phases?
-
-```text
-node scripts/basebrief.js seal --input examples/seal-before-input.json --output tests/outputs/private/quickstart/before.json
-node scripts/basebrief.js diff --before tests/outputs/private/quickstart/before.json --after examples/seal-after-input.json
-```
-
-It only processes explicit input files and does not scan or modify other projects.
-
-## Core Boundaries
-
-- `full`: complete phase baselines, complex handoffs, or unclear and risky work.
-- `lite`: short continuation, read-only handoff, or clearly bounded work across one or two files.
-- `cache-ready`: explicit stable-prefix or prompt-cache experiments only; it is not a normal third mode.
-- The readable brief is the normal user-facing artifact. Provider-facing artifacts are explicit advanced post-processing.
-- Provider-specific estimated-cost evidence is not provider-general proof or a real billing audit.
+These npm scripts are local validation shortcuts only. BaseBrief is not a published npm package, global command, chat client, Agent runtime, hosted platform, key manager, project management system, or provider gateway.
 
 ## Safety Boundaries
 
-- Do not put `.env`, API keys, tokens, or secrets in public artifacts.
-- Do not publish private absolute paths.
-- Do not turn assumptions into verified facts.
-- Do not automatically modify external projects or host-tool configuration.
+- No provider request.
+- No raw private output.
+- No runtime integration.
+- No schema change / No schema-v2.
+- No MCP server.
+- No Workflow Runner.
+- Do not publish `.env`, API keys, tokens, or secrets.
+- Do not write private absolute paths into public docs.
+- Do not record assumptions as verified facts.
 
-## Current Capabilities
+When provider environment variables are absent, release checks should keep reporting `provider_probe_status=skipped`.
 
-- one public skill entry with internal Full / Lite routing
-- BB9 structured handoff contract
-- handoff builder and file-based Codex / Claude adapters
-- artifact checker
-- optional read-only Receiver Safe Check v1
-- zero-dependency CLI Lite: `init`, `build`, `check`, `receiver-init`, `receiver-check`, `receiver-flow`, `review-draft`, `state-init`, `state-read`, `state-status`, `state-validate`, `state-history`, `state-advance`, `sidecar-build`, `sidecar-check`, `seal`, `diff`, `delta`, `context-pack`, `resume`, `export`, `doctor`
-- Project State Sidecar: builds `generic` / `openclaw` bundles and `new-window-starter.md` from local `basebrief-project-state-v1` state, then checks them with `basebrief-sidecar-v1`
-- local file-based Seal/Diff v1
+## Keep Reading
 
-BaseBrief is not a chat client, agent runtime, hosted platform, secret manager, project-management system, or provider gateway.
-
-## Continue Reading
-
-- [5-minute quickstart](docs/quickstart-5min.md)
-- [Integrations](docs/integrations.md)
-- [Mode selection](docs/mode-selection.md)
-- [Integrated Handoff Golden Path](docs/golden-path.md)
-- [Golden Path example kit](examples/golden-path/README.md)
+- [5-minute Quickstart](docs/quickstart-5min.md)
 - [CLI Lite](docs/cli-lite.md)
-- [Receiver Safe Check](docs/receiver-check.md)
-- [Receiver Flow Draft](docs/receiver-flow.md)
-- [Project State](docs/project-state.md)
-- [Project State model](docs/design/project-state-model.md)
-- [Project State validation rules](docs/design/project-state-validation-rules.md)
-- [Project State lifecycle readiness](docs/design/project-state-lifecycle-readiness.md)
-- [Project State lifecycle model](docs/design/project-state-lifecycle-model.md)
-- [v0.9.0 Integrated Handoff Readiness](docs/releases/v0.9.0.md)
-- [v0.9.1 Golden Path Closure Candidate](docs/releases/v0.9.1.md)
-- [v0.9.2 Golden Path Example Closure Candidate](docs/releases/v0.9.2.md)
-- [v0.9.3 Final Closure / Freeze Candidate](docs/releases/v0.9.3.md)
-- [v1.9.1 Delta Receiver Final Closure / Freeze](docs/releases/v1.9.1.md)
-- [v1.x Delta Receiver Closure Matrix](docs/testing-v1.x-delta-receiver-closure-matrix.md)
-- [v1.0.0 Delta Handoff RC Candidate](docs/releases/v1.0.0.md)
-- [Delta Handoff Spec](docs/specs/delta-handoff.md)
-- [Delta Handoff fresh receiver dogfooding v1.0](docs/dogfooding/delta-handoff-fresh-receiver-v1.0.md)
-- [Delta Handoff baseline-advance dogfooding v1.0](docs/dogfooding/delta-handoff-baseline-advance-v1.0.md)
-- [v2.0.0 Context Pack Lite Local Closeout](docs/releases/v2.0.0.md)
-- [Context Pack Lite Spec](docs/specs/context-pack-lite.md)
-- [v2.1.0 Context Pack Check Local Closeout](docs/releases/v2.1.0.md)
-- [v2.1.0 Context Pack Check Plan](docs/releases/v2.1.0-plan.md)
-- [Context Pack Check Spec](docs/specs/context-pack-check.md)
-- [Context Pack Check Acceptance v2.1.0](docs/dogfooding/context-pack-check-acceptance-v2.1.0.md)
-- [v2.2.0 One-command Resume / New-window Prompt Plan](docs/releases/v2.2.0-plan.md)
-- [v2.2.0 One-command Resume / New-window Prompt Local Closeout](docs/releases/v2.2.0.md)
-- [Context Pack Resume Spec](docs/specs/context-pack-resume.md)
-- [Context Pack Resume Dogfooding v2.2.0](docs/dogfooding/context-pack-resume-v2.2.0.md)
-- [v2.3.0 BaseBrief Format Plan](docs/releases/v2.3.0-plan.md)
-- [BaseBrief Format Spec](docs/specs/basebrief-format.md)
-- [v2.4.0 File-only Adapter / MCP-friendly Export Plan](docs/releases/v2.4.0-plan.md)
-- [v2.4.0 File-only Adapter / MCP-friendly Export Local Closeout](docs/releases/v2.4.0.md)
-- [File-only Export Spec](docs/specs/file-only-export.md)
-- [File-only Export Dogfooding v2.4.0](docs/dogfooding/file-only-export-v2.4.0.md)
-- [File-only Export example kit](examples/file-only-export/README.md)
-- [v2.5.0 Context Pack Doctor Plan](docs/releases/v2.5.0-plan.md)
-- [v2.5.0 Context Pack Doctor Local Closeout](docs/releases/v2.5.0.md)
-- [Context Pack Doctor Spec](docs/specs/context-pack-doctor.md)
-- [Context Pack Doctor Dogfooding v2.5.0](docs/dogfooding/context-pack-doctor-v2.5.0.md)
-- [Context Pack Doctor example kit](examples/context-pack-doctor/README.md)
-- [Context Pack Lite example kit](examples/context-pack-lite/README.md)
-- [Context Pack Lite fresh receiver dogfooding v2.0.0](docs/dogfooding/context-pack-lite-fresh-receiver-v2.0.0.md)
-- [v0.9.x Integrated Handoff Closure Matrix](docs/testing-v0.9.x-test-matrix.md)
-- [v0.8.x sidecar test matrix](docs/testing-v0.8.x-test-matrix.md)
-- [v0.8.7 Copyable New-Window Starter](docs/releases/v0.8.7.md)
-- [v0.8.6 Manual Receiver Smoke Result Intake Evidence](docs/releases/v0.8.6.md)
-- [v0.8.3 Sidecar Discoverability Polish](docs/releases/v0.8.3.md)
-- [v0.8.2 Sidecar Receiver Acceptance Evidence](docs/releases/v0.8.2.md)
-- [v0.8.1 Sidecar Check Hardening](docs/releases/v0.8.1.md)
-- [v0.8.0 Sidecar Handoff Bundle](docs/releases/v0.8.0.md)
-- [Sidecar receiver acceptance v0.8.2](docs/dogfooding/sidecar-receiver-acceptance-v0.8.2.md)
-- [Receiver friction log](docs/dogfooding/receiver-friction-log.md)
-- [Receiver Flow dogfooding evidence](docs/dogfooding/receiver-flow-dogfooding.md)
-- [Receiver Flow guided dogfooding](docs/dogfooding/receiver-flow-guided-dogfooding.md)
-- [Receiver Flow review-draft dogfooding](docs/dogfooding/receiver-flow-review-draft-dogfooding.md)
-- [Receiver Flow extract dogfooding](docs/dogfooding/receiver-flow-extract-dogfooding.md)
-- [Receiver Flow v0.5.x closure dogfooding](docs/dogfooding/receiver-flow-v0.5.x-closure.md)
-- [Project State dogfooding](docs/dogfooding/project-state-dogfooding.md)
-- [Project State self-dogfooding v0.6.x](docs/dogfooding/project-state-self-dogfooding-v0.6.x.md)
-- [Project State self-dogfooding v0.6.2](docs/dogfooding/project-state-self-dogfooding-v0.6.2.md)
-- [Project State lifecycle readiness v0.6.3](docs/dogfooding/project-state-lifecycle-readiness-v0.6.3.md)
-- [Project State lifecycle v0.7.0](docs/dogfooding/project-state-lifecycle-v0.7.0.md)
-- [v0.6.0 post-release baseline](docs/baselines/v0.6.0-post-release-baseline.md)
-- [v0.6.x test matrix](docs/testing-v0.6.x-test-matrix.md)
-- [v0.7.x test matrix](docs/testing-v0.7.x-test-matrix.md)
-- [v0.7.0 Project State Lifecycle Candidate](docs/releases/v0.7.0.md)
-- [v0.6.3 Lifecycle Readiness Gate Candidate](docs/releases/v0.6.3.md)
-- [v0.6.2 Self-Dogfooding Evidence Candidate](docs/releases/v0.6.2.md)
-- [v0.6.0 Project State Directory Release](docs/releases/v0.6.0.md)
-- [v0.5.3 Receiver Flow Review Closure](docs/releases/v0.5.3.md)
-- [v0.5.2 Receiver Flow Extract Candidate](docs/releases/v0.5.2.md)
-- [v0.5.1 Review Draft Gate Candidate](docs/releases/v0.5.1.md)
-- [v0.5.0 Guided Receiver Flow Candidate](docs/releases/v0.5.0.md)
-- [v0.4.1 Stabilization Candidate](docs/releases/v0.4.1.md)
-- [v0.4.0 Release Candidate](docs/releases/v0.4.0.md)
-- [v0.3.3 Release Candidate](docs/releases/v0.3.3.md)
-- [v0.3.2 Release Candidate](docs/releases/v0.3.2.md)
-- [v0.3.1 Release Candidate](docs/releases/v0.3.1.md)
-- [v0.3.0 receiver workflow baseline](docs/releases/v0.3.0.md)
-- [Known limitations](docs/known-limitations.md)
-- [Documentation index](docs/index.md)
-- [Public minimal example](examples/minimal/README.md)
+- [Full documentation index and archive](docs/index.md)
 
 ## License
 
-See [LICENSE](LICENSE).
+MIT
