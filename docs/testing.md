@@ -783,6 +783,7 @@ Evidence and contract docs:
 - [v2.5.0 Context Pack Doctor Local Closeout](releases/v2.5.0.md)
 - [Context Pack Doctor Spec](specs/context-pack-doctor.md)
 - [Context Pack Doctor Dogfooding v2.5.0](dogfooding/context-pack-doctor-v2.5.0.md)
+- [Context Pack Doctor Dogfooding v2.5.1](dogfooding/context-pack-doctor-v2.5.1.md)
 - [Context Pack Doctor example kit](../examples/context-pack-doctor/README.md)
 
 The local validation gate is:
@@ -809,6 +810,17 @@ doctor_contract_version: basebrief-doctor-v1
 checker_error_propagation_status: pass
 public_safety_status: pass
 read_only_status: pass
+provider_probe_status=skipped
+```
+
+The v2.5.1 post-commit continuation evidence confirms:
+
+```text
+post_commit_doctor_status: passed
+no_provider_boundary_warning_status: absent
+stale_pack_findings: doctor.pack-head-stale, doctor.pack-branch-mismatch, doctor.live-recheck-required
+broken_pack_findings: doctor.pack-check-error, doctor.live-recheck-required
+export_bundle_check_status: passed
 provider_probe_status=skipped
 ```
 

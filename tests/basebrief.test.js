@@ -5446,6 +5446,7 @@ test("v2.5.0 Context Pack Doctor stays read-only and local-only", () => {
   const closeout = readText("docs/releases/v2.5.0.md");
   const spec = readText("docs/specs/context-pack-doctor.md");
   const dogfooding = readText("docs/dogfooding/context-pack-doctor-v2.5.0.md");
+  const dogfooding251 = readText("docs/dogfooding/context-pack-doctor-v2.5.1.md");
   const exampleReadme = readText("examples/context-pack-doctor/README.md");
 
   assert.match(readme, /doctor --repo <target-repo> --context-pack <context-pack-dir>/);
@@ -5471,7 +5472,11 @@ test("v2.5.0 Context Pack Doctor stays read-only and local-only", () => {
   assert.match(cliLite, /dogfooding\/context-pack-doctor-v2\.5\.0\.md/);
   assert.match(cliLite, /\.\.\/examples\/context-pack-doctor\/README\.md/);
   assert.match(testing, /v2\.5\.0 Context Pack Doctor/);
+  assert.match(testing, /dogfooding\/context-pack-doctor-v2\.5\.1\.md/);
   assert.match(testing, /doctor_contract_version: basebrief-doctor-v1/);
+  assert.match(testing, /post_commit_doctor_status: passed/);
+  assert.match(testing, /no_provider_boundary_warning_status: absent/);
+  assert.match(testing, /export_bundle_check_status: passed/);
   assert.match(testing, /checker_error_propagation_status: pass/);
   assert.match(testing, /provider_probe_status=skipped/);
   assert.match(v2Roadmap, /v2\.5 Context Pack Doctor/);
@@ -5522,6 +5527,23 @@ test("v2.5.0 Context Pack Doctor stays read-only and local-only", () => {
   assert.match(dogfooding, /No MCP server/);
   assert.match(dogfooding, /No Workflow Runner/);
 
+  assert.match(dogfooding251, /Context Pack Doctor Dogfooding v2\.5\.1/);
+  assert.match(dogfooding251, /doctor_contract_version: basebrief-doctor-v1/);
+  assert.match(dogfooding251, /post_commit_doctor_status: passed/);
+  assert.match(dogfooding251, /post_commit_doctor_warning_count: 0/);
+  assert.match(dogfooding251, /post_commit_doctor_findings: doctor\.live-recheck-required/);
+  assert.match(dogfooding251, /no_provider_boundary_warning_status: absent/);
+  assert.match(dogfooding251, /stale_pack_findings: doctor\.pack-head-stale, doctor\.pack-branch-mismatch, doctor\.live-recheck-required/);
+  assert.match(dogfooding251, /broken_pack_findings: doctor\.pack-check-error, doctor\.live-recheck-required/);
+  assert.match(dogfooding251, /export_bundle_check_status: passed/);
+  assert.match(dogfooding251, /provider_probe_status=skipped/);
+  assert.match(dogfooding251, /No `status` command/);
+  assert.match(dogfooding251, /No provider request/);
+  assert.match(dogfooding251, /No MCP server/);
+  assert.match(dogfooding251, /No Workflow Runner/);
+  assert.doesNotMatch(dogfooding251, /[A-Za-z]:[\\/]/);
+  assert.doesNotMatch(dogfooding251, /\\\\/);
+
   assert.match(exampleReadme, /Context Pack Doctor Example Kit/);
   assert.match(exampleReadme, /basebrief-doctor-v1/);
   assert.match(exampleReadme, /"repo": "examples\/example-repo"/);
@@ -5542,6 +5564,7 @@ test("v2.5.0 Context Pack Doctor stays read-only and local-only", () => {
     "docs/releases/v2.5.0.md",
     "docs/specs/context-pack-doctor.md",
     "docs/dogfooding/context-pack-doctor-v2.5.0.md",
+    "docs/dogfooding/context-pack-doctor-v2.5.1.md",
     "examples/context-pack-doctor/README.md",
   ]) {
     const result = checkArtifacts({ inputPath: path.join(repoRoot, relativePath) });

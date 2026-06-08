@@ -474,6 +474,7 @@ function checkContentContracts() {
   const contextPackResumeDogfoodingDoc = readText("docs/dogfooding/context-pack-resume-v2.2.0.md");
   const fileOnlyExportDogfoodingDoc = readText("docs/dogfooding/file-only-export-v2.4.0.md");
   const contextPackDoctorDogfoodingDoc = readText("docs/dogfooding/context-pack-doctor-v2.5.0.md");
+  const contextPackDoctorDogfoodingV251Doc = readText("docs/dogfooding/context-pack-doctor-v2.5.1.md");
   const postReleaseBaselineDoc = readText("docs/baselines/v0.4.0-post-release-baseline.md");
   const v060PostReleaseBaselineDoc = readText("docs/baselines/v0.6.0-post-release-baseline.md");
   const projectStateModelDoc = readText("docs/design/project-state-model.md");
@@ -1064,8 +1065,12 @@ function checkContentContracts() {
   assert(testingDoc.includes("v2.5.0 Context Pack Doctor"), "Testing docs must document v2.5 context pack doctor");
   assert(testingDoc.includes("doctor --repo <target-repo> --context-pack <context-pack-dir>"), "Testing docs must document doctor command");
   assert(testingDoc.includes("Context Pack Doctor Dogfooding v2.5.0"), "Testing docs must link v2.5 doctor dogfooding");
+  assert(testingDoc.includes("Context Pack Doctor Dogfooding v2.5.1"), "Testing docs must link v2.5.1 doctor dogfooding");
   assert(testingDoc.includes("../examples/context-pack-doctor/README.md"), "Testing docs must link context pack doctor example kit");
   assert(testingDoc.includes("doctor_contract_version: basebrief-doctor-v1"), "Testing docs must record doctor contract version");
+  assert(testingDoc.includes("post_commit_doctor_status: passed"), "Testing docs must record v2.5.1 post-commit doctor status");
+  assert(testingDoc.includes("no_provider_boundary_warning_status: absent"), "Testing docs must record v2.5.1 boundary warning absence");
+  assert(testingDoc.includes("export_bundle_check_status: passed"), "Testing docs must record v2.5.1 export bundle check");
   assert(testingDoc.includes("checker_error_propagation_status: pass"), "Testing docs must record checker-error propagation");
   assert(testingDoc.includes("context-pack --repo <target-repo>"), "Testing docs must document context-pack command");
   assert(testingDoc.includes("resume --input <context-pack-dir>"), "Testing docs must document resume command");
@@ -1848,6 +1853,22 @@ function checkContentContracts() {
   assert(contextPackDoctorDogfoodingDoc.includes("No `status` command"), "doctor dogfooding must reject status scope");
   assert(contextPackDoctorDogfoodingDoc.includes("No MCP server"), "doctor dogfooding must reject MCP server scope");
   assert(contextPackDoctorDogfoodingDoc.includes("No Workflow Runner"), "doctor dogfooding must keep runner out of scope");
+  assert(contextPackDoctorDogfoodingV251Doc.includes("Context Pack Doctor Dogfooding v2.5.1"), "v2.5.1 doctor dogfooding doc must have stable title");
+  assert(contextPackDoctorDogfoodingV251Doc.includes("doctor_contract_version: basebrief-doctor-v1"), "v2.5.1 doctor dogfooding must record contract version");
+  assert(contextPackDoctorDogfoodingV251Doc.includes("post_commit_doctor_status: passed"), "v2.5.1 doctor dogfooding must record post-commit pass");
+  assert(contextPackDoctorDogfoodingV251Doc.includes("post_commit_doctor_warning_count: 0"), "v2.5.1 doctor dogfooding must record zero warnings");
+  assert(contextPackDoctorDogfoodingV251Doc.includes("post_commit_doctor_findings: doctor.live-recheck-required"), "v2.5.1 doctor dogfooding must record live recheck finding only");
+  assert(contextPackDoctorDogfoodingV251Doc.includes("no_provider_boundary_warning_status: absent"), "v2.5.1 doctor dogfooding must record boundary warning absence");
+  assert(contextPackDoctorDogfoodingV251Doc.includes("stale_pack_findings: doctor.pack-head-stale, doctor.pack-branch-mismatch, doctor.live-recheck-required"), "v2.5.1 doctor dogfooding must record stale warnings");
+  assert(contextPackDoctorDogfoodingV251Doc.includes("broken_pack_findings: doctor.pack-check-error, doctor.live-recheck-required"), "v2.5.1 doctor dogfooding must record broken pack error");
+  assert(contextPackDoctorDogfoodingV251Doc.includes("export_bundle_check_status: passed"), "v2.5.1 doctor dogfooding must record export bundle check");
+  assert(contextPackDoctorDogfoodingV251Doc.includes("provider_probe_status=skipped"), "v2.5.1 doctor dogfooding must preserve skipped provider gate");
+  assert(contextPackDoctorDogfoodingV251Doc.includes("No `status` command"), "v2.5.1 doctor dogfooding must reject status scope");
+  assert(contextPackDoctorDogfoodingV251Doc.includes("No provider request"), "v2.5.1 doctor dogfooding must reject provider requests");
+  assert(contextPackDoctorDogfoodingV251Doc.includes("No MCP server"), "v2.5.1 doctor dogfooding must reject MCP server scope");
+  assert(contextPackDoctorDogfoodingV251Doc.includes("No Workflow Runner"), "v2.5.1 doctor dogfooding must keep runner out of scope");
+  assert(!/[A-Za-z]:[\\/]/.test(contextPackDoctorDogfoodingV251Doc), "v2.5.1 doctor dogfooding must not expose drive-letter absolute paths");
+  assert(!/\\\\/.test(contextPackDoctorDogfoodingV251Doc), "v2.5.1 doctor dogfooding must not expose UNC paths");
   assert(basebriefCliScript.includes('node scripts/basebrief.js doctor --repo <target-repo> --context-pack <context-pack-dir> [--json]'), "CLI help must expose doctor command");
   assert(basebriefCliScript.includes('if (command === "doctor") return commandDoctor(options);'), "CLI must route doctor command");
   assert(basebriefDoctorScript.includes('basebrief-doctor-v1'), "doctor script must declare contract version");
@@ -3985,6 +4006,7 @@ function checkCliLite() {
     assert(doctorResult.contextPack.startsWith("tests"), "CLI doctor must return a public-safe context pack path");
     assert(doctorResult.summary.errorCount === 0, "CLI doctor must report zero errors for generated pack smoke");
     assert(doctorResult.findings.some((finding) => finding.ruleId === "doctor.live-recheck-required"), "CLI doctor must emit live recheck info");
+    assert(!doctorResult.findings.some((finding) => finding.ruleId === "doctor.no-provider-boundary"), "CLI doctor must not report no-provider-boundary for generated v2.5.1 pack");
     assert(!/[A-Za-z]:[\\/]/.test(JSON.stringify(doctorResult)), "CLI doctor JSON must not expose drive-letter absolute paths");
     assert(!/\\\\/.test(JSON.stringify(doctorResult)), "CLI doctor JSON must not expose UNC paths");
 
