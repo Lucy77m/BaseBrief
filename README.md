@@ -14,7 +14,7 @@ English README: [README.en.md](README.en.md)
 2. [Handoff 契约与产物](docs/handoff.md)
 3. [Integrated Handoff Golden Path](docs/golden-path.md)
 4. [Seal/Diff 阶段变化对比](docs/seal-diff.md)
-5. [v2.0.0 Context Pack Lite Local Closeout](docs/releases/v2.0.0.md)
+5. [v2.2.0 One-command Resume / New-window Prompt Plan](docs/releases/v2.2.0-plan.md)
 
 完整文档与实验历史见 [文档索引](docs/index.md)。
 
@@ -79,6 +79,9 @@ node scripts/basebrief.js sidecar-check --input tests/outputs/private/sidecar-ge
 `v1.0.0` 用 Delta Handoff RC hardening 开启这条线：新增本地 `delta` 命令，把当前 Project State、git range facts、changed-file facts 和 Seal/Diff 状态变化整理成 reviewable `delta-handoff.md`。到 `v1.9.1`，这条 public v1.x Delta Handoff / Receiver line 已本地收口并冻结，覆盖 Delta Handoff、Receiver Acceptance、Report Kit、Starter Integration、Usage Pack、Lint Mini、Fixture Pack、Repair Pack、Dogfooding Evidence 和 Discoverability / Adoption。它始终保持 local-first，不推进 provider、runtime、plugin、MCP、IDE、schema-v2 或平台化工作；`basebrief-project-state-v1` 保持不变，未注入 provider 环境变量时 release checks 仍保持 `provider_probe_status=skipped`。入口见 [v1.9.1 Delta Receiver Final Closure / Freeze](docs/releases/v1.9.1.md)、[v1.x Delta Receiver Closure Matrix](docs/testing-v1.x-delta-receiver-closure-matrix.md)、[v1.0.0 Delta Handoff RC Candidate](docs/releases/v1.0.0.md)、[Delta Handoff Spec](docs/specs/delta-handoff.md)、[Delta Handoff fresh receiver dogfooding v1.0](docs/dogfooding/delta-handoff-fresh-receiver-v1.0.md) 与 [Delta Handoff baseline-advance dogfooding v1.0](docs/dogfooding/delta-handoff-baseline-advance-v1.0.md)。
 
 `v2.0.0` 开启并本地收口 Context Pack Lite：新增本地 `context-pack` 命令，把 repo live facts、固定 public-safe 入口文件、近期 git 信息、风险边界和 receiver state presence checks 编译成 7 个 reviewable Markdown artifacts。它不是 provider/runtime/plugin/MCP/IDE/schema-v2/Workflow Runner，也不是 repo dump；缺输入时用 `not_available`、`not_applicable` 或 `needs-review` 明示。入口见 [v2.0.0 Context Pack Lite Local Closeout](docs/releases/v2.0.0.md)、[Context Pack Lite Spec](docs/specs/context-pack-lite.md)、[Context Pack Lite example kit](examples/context-pack-lite/README.md) 与 [Context Pack Lite fresh receiver dogfooding v2.0.0](docs/dogfooding/context-pack-lite-fresh-receiver-v2.0.0.md)。
+
+`v2.1.0` 本地收口 Context Pack Check：继续复用 `check --input <context-pack-dir>`，对 Context Pack Lite 目录检查 7 文件完整性、共享 review metadata、manifest live facts、风险边界、receiver state 缺输入语义、starter 指令、public safety 与保守厚度 warning。它不新增 `context-pack-check` 顶层命令，不改 CLI JSON 顶层 shape，也不改 `context-pack` generator 输出。入口见 [v2.1.0 Context Pack Check Local Closeout](docs/releases/v2.1.0.md)、[v2.1.0 Context Pack Check Plan](docs/releases/v2.1.0-plan.md)、[Context Pack Check Spec](docs/specs/context-pack-check.md) 与 [Context Pack Check Acceptance v2.1.0](docs/dogfooding/context-pack-check-acceptance-v2.1.0.md)。
+`v2.2.0` starts the docs-first One-command Resume / New-window Prompt line. The narrow surface is `resume --input <context-pack-dir>`: it reuses the existing Context Pack Check result, prints a copyable new-window prompt, carries warning-only findings as review notes, and stops on error findings. It does not change Context Pack Lite generator output or the `check --input <dir> --json` shape, and it does not add provider, runtime, plugin, MCP, IDE, hosted, cloud-memory, schema-v2, or Workflow Runner behavior. Entry points: [v2.2.0 One-command Resume / New-window Prompt Plan](docs/releases/v2.2.0-plan.md) and [Context Pack Resume Spec](docs/specs/context-pack-resume.md).
 
 ## Seal/Diff
 
@@ -146,6 +149,12 @@ BaseBrief 不是聊天客户端、Agent runtime、托管平台、密钥管理器
 - [Delta Handoff baseline-advance dogfooding v1.0](docs/dogfooding/delta-handoff-baseline-advance-v1.0.md)
 - [v2.0.0 Context Pack Lite Local Closeout](docs/releases/v2.0.0.md)
 - [Context Pack Lite Spec](docs/specs/context-pack-lite.md)
+- [v2.1.0 Context Pack Check Local Closeout](docs/releases/v2.1.0.md)
+- [v2.1.0 Context Pack Check Plan](docs/releases/v2.1.0-plan.md)
+- [Context Pack Check Spec](docs/specs/context-pack-check.md)
+- [Context Pack Check Acceptance v2.1.0](docs/dogfooding/context-pack-check-acceptance-v2.1.0.md)
+- [v2.2.0 One-command Resume / New-window Prompt Plan](docs/releases/v2.2.0-plan.md)
+- [Context Pack Resume Spec](docs/specs/context-pack-resume.md)
 - [Context Pack Lite example kit](examples/context-pack-lite/README.md)
 - [Context Pack Lite fresh receiver dogfooding v2.0.0](docs/dogfooding/context-pack-lite-fresh-receiver-v2.0.0.md)
 - [v0.9.x Integrated Handoff Closure Matrix](docs/testing-v0.9.x-test-matrix.md)

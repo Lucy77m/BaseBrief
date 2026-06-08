@@ -52,21 +52,33 @@ v1.x answers: what changed, and how should a receiver accept it?
 v2.0 answers: what local context pack should a new window read before acting?
 ```
 
-## Why Context Pack Lite Before Workflow Runner
+## Why Context Pack Lite Before Resume And Runner
 
-Workflow Runner Lite remains a later possibility, but it should not lead v2.0.
-A runner only chains existing steps. If the central artifact is not clear yet,
-the runner mostly wraps old commands and creates more workflow surface.
+Context Pack Lite should lead v2.x because it gives later user-facing commands
+something stable to read. One-command Resume is valuable, but a resume prompt is
+only useful when the underlying pack is complete, public-safe, bounded, and
+honest about missing inputs.
+
+Workflow Runner Lite remains a later possibility, but it should not lead v2.x.
+A runner only chains existing steps. If the central artifact and resume surface
+are not clear yet, the runner mostly wraps old commands and creates more
+workflow surface.
 
 The recommended order is:
 
 ```text
 v2.0 Context Pack Lite
 v2.1 Context Pack Check
-v2.2 Workflow Runner Lite
+v2.2 One-command Resume / New-window Prompt
+v2.3 BaseBrief Format
+v2.4 File-only Adapter / MCP-friendly Export
+v2.5 Status / Doctor / Change-sensing Lite
+v3.x Workflow Runner Lite or watcher/dashboard work, only after local usage proves need
 ```
 
-Context Pack Lite gives Workflow Runner Lite something meaningful to produce.
+Context Pack Lite gives resume and later runner work something meaningful to
+produce. Context Pack Check should come first so the resume surface does not
+copy an incomplete or unsafe pack into a new window.
 
 ## Non-Goals
 
@@ -81,6 +93,7 @@ The v2.0 line is also not:
 - a vector, embedding, or semantic-index system
 - an agent runtime
 - a daemon or background workflow
+- a watcher, dashboard, or prediction engine
 - a plugin, MCP server, IDE integration, hosted service, or cloud-memory layer
 - a schema-v2 project
 - `basebrief-project-state-v2`
@@ -244,12 +257,68 @@ Runner behavior.
 ### v2.1 Context Pack Check
 
 Prefer integrating checks into the existing `check` family before adding more
-top-level commands. Check for missing files, missing review metadata, unsafe
-content, over-thick output, and live-fact drift.
+top-level commands. v2.1-A freezes the check contract in
+`docs/releases/v2.1.0-plan.md` and `docs/specs/context-pack-check.md`; it does
+not implement a checker rule family yet.
 
-### v2.2 Workflow Runner Lite
+The eventual checker should verify missing files, shared review metadata,
+unsafe content, conservative thickness limits, explicit stale semantics, and
+missing-input degradation. It should not prove every live fact is true; the
+receiver still has to recheck branch, HEAD, worktree, and relevant file state
+before edits.
 
-Only after Context Pack Lite exists and can be checked, consider a narrow runner
+### v2.2 One-command Resume / New-window Prompt
+
+After Context Pack Lite exists and can be checked, add a narrow resume surface
+that reads the latest context pack and prepares a copyable new-window prompt.
+
+The first command surface is:
+
+```text
+node scripts/basebrief.js resume --input <context-pack-dir> [--json]
+```
+
+The command should print prompt text only. It should reuse the existing Context
+Pack Check result, allow warning-only packs with review notes, and stop when
+checker errors are present. It should not send provider requests, create
+external sessions, call AI, run a daemon, introduce a `new-window` alias in the
+first slice, or modify files.
+
+v2.2-A is frozen in `docs/releases/v2.2.0-plan.md` and
+`docs/specs/context-pack-resume.md`.
+
+### v2.3 BaseBrief Format
+
+After resume proves useful, define a stable local-first handoff format for AI
+coding agents. Use restrained wording: BaseBrief can provide a local handoff
+format, not claim to be an industry standard or universal protocol.
+
+Likely artifacts belong to a later format line, not v2.1:
+
+```text
+context.json
+context-pack.md
+context-pack/
+```
+
+This should not be schema-v2 and should not change
+`basebrief-project-state-v1` or `basebrief-sidecar-v1`.
+
+### v2.4 File-only Adapter / MCP-friendly Export
+
+Export files that other tools can consume, without implementing plugins,
+runtime integrations, or an MCP server. This is adapter output only.
+
+### v2.5 Status / Doctor / Change-sensing Lite
+
+Add manual diagnostics such as status or doctor checks only after the pack,
+check, resume, and format surfaces are stable. This should be manually
+triggered, conservative, source-backed, and read-only by default.
+
+### Later Workflow Runner Lite
+
+Only after Context Pack Lite, Context Pack Check, One-command Resume, and
+BaseBrief Format prove useful in local dogfooding, consider a narrow runner
 that chains state, delta, context pack generation, check, and starter output.
 
 ## Acceptance Criteria
@@ -258,11 +327,24 @@ v2.0-A is acceptable when:
 
 - public docs state that v2.0 equals Context Pack Lite
 - the frozen v1.x baseline remains intact
-- the roadmap explains why Workflow Runner is later
+- the roadmap explains why Workflow Runner is later than pack, check, resume,
+  and format work
 - the docs explicitly reject provider, runtime, plugin, MCP, IDE, hosted,
   cloud-memory, schema-v2, vector, embedding, AI auto-summary, and repo-dump
   work
 - the seven recommended artifacts have clear roles
 - review, status, source, trust, and stale semantics are defined
 - missing input degradation is explicit
+- release checks, independent tests, and whitespace checks pass
+
+v2.1-A is acceptable when:
+
+- `docs/releases/v2.1.0-plan.md` freezes the check contract and non-goals
+- `docs/specs/context-pack-check.md` defines required files, metadata,
+  public-safety, stale, and thickness semantics
+- docs keep the preferred surface as existing `check --input <context-pack-dir>`
+- docs state that v2.1-A does not implement checker rules, new commands, or
+  JSON shape changes
+- v2.2 remains One-command Resume / New-window Prompt, while Workflow Runner
+  stays later
 - release checks, independent tests, and whitespace checks pass

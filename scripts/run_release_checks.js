@@ -166,8 +166,14 @@ function checkRequiredFiles() {
     "docs/releases/v2.0.0-plan.md",
     "docs/releases/v2.0.0.md",
     "docs/specs/context-pack-lite.md",
+    "docs/releases/v2.1.0.md",
+    "docs/releases/v2.1.0-plan.md",
+    "docs/specs/context-pack-check.md",
+    "docs/releases/v2.2.0-plan.md",
+    "docs/specs/context-pack-resume.md",
     "docs/roadmap/basebrief-v2-context-pack-lite.md",
     "docs/dogfooding/context-pack-lite-fresh-receiver-v2.0.0.md",
+    "docs/dogfooding/context-pack-check-acceptance-v2.1.0.md",
     "docs/testing-v0.4.x-test-matrix.md",
     "docs/testing-v0.6.x-test-matrix.md",
     "docs/testing-v0.7.x-test-matrix.md",
@@ -213,6 +219,7 @@ function checkRequiredFiles() {
     "scripts/basebrief_seal.js",
     "scripts/basebrief_delta.js",
     "scripts/basebrief_context_pack.js",
+    "scripts/basebrief_resume.js",
     "scripts/bb9_provider_profiles.json",
     "schemas/bb9-handoff.schema.json",
     "schemas/basebrief-receiver-check.schema.json",
@@ -424,8 +431,14 @@ function checkContentContracts() {
   const v200PlanDoc = readText("docs/releases/v2.0.0-plan.md");
   const v200ReleaseDoc = readText("docs/releases/v2.0.0.md");
   const contextPackLiteSpecDoc = readText("docs/specs/context-pack-lite.md");
+  const v210PlanDoc = readText("docs/releases/v2.1.0-plan.md");
+  const v210ReleaseDoc = readText("docs/releases/v2.1.0.md");
+  const contextPackCheckSpecDoc = readText("docs/specs/context-pack-check.md");
+  const v220PlanDoc = readText("docs/releases/v2.2.0-plan.md");
+  const contextPackResumeSpecDoc = readText("docs/specs/context-pack-resume.md");
   const v2ContextPackRoadmapDoc = readText("docs/roadmap/basebrief-v2-context-pack-lite.md");
   const contextPackLiteDogfoodingDoc = readText("docs/dogfooding/context-pack-lite-fresh-receiver-v2.0.0.md");
+  const contextPackCheckDogfoodingDoc = readText("docs/dogfooding/context-pack-check-acceptance-v2.1.0.md");
   const postReleaseBaselineDoc = readText("docs/baselines/v0.4.0-post-release-baseline.md");
   const v060PostReleaseBaselineDoc = readText("docs/baselines/v0.6.0-post-release-baseline.md");
   const projectStateModelDoc = readText("docs/design/project-state-model.md");
@@ -548,6 +561,13 @@ function checkContentContracts() {
   assert(readme.includes("docs/releases/v1.0.0.md"), "README.md should link to v1.0.0 delta handoff RC");
   assert(readme.includes("docs/releases/v1.9.1.md"), "README.md should link to v1.9.1 final closure");
   assert(readme.includes("docs/releases/v2.0.0.md"), "README.md should link to v2.0.0 context pack closeout");
+  assert(readme.includes("docs/releases/v2.1.0.md"), "README.md should link to v2.1.0 context pack check closeout");
+  assert(readme.includes("docs/releases/v2.1.0-plan.md"), "README.md should link to v2.1 context pack check plan");
+  assert(readme.includes("docs/specs/context-pack-check.md"), "README.md should link to context pack check spec");
+  assert(readme.includes("docs/dogfooding/context-pack-check-acceptance-v2.1.0.md"), "README.md should link to v2.1 context pack check dogfooding");
+  assert(readme.includes("docs/releases/v2.2.0-plan.md"), "README.md should link to v2.2 resume plan");
+  assert(readme.includes("docs/specs/context-pack-resume.md"), "README.md should link to context pack resume spec");
+  assert(readme.includes("resume --input <context-pack-dir>"), "README.md should mention resume command");
   assert(readme.includes("examples/context-pack-lite/README.md"), "README.md should link to context pack example kit");
   assert(readme.includes("docs/dogfooding/context-pack-lite-fresh-receiver-v2.0.0.md"), "README.md should link to context pack dogfooding");
   assert(readme.includes("context-pack"), "README.md should mention context-pack command");
@@ -641,6 +661,13 @@ function checkContentContracts() {
   assert(englishReadme.includes("docs/releases/v1.0.0.md"), "README.en.md should link to v1.0.0 delta handoff RC");
   assert(englishReadme.includes("docs/releases/v1.9.1.md"), "README.en.md should link to v1.9.1 final closure");
   assert(englishReadme.includes("docs/releases/v2.0.0.md"), "README.en.md should link to v2.0.0 context pack closeout");
+  assert(englishReadme.includes("docs/releases/v2.1.0.md"), "README.en.md should link to v2.1.0 context pack check closeout");
+  assert(englishReadme.includes("docs/releases/v2.1.0-plan.md"), "README.en.md should link to v2.1 context pack check plan");
+  assert(englishReadme.includes("docs/specs/context-pack-check.md"), "README.en.md should link to context pack check spec");
+  assert(englishReadme.includes("docs/dogfooding/context-pack-check-acceptance-v2.1.0.md"), "README.en.md should link to v2.1 context pack check dogfooding");
+  assert(englishReadme.includes("docs/releases/v2.2.0-plan.md"), "README.en.md should link to v2.2 resume plan");
+  assert(englishReadme.includes("docs/specs/context-pack-resume.md"), "README.en.md should link to context pack resume spec");
+  assert(englishReadme.includes("resume --input <context-pack-dir>"), "README.en.md should mention resume command");
   assert(englishReadme.includes("examples/context-pack-lite/README.md"), "README.en.md should link to context pack example kit");
   assert(englishReadme.includes("docs/dogfooding/context-pack-lite-fresh-receiver-v2.0.0.md"), "README.en.md should link to context pack dogfooding");
   assert(englishReadme.includes("context-pack"), "README.en.md should mention context-pack command");
@@ -939,9 +966,14 @@ function checkContentContracts() {
   assert(testingDoc.includes("v1.0 Delta Handoff Fresh Receiver Dogfooding"), "Testing docs must document v1.0 delta fresh receiver dogfooding");
   assert(testingDoc.includes("v1.0 Delta Handoff RC Candidate"), "Testing docs must document v1.0 delta RC candidate");
   assert(testingDoc.includes("v2.0.0 Context Pack Lite Local Closeout"), "Testing docs must document v2.0.0 context pack closeout");
+  assert(testingDoc.includes("v2.1.0 Context Pack Check Local Closeout"), "Testing docs must document v2.1.0 context pack check closeout");
+  assert(testingDoc.includes("v2.2.0 One-command Resume / New-window Prompt Plan"), "Testing docs must document v2.2.0 resume plan");
   assert(testingDoc.includes("context-pack --repo <target-repo>"), "Testing docs must document context-pack command");
+  assert(testingDoc.includes("resume --input <context-pack-dir>"), "Testing docs must document resume command");
   assert(testingDoc.includes("../examples/context-pack-lite/README.md"), "Testing docs must link context pack example kit");
   assert(testingDoc.includes("dogfooding/context-pack-lite-fresh-receiver-v2.0.0.md"), "Testing docs must link context pack dogfooding");
+  assert(testingDoc.includes("dogfooding/context-pack-check-acceptance-v2.1.0.md"), "Testing docs must link v2.1 context pack check dogfooding");
+  assert(testingDoc.includes("context-pack.too-thick"), "Testing docs must mention the context pack thickness warning");
   assert(testingDoc.includes("v1.5 Delta Receiver Lint Mini Plan"), "Testing docs must document the v1.5 lint mini plan");
   assert(testingDoc.includes("v1.5 Delta Receiver Lint Mini Local Closeout"), "Testing docs must document the v1.5 lint mini closeout");
   assert(testingDoc.includes("v1.6 Delta Receiver Lint Fixture Pack Plan"), "Testing docs must document the v1.6 lint fixture pack plan");
@@ -1022,6 +1054,9 @@ function checkContentContracts() {
   assert(cliLiteDoc.includes("--advance-baseline"), "cli-lite.md must document delta baseline advance option");
   assert(cliLiteDoc.includes("specs/delta-handoff.md"), "cli-lite.md must link delta handoff spec");
   assert(cliLiteDoc.includes("node scripts/basebrief.js context-pack --repo <target-repo> --output-dir <dir>"), "cli-lite.md must document context-pack command");
+  assert(cliLiteDoc.includes("node scripts/basebrief.js resume --input <context-pack-dir>"), "cli-lite.md must document resume command");
+  assert(cliLiteDoc.includes("releases/v2.2.0-plan.md"), "cli-lite.md must link v2.2.0 resume plan");
+  assert(cliLiteDoc.includes("specs/context-pack-resume.md"), "cli-lite.md must link context pack resume spec");
   assert(cliLiteDoc.includes("examples/context-pack-lite/README.md"), "cli-lite.md must link context pack example kit");
   assert(cliLiteDoc.includes("releases/v2.0.0.md"), "cli-lite.md must link v2.0.0 closeout");
   assert(cliLiteDoc.includes("node scripts/basebrief.js receiver-flow"), "cli-lite.md must document receiver-flow command");
@@ -1423,14 +1458,22 @@ function checkContentContracts() {
   assert(docsIndex.includes("roadmap/basebrief-v2-context-pack-lite.md"), "Docs index must link v2 context pack roadmap");
   assert(docsIndex.includes("releases/v2.0.0-plan.md"), "Docs index must link v2.0.0 context pack plan");
   assert(docsIndex.includes("releases/v2.0.0.md"), "Docs index must link v2.0.0 context pack closeout");
+  assert(docsIndex.includes("releases/v2.1.0.md"), "Docs index must link v2.1.0 context pack check closeout");
+  assert(docsIndex.includes("releases/v2.2.0-plan.md"), "Docs index must link v2.2.0 resume plan");
   assert(docsIndex.includes("specs/context-pack-lite.md"), "Docs index must link context pack lite spec");
+  assert(docsIndex.includes("specs/context-pack-resume.md"), "Docs index must link context pack resume spec");
   assert(docsIndex.includes("dogfooding/context-pack-lite-fresh-receiver-v2.0.0.md"), "Docs index must link context pack dogfooding");
+  assert(docsIndex.includes("dogfooding/context-pack-check-acceptance-v2.1.0.md"), "Docs index must link v2.1 context pack check dogfooding");
   assert(docsIndex.includes("../examples/context-pack-lite/README.md"), "Docs index must link context pack example kit");
   assert(v2ContextPackRoadmapDoc.includes("BaseBrief v2.0 is Context Pack Lite"), "v2 roadmap must freeze Context Pack Lite direction");
   assert(v2ContextPackRoadmapDoc.includes("v1.x answers: what changed"), "v2 roadmap must define relationship to v1.x");
   assert(v2ContextPackRoadmapDoc.includes("v2.0 Context Pack Lite"), "v2 roadmap must order Context Pack Lite before later work");
   assert(v2ContextPackRoadmapDoc.includes("v2.1 Context Pack Check"), "v2 roadmap must keep check as later line");
-  assert(v2ContextPackRoadmapDoc.includes("v2.2 Workflow Runner Lite"), "v2 roadmap must keep workflow runner later");
+  assert(v2ContextPackRoadmapDoc.includes("v2.2 One-command Resume / New-window Prompt"), "v2 roadmap must make one-command resume the v2.2 line");
+  assert(v2ContextPackRoadmapDoc.includes("resume --input <context-pack-dir>"), "v2 roadmap must freeze resume command shape");
+  assert(v2ContextPackRoadmapDoc.includes("docs/specs/context-pack-resume.md"), "v2 roadmap must link resume spec");
+  assert(v2ContextPackRoadmapDoc.includes("v2.3 BaseBrief Format"), "v2 roadmap must reserve BaseBrief Format for v2.3");
+  assert(v2ContextPackRoadmapDoc.includes("Workflow Runner Lite or watcher/dashboard work"), "v2 roadmap must keep runner and watcher work later");
   assert(v2ContextPackRoadmapDoc.includes("MANIFEST.md"), "v2 roadmap must define manifest artifact");
   assert(v2ContextPackRoadmapDoc.includes("REPO_MAP.md"), "v2 roadmap must define repo map artifact");
   assert(v2ContextPackRoadmapDoc.includes("KEY_FILES.md"), "v2 roadmap must define key files artifact");
@@ -1444,7 +1487,6 @@ function checkContentContracts() {
   assert(v200PlanDoc.includes("context-pack --repo <target-repo>"), "v2 plan must document the v2.0-B context-pack command");
   assert(v200PlanDoc.includes("v2.0 Context Pack Lite"), "v2 plan must order Context Pack Lite first");
   assert(v200PlanDoc.includes("v2.1 Context Pack Check"), "v2 plan must keep check later");
-  assert(v200PlanDoc.includes("v2.2 Workflow Runner Lite"), "v2 plan must keep runner later");
   assert(v200PlanDoc.includes("not_available"), "v2 plan must define missing input degradation");
   assert(v200PlanDoc.includes("provider_probe_status=skipped"), "v2 plan must preserve skipped provider gate");
   assert(v200ReleaseDoc.includes("v2.0.0 Context Pack Lite Local Closeout"), "v2 closeout doc must have stable title");
@@ -1473,6 +1515,47 @@ function checkContentContracts() {
   assert(contextPackLiteSpecDoc.includes("stale"), "context pack spec must define stale semantics");
   assert(contextPackLiteSpecDoc.includes("no provider request"), "context pack spec must preserve provider boundary");
   assert(contextPackLiteSpecDoc.includes("no AI automatic summary"), "context pack spec must avoid AI auto-summary");
+  assert(v210PlanDoc.includes("v2.1.0 Context Pack Check Plan"), "v2.1 plan must have stable title");
+  assert(v210PlanDoc.includes("v2.1-A check contract"), "v2.1 plan must name the contract freeze");
+  assert(v210PlanDoc.includes("check --input <context-pack-dir>"), "v2.1 plan must prefer existing check input surface");
+  assert(v210PlanDoc.includes("seven expected artifacts"), "v2.1 plan must require the seven artifact shape");
+  assert(v210PlanDoc.includes("Review status"), "v2.1 plan must require review metadata");
+  assert(v210PlanDoc.includes("No provider request") || v210PlanDoc.includes("provider request"), "v2.1 plan must preserve provider boundary");
+  assert(v210PlanDoc.includes("No runtime integration") || v210PlanDoc.includes("runtime integration"), "v2.1 plan must preserve runtime boundary");
+  assert(v210PlanDoc.includes("provider_probe_status=skipped"), "v2.1 plan must preserve skipped provider gate");
+  assert(v210ReleaseDoc.includes("v2.1.0 Context Pack Check Local Closeout"), "v2.1 closeout doc must have stable title");
+  assert(v210ReleaseDoc.includes("v2.1-A"), "v2.1 closeout doc must record contract freeze");
+  assert(v210ReleaseDoc.includes("v2.1-B"), "v2.1 closeout doc must record minimal checker integration");
+  assert(v210ReleaseDoc.includes("v2.1-C"), "v2.1 closeout doc must record evidence and closeout");
+  assert(v210ReleaseDoc.includes("context-pack-check-acceptance-v2.1.0.md"), "v2.1 closeout doc must mention checker dogfooding evidence");
+  assert(v210ReleaseDoc.includes("No new top-level `context-pack-check` command"), "v2.1 closeout doc must reject a new checker command");
+  assert(v210ReleaseDoc.includes("No provider request"), "v2.1 closeout doc must preserve provider boundary");
+  assert(v210ReleaseDoc.includes("No runtime integration"), "v2.1 closeout doc must preserve runtime boundary");
+  assert(v210ReleaseDoc.includes("No schema-v2"), "v2.1 closeout doc must preserve schema-v2 boundary");
+  assert(v210ReleaseDoc.includes("No Workflow Runner"), "v2.1 closeout doc must keep runner out of scope");
+  assert(v210ReleaseDoc.includes("provider_probe_status=skipped"), "v2.1 closeout doc must preserve skipped provider gate");
+  assert(contextPackCheckSpecDoc.includes("Context Pack Check Spec"), "context pack check spec must have stable title");
+  assert(contextPackCheckSpecDoc.includes("Status: v2.1-A contract freeze"), "context pack check spec must mark contract freeze status");
+  assert(contextPackCheckSpecDoc.includes("check --input <context-pack-dir>"), "context pack check spec must prefer existing check surface");
+  assert(contextPackCheckSpecDoc.includes("Required Files"), "context pack check spec must define required files");
+  assert(contextPackCheckSpecDoc.includes("Shared Metadata"), "context pack check spec must define shared metadata");
+  assert(contextPackCheckSpecDoc.includes("Thickness"), "context pack check spec must define thickness direction");
+  assert(contextPackCheckSpecDoc.includes("does not prove"), "context pack check spec must avoid live-fact proof claims");
+  assert(v220PlanDoc.includes("v2.2.0 One-command Resume / New-window Prompt Plan"), "v2.2 plan must have stable title");
+  assert(v220PlanDoc.includes("Status: v2.2-A contract freeze"), "v2.2 plan must mark contract freeze status");
+  assert(v220PlanDoc.includes("resume --input <context-pack-dir>"), "v2.2 plan must document resume command");
+  assert(v220PlanDoc.includes("warning-only packs still produce a prompt"), "v2.2 plan must allow warning-only resume");
+  assert(v220PlanDoc.includes("error findings stop the command"), "v2.2 plan must block errored packs");
+  assert(v220PlanDoc.includes("No context-pack generator output change"), "v2.2 plan must preserve generator output");
+  assert(v220PlanDoc.includes("No `check --input <dir> --json` top-level shape change"), "v2.2 plan must preserve checker JSON shape");
+  assert(v220PlanDoc.includes("No Workflow Runner"), "v2.2 plan must keep runner out of scope");
+  assert(v220PlanDoc.includes("provider_probe_status=skipped"), "v2.2 plan must preserve skipped provider gate");
+  assert(contextPackResumeSpecDoc.includes("Context Pack Resume Spec"), "context pack resume spec must have stable title");
+  assert(contextPackResumeSpecDoc.includes("Status: v2.2-A contract freeze"), "context pack resume spec must mark contract freeze status");
+  assert(contextPackResumeSpecDoc.includes("basebrief-resume-v1"), "context pack resume spec must name contract version");
+  assert(contextPackResumeSpecDoc.includes("warning-only findings"), "context pack resume spec must define warning behavior");
+  assert(contextPackResumeSpecDoc.includes("one or more errors: stop before prompt output"), "context pack resume spec must define error behavior");
+  assert(contextPackResumeSpecDoc.includes("does not change the checker command's own JSON shape"), "context pack resume spec must preserve checker shape");
   assert(contextPackLiteDogfoodingDoc.includes("Context Pack Lite Fresh Receiver Dogfooding v2.0.0"), "context pack dogfooding doc must have stable title");
   assert(contextPackLiteDogfoodingDoc.includes("receiver_task_status: completed"), "context pack dogfooding must record completed receiver status");
   assert(contextPackLiteDogfoodingDoc.includes("handoff_acceptance: pass"), "context pack dogfooding must record pass acceptance");
@@ -1482,6 +1565,14 @@ function checkContentContracts() {
   assert(contextPackLiteDogfoodingDoc.includes("No raw private output"), "context pack dogfooding must reject raw private output");
   assert(contextPackLiteDogfoodingDoc.includes("No runtime integration"), "context pack dogfooding must preserve runtime boundary");
   assert(contextPackLiteDogfoodingDoc.includes("provider_probe_status=skipped"), "context pack dogfooding must preserve skipped provider gate");
+  assert(contextPackCheckDogfoodingDoc.includes("Context Pack Check Acceptance v2.1.0"), "context pack check dogfooding doc must have stable title");
+  assert(contextPackCheckDogfoodingDoc.includes("clean_pack_status: pass"), "context pack check dogfooding must record clean-pack acceptance");
+  assert(contextPackCheckDogfoodingDoc.includes("broken_pack_status: pass"), "context pack check dogfooding must record broken-pack acceptance");
+  assert(contextPackCheckDogfoodingDoc.includes("thickness_warning_status: pass"), "context pack check dogfooding must record thickness warning acceptance");
+  assert(contextPackCheckDogfoodingDoc.includes("public_safety_passthrough_status: pass"), "context pack check dogfooding must record public-safety passthrough");
+  assert(contextPackCheckDogfoodingDoc.includes("No new top-level checker command"), "context pack check dogfooding must reject a new checker command");
+  assert(contextPackCheckDogfoodingDoc.includes("No provider request"), "context pack check dogfooding must preserve provider boundary");
+  assert(contextPackCheckDogfoodingDoc.includes("No raw private output"), "context pack check dogfooding must preserve raw-output boundary");
   assert(contextPackLiteExampleReadme.includes("Context Pack Lite Example Kit"), "context pack example readme must have stable title");
   assert(contextPackLiteExampleReadme.includes("context-pack --repo <target-repo>"), "context pack example readme must document command shape");
   assert(contextPackLiteExampleManifest.includes("MANIFEST.md"), "context pack example manifest must include reading order");
@@ -2860,7 +2951,11 @@ function checkArtifactChecker() {
     "docs/dogfooding/delta-receiver-report-kit-v1.2.md",
     "docs/dogfooding/delta-receiver-lint-dogfooding-v1.8.md",
     "docs/dogfooding/context-pack-lite-fresh-receiver-v2.0.0.md",
+    "docs/dogfooding/context-pack-check-acceptance-v2.1.0.md",
     "docs/releases/v2.0.0.md",
+    "docs/releases/v2.1.0.md",
+    "docs/releases/v2.1.0-plan.md",
+    "docs/specs/context-pack-check.md",
     "examples/context-pack-lite",
     "examples/receiver-check-config.json",
     "examples/receiver/difference-found",
@@ -3042,6 +3137,8 @@ function checkCliLite() {
     assert(helpStdout.includes("--starter-language auto|zh-CN|en|ja"), "CLI help must expose starter language option");
     assert(helpStdout.includes("sidecar-check --input <sidecar-dir>"), "CLI help must expose Sidecar check");
     assert(helpStdout.includes("context-pack --repo <target-repo> --output-dir <dir>"), "CLI help must expose Context Pack Lite");
+    assert(helpStdout.includes("resume --input <context-pack-dir>"), "CLI help must expose Context Pack Resume");
+    assert(!helpStdout.includes("context-pack-check"), "CLI help must not add a context-pack-check command");
 
     const noCommandStdout = execFileSync(process.execPath, [
       "scripts/basebrief.js",
@@ -3470,6 +3567,127 @@ function checkCliLite() {
     assert(fs.existsSync(path.join(contextPackDir, "MANIFEST.md")), "CLI context-pack must write MANIFEST.md");
     assert(fs.existsSync(path.join(contextPackDir, "NEXT_WINDOW_STARTER.md")), "CLI context-pack must write NEXT_WINDOW_STARTER.md");
 
+    const contextPackCheckStdout = execFileSync(process.execPath, [
+      "scripts/basebrief.js",
+      "check",
+      "--input",
+      contextPackDir,
+      "--json",
+    ], {
+      cwd: repoRoot,
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "pipe"],
+      env: process.env,
+    });
+    const contextPackCheckResult = JSON.parse(contextPackCheckStdout);
+    assert(contextPackCheckResult.command === "check", "CLI context pack check must use existing check command");
+    assert(contextPackCheckResult.check.status === "passed", "CLI context pack check must pass a clean generated pack");
+    assert(contextPackCheckResult.check.errorCount === 0, "CLI context pack check must report zero errors for clean pack");
+    assert(
+      !contextPackCheckResult.check.findings.some((finding) => finding.ruleId.startsWith("context-pack.")),
+      "CLI context pack check must report no context-pack findings for clean pack",
+    );
+
+    const resumeStdout = execFileSync(process.execPath, [
+      "scripts/basebrief.js",
+      "resume",
+      "--input",
+      contextPackDir,
+      "--json",
+    ], {
+      cwd: repoRoot,
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "pipe"],
+      env: process.env,
+    });
+    const resumeResult = JSON.parse(resumeStdout);
+    assert(resumeResult.command === "resume", "CLI resume must return command metadata");
+    assert(resumeResult.contractVersion === "basebrief-resume-v1", "CLI resume must return resume contract version");
+    assert(resumeResult.status === "ready", "CLI resume must report ready status for clean pack");
+    assert(resumeResult.input.startsWith("tests"), "CLI resume must return public-safe input path");
+    assert(resumeResult.check.errorCount === 0, "CLI resume must report zero checker errors for clean pack");
+    assert(resumeResult.prompt.includes("BaseBrief Resume Prompt"), "CLI resume must include copyable prompt text");
+    assert(!/[A-Za-z]:[\\/]/.test(resumeResult.prompt), "CLI resume prompt must not expose private absolute paths");
+
+    const contextPackBrokenCases = [
+      {
+        name: "missing-file",
+        mutate(dir) {
+          fs.rmSync(path.join(dir, "KEY_FILES.md"));
+        },
+        ruleId: "context-pack.missing-file",
+      },
+      {
+        name: "invalid-metadata",
+        mutate(dir) {
+          const filePath = path.join(dir, "REPO_MAP.md");
+          fs.writeFileSync(filePath, fs.readFileSync(filePath, "utf8").replace(/^Trust: .+$/m, "Trust: certain"), "utf8");
+        },
+        ruleId: "context-pack.invalid-metadata",
+      },
+      {
+        name: "missing-starter-instruction",
+        mutate(dir) {
+          const filePath = path.join(dir, "NEXT_WINDOW_STARTER.md");
+          fs.writeFileSync(filePath, fs.readFileSync(filePath, "utf8").replace(/^- List any gaps before proposing implementation work\.\r?\n/m, ""), "utf8");
+        },
+        ruleId: "context-pack.missing-starter-instruction",
+      },
+      {
+        name: "private-path",
+        mutate(dir) {
+          const fakePrivatePath = ["C:", "Users", "alice", "secret", "notes.md"].join("\\");
+          fs.appendFileSync(path.join(dir, "MANIFEST.md"), `\n- Debug path: ${fakePrivatePath}\n`, "utf8");
+        },
+        ruleId: "private.absolute-path",
+      },
+    ];
+    contextPackBrokenCases.forEach((testCase) => {
+      const brokenDir = path.join(tempRoot, `context-pack-${testCase.name}`);
+      fs.cpSync(contextPackDir, brokenDir, { recursive: true });
+      testCase.mutate(brokenDir);
+      const result = checkArtifacts({ inputPath: brokenDir });
+      assert(result.status === "failed", `Context Pack broken fixture ${testCase.name} must fail`);
+      assert(
+        result.findings.some((finding) => finding.ruleId === testCase.ruleId),
+        `Context Pack broken fixture ${testCase.name} must report ${testCase.ruleId}`,
+      );
+    });
+
+    const thickDir = path.join(tempRoot, "context-pack-too-thick");
+    fs.cpSync(contextPackDir, thickDir, { recursive: true });
+    fs.appendFileSync(path.join(thickDir, "REPO_MAP.md"), `\n${"A".repeat(21050)}\n`, "utf8");
+    const thickResult = checkArtifacts({ inputPath: thickDir });
+    assert(thickResult.status === "passed", "Context Pack thick fixture must stay passed");
+    assert(thickResult.errorCount === 0, "Context Pack thick fixture must report zero errors");
+    assert(thickResult.warningCount > 0, "Context Pack thick fixture must report warnings");
+    assert(
+      thickResult.findings.some((finding) => finding.ruleId === "context-pack.too-thick"),
+      "Context Pack thick fixture must report context-pack.too-thick",
+    );
+
+    const thickCheckStdout = execFileSync(process.execPath, [
+      "scripts/basebrief.js",
+      "check",
+      "--input",
+      thickDir,
+      "--json",
+    ], {
+      cwd: repoRoot,
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "pipe"],
+      env: process.env,
+    });
+    const thickCheckResult = JSON.parse(thickCheckStdout);
+    assert(thickCheckResult.command === "check", "CLI context pack thickness check must use existing check command");
+    assert(thickCheckResult.check.status === "passed", "CLI context pack thickness check must stay passed");
+    assert(thickCheckResult.check.errorCount === 0, "CLI context pack thickness check must report zero errors");
+    assert(thickCheckResult.check.warningCount > 0, "CLI context pack thickness check must report warnings");
+    assert(
+      thickCheckResult.check.findings.some((finding) => finding.ruleId === "context-pack.too-thick"),
+      "CLI context pack thickness check must report context-pack.too-thick",
+    );
+
     const sidecarDir = path.join(tempRoot, "sidecar-generic");
     const sidecarBuildStdout = execFileSync(process.execPath, [
       "scripts/basebrief.js",
@@ -3534,7 +3752,7 @@ function checkCliLite() {
   } finally {
     fs.rmSync(tempRoot, { recursive: true, force: true });
   }
-  return 21;
+  return 23;
 }
 
 function checkFirstRunWorkflow() {

@@ -16,7 +16,7 @@ const {
 } = require("../scripts/basebrief_build_handoff");
 const { buildAdapterArtifacts, normalizeTargets } = require("../scripts/basebrief_build_adapters");
 const { checkArtifacts } = require("../scripts/basebrief_check_artifacts");
-const { HELP_TEXT, commandBuild, commandCheck, commandContextPack, commandDelta, commandDiff, commandInit, commandReceiverCheck, commandReceiverFlow, commandReceiverInit, commandReviewDraft, commandSidecarBuild, commandSidecarCheck, commandStateAdvance, commandStateHistory, commandStateInit, commandStateRead, commandStateStatus, commandStateValidate, commandSeal, formatHuman, run, starterInput } = require("../scripts/basebrief");
+const { HELP_TEXT, commandBuild, commandCheck, commandContextPack, commandDelta, commandDiff, commandInit, commandReceiverCheck, commandReceiverFlow, commandReceiverInit, commandResume, commandReviewDraft, commandSidecarBuild, commandSidecarCheck, commandStateAdvance, commandStateHistory, commandStateInit, commandStateRead, commandStateStatus, commandStateValidate, commandSeal, formatHuman, run, starterInput } = require("../scripts/basebrief");
 const {
   CONFIG_SCHEMA_VERSION: RECEIVER_CHECK_SCHEMA_VERSION,
   RESULT_SCHEMA_VERSION: RECEIVER_CHECK_RESULT_SCHEMA_VERSION,
@@ -1677,6 +1677,10 @@ test("v1.0.0 delta handoff RC hardening exposes local-first delta without expand
   const v200Plan = readText("docs/releases/v2.0.0-plan.md");
   const contextPackLiteRoadmap = readText("docs/roadmap/basebrief-v2-context-pack-lite.md");
   const contextPackLiteSpec = readText("docs/specs/context-pack-lite.md");
+  const v210Plan = readText("docs/releases/v2.1.0-plan.md");
+  const v210Release = readText("docs/releases/v2.1.0.md");
+  const contextPackCheckSpec = readText("docs/specs/context-pack-check.md");
+  const contextPackCheckDogfooding = readText("docs/dogfooding/context-pack-check-acceptance-v2.1.0.md");
   const v1xDeltaReceiverMatrix = readText("docs/testing-v1.x-delta-receiver-closure-matrix.md");
   const plan = readText("docs/releases/v1.0.0-plan.md");
   const rcReview = readText("docs/releases/v1.0.0-rc-review.md");
@@ -1747,7 +1751,11 @@ test("v1.0.0 delta handoff RC hardening exposes local-first delta without expand
   assert.match(docsIndex, /testing-v1\.x-delta-receiver-closure-matrix\.md/);
   assert.match(docsIndex, /roadmap\/basebrief-v2-context-pack-lite\.md/);
   assert.match(docsIndex, /releases\/v2\.0\.0-plan\.md/);
+  assert.match(docsIndex, /releases\/v2\.1\.0\.md/);
+  assert.match(docsIndex, /releases\/v2\.1\.0-plan\.md/);
   assert.match(docsIndex, /specs\/context-pack-lite\.md/);
+  assert.match(docsIndex, /specs\/context-pack-check\.md/);
+  assert.match(docsIndex, /dogfooding\/context-pack-check-acceptance-v2\.1\.0\.md/);
   assert.match(docsIndex, /specs\/delta-handoff\.md/);
   assert.match(docsIndex, /\.\.\/examples\/delta-handoff\.md/);
   assert.match(docsIndex, /dogfooding\/delta-handoff-fresh-receiver-v1\.0\.md/);
@@ -1782,6 +1790,9 @@ test("v1.0.0 delta handoff RC hardening exposes local-first delta without expand
   assert.match(testing, /v1\.9 Delta Receiver Lint Discoverability \/ Adoption Plan/);
   assert.match(testing, /v1\.9 Delta Receiver Lint Discoverability \/ Adoption Local Closeout/);
   assert.match(testing, /v1\.9\.1 Delta Receiver Final Closure \/ Freeze/);
+  assert.match(testing, /v2\.1\.0 Context Pack Check Local Closeout/);
+  assert.match(testing, /check --input <context-pack-dir>/);
+  assert.match(testing, /context-pack\.too-thick/);
   assert.match(testing, /testing-v1\.x-delta-receiver-closure-matrix\.md/);
   assert.match(testing, /receiver-specific rule families/);
   assert.match(testing, /Markdown\/text report kit/);
@@ -1856,14 +1867,18 @@ test("v1.0.0 delta handoff RC hardening exposes local-first delta without expand
   assert.match(contextPackLiteRoadmap, /v2\.0 answers: what local context pack/);
   assert.match(contextPackLiteRoadmap, /v2\.0 Context Pack Lite/);
   assert.match(contextPackLiteRoadmap, /v2\.1 Context Pack Check/);
-  assert.match(contextPackLiteRoadmap, /v2\.2 Workflow Runner Lite/);
+  assert.match(contextPackLiteRoadmap, /v2\.2 One-command Resume \/ New-window Prompt/);
+  assert.match(contextPackLiteRoadmap, /v2\.3 BaseBrief Format/);
+  assert.match(contextPackLiteRoadmap, /Workflow Runner Lite or watcher\/dashboard work/);
   for (const artifact of ["MANIFEST.md", "REPO_MAP.md", "KEY_FILES.md", "RECENT_DELTA.md", "RISK_BOUNDARIES.md", "RECEIVER_STATE.md", "NEXT_WINDOW_STARTER.md"]) {
     assert.match(contextPackLiteRoadmap, new RegExp(artifact.replace(".", "\\.")));
     assert.match(contextPackLiteSpec, new RegExp(artifact.replace(".", "\\.")));
+    assert.match(contextPackCheckSpec, new RegExp(artifact.replace(".", "\\.")));
   }
   for (const term of ["reviewed", "needs-review", "generated", "not_available", "not_applicable", "stale", "source", "trust"]) {
     assert.match(contextPackLiteRoadmap, new RegExp(term));
     assert.match(contextPackLiteSpec, new RegExp(term));
+    assert.match(contextPackCheckSpec, new RegExp(term));
   }
   assert.match(contextPackLiteRoadmap, /a provider request path/);
   assert.match(contextPackLiteRoadmap, /a Repomix or Gitingest replacement/);
@@ -1877,6 +1892,37 @@ test("v1.0.0 delta handoff RC hardening exposes local-first delta without expand
   assert.match(contextPackLiteSpec, /This spec defines the artifact contract only/);
   assert.match(contextPackLiteSpec, /do not invent receiver history/);
   assert.match(contextPackLiteSpec, /Prefer integrating this with the existing check surface/);
+  assert.match(v210Plan, /v2\.1\.0 Context Pack Check Plan/);
+  assert.match(v210Plan, /v2\.1-A check contract/);
+  assert.match(v210Plan, /check --input <context-pack-dir>/);
+  assert.match(v210Plan, /seven expected artifacts/);
+  assert.match(v210Plan, /Review status/);
+  assert.match(v210Plan, /provider_probe_status=skipped/);
+  assert.match(v210Release, /v2\.1\.0 Context Pack Check Local Closeout/);
+  assert.match(v210Release, /v2\.1-A/);
+  assert.match(v210Release, /v2\.1-B/);
+  assert.match(v210Release, /v2\.1-C/);
+  assert.match(v210Release, /No new top-level `context-pack-check` command/);
+  assert.match(v210Release, /No provider request/);
+  assert.match(v210Release, /No runtime integration/);
+  assert.match(v210Release, /No schema-v2/);
+  assert.match(v210Release, /No Workflow Runner/);
+  assert.match(v210Release, /provider_probe_status=skipped/);
+  assert.match(contextPackCheckSpec, /Context Pack Check Spec/);
+  assert.match(contextPackCheckSpec, /Status: v2\.1-A contract freeze/);
+  assert.match(contextPackCheckSpec, /Required Files/);
+  assert.match(contextPackCheckSpec, /Shared Metadata/);
+  assert.match(contextPackCheckSpec, /Thickness/);
+  assert.match(contextPackCheckSpec, /does not prove/);
+  assert.match(contextPackCheckSpec, /keep the result shape compatible with Artifact Checker JSON/);
+  assert.match(contextPackCheckDogfooding, /Context Pack Check Acceptance v2\.1\.0/);
+  assert.match(contextPackCheckDogfooding, /clean_pack_status: pass/);
+  assert.match(contextPackCheckDogfooding, /broken_pack_status: pass/);
+  assert.match(contextPackCheckDogfooding, /thickness_warning_status: pass/);
+  assert.match(contextPackCheckDogfooding, /public_safety_passthrough_status: pass/);
+  assert.match(contextPackCheckDogfooding, /No new top-level checker command/);
+  assert.match(contextPackCheckDogfooding, /No raw private output/);
+  assert.match(contextPackCheckDogfooding, /No provider request/);
 
   assert.match(cliLite, /delta --repo <target-repo> --output-dir <dir>/);
   assert.match(release, /v1\.0\.0 Delta Handoff RC Candidate/);
@@ -5011,6 +5057,107 @@ test("v2.0.0 Context Pack Lite example and closeout stay public-safe and discove
   }
 });
 
+test("v2.1.0 Context Pack Check closeout stays public-safe and discoverable", () => {
+  const readme = readText("README.md");
+  const englishReadme = readText("README.en.md");
+  const docsIndex = readText("docs/index.md");
+  const testing = readText("docs/testing.md");
+  const roadmap = readText("docs/roadmap/basebrief-long-term-baseline.md");
+  const closeout = readText("docs/releases/v2.1.0.md");
+  const dogfooding = readText("docs/dogfooding/context-pack-check-acceptance-v2.1.0.md");
+
+  assert.match(readme, /docs\/releases\/v2\.1\.0\.md/);
+  assert.match(readme, /docs\/dogfooding\/context-pack-check-acceptance-v2\.1\.0\.md/);
+  assert.match(englishReadme, /docs\/releases\/v2\.1\.0\.md/);
+  assert.match(englishReadme, /docs\/dogfooding\/context-pack-check-acceptance-v2\.1\.0\.md/);
+  assert.match(docsIndex, /releases\/v2\.1\.0\.md/);
+  assert.match(docsIndex, /dogfooding\/context-pack-check-acceptance-v2\.1\.0\.md/);
+  assert.match(testing, /v2\.1\.0 Context Pack Check Local Closeout/);
+  assert.match(testing, /context-pack\.too-thick/);
+  assert.match(testing, /provider_probe_status=skipped/);
+  assert.match(roadmap, /Local v2\.1 Context Pack Check closeout status/);
+  assert.match(roadmap, /v2\.2 should prefer One-command Resume \/ New-window Prompt/);
+
+  assert.match(closeout, /v2\.1-A/);
+  assert.match(closeout, /v2\.1-B/);
+  assert.match(closeout, /v2\.1-C/);
+  assert.match(closeout, /No new top-level `context-pack-check` command/);
+  assert.match(closeout, /No provider request/);
+  assert.match(closeout, /No runtime integration/);
+  assert.match(closeout, /No schema-v2/);
+  assert.match(closeout, /No Workflow Runner/);
+  assert.match(closeout, /provider_probe_status=skipped/);
+
+  assert.match(dogfooding, /clean_pack_status: pass/);
+  assert.match(dogfooding, /broken_pack_status: pass/);
+  assert.match(dogfooding, /thickness_warning_status: pass/);
+  assert.match(dogfooding, /public_safety_passthrough_status: pass/);
+  assert.match(dogfooding, /No raw private output/);
+  assert.match(dogfooding, /No provider request/);
+
+  for (const relativePath of [
+    "docs/releases/v2.1.0.md",
+    "docs/dogfooding/context-pack-check-acceptance-v2.1.0.md",
+  ]) {
+    const result = checkArtifacts({ inputPath: path.join(repoRoot, relativePath) });
+    assert.equal(result.status, "passed", relativePath);
+    assert.equal(result.errorCount, 0, relativePath);
+    assert.equal(result.warningCount, 0, relativePath);
+  }
+});
+
+test("v2.2.0 Context Pack Resume contract is docs-first and discoverable", () => {
+  const readme = readText("README.md");
+  const englishReadme = readText("README.en.md");
+  const docsIndex = readText("docs/index.md");
+  const cliLite = readText("docs/cli-lite.md");
+  const testing = readText("docs/testing.md");
+  const roadmap = readText("docs/roadmap/basebrief-long-term-baseline.md");
+  const v2Roadmap = readText("docs/roadmap/basebrief-v2-context-pack-lite.md");
+  const plan = readText("docs/releases/v2.2.0-plan.md");
+  const spec = readText("docs/specs/context-pack-resume.md");
+
+  assert.match(readme, /docs\/releases\/v2\.2\.0-plan\.md/);
+  assert.match(readme, /docs\/specs\/context-pack-resume\.md/);
+  assert.match(englishReadme, /docs\/releases\/v2\.2\.0-plan\.md/);
+  assert.match(englishReadme, /docs\/specs\/context-pack-resume\.md/);
+  assert.match(docsIndex, /releases\/v2\.2\.0-plan\.md/);
+  assert.match(docsIndex, /specs\/context-pack-resume\.md/);
+  assert.match(cliLite, /resume --input <context-pack-dir>/);
+  assert.match(testing, /v2\.2\.0 One-command Resume \/ New-window Prompt Plan/);
+  assert.match(roadmap, /Local v2\.2 One-command Resume \/ New-window Prompt contract status/);
+  assert.match(v2Roadmap, /v2\.2 One-command Resume \/ New-window Prompt/);
+
+  assert.match(plan, /Status: v2\.2-A contract freeze/);
+  assert.match(plan, /resume --input <context-pack-dir>/);
+  assert.match(plan, /warning-only packs still produce a prompt/);
+  assert.match(plan, /error findings stop the command/);
+  assert.match(plan, /No provider request/i);
+  assert.match(plan, /No runtime integration/i);
+  assert.match(plan, /No Workflow Runner/);
+  assert.match(plan, /No context-pack generator output change/i);
+  assert.match(plan, /No `check --input <dir> --json` top-level shape change/i);
+  assert.match(plan, /provider_probe_status=skipped/);
+
+  assert.match(spec, /Context Pack Resume Spec/);
+  assert.match(spec, /Status: v2\.2-A contract freeze/);
+  assert.match(spec, /resume --input <context-pack-dir>/);
+  assert.match(spec, /warning-only findings/);
+  assert.match(spec, /one or more errors: stop before prompt output/);
+  assert.match(spec, /basebrief-resume-v1/);
+  assert.match(spec, /does not change the checker command's own JSON shape/);
+
+  for (const relativePath of [
+    "docs/releases/v2.2.0-plan.md",
+    "docs/specs/context-pack-resume.md",
+  ]) {
+    const result = checkArtifacts({ inputPath: path.join(repoRoot, relativePath) });
+    assert.equal(result.status, "passed", relativePath);
+    assert.equal(result.errorCount, 0, relativePath);
+    assert.equal(result.warningCount, 0, relativePath);
+  }
+});
+
 test("Context Pack Lite writes seven reviewable artifacts without expanding scope", () => {
   const repoDir = path.join(repoRoot, "tests", "outputs", "private", `context-pack-repo-${Date.now()}`);
   const outputDir = path.join(repoRoot, "tests", "outputs", "private", `context-pack-output-${Date.now()}`);
@@ -5103,6 +5250,255 @@ test("Context Pack Lite writes seven reviewable artifacts without expanding scop
     fs.rmSync(commandOutputDir, { recursive: true, force: true });
     fs.rmSync(nonEmptyDir, { recursive: true, force: true });
     fs.rmSync(nonGitDir, { recursive: true, force: true });
+  }
+});
+
+test("Context Pack Check validates clean and broken pack directories through existing check surface", () => {
+  const tempRoot = path.join(repoRoot, "tests", "outputs", "private", `context-pack-check-${Date.now()}`);
+  const repoDir = path.join(tempRoot, "repo");
+  const packDir = path.join(tempRoot, "pack");
+  const cliPackDir = path.join(tempRoot, "cli-pack");
+  try {
+    fs.mkdirSync(path.join(repoDir, "docs"), { recursive: true });
+    fs.mkdirSync(path.join(repoDir, "scripts"), { recursive: true });
+    fs.writeFileSync(path.join(repoDir, "README.md"), "# Fixture\n", "utf8");
+    fs.writeFileSync(path.join(repoDir, "docs", "index.md"), "# Docs\n", "utf8");
+    fs.writeFileSync(path.join(repoDir, "scripts", "safe.js"), "const safe = true;\n", "utf8");
+    git(repoDir, ["init"]);
+    git(repoDir, ["config", "user.email", "basebrief@example.invalid"]);
+    git(repoDir, ["config", "user.name", "BaseBrief Context Pack Check Test"]);
+    git(repoDir, ["add", "."]);
+    git(repoDir, ["commit", "-m", "context pack check fixture"]);
+
+    buildContextPack({ repoPath: repoDir, outputDir: packDir, maxFiles: 3 });
+    const clean = checkArtifacts({ inputPath: packDir });
+    assert.equal(clean.status, "passed");
+    assert.equal(clean.errorCount, 0);
+    assert.equal(clean.warningCount, 0);
+    assert.equal(clean.findings.some((finding) => finding.ruleId.startsWith("context-pack.")), false);
+
+    const cli = spawnSync(process.execPath, [
+      "scripts/basebrief.js",
+      "check",
+      "--input",
+      packDir,
+      "--json",
+    ], { cwd: repoRoot, encoding: "utf8" });
+    assert.equal(cli.status, 0, cli.stderr);
+    const cliResult = JSON.parse(cli.stdout);
+    assert.equal(cliResult.command, "check");
+    assert.equal(cliResult.check.status, "passed");
+    assert.equal(cliResult.check.errorCount, 0);
+    assert.equal(cliResult.check.findings.some((finding) => finding.ruleId.startsWith("context-pack.")), false);
+
+    const brokenCases = [
+      {
+        name: "missing-file",
+        mutate(dir) {
+          fs.rmSync(path.join(dir, "KEY_FILES.md"));
+        },
+        ruleId: "context-pack.missing-file",
+      },
+      {
+        name: "missing-metadata",
+        mutate(dir) {
+          const filePath = path.join(dir, "REPO_MAP.md");
+          fs.writeFileSync(filePath, fs.readFileSync(filePath, "utf8").replace(/^Trust: .+\r?\n/m, ""), "utf8");
+        },
+        ruleId: "context-pack.missing-metadata",
+      },
+      {
+        name: "invalid-metadata",
+        mutate(dir) {
+          const filePath = path.join(dir, "REPO_MAP.md");
+          fs.writeFileSync(filePath, fs.readFileSync(filePath, "utf8").replace(/^Trust: .+$/m, "Trust: certain"), "utf8");
+        },
+        ruleId: "context-pack.invalid-metadata",
+      },
+      {
+        name: "missing-manifest-field",
+        mutate(dir) {
+          const filePath = path.join(dir, "MANIFEST.md");
+          fs.writeFileSync(filePath, fs.readFileSync(filePath, "utf8").replace(/^- Branch: .+\r?\n/m, ""), "utf8");
+        },
+        ruleId: "context-pack.missing-manifest-field",
+      },
+      {
+        name: "missing-risk-boundary",
+        mutate(dir) {
+          const filePath = path.join(dir, "RISK_BOUNDARIES.md");
+          fs.writeFileSync(filePath, fs.readFileSync(filePath, "utf8").replace(/^- No provider request\.\r?\n/m, ""), "utf8");
+        },
+        ruleId: "context-pack.missing-risk-boundary",
+      },
+      {
+        name: "missing-receiver-state-semantics",
+        mutate(dir) {
+          const filePath = path.join(dir, "RECEIVER_STATE.md");
+          const content = fs.readFileSync(filePath, "utf8")
+            .replace(/not_available/g, "missing")
+            .replace(/not_applicable/g, "absent")
+            .replace(/needs-review/g, "review-needed");
+          fs.writeFileSync(filePath, content, "utf8");
+        },
+        ruleId: "context-pack.missing-receiver-state-semantics",
+      },
+      {
+        name: "missing-starter-instruction",
+        mutate(dir) {
+          const filePath = path.join(dir, "NEXT_WINDOW_STARTER.md");
+          fs.writeFileSync(filePath, fs.readFileSync(filePath, "utf8").replace(/^- List any gaps before proposing implementation work\.\r?\n/m, ""), "utf8");
+        },
+        ruleId: "context-pack.missing-starter-instruction",
+      },
+      {
+        name: "private-path",
+        mutate(dir) {
+          const fakePrivatePath = ["C:", "Users", "alice", "secret", "notes.md"].join("\\");
+          fs.appendFileSync(path.join(dir, "MANIFEST.md"), `\n- Debug path: ${fakePrivatePath}\n`, "utf8");
+        },
+        ruleId: "private.absolute-path",
+      },
+      {
+        name: "secret-like",
+        mutate(dir) {
+          const fakeSecret = ["sk", "1234567890abcdef"].join("-");
+          const fakeTokenLabel = ["to", "ken"].join("");
+          fs.appendFileSync(path.join(dir, "MANIFEST.md"), `\n- Debug ${fakeTokenLabel}: ${fakeSecret}\n`, "utf8");
+        },
+        ruleId: "secret.sk",
+      },
+    ];
+
+    for (const testCase of brokenCases) {
+      const brokenDir = path.join(tempRoot, testCase.name);
+      fs.cpSync(packDir, brokenDir, { recursive: true });
+      testCase.mutate(brokenDir);
+      const result = checkArtifacts({ inputPath: brokenDir });
+      assert.equal(result.status, "failed", testCase.name);
+      assert(
+        result.findings.some((finding) => finding.ruleId === testCase.ruleId),
+        `${testCase.name} must report ${testCase.ruleId}`,
+      );
+    }
+
+    const thickDir = path.join(tempRoot, "too-thick");
+    fs.cpSync(packDir, thickDir, { recursive: true });
+    fs.appendFileSync(path.join(thickDir, "REPO_MAP.md"), `\n${"A".repeat(21050)}\n`, "utf8");
+    const thick = checkArtifacts({ inputPath: thickDir });
+    assert.equal(thick.status, "passed");
+    assert.equal(thick.errorCount, 0);
+    assert(thick.warningCount > 0);
+    assert(thick.findings.some((finding) => finding.ruleId === "context-pack.too-thick"));
+
+    fs.cpSync(packDir, cliPackDir, { recursive: true });
+    const cliMapPath = path.join(cliPackDir, "REPO_MAP.md");
+    fs.writeFileSync(
+      cliMapPath,
+      fs.readFileSync(cliMapPath, "utf8").replace(/^Trust: .+$/m, "Trust: certain"),
+      "utf8",
+    );
+    const failedCli = spawnSync(process.execPath, [
+      "scripts/basebrief.js",
+      "check",
+      "--input",
+      cliPackDir,
+      "--json",
+    ], { cwd: repoRoot, encoding: "utf8" });
+    assert.notEqual(failedCli.status, 0);
+    const failedCliResult = JSON.parse(failedCli.stdout);
+    assert.equal(failedCliResult.check.status, "failed");
+    assert(failedCliResult.check.findings.some((finding) => finding.ruleId === "context-pack.invalid-metadata"));
+
+    const thickCliDir = path.join(tempRoot, "cli-too-thick");
+    fs.cpSync(packDir, thickCliDir, { recursive: true });
+    fs.appendFileSync(path.join(thickCliDir, "REPO_MAP.md"), `\n${"B".repeat(21050)}\n`, "utf8");
+    const thickCli = spawnSync(process.execPath, [
+      "scripts/basebrief.js",
+      "check",
+      "--input",
+      thickCliDir,
+      "--json",
+    ], { cwd: repoRoot, encoding: "utf8" });
+    assert.equal(thickCli.status, 0, thickCli.stderr);
+    const thickCliResult = JSON.parse(thickCli.stdout);
+    assert.equal(thickCliResult.check.status, "passed");
+    assert.equal(thickCliResult.check.errorCount, 0);
+    assert(thickCliResult.check.warningCount > 0);
+    assert(thickCliResult.check.findings.some((finding) => finding.ruleId === "context-pack.too-thick"));
+  } finally {
+    fs.rmSync(tempRoot, { recursive: true, force: true });
+  }
+});
+
+test("Context Pack Resume prints copyable prompt from checked pack input", () => {
+  const tempRoot = path.join(repoRoot, "tests", "outputs", "private", `context-pack-resume-${Date.now()}`);
+  const repoDir = path.join(tempRoot, "repo");
+  const packDir = path.join(tempRoot, "pack");
+  const thickDir = path.join(tempRoot, "thick");
+  const brokenDir = path.join(tempRoot, "broken");
+  try {
+    fs.mkdirSync(path.join(repoDir, "docs"), { recursive: true });
+    fs.writeFileSync(path.join(repoDir, "README.md"), "# Fixture\n", "utf8");
+    fs.writeFileSync(path.join(repoDir, "docs", "index.md"), "# Docs\n", "utf8");
+    git(repoDir, ["init"]);
+    git(repoDir, ["config", "user.email", "basebrief@example.invalid"]);
+    git(repoDir, ["config", "user.name", "BaseBrief Resume Test"]);
+    git(repoDir, ["add", "."]);
+    git(repoDir, ["commit", "-m", "resume fixture"]);
+
+    buildContextPack({ repoPath: repoDir, outputDir: packDir, maxFiles: 3 });
+    const result = commandResume({ input: packDir });
+    assert.equal(result.command, "resume");
+    assert.equal(result.contractVersion, "basebrief-resume-v1");
+    assert.equal(result.status, "ready");
+    assert.equal(result.check.errorCount, 0);
+    assert.match(result.prompt, /BaseBrief Resume Prompt/);
+    assert.match(result.prompt, /NEXT_WINDOW_STARTER\.md/);
+    assert.match(result.prompt, /Recheck current cwd, git branch, HEAD, and worktree status/);
+    assert.match(result.prompt, /check_findings: none/);
+    assert.match(formatHuman(result), /BaseBrief Resume Prompt/);
+    assert.match(HELP_TEXT, /resume --input <context-pack-dir>/);
+    assert.equal(run(["node", "scripts/basebrief.js", "resume", "--input", packDir]).command, "resume");
+
+    const cli = spawnSync(process.execPath, [
+      "scripts/basebrief.js",
+      "resume",
+      "--input",
+      packDir,
+      "--json",
+    ], { cwd: repoRoot, encoding: "utf8" });
+    assert.equal(cli.status, 0, cli.stderr);
+    const cliResult = JSON.parse(cli.stdout);
+    assert.equal(cliResult.command, "resume");
+    assert.equal(cliResult.input.startsWith("tests"), true);
+    assert.match(cliResult.prompt, /tests\/outputs\/private\/context-pack-resume-/);
+    assert.doesNotMatch(cliResult.prompt, /[A-Za-z]:[\\/]/);
+
+    fs.cpSync(packDir, thickDir, { recursive: true });
+    fs.appendFileSync(path.join(thickDir, "REPO_MAP.md"), `\n${"C".repeat(21050)}\n`, "utf8");
+    const warningOnly = commandResume({ input: thickDir });
+    assert.equal(warningOnly.status, "ready");
+    assert.equal(warningOnly.check.errorCount, 0);
+    assert(warningOnly.check.warningCount > 0);
+    assert.match(warningOnly.prompt, /context-pack\.too-thick/);
+
+    fs.cpSync(packDir, brokenDir, { recursive: true });
+    fs.writeFileSync(
+      path.join(brokenDir, "REPO_MAP.md"),
+      fs.readFileSync(path.join(brokenDir, "REPO_MAP.md"), "utf8").replace(/^Trust: .+$/m, "Trust: certain"),
+      "utf8",
+    );
+    assert.throws(
+      () => commandResume({ input: brokenDir }),
+      /Context pack check failed: errors=1/,
+    );
+    assert.throws(
+      () => commandResume({ input: packDir, output: path.join(tempRoot, "resume.md") }),
+      /stdout only/,
+    );
+  } finally {
+    fs.rmSync(tempRoot, { recursive: true, force: true });
   }
 });
 

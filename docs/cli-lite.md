@@ -364,9 +364,30 @@ See [Context Pack Lite Spec](specs/context-pack-lite.md),
 [Context Pack Lite example kit](../examples/context-pack-lite/README.md), and
 [v2.0.0 Context Pack Lite Local Closeout](releases/v2.0.0.md).
 
+### resume
+
+```text
+node scripts/basebrief.js resume --input <context-pack-dir> [--json]
+```
+
+This command reads a Context Pack Lite directory, reuses the existing Artifact
+Checker result, and prints a copyable new-window prompt. Clean packs produce a
+prompt. Warning-only packs also produce a prompt and include the warning
+findings as review notes. Error findings stop the command before prompt output.
+
+`resume` is read-only and stdout-only in the first v2.2 slice. It does not
+change Context Pack Lite generator output, does not change
+`check --input <dir> --json`, and does not create sessions, call providers,
+call AI, run a daemon, or write output files.
+
+See [v2.2.0 One-command Resume / New-window Prompt Plan](releases/v2.2.0-plan.md)
+and [Context Pack Resume Spec](specs/context-pack-resume.md).
+
 ## JSON Output
 
-`--json` prints a stable summary with command metadata, output file names, and check status. It does not copy full prompt text into the summary.
+`--json` prints stable command metadata, output file names, and check status
+where relevant. `resume --json` includes the copyable prompt because the prompt
+is that command's primary output.
 
 ## Boundary
 

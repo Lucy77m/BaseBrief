@@ -562,6 +562,89 @@ Expected release-check output without provider env remains:
 provider_probe_status=skipped
 ```
 
+## v2.1.0 Context Pack Check Local Closeout
+
+`v2.1.0` locally closes the Context Pack Check line. It keeps the existing
+Artifact Checker surface and adds Context Pack Lite directory checks for seven
+required artifacts, shared review metadata, manifest live-fact fields,
+risk-boundary coverage, receiver-state missing-input semantics, next-window
+starter instructions, public safety, and conservative thickness warnings.
+
+The public command surface remains:
+
+```text
+node scripts/basebrief.js check --input <context-pack-dir> --json
+```
+
+This closeout adds no new top-level command, no CLI JSON top-level shape
+change, no `context-pack` generator output change, no provider request, no
+runtime integration, no plugin, MCP, IDE, hosted service, Workflow Runner,
+schema-v2, AI automatic summary, vector index, embedding, watcher, daemon,
+dashboard, prediction engine, push, tag, release, pull request, npm publish,
+or global CLI install.
+
+Evidence, contract, and closeout docs:
+
+- [v2.1.0 Context Pack Check Local Closeout](releases/v2.1.0.md)
+- [v2.1.0 Context Pack Check Plan](releases/v2.1.0-plan.md)
+- [Context Pack Check Spec](specs/context-pack-check.md)
+- [Context Pack Check Acceptance v2.1.0](dogfooding/context-pack-check-acceptance-v2.1.0.md)
+
+The local validation gate for this closeout is:
+
+```text
+node scripts/run_release_checks.js
+npm run check
+git diff --check
+```
+
+Expected release-check output without provider env remains:
+
+```text
+provider_probe_status=skipped
+```
+
+The closeout keeps three acceptance classes explicit:
+
+- clean Context Pack directory => `status: passed`, zero errors
+- broken Context Pack directory => expected `context-pack.*` error findings
+- thick Context Pack directory => `context-pack.too-thick` warning while the
+  overall result remains `passed`
+
+## v2.2.0 One-command Resume / New-window Prompt Plan
+
+`v2.2.0` starts the docs-first resume line. It adds the narrow local surface:
+
+```text
+node scripts/basebrief.js resume --input <context-pack-dir> [--json]
+```
+
+The command reuses the existing Context Pack Check behavior, prints copyable
+new-window prompt text, carries warning-only findings as review notes, and
+stops before prompt output when checker errors are present.
+
+Evidence and contract docs:
+
+- [v2.2.0 One-command Resume / New-window Prompt Plan](releases/v2.2.0-plan.md)
+- [Context Pack Resume Spec](specs/context-pack-resume.md)
+
+The local validation gate for this line is:
+
+```text
+node --test tests/basebrief.test.js --test-name-pattern "resume"
+node scripts/basebrief.js resume --input examples/context-pack-lite --json
+node scripts/basebrief.js check --input examples/context-pack-lite --json
+npm test
+npm run release-check
+git diff --check
+```
+
+Expected release-check output without provider env remains:
+
+```text
+provider_probe_status=skipped
+```
+
 ## v0.4.1 Stabilization Candidate
 
 `v0.4.1` is a stabilization-only cycle after the `v0.4.0` public release. It uses

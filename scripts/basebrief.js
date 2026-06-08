@@ -23,6 +23,7 @@ const { commandDiff: commandSealDiff, commandSeal: commandCreateSeal } = require
 const { buildSidecarBundle, checkSidecarBundle } = require("./basebrief_sidecar");
 const { runDelta } = require("./basebrief_delta");
 const { buildContextPack } = require("./basebrief_context_pack");
+const { runResume } = require("./basebrief_resume");
 
 const STARTER_FILE = "basebrief-handoff-input.json";
 const HELP_TEXT = [
@@ -49,6 +50,7 @@ const HELP_TEXT = [
   "  node scripts/basebrief.js diff --before <file> --after <file>",
   "  node scripts/basebrief.js delta --repo <target-repo> --output-dir <dir> [--since <commit>] [--advance-baseline] [--json]",
   "  node scripts/basebrief.js context-pack --repo <target-repo> --output-dir <dir> [--since <commit>] [--max-files <n>] [--json]",
+  "  node scripts/basebrief.js resume --input <context-pack-dir> [--json]",
   "",
   "Start here:",
   "  docs/quickstart-5min.md",
@@ -358,6 +360,14 @@ function commandContextPack(options) {
   });
 }
 
+function commandResume(options) {
+  return runResume({
+    input: options.input,
+    output: options.output,
+    "output-dir": options["output-dir"],
+  });
+}
+
 function run(argv) {
   const command = argv[2];
   if (!command || command === "--help" || command === "-h") return { command: "help" };
@@ -384,6 +394,7 @@ function run(argv) {
   if (command === "diff") return commandDiff(options);
   if (command === "delta") return commandDelta(options);
   if (command === "context-pack") return commandContextPack(options);
+  if (command === "resume") return commandResume(options);
   throw new Error(`Unknown command: ${command}`);
 }
 
@@ -516,6 +527,15 @@ function toPublicResult(result) {
       repo: publicPath(result.repo, cwd),
       outputDir: publicPath(result.outputDir, cwd),
       outputFiles: toRelativeMap(result.outputFiles, cwd),
+    };
+  }
+  if (result.command === "resume") {
+    const publicInput = publicPath(result.input, cwd).replace(/\\/g, "/");
+    const absoluteInput = result.input.replace(/\\/g, "/");
+    return {
+      ...result,
+      input: publicInput,
+      prompt: result.prompt.replace(absoluteInput, publicInput),
     };
   }
   return result;
@@ -694,6 +714,9 @@ function formatHuman(result) {
       "",
     ].join(os.EOL);
   }
+  if (result.command === "resume") {
+    return result.prompt.endsWith(os.EOL) ? result.prompt : `${result.prompt}${os.EOL}`;
+  }
   return `${JSON.stringify(result, null, 2)}${os.EOL}`;
 }
 
@@ -763,6 +786,7 @@ module.exports = {
   commandSeal,
   commandDelta,
   commandContextPack,
+  commandResume,
   formatFindingLines,
   formatHuman,
   parseOptions,

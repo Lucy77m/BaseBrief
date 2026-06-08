@@ -72,6 +72,32 @@ const STARTER_FACT_LAYERS = [
   "live_repo_state",
   "receiver_window_rechecks",
 ];
+const CONTEXT_PACK_FILES = [
+  "MANIFEST.md",
+  "REPO_MAP.md",
+  "KEY_FILES.md",
+  "RECENT_DELTA.md",
+  "RISK_BOUNDARIES.md",
+  "RECEIVER_STATE.md",
+  "NEXT_WINDOW_STARTER.md",
+];
+const CONTEXT_PACK_METADATA_FIELDS = [
+  "Review status",
+  "Source",
+  "Trust",
+  "Stale",
+];
+const CONTEXT_PACK_REVIEW_STATUSES = new Set([
+  "reviewed",
+  "needs-review",
+  "generated",
+  "not_available",
+  "not_applicable",
+  "stale",
+]);
+const CONTEXT_PACK_TRUST_VALUES = new Set(["high", "medium", "low"]);
+const CONTEXT_PACK_SINGLE_FILE_CHAR_LIMIT = 20000;
+const CONTEXT_PACK_TOTAL_CHAR_LIMIT = 80000;
 
 function parseArgs(argv) {
   const args = argv.slice(2);
@@ -142,6 +168,12 @@ function findLabeledFieldIndex(content, label) {
   const pattern = new RegExp("^\\s*`?" + escapeRegex(label) + "`?\\s*:", "m");
   const match = pattern.exec(content);
   return match ? match.index : -1;
+}
+
+function getLabeledFieldValue(content, label) {
+  const pattern = new RegExp("^\\s*`?" + escapeRegex(label) + "`?\\s*:\\s*(.*?)\\s*$", "m");
+  const match = pattern.exec(content);
+  return match ? match[1].trim() : "";
 }
 
 function getMarkdownTitle(content) {
@@ -334,6 +366,225 @@ function scanDeltaStyleReceiverMarkdown(findings, displayPath, content) {
   addReceiverMarkdownWarnings(findings, displayPath, content);
 }
 
+function isContextPackDirectory(inputRoot) {
+  if (!inputRoot || !fs.existsSync(inputRoot) || !fs.statSync(inputRoot).isDirectory()) {
+    return false;
+  }
+  const presentFiles = CONTEXT_PACK_FILES.filter((fileName) => fs.existsSync(path.join(inputRoot, fileName)));
+  return presentFiles.includes("MANIFEST.md") && presentFiles.length >= 3;
+}
+
+function addContextPackFinding(findings, severity, ruleId, file, content, fallbackLine, message) {
+  addFinding(findings, severity, ruleId, file, fallbackLine, message);
+}
+
+function scanContextPackMetadata(findings, fileName, content) {
+  for (const field of CONTEXT_PACK_METADATA_FIELDS) {
+    if (!hasLabeledField(content, field)) {
+      addContextPackFinding(
+        findings,
+        "ERROR",
+        "context-pack.missing-metadata",
+        fileName,
+        content,
+        1,
+        `Context Pack artifact is missing metadata field: ${field}.`,
+      );
+    }
+  }
+
+  const reviewStatus = getLabeledFieldValue(content, "Review status").toLowerCase();
+  if (reviewStatus && !CONTEXT_PACK_REVIEW_STATUSES.has(reviewStatus)) {
+    addContextPackFinding(
+      findings,
+      "ERROR",
+      "context-pack.invalid-metadata",
+      fileName,
+      content,
+      lineNumberForIndex(content, findLabeledFieldIndex(content, "Review status")),
+      `Context Pack artifact has invalid Review status: ${reviewStatus}.`,
+    );
+  }
+
+  const trust = getLabeledFieldValue(content, "Trust").toLowerCase();
+  if (trust && !CONTEXT_PACK_TRUST_VALUES.has(trust)) {
+    addContextPackFinding(
+      findings,
+      "ERROR",
+      "context-pack.invalid-metadata",
+      fileName,
+      content,
+      lineNumberForIndex(content, findLabeledFieldIndex(content, "Trust")),
+      `Context Pack artifact has invalid Trust value: ${trust}.`,
+    );
+  }
+
+  const stale = getLabeledFieldValue(content, "Stale").toLowerCase();
+  if (stale && stale !== "true" && stale !== "false") {
+    addContextPackFinding(
+      findings,
+      "ERROR",
+      "context-pack.invalid-metadata",
+      fileName,
+      content,
+      lineNumberForIndex(content, findLabeledFieldIndex(content, "Stale")),
+      `Context Pack artifact has invalid Stale value: ${stale}.`,
+    );
+  }
+}
+
+function scanContextPackManifest(findings, content) {
+  const required = [
+    { label: "branch", pattern: /\bBranch\s*:/i },
+    { label: "HEAD", pattern: /\bHEAD\s*:/ },
+    { label: "worktree status", pattern: /\bWorktree status\s*:/i },
+    { label: "reading order", pattern: /Reading Order/i },
+    { label: "safety notes", pattern: /Safety Notes/i },
+  ];
+
+  for (const item of required) {
+    if (!item.pattern.test(content)) {
+      addFinding(
+        findings,
+        "ERROR",
+        "context-pack.missing-manifest-field",
+        "MANIFEST.md",
+        1,
+        `Context Pack manifest is missing ${item.label}.`,
+      );
+    }
+  }
+}
+
+function scanContextPackRiskBoundaries(findings, content) {
+  const required = [
+    { label: "no provider request", pattern: /No provider request/i },
+    { label: "no runtime integration", pattern: /No runtime integration/i },
+    {
+      label: "no plugin/MCP/IDE/hosted/cloud-memory",
+      pattern: /No plugin[\s\S]{0,160}MCP[\s\S]{0,160}IDE[\s\S]{0,160}hosted[\s\S]{0,160}cloud-memory/i,
+    },
+    { label: "no schema-v2", pattern: /No schema-v2/i },
+    { label: "no repo dump", pattern: /No repo dump/i },
+    {
+      label: "no secrets/.env/token/credentials",
+      pattern: /(?:secret|\.env|API keys?|tokens?|credentials)[\s\S]{0,180}(?:secret|\.env|API keys?|tokens?|credentials)/i,
+    },
+  ];
+
+  for (const item of required) {
+    if (!item.pattern.test(content)) {
+      addFinding(
+        findings,
+        "ERROR",
+        "context-pack.missing-risk-boundary",
+        "RISK_BOUNDARIES.md",
+        1,
+        `Context Pack risk boundaries are missing ${item.label}.`,
+      );
+    }
+  }
+}
+
+function scanContextPackReceiverState(findings, content) {
+  if (!/\b(?:not_available|not_applicable|needs-review)\b/.test(content)) {
+    addFinding(
+      findings,
+      "ERROR",
+      "context-pack.missing-receiver-state-semantics",
+      "RECEIVER_STATE.md",
+      1,
+      "Context Pack receiver state must expose not_available, not_applicable, or needs-review semantics.",
+    );
+  }
+}
+
+function scanContextPackStarter(findings, content) {
+  const required = [
+    {
+      label: "live repo fact recheck",
+      pattern: /recheck (?:the )?live (?:repository|repo) facts?|live repo fact recheck/i,
+    },
+    {
+      label: "reading order",
+      pattern: /Start by reading|Reading Order|read[\s\S]{0,120}MANIFEST\.md[\s\S]{0,240}RECENT_DELTA\.md/i,
+    },
+    {
+      label: "report gaps before edits",
+      pattern: /(?:report|list)[\s\S]{0,80}gaps[\s\S]{0,80}before/i,
+    },
+    {
+      label: "keep v1.x frozen unless explicitly reopened",
+      pattern: /frozen v1\.x[\s\S]{0,140}unless explicitly (?:asked|reopened)|Do not continue the frozen v1\.x/i,
+    },
+  ];
+
+  for (const item of required) {
+    if (!item.pattern.test(content)) {
+      addFinding(
+        findings,
+        "ERROR",
+        "context-pack.missing-starter-instruction",
+        "NEXT_WINDOW_STARTER.md",
+        1,
+        `Context Pack starter is missing instruction: ${item.label}.`,
+      );
+    }
+  }
+}
+
+function scanContextPackDirectory(inputRoot) {
+  const findings = [];
+  let totalChars = 0;
+
+  for (const fileName of CONTEXT_PACK_FILES) {
+    const fullPath = path.join(inputRoot, fileName);
+    if (!fs.existsSync(fullPath)) {
+      addFinding(
+        findings,
+        "ERROR",
+        "context-pack.missing-file",
+        fileName,
+        1,
+        `Context Pack directory is missing required file: ${fileName}.`,
+      );
+      continue;
+    }
+
+    const content = fs.readFileSync(fullPath, "utf8");
+    totalChars += content.length;
+    scanContextPackMetadata(findings, fileName, content);
+    if (content.length > CONTEXT_PACK_SINGLE_FILE_CHAR_LIMIT) {
+      addFinding(
+        findings,
+        "WARNING",
+        "context-pack.too-thick",
+        fileName,
+        1,
+        `Context Pack artifact exceeds ${CONTEXT_PACK_SINGLE_FILE_CHAR_LIMIT} characters.`,
+      );
+    }
+
+    if (fileName === "MANIFEST.md") scanContextPackManifest(findings, content);
+    if (fileName === "RISK_BOUNDARIES.md") scanContextPackRiskBoundaries(findings, content);
+    if (fileName === "RECEIVER_STATE.md") scanContextPackReceiverState(findings, content);
+    if (fileName === "NEXT_WINDOW_STARTER.md") scanContextPackStarter(findings, content);
+  }
+
+  if (totalChars > CONTEXT_PACK_TOTAL_CHAR_LIMIT) {
+    addFinding(
+      findings,
+      "WARNING",
+      "context-pack.too-thick",
+      ".",
+      1,
+      `Context Pack directory exceeds ${CONTEXT_PACK_TOTAL_CHAR_LIMIT} total characters.`,
+    );
+  }
+
+  return findings;
+}
+
 function addFinding(findings, severity, ruleId, file, line, message) {
   findings.push({
     severity,
@@ -402,6 +653,10 @@ function checkArtifacts(options) {
   const inputFiles = listInputFiles(inputPath);
   const baseDir = fs.existsSync(inputRoot) && fs.statSync(inputRoot).isDirectory() ? inputRoot : path.dirname(inputRoot);
   const findings = [];
+
+  if (isContextPackDirectory(inputRoot)) {
+    findings.push(...scanContextPackDirectory(inputRoot));
+  }
 
   for (const filePath of inputFiles) {
     const displayPath = path.relative(baseDir, filePath) || path.basename(filePath);

@@ -447,8 +447,30 @@ Local v2.0 Context Pack Lite closeout status:
   `docs/dogfooding/context-pack-lite-fresh-receiver-v2.0.0.md`, and
   `docs/releases/v2.0.0.md` close v2.0-C with public-safe examples,
   dogfooding evidence, and local closeout
-- the next recommended line is v2.1 Context Pack Check; Workflow Runner Lite
-  remains later
+
+Local v2.1 Context Pack Check closeout status:
+
+- `docs/releases/v2.1.0-plan.md` and `docs/specs/context-pack-check.md`
+  record the v2.1-A contract freeze
+- `scripts/basebrief_check_artifacts.js` and the existing CLI Lite `check`
+  surface implement v2.1-B minimal checker integration without adding a
+  top-level `context-pack-check` command
+- `docs/dogfooding/context-pack-check-acceptance-v2.1.0.md` and
+  `docs/releases/v2.1.0.md` close v2.1-C with public-safe checker acceptance
+  evidence and local closeout
+- v2.2 should prefer One-command Resume / New-window Prompt, then v2.3
+  BaseBrief Format, while Workflow Runner Lite remains later
+
+Local v2.2 One-command Resume / New-window Prompt contract status:
+
+- `docs/releases/v2.2.0-plan.md` and `docs/specs/context-pack-resume.md`
+  record the v2.2-A contract freeze
+- `resume --input <context-pack-dir>` should reuse the existing Context Pack
+  Check result and print copyable prompt text
+- warning-only packs remain resumable with review notes; error findings block
+  prompt output
+- v2.2 must not change Context Pack Lite generator output or the existing
+  `check --input <dir> --json` top-level shape
 
 ### Phase 8A: Receiver Workflow
 
@@ -580,10 +602,14 @@ Discoverability / Adoption. `docs/releases/v1.9.1.md` and
 closure records for that line. The v2.0 Context Pack Lite line has now started
 and locally closed its first slice: direction freeze, minimal `context-pack`
 generator, public-safe example kit, fresh-receiver dogfooding evidence, and
-`docs/releases/v2.0.0.md` closeout. The next cycle should prefer v2.1 Context
-Pack Check before any Workflow Runner Lite work, and should still avoid
-provider requests, runtime integration, command-output changes, plugins, MCP,
-IDE, Auto Flow, schema-v2, or publication work unless repeated local usage
+`docs/releases/v2.0.0.md` closeout. The v2.1 Context Pack Check line is now
+locally closed with contract freeze, minimal checker integration, public-safe
+acceptance evidence, and `docs/releases/v2.1.0.md` closeout. The following
+product surface should prefer v2.2 One-command Resume /
+New-window Prompt and v2.3 BaseBrief Format before any Workflow Runner Lite
+work, and should still avoid provider requests, runtime integration,
+command-output changes, plugins, MCP, IDE, Auto Flow, schema-v2, watcher,
+daemon, dashboard, prediction, or publication work unless repeated local usage
 exposes a concrete blocker.
 
 It should not chase a new benchmark variant, installed CLI, plugin, MCP, IDE,
