@@ -870,6 +870,26 @@ Expected release-check output without provider env remains:
 provider_probe_status=skipped
 ```
 
+## v2.6.4 Context Engineering Reference Notes
+
+`v2.6.4` is local reference/adoption planning notes, not a release closeout or
+new feature line. It maps external context engineering themes such as own your
+context window, stateless reducer, handoff artifact, memory hygiene, and
+context compression to BaseBrief Context Pack, Check, Resume, Doctor,
+File-only Export, live recheck, and risk boundaries.
+
+The evidence is recorded in
+[Context Engineering Reference Notes v2.6.4](dogfooding/context-engineering-reference-notes-v2.6.4.md).
+It keeps v3 Continuation Harness or Workflow Runner Lite behind repeated real
+friction, and adds no Status command, provider request, runtime integration,
+MCP server/tools, schema-v2, or JSON contract change.
+
+Expected release-check output without provider env remains:
+
+```text
+provider_probe_status=skipped
+```
+
 ## v0.4.1 Stabilization Candidate
 
 `v0.4.1` is a stabilization-only cycle after the `v0.4.0` public release. It uses

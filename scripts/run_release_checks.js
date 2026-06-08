@@ -188,6 +188,7 @@ function checkRequiredFiles() {
     "docs/dogfooding/file-only-export-v2.4.0.md",
     "docs/dogfooding/context-pack-doctor-v2.5.0.md",
     "docs/dogfooding/context-pack-adoption-notes-v2.6.1.md",
+    "docs/dogfooding/context-engineering-reference-notes-v2.6.4.md",
     "docs/testing-v0.4.x-test-matrix.md",
     "docs/testing-v0.6.x-test-matrix.md",
     "docs/testing-v0.7.x-test-matrix.md",
@@ -479,6 +480,7 @@ function checkContentContracts() {
   const contextPackDoctorDogfoodingDoc = readText("docs/dogfooding/context-pack-doctor-v2.5.0.md");
   const contextPackDoctorDogfoodingV251Doc = readText("docs/dogfooding/context-pack-doctor-v2.5.1.md");
   const contextPackAdoptionNotesV261Doc = readText("docs/dogfooding/context-pack-adoption-notes-v2.6.1.md");
+  const contextEngineeringReferenceNotesV264Doc = readText("docs/dogfooding/context-engineering-reference-notes-v2.6.4.md");
   const postReleaseBaselineDoc = readText("docs/baselines/v0.4.0-post-release-baseline.md");
   const v060PostReleaseBaselineDoc = readText("docs/baselines/v0.6.0-post-release-baseline.md");
   const projectStateModelDoc = readText("docs/design/project-state-model.md");
@@ -975,6 +977,10 @@ function checkContentContracts() {
   assert(testingDoc.includes("dogfooding/context-pack-adoption-notes-v2.6.1.md"), "Testing docs must link v2.6.1 adoption notes");
   assert(testingDoc.includes("`blocking`, `confusing`, or `nice-to-have`"), "Testing docs must record v2.6.1 friction classes");
   assert(testingDoc.includes("not a new feature line or contract"), "Testing docs must keep v2.6.1 out of feature and contract scope");
+  assert(testingDoc.includes("v2.6.4 Context Engineering Reference Notes"), "Testing docs must document v2.6.4 reference notes");
+  assert(testingDoc.includes("dogfooding/context-engineering-reference-notes-v2.6.4.md"), "Testing docs must link v2.6.4 reference notes");
+  assert(testingDoc.includes("own your") && testingDoc.includes("stateless reducer") && testingDoc.includes("handoff artifact") && testingDoc.includes("memory hygiene") && testingDoc.includes("context compression"), "Testing docs must summarize v2.6.4 external context themes");
+  assert(testingDoc.includes("v3 Continuation Harness") && testingDoc.includes("Workflow Runner Lite") && testingDoc.includes("repeated real") && testingDoc.includes("friction"), "Testing docs must keep v3 behind repeated friction");
   assert(testingDoc.includes("checker_error_propagation_status: pass"), "Testing docs must record checker-error propagation");
   assert(testingDoc.includes("context-pack --repo <target-repo>"), "Testing docs must document context-pack command");
   assert(testingDoc.includes("resume --input <context-pack-dir>"), "Testing docs must document resume command");
@@ -1500,6 +1506,7 @@ function checkContentContracts() {
   assert(docsIndex.includes("dogfooding/context-pack-doctor-v2.5.0.md"), "Docs index must link v2.5.0 doctor dogfooding");
   assert(docsIndex.includes("../examples/context-pack-doctor/README.md"), "Docs index must link context pack doctor example kit");
   assert(docsIndex.includes("dogfooding/context-pack-adoption-notes-v2.6.1.md"), "Docs index must link v2.6.1 adoption notes");
+  assert(docsIndex.includes("dogfooding/context-engineering-reference-notes-v2.6.4.md"), "Docs index must link v2.6.4 reference notes");
   assert(docsIndex.includes("specs/context-pack-lite.md"), "Docs index must link context pack lite spec");
   assert(docsIndex.includes("specs/context-pack-resume.md"), "Docs index must link context pack resume spec");
   assert(docsIndex.includes("specs/basebrief-format.md"), "Docs index must link basebrief format spec");
@@ -1545,6 +1552,11 @@ function checkContentContracts() {
   assert(v2ContextPackRoadmapDoc.includes("docs/dogfooding/context-pack-adoption-notes-v2.6.1.md"), "v2 roadmap must link v2.6.1 adoption notes");
   assert(v2ContextPackRoadmapDoc.includes("blocking`, `confusing`, or `nice-to-have`"), "v2 roadmap must preserve v2.6.x friction classification");
   assert(v2ContextPackRoadmapDoc.includes("command or contract line"), "v2 roadmap must keep v2.6.x out of command and contract scope");
+  assert(v2ContextPackRoadmapDoc.includes("v2.6.4 External Reference Alignment"), "v2 roadmap must document v2.6.4 reference alignment");
+  assert(v2ContextPackRoadmapDoc.includes("docs/dogfooding/context-engineering-reference-notes-v2.6.4.md"), "v2 roadmap must link v2.6.4 reference notes");
+  assert(v2ContextPackRoadmapDoc.includes("context engineering") && v2ContextPackRoadmapDoc.includes("handoff artifact") && v2ContextPackRoadmapDoc.includes("memory hygiene") && v2ContextPackRoadmapDoc.includes("stateless reducer") && v2ContextPackRoadmapDoc.includes("context compression"), "v2 roadmap must summarize v2.6.4 reference themes");
+  assert(v2ContextPackRoadmapDoc.includes("not a new feature line or contract"), "v2 roadmap must keep v2.6.4 out of feature and contract scope");
+  assert(v2ContextPackRoadmapDoc.includes("wait until repeated real adoption friction"), "v2 roadmap must keep v3 behind repeated friction");
   assert(v2ContextPackRoadmapDoc.includes("exports/manifest.json"), "v2 roadmap must define export manifest");
   assert(v2ContextPackRoadmapDoc.includes("exports/context-pack.md"), "v2 roadmap must define readable export");
   assert(v2ContextPackRoadmapDoc.includes("exports/context.json"), "v2 roadmap must define machine-readable export");
@@ -1807,6 +1819,33 @@ function checkContentContracts() {
   assert(contextPackAdoptionNotesV261Doc.includes("provider_probe_status=skipped"), "v2.6.1 adoption notes must preserve skipped provider gate");
   assert(!/[A-Za-z]:[\\/]/.test(contextPackAdoptionNotesV261Doc), "v2.6.1 adoption notes must not expose drive-letter absolute paths");
   assert(!/\\\\/.test(contextPackAdoptionNotesV261Doc), "v2.6.1 adoption notes must not expose UNC paths");
+  assert(contextEngineeringReferenceNotesV264Doc.includes("Context Engineering Reference Notes v2.6.4"), "v2.6.4 reference notes doc must have stable title");
+  assert(contextEngineeringReferenceNotesV264Doc.includes("not a release closeout, command, contract, schema"), "v2.6.4 reference notes must avoid contract claims");
+  assert(contextEngineeringReferenceNotesV264Doc.includes("own your context window"), "v2.6.4 reference notes must mention own-your-context-window theme");
+  assert(contextEngineeringReferenceNotesV264Doc.includes("stateless reducer"), "v2.6.4 reference notes must mention stateless reducer theme");
+  assert(contextEngineeringReferenceNotesV264Doc.includes("handoff artifact"), "v2.6.4 reference notes must mention handoff artifact theme");
+  assert(contextEngineeringReferenceNotesV264Doc.includes("memory hygiene"), "v2.6.4 reference notes must mention memory hygiene theme");
+  assert(contextEngineeringReferenceNotesV264Doc.includes("context compression"), "v2.6.4 reference notes must mention context compression theme");
+  assert(contextEngineeringReferenceNotesV264Doc.includes("Context Pack is the handoff artifact"), "v2.6.4 reference notes must map Context Pack to handoff artifact");
+  assert(contextEngineeringReferenceNotesV264Doc.includes("Context Pack Check is the review gate"), "v2.6.4 reference notes must map check to review gate");
+  assert(contextEngineeringReferenceNotesV264Doc.includes("Resume turns a checked pack"), "v2.6.4 reference notes must map resume to next-window prompt");
+  assert(contextEngineeringReferenceNotesV264Doc.includes("Doctor compares inherited pack facts with live repo facts"), "v2.6.4 reference notes must map doctor to live recheck");
+  assert(contextEngineeringReferenceNotesV264Doc.includes("File-only Export makes the pack consumable as plain files"), "v2.6.4 reference notes must map file-only export");
+  assert(contextEngineeringReferenceNotesV264Doc.includes("v3 Continuation Harness") && contextEngineeringReferenceNotesV264Doc.includes("Workflow Runner Lite") && contextEngineeringReferenceNotesV264Doc.includes("repeated") && contextEngineeringReferenceNotesV264Doc.includes("real friction"), "v2.6.4 reference notes must keep v3 behind repeated friction");
+  assert(contextEngineeringReferenceNotesV264Doc.includes("Do not start v3 merely because external references mention agents"), "v2.6.4 reference notes must reject hype-driven v3 scope");
+  assert(contextEngineeringReferenceNotesV264Doc.includes("No Status command"), "v2.6.4 reference notes must reject status command scope");
+  assert(contextEngineeringReferenceNotesV264Doc.includes("No Workflow Runner"), "v2.6.4 reference notes must keep runner out of scope");
+  assert(contextEngineeringReferenceNotesV264Doc.includes("No provider request"), "v2.6.4 reference notes must reject provider requests");
+  assert(contextEngineeringReferenceNotesV264Doc.includes("No runtime integration"), "v2.6.4 reference notes must reject runtime integration");
+  assert(contextEngineeringReferenceNotesV264Doc.includes("No MCP server"), "v2.6.4 reference notes must reject MCP server scope");
+  assert(contextEngineeringReferenceNotesV264Doc.includes("No MCP tools"), "v2.6.4 reference notes must reject MCP tools scope");
+  assert(contextEngineeringReferenceNotesV264Doc.includes("No schema-v2"), "v2.6.4 reference notes must reject schema-v2");
+  assert(contextEngineeringReferenceNotesV264Doc.includes("No `check --input <dir> --json` top-level shape change"), "v2.6.4 reference notes must preserve checker JSON shape");
+  assert(contextEngineeringReferenceNotesV264Doc.includes("No Doctor JSON contract change"), "v2.6.4 reference notes must preserve doctor JSON shape");
+  assert(contextEngineeringReferenceNotesV264Doc.includes("No Export JSON contract change"), "v2.6.4 reference notes must preserve export JSON shape");
+  assert(contextEngineeringReferenceNotesV264Doc.includes("provider_probe_status=skipped"), "v2.6.4 reference notes must preserve skipped provider gate");
+  assert(!/(^|[^A-Za-z])[A-Za-z]:[\\/]/.test(contextEngineeringReferenceNotesV264Doc), "v2.6.4 reference notes must not expose drive-letter absolute paths");
+  assert(!/\\\\/.test(contextEngineeringReferenceNotesV264Doc), "v2.6.4 reference notes must not expose UNC paths");
   assert(contextPackDoctorDogfoodingDoc.includes("Context Pack Doctor Dogfooding v2.5.0"), "doctor dogfooding doc must have stable title");
   assert(contextPackDoctorDogfoodingDoc.includes("doctor_contract_version: basebrief-doctor-v1"), "doctor dogfooding must record contract version");
   assert(contextPackDoctorDogfoodingDoc.includes("doctor_command_status: warning"), "doctor dogfooding must record warning status");

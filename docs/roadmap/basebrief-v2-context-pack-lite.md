@@ -409,6 +409,16 @@ change `check --input <dir> --json`, change Doctor JSON, call providers, add
 runtime behavior, create plugins, create an MCP server/tools, add schema-v2, or
 become a Workflow Runner.
 
+### v2.6.4 External Reference Alignment
+
+`docs/dogfooding/context-engineering-reference-notes-v2.6.4.md` maps external
+context engineering, handoff artifact, memory hygiene, stateless reducer, and
+context compression guidance to the existing BaseBrief Context Pack line.
+
+This is not a new feature line or contract. It is direction-setting evidence for
+later v3 discussion only. v3 Continuation Harness or Workflow Runner Lite should
+wait until repeated real adoption friction points to the same missing capability.
+
 ### Later Workflow Runner Lite
 
 Only after Context Pack Lite, Context Pack Check, One-command Resume,
