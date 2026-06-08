@@ -451,6 +451,11 @@ ahead-7 local adoption bundle before any push, tag, release, or pull request.
 It confirms the bundle is docs/examples/release-check/adoption polish only.
 It is not a release closeout, feature implementation, CLI behavior change, Status command, Workflow Runner, or JSON contract change.
 
+`docs/dogfooding/context-pack-feature-feasibility-spike-v2.6.11.md` evaluates
+Continuation Harness Lite as a feasibility spike with implementation_status: not_started.
+It asks whether real users need a narrower helper around `context-pack -> check -> resume -> live recheck`.
+It is not a feature implementation, new command, Status command, Workflow Runner, or JSON contract change.
+
 ### Later Workflow Runner Lite
 
 Only after Context Pack Lite, Context Pack Check, One-command Resume,

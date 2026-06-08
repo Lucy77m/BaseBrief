@@ -195,6 +195,7 @@ function checkRequiredFiles() {
     "docs/dogfooding/context-pack-first-run-friction-repair-v2.6.8.md",
     "docs/dogfooding/context-pack-adoption-decision-checkpoint-v2.6.9.md",
     "docs/dogfooding/context-pack-pre-release-bundle-audit-v2.6.10.md",
+    "docs/dogfooding/context-pack-feature-feasibility-spike-v2.6.11.md",
     "docs/testing-v0.4.x-test-matrix.md",
     "docs/testing-v0.6.x-test-matrix.md",
     "docs/testing-v0.7.x-test-matrix.md",
@@ -493,6 +494,7 @@ function checkContentContracts() {
   const contextPackFirstRunFrictionRepairV268Doc = readText("docs/dogfooding/context-pack-first-run-friction-repair-v2.6.8.md");
   const contextPackAdoptionDecisionCheckpointV269Doc = readText("docs/dogfooding/context-pack-adoption-decision-checkpoint-v2.6.9.md");
   const contextPackPreReleaseBundleAuditV2610Doc = readText("docs/dogfooding/context-pack-pre-release-bundle-audit-v2.6.10.md");
+  const contextPackFeatureFeasibilitySpikeV2611Doc = readText("docs/dogfooding/context-pack-feature-feasibility-spike-v2.6.11.md");
   const postReleaseBaselineDoc = readText("docs/baselines/v0.4.0-post-release-baseline.md");
   const v060PostReleaseBaselineDoc = readText("docs/baselines/v0.6.0-post-release-baseline.md");
   const projectStateModelDoc = readText("docs/design/project-state-model.md");
@@ -1017,6 +1019,10 @@ function checkContentContracts() {
   assert(testingDoc.includes("v2.6.10 Context Pack Pre-Release Bundle Audit"), "Testing docs must document v2.6.10 bundle audit");
   assert(testingDoc.includes("dogfooding/context-pack-pre-release-bundle-audit-v2.6.10.md"), "Testing docs must link v2.6.10 bundle audit");
   assert(testingDoc.includes("ahead-7 local adoption bundle") && testingDoc.includes("docs/examples/release-check/adoption polish only"), "Testing docs must summarize v2.6.10 bundle scope");
+  assert(testingDoc.includes("v2.6.11 Context Pack Feature Feasibility Spike"), "Testing docs must document v2.6.11 feasibility spike");
+  assert(testingDoc.includes("dogfooding/context-pack-feature-feasibility-spike-v2.6.11.md"), "Testing docs must link v2.6.11 feasibility spike");
+  assert(testingDoc.includes("Continuation Harness Lite") && testingDoc.includes("implementation_status: not_started"), "Testing docs must keep v2.6.11 not started");
+  assert(testingDoc.includes("context-pack -> check -> resume -> live recheck"), "Testing docs must summarize v2.6.11 feasibility question");
   assert(testingDoc.includes("checker_error_propagation_status: pass"), "Testing docs must record checker-error propagation");
   assert(testingDoc.includes("context-pack --repo <target-repo>"), "Testing docs must document context-pack command");
   assert(testingDoc.includes("resume --input <context-pack-dir>"), "Testing docs must document resume command");
@@ -1549,6 +1555,7 @@ function checkContentContracts() {
   assert(docsIndex.includes("dogfooding/context-pack-first-run-friction-repair-v2.6.8.md"), "Docs index must link v2.6.8 friction repair");
   assert(docsIndex.includes("dogfooding/context-pack-adoption-decision-checkpoint-v2.6.9.md"), "Docs index must link v2.6.9 decision checkpoint");
   assert(docsIndex.includes("dogfooding/context-pack-pre-release-bundle-audit-v2.6.10.md"), "Docs index must link v2.6.10 bundle audit");
+  assert(docsIndex.includes("dogfooding/context-pack-feature-feasibility-spike-v2.6.11.md"), "Docs index must link v2.6.11 feasibility spike");
   assert(docsIndex.includes("specs/context-pack-lite.md"), "Docs index must link context pack lite spec");
   assert(docsIndex.includes("specs/context-pack-resume.md"), "Docs index must link context pack resume spec");
   assert(docsIndex.includes("specs/basebrief-format.md"), "Docs index must link basebrief format spec");
@@ -1617,6 +1624,9 @@ function checkContentContracts() {
   assert(v2ContextPackRoadmapDoc.includes("docs/dogfooding/context-pack-pre-release-bundle-audit-v2.6.10.md"), "v2 roadmap must link v2.6.10 bundle audit");
   assert(v2ContextPackRoadmapDoc.includes("ahead-7 local adoption bundle") && v2ContextPackRoadmapDoc.includes("not a release closeout"), "v2 roadmap must summarize v2.6.10 bundle audit");
   assert(v2ContextPackRoadmapDoc.includes("docs/examples/release-check/adoption polish only") && v2ContextPackRoadmapDoc.includes("not a release closeout, feature implementation, CLI behavior change"), "v2 roadmap must keep v2.6.10 out of behavior scope");
+  assert(v2ContextPackRoadmapDoc.includes("docs/dogfooding/context-pack-feature-feasibility-spike-v2.6.11.md"), "v2 roadmap must link v2.6.11 feasibility spike");
+  assert(v2ContextPackRoadmapDoc.includes("Continuation Harness Lite") && v2ContextPackRoadmapDoc.includes("implementation_status: not_started"), "v2 roadmap must keep v2.6.11 not started");
+  assert(v2ContextPackRoadmapDoc.includes("context-pack -> check -> resume -> live recheck") && v2ContextPackRoadmapDoc.includes("not a feature implementation, new command, Status command, Workflow Runner, or JSON contract change"), "v2 roadmap must keep v2.6.11 in feasibility scope");
   assert(v2ContextPackRoadmapDoc.includes("exports/manifest.json"), "v2 roadmap must define export manifest");
   assert(v2ContextPackRoadmapDoc.includes("exports/context-pack.md"), "v2 roadmap must define readable export");
   assert(v2ContextPackRoadmapDoc.includes("exports/context.json"), "v2 roadmap must define machine-readable export");
@@ -2087,6 +2097,39 @@ function checkContentContracts() {
   assert(contextPackPreReleaseBundleAuditV2610Doc.includes("provider_probe_status=skipped"), "v2.6.10 bundle audit must preserve skipped provider gate");
   assert(!/(^|[^A-Za-z])[A-Za-z]:[\\/]/.test(contextPackPreReleaseBundleAuditV2610Doc), "v2.6.10 bundle audit must not expose drive-letter absolute paths");
   assert(!/\\\\/.test(contextPackPreReleaseBundleAuditV2610Doc), "v2.6.10 bundle audit must not expose UNC paths");
+  assert(contextPackFeatureFeasibilitySpikeV2611Doc.includes("Context Pack Feature Feasibility Spike v2.6.11"), "v2.6.11 feasibility spike doc must have stable title");
+  assert(contextPackFeatureFeasibilitySpikeV2611Doc.includes("feasibility spike only, not a release"), "v2.6.11 feasibility spike must avoid release claims");
+  assert(contextPackFeatureFeasibilitySpikeV2611Doc.includes("feature_candidate: Continuation Harness Lite"), "v2.6.11 feasibility spike must name the candidate");
+  assert(contextPackFeatureFeasibilitySpikeV2611Doc.includes("implementation_status: not_started"), "v2.6.11 feasibility spike must keep implementation not started");
+  assert(contextPackFeatureFeasibilitySpikeV2611Doc.includes("release_closeout_status: not_started"), "v2.6.11 feasibility spike must keep release closeout not started");
+  assert(contextPackFeatureFeasibilitySpikeV2611Doc.includes("push_status: not_started"), "v2.6.11 feasibility spike must keep push not started");
+  assert(contextPackFeatureFeasibilitySpikeV2611Doc.includes("tag_status: not_started"), "v2.6.11 feasibility spike must keep tag not started");
+  assert(contextPackFeatureFeasibilitySpikeV2611Doc.includes("release_status: not_started"), "v2.6.11 feasibility spike must keep release not started");
+  assert(contextPackFeatureFeasibilitySpikeV2611Doc.includes("Do real users need a narrower helper around context-pack -> check -> resume -> live recheck?"), "v2.6.11 feasibility spike must define the core question");
+  assert(contextPackFeatureFeasibilitySpikeV2611Doc.includes("repeatedly show the same blocking or high-frequency confusing friction"), "v2.6.11 feasibility spike must gate future work on repeated friction");
+  assert(contextPackFeatureFeasibilitySpikeV2611Doc.includes("Keep `check` as the pack validity gate"), "v2.6.11 feasibility spike must preserve check role");
+  assert(contextPackFeatureFeasibilitySpikeV2611Doc.includes("Keep `resume` as the copyable next-window prompt surface"), "v2.6.11 feasibility spike must preserve resume role");
+  assert(contextPackFeatureFeasibilitySpikeV2611Doc.includes("Keep `doctor` as live repo comparison, not always-on Status"), "v2.6.11 feasibility spike must preserve doctor role");
+  assert(contextPackFeatureFeasibilitySpikeV2611Doc.includes("does not define a command name, output format, JSON shape, schema, or runtime behavior"), "v2.6.11 feasibility spike must avoid implementation details");
+  assert(contextPackFeatureFeasibilitySpikeV2611Doc.includes("Status"), "v2.6.11 feasibility spike must reject status scope");
+  assert(contextPackFeatureFeasibilitySpikeV2611Doc.includes("Workflow Runner"), "v2.6.11 feasibility spike must reject workflow runner scope");
+  assert(contextPackFeatureFeasibilitySpikeV2611Doc.includes("Provider request") || contextPackFeatureFeasibilitySpikeV2611Doc.includes("provider request"), "v2.6.11 feasibility spike must reject provider requests");
+  assert(contextPackFeatureFeasibilitySpikeV2611Doc.includes("Runtime integration") || contextPackFeatureFeasibilitySpikeV2611Doc.includes("runtime integration"), "v2.6.11 feasibility spike must reject runtime scope");
+  assert(contextPackFeatureFeasibilitySpikeV2611Doc.includes("MCP server"), "v2.6.11 feasibility spike must reject MCP server scope");
+  assert(contextPackFeatureFeasibilitySpikeV2611Doc.includes("MCP tools"), "v2.6.11 feasibility spike must reject MCP tools scope");
+  assert(contextPackFeatureFeasibilitySpikeV2611Doc.includes("Schema-v2") || contextPackFeatureFeasibilitySpikeV2611Doc.includes("schema-v2"), "v2.6.11 feasibility spike must reject schema-v2");
+  assert(contextPackFeatureFeasibilitySpikeV2611Doc.includes("Daemon") || contextPackFeatureFeasibilitySpikeV2611Doc.includes("daemon"), "v2.6.11 feasibility spike must reject daemon scope");
+  assert(contextPackFeatureFeasibilitySpikeV2611Doc.includes("Watcher") || contextPackFeatureFeasibilitySpikeV2611Doc.includes("watcher"), "v2.6.11 feasibility spike must reject watcher scope");
+  assert(contextPackFeatureFeasibilitySpikeV2611Doc.includes("Hosted memory") || contextPackFeatureFeasibilitySpikeV2611Doc.includes("hosted memory"), "v2.6.11 feasibility spike must reject hosted memory");
+  assert(contextPackFeatureFeasibilitySpikeV2611Doc.includes("No new CLI command"), "v2.6.11 feasibility spike must reject new commands");
+  assert(contextPackFeatureFeasibilitySpikeV2611Doc.includes("No Context Pack seven-file structure change"), "v2.6.11 feasibility spike must preserve seven-file structure");
+  assert(contextPackFeatureFeasibilitySpikeV2611Doc.includes("No `check --input <dir> --json` top-level shape change"), "v2.6.11 feasibility spike must preserve checker JSON shape");
+  assert(contextPackFeatureFeasibilitySpikeV2611Doc.includes("No Resume JSON contract change"), "v2.6.11 feasibility spike must preserve resume JSON contract");
+  assert(contextPackFeatureFeasibilitySpikeV2611Doc.includes("No Doctor JSON contract change"), "v2.6.11 feasibility spike must preserve doctor JSON contract");
+  assert(contextPackFeatureFeasibilitySpikeV2611Doc.includes("No Export JSON contract change"), "v2.6.11 feasibility spike must preserve export JSON contract");
+  assert(contextPackFeatureFeasibilitySpikeV2611Doc.includes("provider_probe_status=skipped"), "v2.6.11 feasibility spike must preserve skipped provider gate");
+  assert(!/(^|[^A-Za-z])[A-Za-z]:[\\/]/.test(contextPackFeatureFeasibilitySpikeV2611Doc), "v2.6.11 feasibility spike must not expose drive-letter absolute paths");
+  assert(!/\\\\/.test(contextPackFeatureFeasibilitySpikeV2611Doc), "v2.6.11 feasibility spike must not expose UNC paths");
   assert(contextPackDoctorDogfoodingDoc.includes("Context Pack Doctor Dogfooding v2.5.0"), "doctor dogfooding doc must have stable title");
   assert(contextPackDoctorDogfoodingDoc.includes("doctor_contract_version: basebrief-doctor-v1"), "doctor dogfooding must record contract version");
   assert(contextPackDoctorDogfoodingDoc.includes("doctor_command_status: warning"), "doctor dogfooding must record warning status");

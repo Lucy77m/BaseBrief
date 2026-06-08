@@ -1004,6 +1004,26 @@ Expected release-check output without provider env remains:
 provider_probe_status=skipped
 ```
 
+## v2.6.11 Context Pack Feature Feasibility Spike
+
+`v2.6.11` is a local feasibility spike, not a release closeout or feature
+implementation. It evaluates whether Continuation Harness Lite is worth
+considering later, with `implementation_status: not_started`.
+
+The evidence is recorded in
+[Context Pack Feature Feasibility Spike v2.6.11](dogfooding/context-pack-feature-feasibility-spike-v2.6.11.md).
+It asks whether real users need a narrower helper around
+`context-pack -> check -> resume -> live recheck`, while keeping Status,
+Workflow Runner, provider request, runtime integration, MCP server/tools,
+schema-v2, daemon, watcher, hosted memory, and JSON contract changes out of
+scope.
+
+Expected release-check output without provider env remains:
+
+```text
+provider_probe_status=skipped
+```
+
 ## v0.4.1 Stabilization Candidate
 
 `v0.4.1` is a stabilization-only cycle after the `v0.4.0` public release. It uses
