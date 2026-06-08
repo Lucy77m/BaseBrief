@@ -929,6 +929,25 @@ Expected release-check output without provider env remains:
 provider_probe_status=skipped
 ```
 
+## v2.6.7 Context Pack First-Run Rehearsal Audit
+
+`v2.6.7` is local adoption evidence, not a release closeout or new feature
+line. It records a real first-run rehearsal from README and quickstart through
+minimal examples, Context Pack generation, `check`, `resume`, `doctor`, and the
+public example kits.
+
+The evidence is recorded in
+[Context Pack First-Run Rehearsal Audit v2.6.7](dogfooding/context-pack-first-run-rehearsal-audit-v2.6.7.md).
+It confirms a clean generated pack, `Continuation rules:` in the resume prompt,
+`doctor.live-recheck-required` as an info finding, and `doctor.pack-head-stale`
+as the stale public-example warning. No blocking adoption friction was found.
+
+Expected release-check output without provider env remains:
+
+```text
+provider_probe_status=skipped
+```
+
 ## v0.4.1 Stabilization Candidate
 
 `v0.4.1` is a stabilization-only cycle after the `v0.4.0` public release. It uses

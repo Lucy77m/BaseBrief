@@ -428,6 +428,12 @@ scenario matrix back to existing public example kits and dogfooding notes. It
 is a first-run fixture-reading lab, not new fixture generation, not a command
 line, and not a JSON contract change.
 
+`docs/dogfooding/context-pack-first-run-rehearsal-audit-v2.6.7.md` records a
+real first-run rehearsal through README, quickstart, minimal examples,
+Context Pack generation, Check, Resume, Doctor, and public example kits. It is
+adoption evidence only; no blocking friction was found, and it does not justify
+a Status command, Workflow Runner, or JSON contract change.
+
 ### Later Workflow Runner Lite
 
 Only after Context Pack Lite, Context Pack Check, One-command Resume,

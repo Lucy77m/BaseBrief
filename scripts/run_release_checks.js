@@ -191,6 +191,7 @@ function checkRequiredFiles() {
     "docs/dogfooding/context-engineering-reference-notes-v2.6.4.md",
     "docs/dogfooding/context-pack-adoption-scenario-matrix-v2.6.5.md",
     "docs/dogfooding/context-pack-first-run-fixture-lab-v2.6.6.md",
+    "docs/dogfooding/context-pack-first-run-rehearsal-audit-v2.6.7.md",
     "docs/testing-v0.4.x-test-matrix.md",
     "docs/testing-v0.6.x-test-matrix.md",
     "docs/testing-v0.7.x-test-matrix.md",
@@ -485,6 +486,7 @@ function checkContentContracts() {
   const contextEngineeringReferenceNotesV264Doc = readText("docs/dogfooding/context-engineering-reference-notes-v2.6.4.md");
   const contextPackAdoptionScenarioMatrixV265Doc = readText("docs/dogfooding/context-pack-adoption-scenario-matrix-v2.6.5.md");
   const contextPackFirstRunFixtureLabV266Doc = readText("docs/dogfooding/context-pack-first-run-fixture-lab-v2.6.6.md");
+  const contextPackFirstRunRehearsalAuditV267Doc = readText("docs/dogfooding/context-pack-first-run-rehearsal-audit-v2.6.7.md");
   const postReleaseBaselineDoc = readText("docs/baselines/v0.4.0-post-release-baseline.md");
   const v060PostReleaseBaselineDoc = readText("docs/baselines/v0.6.0-post-release-baseline.md");
   const projectStateModelDoc = readText("docs/design/project-state-model.md");
@@ -993,6 +995,9 @@ function checkContentContracts() {
   assert(testingDoc.includes("dogfooding/context-pack-first-run-fixture-lab-v2.6.6.md"), "Testing docs must link v2.6.6 fixture lab");
   assert(testingDoc.includes("branch mismatch") && testingDoc.includes("Continuation rules:"), "Testing docs must summarize v2.6.6 fixture lab coverage");
   assert(testingDoc.includes("`check` as the structural review gate") && testingDoc.includes("`resume` as the copyable") && testingDoc.includes("`doctor` as live repo comparison"), "Testing docs must preserve v2.6.6 command roles");
+  assert(testingDoc.includes("v2.6.7 Context Pack First-Run Rehearsal Audit"), "Testing docs must document v2.6.7 rehearsal audit");
+  assert(testingDoc.includes("dogfooding/context-pack-first-run-rehearsal-audit-v2.6.7.md"), "Testing docs must link v2.6.7 rehearsal audit");
+  assert(testingDoc.includes("clean generated pack") && testingDoc.includes("doctor.pack-head-stale") && testingDoc.includes("No blocking adoption friction was found"), "Testing docs must summarize v2.6.7 rehearsal results");
   assert(testingDoc.includes("checker_error_propagation_status: pass"), "Testing docs must record checker-error propagation");
   assert(testingDoc.includes("context-pack --repo <target-repo>"), "Testing docs must document context-pack command");
   assert(testingDoc.includes("resume --input <context-pack-dir>"), "Testing docs must document resume command");
@@ -1521,6 +1526,7 @@ function checkContentContracts() {
   assert(docsIndex.includes("dogfooding/context-engineering-reference-notes-v2.6.4.md"), "Docs index must link v2.6.4 reference notes");
   assert(docsIndex.includes("dogfooding/context-pack-adoption-scenario-matrix-v2.6.5.md"), "Docs index must link v2.6.5 scenario matrix");
   assert(docsIndex.includes("dogfooding/context-pack-first-run-fixture-lab-v2.6.6.md"), "Docs index must link v2.6.6 fixture lab");
+  assert(docsIndex.includes("dogfooding/context-pack-first-run-rehearsal-audit-v2.6.7.md"), "Docs index must link v2.6.7 rehearsal audit");
   assert(docsIndex.includes("specs/context-pack-lite.md"), "Docs index must link context pack lite spec");
   assert(docsIndex.includes("specs/context-pack-resume.md"), "Docs index must link context pack resume spec");
   assert(docsIndex.includes("specs/basebrief-format.md"), "Docs index must link basebrief format spec");
@@ -1577,6 +1583,9 @@ function checkContentContracts() {
   assert(v2ContextPackRoadmapDoc.includes("docs/dogfooding/context-pack-first-run-fixture-lab-v2.6.6.md"), "v2 roadmap must link v2.6.6 fixture lab");
   assert(v2ContextPackRoadmapDoc.includes("first-run fixture-reading lab"), "v2 roadmap must describe v2.6.6 fixture lab purpose");
   assert(v2ContextPackRoadmapDoc.includes("not new fixture generation") && v2ContextPackRoadmapDoc.includes("not a JSON contract change"), "v2 roadmap must keep v2.6.6 out of fixture-generation and contract scope");
+  assert(v2ContextPackRoadmapDoc.includes("docs/dogfooding/context-pack-first-run-rehearsal-audit-v2.6.7.md"), "v2 roadmap must link v2.6.7 rehearsal audit");
+  assert(v2ContextPackRoadmapDoc.includes("real first-run rehearsal through README, quickstart, minimal examples"), "v2 roadmap must summarize v2.6.7 rehearsal route");
+  assert(v2ContextPackRoadmapDoc.includes("no blocking friction was found"), "v2 roadmap must record v2.6.7 blocking result");
   assert(v2ContextPackRoadmapDoc.includes("exports/manifest.json"), "v2 roadmap must define export manifest");
   assert(v2ContextPackRoadmapDoc.includes("exports/context-pack.md"), "v2 roadmap must define readable export");
   assert(v2ContextPackRoadmapDoc.includes("exports/context.json"), "v2 roadmap must define machine-readable export");
@@ -1930,6 +1939,37 @@ function checkContentContracts() {
   assert(contextPackFirstRunFixtureLabV266Doc.includes("provider_probe_status=skipped"), "v2.6.6 fixture lab must preserve skipped provider gate");
   assert(!/(^|[^A-Za-z])[A-Za-z]:[\\/]/.test(contextPackFirstRunFixtureLabV266Doc), "v2.6.6 fixture lab must not expose drive-letter absolute paths");
   assert(!/\\\\/.test(contextPackFirstRunFixtureLabV266Doc), "v2.6.6 fixture lab must not expose UNC paths");
+  assert(contextPackFirstRunRehearsalAuditV267Doc.includes("Context Pack First-Run Rehearsal Audit v2.6.7"), "v2.6.7 rehearsal audit doc must have stable title");
+  assert(contextPackFirstRunRehearsalAuditV267Doc.includes("local adoption evidence, not a release closeout"), "v2.6.7 rehearsal audit must avoid release closeout claims");
+  assert(contextPackFirstRunRehearsalAuditV267Doc.includes("README.md") && contextPackFirstRunRehearsalAuditV267Doc.includes("docs/quickstart-5min.md") && contextPackFirstRunRehearsalAuditV267Doc.includes("examples/minimal/README.md"), "v2.6.7 rehearsal audit must include first-run route");
+  assert(contextPackFirstRunRehearsalAuditV267Doc.includes("examples/context-pack-lite/README.md") && contextPackFirstRunRehearsalAuditV267Doc.includes("examples/context-pack-doctor/README.md"), "v2.6.7 rehearsal audit must include example kits");
+  assert(contextPackFirstRunRehearsalAuditV267Doc.includes("build_status: passed"), "v2.6.7 rehearsal audit must record build status");
+  assert(contextPackFirstRunRehearsalAuditV267Doc.includes("context_pack_status: generated"), "v2.6.7 rehearsal audit must record context pack generation");
+  assert(contextPackFirstRunRehearsalAuditV267Doc.includes("context_pack_check_status: passed"), "v2.6.7 rehearsal audit must record check pass");
+  assert(contextPackFirstRunRehearsalAuditV267Doc.includes("context_pack_check_warning_count: 0"), "v2.6.7 rehearsal audit must record no generated pack warnings");
+  assert(contextPackFirstRunRehearsalAuditV267Doc.includes("resume_starter_contains: Continuation rules:"), "v2.6.7 rehearsal audit must record starter continuation rules");
+  assert(contextPackFirstRunRehearsalAuditV267Doc.includes("doctor_contract_version: basebrief-doctor-v1"), "v2.6.7 rehearsal audit must record doctor contract version");
+  assert(contextPackFirstRunRehearsalAuditV267Doc.includes("doctor_status: passed"), "v2.6.7 rehearsal audit must record generated doctor pass");
+  assert(contextPackFirstRunRehearsalAuditV267Doc.includes("doctor.live-recheck-required"), "v2.6.7 rehearsal audit must preserve live recheck info rule id");
+  assert(contextPackFirstRunRehearsalAuditV267Doc.includes("example_pack_check_status: passed"), "v2.6.7 rehearsal audit must record example pack check pass");
+  assert(contextPackFirstRunRehearsalAuditV267Doc.includes("example_pack_doctor_status: warning"), "v2.6.7 rehearsal audit must record example doctor warning");
+  assert(contextPackFirstRunRehearsalAuditV267Doc.includes("doctor.pack-head-stale"), "v2.6.7 rehearsal audit must preserve stale HEAD rule id");
+  assert(contextPackFirstRunRehearsalAuditV267Doc.includes("blocking | None observed"), "v2.6.7 rehearsal audit must record no blocking friction");
+  assert(contextPackFirstRunRehearsalAuditV267Doc.includes("No command, contract, or schema change"), "v2.6.7 rehearsal audit must avoid expanding behavior after no blocking friction");
+  assert(contextPackFirstRunRehearsalAuditV267Doc.includes("No Status command"), "v2.6.7 rehearsal audit must reject status command scope");
+  assert(contextPackFirstRunRehearsalAuditV267Doc.includes("No Workflow Runner"), "v2.6.7 rehearsal audit must reject workflow runner scope");
+  assert(contextPackFirstRunRehearsalAuditV267Doc.includes("No provider request"), "v2.6.7 rehearsal audit must reject provider requests");
+  assert(contextPackFirstRunRehearsalAuditV267Doc.includes("No runtime integration"), "v2.6.7 rehearsal audit must reject runtime integration");
+  assert(contextPackFirstRunRehearsalAuditV267Doc.includes("No MCP server"), "v2.6.7 rehearsal audit must reject MCP server scope");
+  assert(contextPackFirstRunRehearsalAuditV267Doc.includes("No MCP tools"), "v2.6.7 rehearsal audit must reject MCP tools scope");
+  assert(contextPackFirstRunRehearsalAuditV267Doc.includes("No schema-v2"), "v2.6.7 rehearsal audit must reject schema-v2");
+  assert(contextPackFirstRunRehearsalAuditV267Doc.includes("No `check --input <dir> --json` top-level shape change"), "v2.6.7 rehearsal audit must preserve checker JSON shape");
+  assert(contextPackFirstRunRehearsalAuditV267Doc.includes("No Resume JSON contract change"), "v2.6.7 rehearsal audit must preserve resume JSON contract");
+  assert(contextPackFirstRunRehearsalAuditV267Doc.includes("No Doctor JSON contract change"), "v2.6.7 rehearsal audit must preserve doctor JSON contract");
+  assert(contextPackFirstRunRehearsalAuditV267Doc.includes("No Export JSON contract change"), "v2.6.7 rehearsal audit must preserve export JSON contract");
+  assert(contextPackFirstRunRehearsalAuditV267Doc.includes("provider_probe_status=skipped"), "v2.6.7 rehearsal audit must preserve skipped provider gate");
+  assert(!/(^|[^A-Za-z])[A-Za-z]:[\\/]/.test(contextPackFirstRunRehearsalAuditV267Doc), "v2.6.7 rehearsal audit must not expose drive-letter absolute paths");
+  assert(!/\\\\/.test(contextPackFirstRunRehearsalAuditV267Doc), "v2.6.7 rehearsal audit must not expose UNC paths");
   assert(contextPackDoctorDogfoodingDoc.includes("Context Pack Doctor Dogfooding v2.5.0"), "doctor dogfooding doc must have stable title");
   assert(contextPackDoctorDogfoodingDoc.includes("doctor_contract_version: basebrief-doctor-v1"), "doctor dogfooding must record contract version");
   assert(contextPackDoctorDogfoodingDoc.includes("doctor_command_status: warning"), "doctor dogfooding must record warning status");
