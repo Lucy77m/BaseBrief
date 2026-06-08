@@ -5713,8 +5713,6 @@ test("Context Pack Doctor reports conservative read-only diagnostics", () => {
     git(repoDir, ["commit", "-m", "doctor fixture"]);
 
     buildContextPack({ repoPath: repoDir, outputDir: packDir, maxFiles: 4 });
-    fs.appendFileSync(path.join(packDir, "RISK_BOUNDARIES.md"), "\n- No Workflow Runner.\n", "utf8");
-    fs.appendFileSync(path.join(packDir, "NEXT_WINDOW_STARTER.md"), "\n- No Workflow Runner.\n", "utf8");
 
     const clean = runDoctor({ repo: repoDir, "context-pack": packDir });
     assert.equal(clean.command, "doctor");
@@ -5724,6 +5722,7 @@ test("Context Pack Doctor reports conservative read-only diagnostics", () => {
     assert.equal(clean.summary.warningCount, 0);
     assert.equal(clean.summary.infoCount, 1);
     assert(clean.findings.some((finding) => finding.ruleId === "doctor.live-recheck-required"));
+    assert.equal(clean.findings.some((finding) => finding.ruleId === "doctor.no-provider-boundary"), false);
 
     fs.cpSync(packDir, stalePackDir, { recursive: true });
     fs.writeFileSync(path.join(repoDir, "README.md"), "# Doctor Fixture\n\nUpdated.\n", "utf8");
@@ -5734,8 +5733,6 @@ test("Context Pack Doctor reports conservative read-only diagnostics", () => {
     assert(stale.findings.some((finding) => finding.ruleId === "doctor.pack-head-stale"));
 
     buildContextPack({ repoPath: repoDir, outputDir: dirtyPackDir, maxFiles: 4 });
-    fs.appendFileSync(path.join(dirtyPackDir, "RISK_BOUNDARIES.md"), "\n- No Workflow Runner.\n", "utf8");
-    fs.appendFileSync(path.join(dirtyPackDir, "NEXT_WINDOW_STARTER.md"), "\n- No Workflow Runner.\n", "utf8");
     fs.writeFileSync(path.join(repoDir, "dirty-note.md"), "dirty\n", "utf8");
     const dirty = runDoctor({ repo: repoDir, "context-pack": dirtyPackDir });
     assert.equal(dirty.status, "warning");
@@ -5835,6 +5832,7 @@ test("Context Pack Lite writes seven reviewable artifacts without expanding scop
       assert.equal(fs.existsSync(path.join(outputDir, fileName)), true, fileName);
     }
     const manifest = fs.readFileSync(path.join(outputDir, "MANIFEST.md"), "utf8");
+    const riskBoundaries = fs.readFileSync(path.join(outputDir, "RISK_BOUNDARIES.md"), "utf8");
     const receiverState = fs.readFileSync(path.join(outputDir, "RECEIVER_STATE.md"), "utf8");
     const recentDelta = fs.readFileSync(path.join(outputDir, "RECENT_DELTA.md"), "utf8");
     const starter = fs.readFileSync(path.join(outputDir, "NEXT_WINDOW_STARTER.md"), "utf8");
@@ -5843,8 +5841,10 @@ test("Context Pack Lite writes seven reviewable artifacts without expanding scop
     assert.match(receiverState, /\.basebrief\/state\.json`: not_available/);
     assert.match(receiverState, /\.basebrief\/delta-baseline\.json`: not_available/);
     assert.match(recentDelta, /notes\.md/);
+    assert.match(riskBoundaries, /No Workflow Runner\./);
     assert.match(starter, /No provider/);
     assert.match(starter, /schema-v2/);
+    assert.match(starter, /No Workflow Runner\./);
 
     const cli = spawnSync(process.execPath, [
       "scripts/basebrief.js",

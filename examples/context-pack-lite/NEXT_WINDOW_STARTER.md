@@ -28,6 +28,7 @@ Current task:
 - No provider request.
 - No runtime integration.
 - No schema-v2.
+- No Workflow Runner.
 - Do not add provider, runtime, plugin, MCP, IDE, hosted, cloud-memory, schema-v2, AI auto-summary, vector, embedding, or repo-dump behavior.
 - If an input is missing, report `not_available`, `not_applicable`, or `needs-review`.
 

@@ -13,6 +13,7 @@ Stale: false
 - No runtime integration.
 - No plugin, MCP, IDE, hosted service, or cloud-memory work.
 - No schema-v2, basebrief-project-state-v2, or basebrief-sidecar-v2.
+- No Workflow Runner.
 - No repo dump behavior.
 - No push, tag, release, pull request, npm publish, or global CLI install without explicit approval.
 - Do not read, write, or expose `.env`, API keys, tokens, credentials, raw private output, or private notes.
