@@ -193,6 +193,7 @@ function checkRequiredFiles() {
     "docs/dogfooding/context-pack-first-run-fixture-lab-v2.6.6.md",
     "docs/dogfooding/context-pack-first-run-rehearsal-audit-v2.6.7.md",
     "docs/dogfooding/context-pack-first-run-friction-repair-v2.6.8.md",
+    "docs/dogfooding/context-pack-adoption-decision-checkpoint-v2.6.9.md",
     "docs/testing-v0.4.x-test-matrix.md",
     "docs/testing-v0.6.x-test-matrix.md",
     "docs/testing-v0.7.x-test-matrix.md",
@@ -489,6 +490,7 @@ function checkContentContracts() {
   const contextPackFirstRunFixtureLabV266Doc = readText("docs/dogfooding/context-pack-first-run-fixture-lab-v2.6.6.md");
   const contextPackFirstRunRehearsalAuditV267Doc = readText("docs/dogfooding/context-pack-first-run-rehearsal-audit-v2.6.7.md");
   const contextPackFirstRunFrictionRepairV268Doc = readText("docs/dogfooding/context-pack-first-run-friction-repair-v2.6.8.md");
+  const contextPackAdoptionDecisionCheckpointV269Doc = readText("docs/dogfooding/context-pack-adoption-decision-checkpoint-v2.6.9.md");
   const postReleaseBaselineDoc = readText("docs/baselines/v0.4.0-post-release-baseline.md");
   const v060PostReleaseBaselineDoc = readText("docs/baselines/v0.6.0-post-release-baseline.md");
   const projectStateModelDoc = readText("docs/design/project-state-model.md");
@@ -1007,6 +1009,9 @@ function checkContentContracts() {
   assert(testingDoc.includes("v2.6.8 Context Pack First-Run Friction Repair"), "Testing docs must document v2.6.8 friction repair");
   assert(testingDoc.includes("dogfooding/context-pack-first-run-friction-repair-v2.6.8.md"), "Testing docs must link v2.6.8 friction repair");
   assert(testingDoc.includes("Get-Content -Encoding UTF8 <file>") && testingDoc.includes("最短闭环 -> 路径 B -> 路径 B3"), "Testing docs must summarize v2.6.8 repair coverage");
+  assert(testingDoc.includes("v2.6.9 Context Pack Adoption Decision Checkpoint"), "Testing docs must document v2.6.9 decision checkpoint");
+  assert(testingDoc.includes("dogfooding/context-pack-adoption-decision-checkpoint-v2.6.9.md"), "Testing docs must link v2.6.9 decision checkpoint");
+  assert(testingDoc.includes("v2.6.x local adoption incubation") && testingDoc.includes("current evidence does not justify Status"), "Testing docs must summarize v2.6.9 decision");
   assert(testingDoc.includes("checker_error_propagation_status: pass"), "Testing docs must record checker-error propagation");
   assert(testingDoc.includes("context-pack --repo <target-repo>"), "Testing docs must document context-pack command");
   assert(testingDoc.includes("resume --input <context-pack-dir>"), "Testing docs must document resume command");
@@ -1537,6 +1542,7 @@ function checkContentContracts() {
   assert(docsIndex.includes("dogfooding/context-pack-first-run-fixture-lab-v2.6.6.md"), "Docs index must link v2.6.6 fixture lab");
   assert(docsIndex.includes("dogfooding/context-pack-first-run-rehearsal-audit-v2.6.7.md"), "Docs index must link v2.6.7 rehearsal audit");
   assert(docsIndex.includes("dogfooding/context-pack-first-run-friction-repair-v2.6.8.md"), "Docs index must link v2.6.8 friction repair");
+  assert(docsIndex.includes("dogfooding/context-pack-adoption-decision-checkpoint-v2.6.9.md"), "Docs index must link v2.6.9 decision checkpoint");
   assert(docsIndex.includes("specs/context-pack-lite.md"), "Docs index must link context pack lite spec");
   assert(docsIndex.includes("specs/context-pack-resume.md"), "Docs index must link context pack resume spec");
   assert(docsIndex.includes("specs/basebrief-format.md"), "Docs index must link basebrief format spec");
@@ -1599,6 +1605,9 @@ function checkContentContracts() {
   assert(v2ContextPackRoadmapDoc.includes("docs/dogfooding/context-pack-first-run-friction-repair-v2.6.8.md"), "v2 roadmap must link v2.6.8 friction repair");
   assert(v2ContextPackRoadmapDoc.includes("quickstart route") && v2ContextPackRoadmapDoc.includes("Windows/PowerShell UTF-8 display handling"), "v2 roadmap must summarize v2.6.8 repair coverage");
   assert(v2ContextPackRoadmapDoc.includes("docs/examples") && v2ContextPackRoadmapDoc.includes("polish only"), "v2 roadmap must keep v2.6.8 in adoption polish scope");
+  assert(v2ContextPackRoadmapDoc.includes("docs/dogfooding/context-pack-adoption-decision-checkpoint-v2.6.9.md"), "v2 roadmap must link v2.6.9 decision checkpoint");
+  assert(v2ContextPackRoadmapDoc.includes("continue v2.6.x local adoption") && v2ContextPackRoadmapDoc.includes("Current evidence does not justify Status"), "v2 roadmap must summarize v2.6.9 decision");
+  assert(v2ContextPackRoadmapDoc.includes("v3 Continuation Harness") && v2ContextPackRoadmapDoc.includes("new public fixture generation"), "v2 roadmap must keep v2.6.9 feature gates closed");
   assert(v2ContextPackRoadmapDoc.includes("exports/manifest.json"), "v2 roadmap must define export manifest");
   assert(v2ContextPackRoadmapDoc.includes("exports/context-pack.md"), "v2 roadmap must define readable export");
   assert(v2ContextPackRoadmapDoc.includes("exports/context.json"), "v2 roadmap must define machine-readable export");
@@ -2003,6 +2012,37 @@ function checkContentContracts() {
   assert(contextPackFirstRunFrictionRepairV268Doc.includes("provider_probe_status=skipped"), "v2.6.8 friction repair must preserve skipped provider gate");
   assert(!/(^|[^A-Za-z])[A-Za-z]:[\\/]/.test(contextPackFirstRunFrictionRepairV268Doc), "v2.6.8 friction repair must not expose drive-letter absolute paths");
   assert(!/\\\\/.test(contextPackFirstRunFrictionRepairV268Doc), "v2.6.8 friction repair must not expose UNC paths");
+  assert(contextPackAdoptionDecisionCheckpointV269Doc.includes("Context Pack Adoption Decision Checkpoint v2.6.9"), "v2.6.9 decision checkpoint doc must have stable title");
+  assert(contextPackAdoptionDecisionCheckpointV269Doc.includes("local adoption evidence, not a release closeout"), "v2.6.9 decision checkpoint must avoid release closeout claims");
+  assert(contextPackAdoptionDecisionCheckpointV269Doc.includes("context-pack-adoption-notes-v2.6.1.md"), "v2.6.9 decision checkpoint must cite v2.6.1 evidence");
+  assert(contextPackAdoptionDecisionCheckpointV269Doc.includes("context-engineering-reference-notes-v2.6.4.md"), "v2.6.9 decision checkpoint must cite v2.6.4 evidence");
+  assert(contextPackAdoptionDecisionCheckpointV269Doc.includes("context-pack-adoption-scenario-matrix-v2.6.5.md"), "v2.6.9 decision checkpoint must cite v2.6.5 evidence");
+  assert(contextPackAdoptionDecisionCheckpointV269Doc.includes("context-pack-first-run-fixture-lab-v2.6.6.md"), "v2.6.9 decision checkpoint must cite v2.6.6 evidence");
+  assert(contextPackAdoptionDecisionCheckpointV269Doc.includes("context-pack-first-run-rehearsal-audit-v2.6.7.md"), "v2.6.9 decision checkpoint must cite v2.6.7 evidence");
+  assert(contextPackAdoptionDecisionCheckpointV269Doc.includes("context-pack-first-run-friction-repair-v2.6.8.md"), "v2.6.9 decision checkpoint must cite v2.6.8 evidence");
+  assert(contextPackAdoptionDecisionCheckpointV269Doc.includes("decision: continue v2.6.x local adoption incubation"), "v2.6.9 decision checkpoint must record incubation decision");
+  assert(contextPackAdoptionDecisionCheckpointV269Doc.includes("feature_line_status: not_started"), "v2.6.9 decision checkpoint must keep feature line closed");
+  assert(contextPackAdoptionDecisionCheckpointV269Doc.includes("status_command_status: not_started"), "v2.6.9 decision checkpoint must keep status command closed");
+  assert(contextPackAdoptionDecisionCheckpointV269Doc.includes("workflow_runner_status: not_started"), "v2.6.9 decision checkpoint must keep workflow runner closed");
+  assert(contextPackAdoptionDecisionCheckpointV269Doc.includes("v3_continuation_harness_status: not_started"), "v2.6.9 decision checkpoint must keep v3 harness closed");
+  assert(contextPackAdoptionDecisionCheckpointV269Doc.includes("repeated real usage") && contextPackAdoptionDecisionCheckpointV269Doc.includes("blocking or high-frequency confusing friction"), "v2.6.9 decision checkpoint must define escalation criteria");
+  assert(contextPackAdoptionDecisionCheckpointV269Doc.includes("Do not turn Doctor into an always-on Status command"), "v2.6.9 decision checkpoint must reject always-on status");
+  assert(contextPackAdoptionDecisionCheckpointV269Doc.includes("Do not turn Check into a live repository comparison surface"), "v2.6.9 decision checkpoint must preserve check role");
+  assert(contextPackAdoptionDecisionCheckpointV269Doc.includes("No Status command"), "v2.6.9 decision checkpoint must reject status command scope");
+  assert(contextPackAdoptionDecisionCheckpointV269Doc.includes("No Workflow Runner"), "v2.6.9 decision checkpoint must reject workflow runner scope");
+  assert(contextPackAdoptionDecisionCheckpointV269Doc.includes("No v3 Continuation Harness"), "v2.6.9 decision checkpoint must reject v3 harness scope");
+  assert(contextPackAdoptionDecisionCheckpointV269Doc.includes("No provider request"), "v2.6.9 decision checkpoint must reject provider requests");
+  assert(contextPackAdoptionDecisionCheckpointV269Doc.includes("No runtime integration"), "v2.6.9 decision checkpoint must reject runtime integration");
+  assert(contextPackAdoptionDecisionCheckpointV269Doc.includes("No MCP server"), "v2.6.9 decision checkpoint must reject MCP server scope");
+  assert(contextPackAdoptionDecisionCheckpointV269Doc.includes("No MCP tools"), "v2.6.9 decision checkpoint must reject MCP tools scope");
+  assert(contextPackAdoptionDecisionCheckpointV269Doc.includes("No schema-v2"), "v2.6.9 decision checkpoint must reject schema-v2");
+  assert(contextPackAdoptionDecisionCheckpointV269Doc.includes("No `check --input <dir> --json` top-level shape change"), "v2.6.9 decision checkpoint must preserve checker JSON shape");
+  assert(contextPackAdoptionDecisionCheckpointV269Doc.includes("No Resume JSON contract change"), "v2.6.9 decision checkpoint must preserve resume JSON contract");
+  assert(contextPackAdoptionDecisionCheckpointV269Doc.includes("No Doctor JSON contract change"), "v2.6.9 decision checkpoint must preserve doctor JSON contract");
+  assert(contextPackAdoptionDecisionCheckpointV269Doc.includes("No Export JSON contract change"), "v2.6.9 decision checkpoint must preserve export JSON contract");
+  assert(contextPackAdoptionDecisionCheckpointV269Doc.includes("provider_probe_status=skipped"), "v2.6.9 decision checkpoint must preserve skipped provider gate");
+  assert(!/(^|[^A-Za-z])[A-Za-z]:[\\/]/.test(contextPackAdoptionDecisionCheckpointV269Doc), "v2.6.9 decision checkpoint must not expose drive-letter absolute paths");
+  assert(!/\\\\/.test(contextPackAdoptionDecisionCheckpointV269Doc), "v2.6.9 decision checkpoint must not expose UNC paths");
   assert(contextPackDoctorDogfoodingDoc.includes("Context Pack Doctor Dogfooding v2.5.0"), "doctor dogfooding doc must have stable title");
   assert(contextPackDoctorDogfoodingDoc.includes("doctor_contract_version: basebrief-doctor-v1"), "doctor dogfooding must record contract version");
   assert(contextPackDoctorDogfoodingDoc.includes("doctor_command_status: warning"), "doctor dogfooding must record warning status");

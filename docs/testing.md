@@ -967,6 +967,25 @@ Expected release-check output without provider env remains:
 provider_probe_status=skipped
 ```
 
+## v2.6.9 Context Pack Adoption Decision Checkpoint
+
+`v2.6.9` is a local decision checkpoint, not a release closeout or new feature
+line. It summarizes v2.6.1 through v2.6.8 adoption evidence and keeps the next
+default as v2.6.x local adoption incubation.
+
+The evidence is recorded in
+[Context Pack Adoption Decision Checkpoint v2.6.9](dogfooding/context-pack-adoption-decision-checkpoint-v2.6.9.md).
+It concludes that current evidence does not justify Status, Workflow Runner
+Lite, v3 Continuation Harness, provider integration, runtime integration, MCP
+server/tools, schema-v2, hosted memory, daemon, watcher, or new public fixture
+generation.
+
+Expected release-check output without provider env remains:
+
+```text
+provider_probe_status=skipped
+```
+
 ## v0.4.1 Stabilization Candidate
 
 `v0.4.1` is a stabilization-only cycle after the `v0.4.0` public release. It uses

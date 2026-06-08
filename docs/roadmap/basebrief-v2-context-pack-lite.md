@@ -440,6 +440,12 @@ documenting Windows/PowerShell UTF-8 display handling. It is docs/examples
 polish only, not a new command, Status surface, Workflow Runner, or JSON
 contract change.
 
+`docs/dogfooding/context-pack-adoption-decision-checkpoint-v2.6.9.md`
+summarizes v2.6.1 through v2.6.8 and decides to continue v2.6.x local adoption
+incubation. Current evidence does not justify Status, Workflow Runner Lite,
+v3 Continuation Harness, provider/runtime integration, MCP server/tools,
+schema-v2, hosted memory, daemon, watcher, or new public fixture generation.
+
 ### Later Workflow Runner Lite
 
 Only after Context Pack Lite, Context Pack Check, One-command Resume,
