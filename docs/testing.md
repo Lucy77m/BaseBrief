@@ -851,6 +851,25 @@ Expected release-check output without provider env remains:
 provider_probe_status=skipped
 ```
 
+## v2.6.1 Context Pack Adoption Notes
+
+`v2.6.1` is local post-v2.6 adoption-notes work, not a new minor-version line.
+It records a public-safe first-run smoke from README and quickstart guidance
+through `context-pack`, `check`, `resume`, and `doctor`, then sorts friction as
+`blocking`, `confusing`, or `nice-to-have`.
+
+The evidence is recorded in
+[Context Pack Adoption Notes v2.6.1](dogfooding/context-pack-adoption-notes-v2.6.1.md).
+This is not a new feature line or contract. It keeps adoption fixes limited to
+docs/examples/release-check polish, keeps `doctor.live-recheck-required` as an
+info finding, and keeps Doctor out of always-on Status scope.
+
+Expected release-check output without provider env remains:
+
+```text
+provider_probe_status=skipped
+```
+
 ## v0.4.1 Stabilization Candidate
 
 `v0.4.1` is a stabilization-only cycle after the `v0.4.0` public release. It uses

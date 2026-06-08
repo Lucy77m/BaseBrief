@@ -514,8 +514,8 @@ function scanContextPackStarter(findings, content) {
       pattern: /(?:report|list)[\s\S]{0,80}gaps[\s\S]{0,80}before/i,
     },
     {
-      label: "keep v1.x frozen unless explicitly reopened",
-      pattern: /frozen v1\.x[\s\S]{0,140}unless explicitly (?:asked|reopened)|Do not continue the frozen v1\.x/i,
+      label: "do not continue historical or frozen lines unless explicitly asked",
+      pattern: /historical release slices[\s\S]{0,140}frozen lines[\s\S]{0,140}unless explicitly asked|frozen v1\.x[\s\S]{0,140}unless explicitly (?:asked|reopened)|Do not continue the frozen v1\.x/i,
     },
   ];
 

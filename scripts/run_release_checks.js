@@ -187,6 +187,7 @@ function checkRequiredFiles() {
     "docs/dogfooding/context-pack-resume-v2.2.0.md",
     "docs/dogfooding/file-only-export-v2.4.0.md",
     "docs/dogfooding/context-pack-doctor-v2.5.0.md",
+    "docs/dogfooding/context-pack-adoption-notes-v2.6.1.md",
     "docs/testing-v0.4.x-test-matrix.md",
     "docs/testing-v0.6.x-test-matrix.md",
     "docs/testing-v0.7.x-test-matrix.md",
@@ -477,6 +478,7 @@ function checkContentContracts() {
   const fileOnlyExportDogfoodingDoc = readText("docs/dogfooding/file-only-export-v2.4.0.md");
   const contextPackDoctorDogfoodingDoc = readText("docs/dogfooding/context-pack-doctor-v2.5.0.md");
   const contextPackDoctorDogfoodingV251Doc = readText("docs/dogfooding/context-pack-doctor-v2.5.1.md");
+  const contextPackAdoptionNotesV261Doc = readText("docs/dogfooding/context-pack-adoption-notes-v2.6.1.md");
   const postReleaseBaselineDoc = readText("docs/baselines/v0.4.0-post-release-baseline.md");
   const v060PostReleaseBaselineDoc = readText("docs/baselines/v0.6.0-post-release-baseline.md");
   const projectStateModelDoc = readText("docs/design/project-state-model.md");
@@ -514,6 +516,7 @@ function checkContentContracts() {
   const contextPackLiteExampleReadme = readText("examples/context-pack-lite/README.md");
   const contextPackLiteExampleManifest = readText("examples/context-pack-lite/MANIFEST.md");
   const contextPackLiteExampleReceiverState = readText("examples/context-pack-lite/RECEIVER_STATE.md");
+  const contextPackLiteExampleStarter = readText("examples/context-pack-lite/NEXT_WINDOW_STARTER.md");
   const fileOnlyExportExampleReadme = readText("examples/file-only-export/README.md");
   const fileOnlyExportExampleManifest = readJson("examples/file-only-export/exports/manifest.json");
   const fileOnlyExportExampleContext = readJson("examples/file-only-export/exports/context.json");
@@ -968,6 +971,10 @@ function checkContentContracts() {
   assert(testingDoc.includes("v2.6.0 First-Run / Adoption Polish Local Closeout"), "Testing docs must document v2.6 adoption polish closeout");
   assert(testingDoc.includes("docs/examples/release-check adoption polish"), "Testing docs must scope v2.6 as docs/examples/release-check polish");
   assert(testingDoc.includes("no always-on status command"), "Testing docs must keep v2.6 out of status scope");
+  assert(testingDoc.includes("v2.6.1 Context Pack Adoption Notes"), "Testing docs must document v2.6.1 adoption notes");
+  assert(testingDoc.includes("dogfooding/context-pack-adoption-notes-v2.6.1.md"), "Testing docs must link v2.6.1 adoption notes");
+  assert(testingDoc.includes("`blocking`, `confusing`, or `nice-to-have`"), "Testing docs must record v2.6.1 friction classes");
+  assert(testingDoc.includes("not a new feature line or contract"), "Testing docs must keep v2.6.1 out of feature and contract scope");
   assert(testingDoc.includes("checker_error_propagation_status: pass"), "Testing docs must record checker-error propagation");
   assert(testingDoc.includes("context-pack --repo <target-repo>"), "Testing docs must document context-pack command");
   assert(testingDoc.includes("resume --input <context-pack-dir>"), "Testing docs must document resume command");
@@ -1492,6 +1499,7 @@ function checkContentContracts() {
   assert(docsIndex.includes("specs/context-pack-doctor.md"), "Docs index must link context pack doctor spec");
   assert(docsIndex.includes("dogfooding/context-pack-doctor-v2.5.0.md"), "Docs index must link v2.5.0 doctor dogfooding");
   assert(docsIndex.includes("../examples/context-pack-doctor/README.md"), "Docs index must link context pack doctor example kit");
+  assert(docsIndex.includes("dogfooding/context-pack-adoption-notes-v2.6.1.md"), "Docs index must link v2.6.1 adoption notes");
   assert(docsIndex.includes("specs/context-pack-lite.md"), "Docs index must link context pack lite spec");
   assert(docsIndex.includes("specs/context-pack-resume.md"), "Docs index must link context pack resume spec");
   assert(docsIndex.includes("specs/basebrief-format.md"), "Docs index must link basebrief format spec");
@@ -1533,6 +1541,10 @@ function checkContentContracts() {
   assert(v2ContextPackRoadmapDoc.includes("docs/releases/v2.6.0.md"), "v2 roadmap must link v2.6 closeout");
   assert(v2ContextPackRoadmapDoc.includes("It is adoption polish only"), "v2 roadmap must scope v2.6 as adoption polish");
   assert(v2ContextPackRoadmapDoc.includes("does not add a command"), "v2 roadmap must keep v2.6 out of command scope");
+  assert(v2ContextPackRoadmapDoc.includes("v2.6.x Local Adoption Notes"), "v2 roadmap must name v2.6.1 adoption notes");
+  assert(v2ContextPackRoadmapDoc.includes("docs/dogfooding/context-pack-adoption-notes-v2.6.1.md"), "v2 roadmap must link v2.6.1 adoption notes");
+  assert(v2ContextPackRoadmapDoc.includes("blocking`, `confusing`, or `nice-to-have`"), "v2 roadmap must preserve v2.6.x friction classification");
+  assert(v2ContextPackRoadmapDoc.includes("command or contract line"), "v2 roadmap must keep v2.6.x out of command and contract scope");
   assert(v2ContextPackRoadmapDoc.includes("exports/manifest.json"), "v2 roadmap must define export manifest");
   assert(v2ContextPackRoadmapDoc.includes("exports/context-pack.md"), "v2 roadmap must define readable export");
   assert(v2ContextPackRoadmapDoc.includes("exports/context.json"), "v2 roadmap must define machine-readable export");
@@ -1766,6 +1778,35 @@ function checkContentContracts() {
   assert(v260ReleaseDoc.includes("provider_probe_status=skipped"), "v2.6 closeout doc must preserve skipped provider gate");
   assert(v260ReleaseDoc.includes("docs/examples/release-check polish"), "v2.6 closeout doc must scope release prep as polish");
   assert(v260ReleaseDoc.includes("does not reopen v2.2 resume scope"), "v2.6 closeout doc must avoid reopening earlier v2 scopes");
+  assert(contextPackAdoptionNotesV261Doc.includes("Context Pack Adoption Notes v2.6.1"), "v2.6.1 adoption notes doc must have stable title");
+  assert(contextPackAdoptionNotesV261Doc.includes("not a new minor-version line"), "v2.6.1 adoption notes must avoid contract claims");
+  assert(contextPackAdoptionNotesV261Doc.includes("contract, command, schema, or release"), "v2.6.1 adoption notes must avoid contract claims");
+  assert(contextPackAdoptionNotesV261Doc.includes("README -> docs/quickstart-5min.md -> examples/minimal/README.md"), "v2.6.1 adoption notes must record first-run route");
+  assert(contextPackAdoptionNotesV261Doc.includes("context-pack -> check -> resume -> doctor"), "v2.6.1 adoption notes must record context-pack command route");
+  assert(contextPackAdoptionNotesV261Doc.includes("`blocking`"), "v2.6.1 adoption notes must define blocking friction");
+  assert(contextPackAdoptionNotesV261Doc.includes("`confusing`"), "v2.6.1 adoption notes must define confusing friction");
+  assert(contextPackAdoptionNotesV261Doc.includes("`nice-to-have`"), "v2.6.1 adoption notes must define nice-to-have friction");
+  assert(contextPackAdoptionNotesV261Doc.includes("build_status: passed"), "v2.6.1 adoption notes must record first-run build result");
+  assert(contextPackAdoptionNotesV261Doc.includes("context_pack_check_status: passed"), "v2.6.1 adoption notes must record context pack check result");
+  assert(contextPackAdoptionNotesV261Doc.includes("resume_status: ready"), "v2.6.1 adoption notes must record resume result");
+  assert(contextPackAdoptionNotesV261Doc.includes("doctor_contract_version: basebrief-doctor-v1"), "v2.6.1 adoption notes must preserve doctor contract version");
+  assert(contextPackAdoptionNotesV261Doc.includes("doctor_info_findings: doctor.live-recheck-required"), "v2.6.1 adoption notes must record live recheck info");
+  assert(contextPackAdoptionNotesV261Doc.includes("context-pack.too-thick"), "v2.6.1 adoption notes must preserve thickness warning interpretation");
+  assert(contextPackAdoptionNotesV261Doc.includes("doctor.pack-head-stale"), "v2.6.1 adoption notes must preserve stale doctor interpretation");
+  assert(contextPackAdoptionNotesV261Doc.includes("doctor.pack-check-error"), "v2.6.1 adoption notes must preserve broken-pack doctor interpretation");
+  assert(contextPackAdoptionNotesV261Doc.includes("repair_candidate: v2.6.2 starter wording repair"), "v2.6.1 adoption notes must record the v2.6.2 repair candidate");
+  assert(contextPackAdoptionNotesV261Doc.includes("Do not turn Doctor into an always-on Status command"), "v2.6.1 adoption notes must reject always-on status scope");
+  assert(contextPackAdoptionNotesV261Doc.includes("No Status command"), "v2.6.1 adoption notes must reject status command scope");
+  assert(contextPackAdoptionNotesV261Doc.includes("No provider request"), "v2.6.1 adoption notes must reject provider requests");
+  assert(contextPackAdoptionNotesV261Doc.includes("No MCP server"), "v2.6.1 adoption notes must reject MCP server scope");
+  assert(contextPackAdoptionNotesV261Doc.includes("No MCP tools"), "v2.6.1 adoption notes must reject MCP tools scope");
+  assert(contextPackAdoptionNotesV261Doc.includes("No schema-v2"), "v2.6.1 adoption notes must reject schema-v2");
+  assert(contextPackAdoptionNotesV261Doc.includes("No Workflow Runner"), "v2.6.1 adoption notes must keep runner out of scope");
+  assert(contextPackAdoptionNotesV261Doc.includes("No `check --input <dir> --json` top-level shape change"), "v2.6.1 adoption notes must preserve checker JSON shape");
+  assert(contextPackAdoptionNotesV261Doc.includes("No Doctor JSON contract change"), "v2.6.1 adoption notes must preserve doctor JSON shape");
+  assert(contextPackAdoptionNotesV261Doc.includes("provider_probe_status=skipped"), "v2.6.1 adoption notes must preserve skipped provider gate");
+  assert(!/[A-Za-z]:[\\/]/.test(contextPackAdoptionNotesV261Doc), "v2.6.1 adoption notes must not expose drive-letter absolute paths");
+  assert(!/\\\\/.test(contextPackAdoptionNotesV261Doc), "v2.6.1 adoption notes must not expose UNC paths");
   assert(contextPackDoctorDogfoodingDoc.includes("Context Pack Doctor Dogfooding v2.5.0"), "doctor dogfooding doc must have stable title");
   assert(contextPackDoctorDogfoodingDoc.includes("doctor_contract_version: basebrief-doctor-v1"), "doctor dogfooding must record contract version");
   assert(contextPackDoctorDogfoodingDoc.includes("doctor_command_status: warning"), "doctor dogfooding must record warning status");
@@ -1840,6 +1881,10 @@ function checkContentContracts() {
   assert(contextPackLiteExampleManifest.includes("MANIFEST.md"), "context pack example manifest must include reading order");
   assert(contextPackLiteExampleReceiverState.includes("not_available"), "context pack example receiver state must show missing input degradation");
   assert(contextPackLiteExampleReceiverState.includes("not_applicable"), "context pack example receiver state must show not applicable receiver history");
+  assert(contextPackLiteExampleStarter.includes("Continuation rules:"), "context pack example starter must use continuation rules");
+  assert(contextPackLiteExampleStarter.includes("Treat this pack as inherited context"), "context pack example starter must treat the pack as inherited context");
+  assert(contextPackLiteExampleStarter.includes("Use the latest user instruction as the real current goal"), "context pack example starter must preserve latest-user-goal wording");
+  assert(!contextPackLiteExampleStarter.includes("v2.0 Context Pack Lite implementation slice"), "context pack example starter must not hard-code old v2.0 task wording");
   assert(fileOnlyExportExampleReadme.includes("File-only Export Example Kit"), "file-only export example readme must have stable title");
   assert(fileOnlyExportExampleReadme.includes("export --input examples/context-pack-lite --output-dir examples/file-only-export/exports --json"), "file-only export example readme must document command shape");
   assert(fileOnlyExportExampleReadme.includes("recommended example output directory name"), "file-only export example readme must clarify exports directory naming");
@@ -1881,6 +1926,10 @@ function checkContentContracts() {
   fileOnlyExportExpectedSourceFiles.forEach((sourceFile) => {
     assert(fileOnlyExportExampleContextPack.includes(`BASEBRIEF_SOURCE_FILE: ${sourceFile}`), `file-only export context-pack must preserve source label for ${sourceFile}`);
   });
+  assert(fileOnlyExportExampleContextPack.includes("Continuation rules:"), "file-only export context-pack must use continuation rules");
+  assert(fileOnlyExportExampleContextPack.includes("Treat this pack as inherited context"), "file-only export context-pack must treat the pack as inherited context");
+  assert(fileOnlyExportExampleContextPack.includes("Use the latest user instruction as the real current goal"), "file-only export context-pack must preserve latest-user-goal wording");
+  assert(!fileOnlyExportExampleContextPack.includes("v2.0 Context Pack Lite implementation slice"), "file-only export context-pack must not hard-code old v2.0 task wording");
   assert(fileOnlyExportExampleAdapterNotes.includes("No provider request"), "file-only export adapter notes must preserve provider boundary");
   assert(fileOnlyExportExampleAdapterNotes.includes("No MCP server"), "file-only export adapter notes must reject MCP server scope");
   assert(fileOnlyExportExampleAdapterNotes.includes("No Workflow Runner"), "file-only export adapter notes must keep runner out of scope");

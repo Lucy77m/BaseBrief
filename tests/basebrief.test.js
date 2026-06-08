@@ -5897,6 +5897,10 @@ test("Context Pack Lite writes seven reviewable artifacts without expanding scop
     assert.match(receiverState, /\.basebrief\/delta-baseline\.json`: not_available/);
     assert.match(recentDelta, /notes\.md/);
     assert.match(riskBoundaries, /No Workflow Runner\./);
+    assert.match(starter, /Continuation rules:/);
+    assert.match(starter, /Treat this pack as inherited context/);
+    assert.match(starter, /Use the latest user instruction as the real current goal/);
+    assert.doesNotMatch(starter, /v2\.0 Context Pack Lite implementation slice/);
     assert.match(starter, /No provider/);
     assert.match(starter, /schema-v2/);
     assert.match(starter, /No Workflow Runner\./);

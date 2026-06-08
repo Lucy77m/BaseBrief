@@ -21,10 +21,11 @@ Before editing, recheck the live repository facts:
 - expected_branch_from_pack: main
 - expected_head_from_pack: example-head-redacted
 
-Current task:
+Continuation rules:
 
-- Continue only the user-approved v2.0 Context Pack Lite implementation slice.
-- Do not continue the frozen v1.x Delta Receiver line unless explicitly asked.
+- Treat this pack as inherited context, not as this window's task by itself.
+- Use the latest user instruction as the real current goal after reading and live-rechecking the pack.
+- Do not continue historical release slices or frozen lines unless explicitly asked.
 - No provider request.
 - No runtime integration.
 - No schema-v2.

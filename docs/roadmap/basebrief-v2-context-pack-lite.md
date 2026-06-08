@@ -391,6 +391,24 @@ It does not add a command, change Context Pack Lite generator output, change
 status command, call providers, add runtime behavior, create plugins, create an
 MCP server/tools, add schema-v2, or become a Workflow Runner.
 
+### v2.6.x Local Adoption Notes
+
+After v2.6.0, adoption feedback should accumulate as v2.6.x local notes before
+opening another minor-version line. This is dogfooding feedback, not a new
+command or contract line.
+The first public-safe record is
+`docs/dogfooding/context-pack-adoption-notes-v2.6.1.md`.
+
+The loop records real first-run friction from README, quickstart, minimal
+examples, Context Pack Check, Resume, and Doctor. It classifies observations as
+`blocking`, `confusing`, or `nice-to-have`, then fixes only blocking or repeated
+confusing docs/examples friction.
+
+It does not add a status command, change Context Pack Lite generator output,
+change `check --input <dir> --json`, change Doctor JSON, call providers, add
+runtime behavior, create plugins, create an MCP server/tools, add schema-v2, or
+become a Workflow Runner.
+
 ### Later Workflow Runner Lite
 
 Only after Context Pack Lite, Context Pack Check, One-command Resume,
