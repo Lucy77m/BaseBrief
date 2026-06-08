@@ -472,6 +472,22 @@ Local v2.2 One-command Resume / New-window Prompt contract status:
 - v2.2 must not change Context Pack Lite generator output or the existing
   `check --input <dir> --json` top-level shape
 
+Local v2.2 closeout status:
+
+- `docs/dogfooding/context-pack-resume-v2.2.0.md` records clean,
+  warning-only, and errored resume acceptance classes
+- `docs/releases/v2.2.0.md` closes v2.2-C with public-safe dogfooding evidence
+  and local closeout
+
+Local v2.3 BaseBrief Format contract status:
+
+- `docs/releases/v2.3.0-plan.md` and `docs/specs/basebrief-format.md` record
+  the v2.3-A contract freeze
+- BaseBrief Format is a future local-first packaging direction around
+  `context-pack/`, `context-pack.md`, and `context.json`
+- v2.3-A adds no command, generator, JSON schema file, schema-v2, provider,
+  runtime, plugin, MCP, IDE, hosted/cloud-memory, or Workflow Runner behavior
+
 ### Phase 8A: Receiver Workflow
 
 Goal: make receiver acceptance explicit and locally verifiable without turning BaseBrief into an agent runtime.

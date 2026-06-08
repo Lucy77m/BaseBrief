@@ -626,7 +626,9 @@ stops before prompt output when checker errors are present.
 Evidence and contract docs:
 
 - [v2.2.0 One-command Resume / New-window Prompt Plan](releases/v2.2.0-plan.md)
+- [v2.2.0 One-command Resume / New-window Prompt Local Closeout](releases/v2.2.0.md)
 - [Context Pack Resume Spec](specs/context-pack-resume.md)
+- [Context Pack Resume Dogfooding v2.2.0](dogfooding/context-pack-resume-v2.2.0.md)
 
 The local validation gate for this line is:
 
@@ -634,6 +636,47 @@ The local validation gate for this line is:
 node --test tests/basebrief.test.js --test-name-pattern "resume"
 node scripts/basebrief.js resume --input examples/context-pack-lite --json
 node scripts/basebrief.js check --input examples/context-pack-lite --json
+npm test
+npm run release-check
+git diff --check
+```
+
+Expected release-check output without provider env remains:
+
+```text
+provider_probe_status=skipped
+```
+
+The closeout keeps three acceptance classes explicit:
+
+- clean Context Pack directory => `resume` returns `status: ready`
+- warning-only Context Pack directory => `resume` returns `status: ready` and
+  carries warning findings as review notes
+- errored Context Pack directory => `resume` stops before prompt output
+
+## v2.3.0 BaseBrief Format Plan
+
+`v2.3.0` freezes BaseBrief Format as a docs-first contract. It defines the
+future local-first packaging family:
+
+```text
+context-pack/
+context-pack.md
+context.json
+```
+
+This line is planning only. It adds no command, generator, JSON schema file,
+schema-v2, format emission, provider request, runtime integration, plugin, MCP,
+IDE, hosted service, cloud-memory behavior, or Workflow Runner.
+
+Evidence and contract docs:
+
+- [v2.3.0 BaseBrief Format Plan](releases/v2.3.0-plan.md)
+- [BaseBrief Format Spec](specs/basebrief-format.md)
+
+The local validation gate for this planning line is:
+
+```text
 npm test
 npm run release-check
 git diff --check

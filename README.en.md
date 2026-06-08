@@ -84,6 +84,8 @@ node scripts/basebrief.js sidecar-check --input tests/outputs/private/sidecar-ge
 
 `v2.2.0` starts the docs-first One-command Resume / New-window Prompt line. The narrow surface is `resume --input <context-pack-dir>`: it reuses the existing Context Pack Check result, prints a copyable new-window prompt, carries warning-only findings as review notes, and stops on error findings. It does not change Context Pack Lite generator output or the `check --input <dir> --json` shape, and it does not add provider, runtime, plugin, MCP, IDE, hosted, cloud-memory, schema-v2, or Workflow Runner behavior. Entry points: [v2.2.0 One-command Resume / New-window Prompt Plan](docs/releases/v2.2.0-plan.md) and [Context Pack Resume Spec](docs/specs/context-pack-resume.md).
 
+`v2.2.0` is locally closed by [v2.2.0 One-command Resume / New-window Prompt Local Closeout](docs/releases/v2.2.0.md) and [Context Pack Resume Dogfooding v2.2.0](docs/dogfooding/context-pack-resume-v2.2.0.md). The next docs-first line is `v2.3.0` BaseBrief Format: it freezes the future local packaging direction around `context-pack/`, `context-pack.md`, and `context.json` without adding a command, generator, JSON schema file, schema-v2, provider, runtime, plugin, MCP, IDE, hosted, cloud-memory, or Workflow Runner behavior. Entry points: [v2.3.0 BaseBrief Format Plan](docs/releases/v2.3.0-plan.md) and [BaseBrief Format Spec](docs/specs/basebrief-format.md).
+
 ## Seal/Diff
 
 Seal/Diff answers: what changed in facts, decisions, risks, and task boundaries between two phases?
@@ -155,7 +157,11 @@ BaseBrief is not a chat client, agent runtime, hosted platform, secret manager, 
 - [Context Pack Check Spec](docs/specs/context-pack-check.md)
 - [Context Pack Check Acceptance v2.1.0](docs/dogfooding/context-pack-check-acceptance-v2.1.0.md)
 - [v2.2.0 One-command Resume / New-window Prompt Plan](docs/releases/v2.2.0-plan.md)
+- [v2.2.0 One-command Resume / New-window Prompt Local Closeout](docs/releases/v2.2.0.md)
 - [Context Pack Resume Spec](docs/specs/context-pack-resume.md)
+- [Context Pack Resume Dogfooding v2.2.0](docs/dogfooding/context-pack-resume-v2.2.0.md)
+- [v2.3.0 BaseBrief Format Plan](docs/releases/v2.3.0-plan.md)
+- [BaseBrief Format Spec](docs/specs/basebrief-format.md)
 - [Context Pack Lite example kit](examples/context-pack-lite/README.md)
 - [Context Pack Lite fresh receiver dogfooding v2.0.0](docs/dogfooding/context-pack-lite-fresh-receiver-v2.0.0.md)
 - [v0.9.x Integrated Handoff Closure Matrix](docs/testing-v0.9.x-test-matrix.md)

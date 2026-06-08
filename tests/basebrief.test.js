@@ -5115,18 +5115,34 @@ test("v2.2.0 Context Pack Resume contract is docs-first and discoverable", () =>
   const roadmap = readText("docs/roadmap/basebrief-long-term-baseline.md");
   const v2Roadmap = readText("docs/roadmap/basebrief-v2-context-pack-lite.md");
   const plan = readText("docs/releases/v2.2.0-plan.md");
+  const closeout = readText("docs/releases/v2.2.0.md");
   const spec = readText("docs/specs/context-pack-resume.md");
+  const dogfooding = readText("docs/dogfooding/context-pack-resume-v2.2.0.md");
 
   assert.match(readme, /docs\/releases\/v2\.2\.0-plan\.md/);
+  assert.match(readme, /docs\/releases\/v2\.2\.0\.md/);
   assert.match(readme, /docs\/specs\/context-pack-resume\.md/);
+  assert.match(readme, /docs\/releases\/v2\.3\.0-plan\.md/);
+  assert.match(readme, /docs\/specs\/basebrief-format\.md/);
   assert.match(englishReadme, /docs\/releases\/v2\.2\.0-plan\.md/);
+  assert.match(englishReadme, /docs\/releases\/v2\.2\.0\.md/);
   assert.match(englishReadme, /docs\/specs\/context-pack-resume\.md/);
+  assert.match(englishReadme, /docs\/releases\/v2\.3\.0-plan\.md/);
+  assert.match(englishReadme, /docs\/specs\/basebrief-format\.md/);
   assert.match(docsIndex, /releases\/v2\.2\.0-plan\.md/);
+  assert.match(docsIndex, /releases\/v2\.2\.0\.md/);
   assert.match(docsIndex, /specs\/context-pack-resume\.md/);
+  assert.match(docsIndex, /dogfooding\/context-pack-resume-v2\.2\.0\.md/);
+  assert.match(docsIndex, /releases\/v2\.3\.0-plan\.md/);
+  assert.match(docsIndex, /specs\/basebrief-format\.md/);
   assert.match(cliLite, /resume --input <context-pack-dir>/);
   assert.match(testing, /v2\.2\.0 One-command Resume \/ New-window Prompt Plan/);
+  assert.match(testing, /v2\.3\.0 BaseBrief Format Plan/);
   assert.match(roadmap, /Local v2\.2 One-command Resume \/ New-window Prompt contract status/);
+  assert.match(roadmap, /Local v2\.2 closeout status/);
+  assert.match(roadmap, /Local v2\.3 BaseBrief Format contract status/);
   assert.match(v2Roadmap, /v2\.2 One-command Resume \/ New-window Prompt/);
+  assert.match(v2Roadmap, /v2\.3 BaseBrief Format/);
 
   assert.match(plan, /Status: v2\.2-A contract freeze/);
   assert.match(plan, /resume --input <context-pack-dir>/);
@@ -5139,6 +5155,17 @@ test("v2.2.0 Context Pack Resume contract is docs-first and discoverable", () =>
   assert.match(plan, /No `check --input <dir> --json` top-level shape change/i);
   assert.match(plan, /provider_probe_status=skipped/);
 
+  assert.match(closeout, /v2\.2\.0 One-command Resume \/ New-window Prompt Local Closeout/);
+  assert.match(closeout, /v2\.2-A/);
+  assert.match(closeout, /v2\.2-B/);
+  assert.match(closeout, /v2\.2-C/);
+  assert.match(closeout, /Warning-only Context Pack inputs still produce a prompt/);
+  assert.match(closeout, /Errored Context Pack inputs stop before prompt output/);
+  assert.match(closeout, /No Context Pack Lite generator output change/);
+  assert.match(closeout, /No `check --input <dir> --json` top-level shape change/);
+  assert.match(closeout, /No Workflow Runner/);
+  assert.match(closeout, /provider_probe_status=skipped/);
+
   assert.match(spec, /Context Pack Resume Spec/);
   assert.match(spec, /Status: v2\.2-A contract freeze/);
   assert.match(spec, /resume --input <context-pack-dir>/);
@@ -5147,9 +5174,73 @@ test("v2.2.0 Context Pack Resume contract is docs-first and discoverable", () =>
   assert.match(spec, /basebrief-resume-v1/);
   assert.match(spec, /does not change the checker command's own JSON shape/);
 
+  assert.match(dogfooding, /Context Pack Resume Dogfooding v2\.2\.0/);
+  assert.match(dogfooding, /clean_resume_status: pass/);
+  assert.match(dogfooding, /warning_only_resume_status: pass/);
+  assert.match(dogfooding, /error_resume_status: pass/);
+  assert.match(dogfooding, /No raw private output/);
+  assert.match(dogfooding, /No Workflow Runner/);
+  assert.match(dogfooding, /provider_probe_status=skipped/);
+
   for (const relativePath of [
     "docs/releases/v2.2.0-plan.md",
+    "docs/releases/v2.2.0.md",
     "docs/specs/context-pack-resume.md",
+    "docs/dogfooding/context-pack-resume-v2.2.0.md",
+  ]) {
+    const result = checkArtifacts({ inputPath: path.join(repoRoot, relativePath) });
+    assert.equal(result.status, "passed", relativePath);
+    assert.equal(result.errorCount, 0, relativePath);
+    assert.equal(result.warningCount, 0, relativePath);
+  }
+});
+
+test("v2.3.0 BaseBrief Format stays docs-first and local-only", () => {
+  const readme = readText("README.md");
+  const englishReadme = readText("README.en.md");
+  const docsIndex = readText("docs/index.md");
+  const testing = readText("docs/testing.md");
+  const roadmap = readText("docs/roadmap/basebrief-long-term-baseline.md");
+  const v2Roadmap = readText("docs/roadmap/basebrief-v2-context-pack-lite.md");
+  const plan = readText("docs/releases/v2.3.0-plan.md");
+  const spec = readText("docs/specs/basebrief-format.md");
+
+  assert.match(readme, /docs\/releases\/v2\.3\.0-plan\.md/);
+  assert.match(readme, /docs\/specs\/basebrief-format\.md/);
+  assert.match(englishReadme, /docs\/releases\/v2\.3\.0-plan\.md/);
+  assert.match(englishReadme, /docs\/specs\/basebrief-format\.md/);
+  assert.match(docsIndex, /releases\/v2\.3\.0-plan\.md/);
+  assert.match(docsIndex, /specs\/basebrief-format\.md/);
+  assert.match(testing, /v2\.3\.0 BaseBrief Format Plan/);
+  assert.match(roadmap, /Local v2\.3 BaseBrief Format contract status/);
+  assert.match(v2Roadmap, /v2\.3 BaseBrief Format/);
+
+  assert.match(plan, /v2\.3\.0 BaseBrief Format Plan/);
+  assert.match(plan, /Status: v2\.3-A contract freeze/);
+  assert.match(plan, /context-pack\//);
+  assert.match(plan, /context-pack\.md/);
+  assert.match(plan, /context\.json/);
+  assert.match(plan, /No command\./);
+  assert.match(plan, /No implementation\./);
+  assert.match(plan, /No generator\./);
+  assert.match(plan, /No JSON schema file\./);
+  assert.match(plan, /No schema-v2\./);
+  assert.match(plan, /No Workflow Runner\./);
+  assert.match(plan, /provider_probe_status=skipped/);
+
+  assert.match(spec, /BaseBrief Format Spec/);
+  assert.match(spec, /Status: v2\.3-A contract freeze/);
+  assert.match(spec, /context-pack\//);
+  assert.match(spec, /context-pack\.md/);
+  assert.match(spec, /context\.json/);
+  assert.match(spec, /does not implement a command/);
+  assert.match(spec, /schema-v2/);
+  assert.match(spec, /Workflow Runner/);
+  assert.match(spec, /Context Pack Lite generator output/);
+
+  for (const relativePath of [
+    "docs/releases/v2.3.0-plan.md",
+    "docs/specs/basebrief-format.md",
   ]) {
     const result = checkArtifacts({ inputPath: path.join(repoRoot, relativePath) });
     assert.equal(result.status, "passed", relativePath);

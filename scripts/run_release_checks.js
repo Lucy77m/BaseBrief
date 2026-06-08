@@ -170,10 +170,14 @@ function checkRequiredFiles() {
     "docs/releases/v2.1.0-plan.md",
     "docs/specs/context-pack-check.md",
     "docs/releases/v2.2.0-plan.md",
+    "docs/releases/v2.2.0.md",
+    "docs/releases/v2.3.0-plan.md",
     "docs/specs/context-pack-resume.md",
+    "docs/specs/basebrief-format.md",
     "docs/roadmap/basebrief-v2-context-pack-lite.md",
     "docs/dogfooding/context-pack-lite-fresh-receiver-v2.0.0.md",
     "docs/dogfooding/context-pack-check-acceptance-v2.1.0.md",
+    "docs/dogfooding/context-pack-resume-v2.2.0.md",
     "docs/testing-v0.4.x-test-matrix.md",
     "docs/testing-v0.6.x-test-matrix.md",
     "docs/testing-v0.7.x-test-matrix.md",
@@ -435,10 +439,14 @@ function checkContentContracts() {
   const v210ReleaseDoc = readText("docs/releases/v2.1.0.md");
   const contextPackCheckSpecDoc = readText("docs/specs/context-pack-check.md");
   const v220PlanDoc = readText("docs/releases/v2.2.0-plan.md");
+  const v220ReleaseDoc = readText("docs/releases/v2.2.0.md");
+  const v230PlanDoc = readText("docs/releases/v2.3.0-plan.md");
   const contextPackResumeSpecDoc = readText("docs/specs/context-pack-resume.md");
+  const basebriefFormatSpecDoc = readText("docs/specs/basebrief-format.md");
   const v2ContextPackRoadmapDoc = readText("docs/roadmap/basebrief-v2-context-pack-lite.md");
   const contextPackLiteDogfoodingDoc = readText("docs/dogfooding/context-pack-lite-fresh-receiver-v2.0.0.md");
   const contextPackCheckDogfoodingDoc = readText("docs/dogfooding/context-pack-check-acceptance-v2.1.0.md");
+  const contextPackResumeDogfoodingDoc = readText("docs/dogfooding/context-pack-resume-v2.2.0.md");
   const postReleaseBaselineDoc = readText("docs/baselines/v0.4.0-post-release-baseline.md");
   const v060PostReleaseBaselineDoc = readText("docs/baselines/v0.6.0-post-release-baseline.md");
   const projectStateModelDoc = readText("docs/design/project-state-model.md");
@@ -566,7 +574,11 @@ function checkContentContracts() {
   assert(readme.includes("docs/specs/context-pack-check.md"), "README.md should link to context pack check spec");
   assert(readme.includes("docs/dogfooding/context-pack-check-acceptance-v2.1.0.md"), "README.md should link to v2.1 context pack check dogfooding");
   assert(readme.includes("docs/releases/v2.2.0-plan.md"), "README.md should link to v2.2 resume plan");
+  assert(readme.includes("docs/releases/v2.2.0.md"), "README.md should link to v2.2 resume closeout");
   assert(readme.includes("docs/specs/context-pack-resume.md"), "README.md should link to context pack resume spec");
+  assert(readme.includes("docs/dogfooding/context-pack-resume-v2.2.0.md"), "README.md should link to v2.2 resume dogfooding");
+  assert(readme.includes("docs/releases/v2.3.0-plan.md"), "README.md should link to v2.3 format plan");
+  assert(readme.includes("docs/specs/basebrief-format.md"), "README.md should link to basebrief format spec");
   assert(readme.includes("resume --input <context-pack-dir>"), "README.md should mention resume command");
   assert(readme.includes("examples/context-pack-lite/README.md"), "README.md should link to context pack example kit");
   assert(readme.includes("docs/dogfooding/context-pack-lite-fresh-receiver-v2.0.0.md"), "README.md should link to context pack dogfooding");
@@ -666,7 +678,11 @@ function checkContentContracts() {
   assert(englishReadme.includes("docs/specs/context-pack-check.md"), "README.en.md should link to context pack check spec");
   assert(englishReadme.includes("docs/dogfooding/context-pack-check-acceptance-v2.1.0.md"), "README.en.md should link to v2.1 context pack check dogfooding");
   assert(englishReadme.includes("docs/releases/v2.2.0-plan.md"), "README.en.md should link to v2.2 resume plan");
+  assert(englishReadme.includes("docs/releases/v2.2.0.md"), "README.en.md should link to v2.2 resume closeout");
   assert(englishReadme.includes("docs/specs/context-pack-resume.md"), "README.en.md should link to context pack resume spec");
+  assert(englishReadme.includes("docs/dogfooding/context-pack-resume-v2.2.0.md"), "README.en.md should link to v2.2 resume dogfooding");
+  assert(englishReadme.includes("docs/releases/v2.3.0-plan.md"), "README.en.md should link to v2.3 format plan");
+  assert(englishReadme.includes("docs/specs/basebrief-format.md"), "README.en.md should link to basebrief format spec");
   assert(englishReadme.includes("resume --input <context-pack-dir>"), "README.en.md should mention resume command");
   assert(englishReadme.includes("examples/context-pack-lite/README.md"), "README.en.md should link to context pack example kit");
   assert(englishReadme.includes("docs/dogfooding/context-pack-lite-fresh-receiver-v2.0.0.md"), "README.en.md should link to context pack dogfooding");
@@ -968,8 +984,11 @@ function checkContentContracts() {
   assert(testingDoc.includes("v2.0.0 Context Pack Lite Local Closeout"), "Testing docs must document v2.0.0 context pack closeout");
   assert(testingDoc.includes("v2.1.0 Context Pack Check Local Closeout"), "Testing docs must document v2.1.0 context pack check closeout");
   assert(testingDoc.includes("v2.2.0 One-command Resume / New-window Prompt Plan"), "Testing docs must document v2.2.0 resume plan");
+  assert(testingDoc.includes("v2.3.0 BaseBrief Format Plan"), "Testing docs must document v2.3.0 format plan");
   assert(testingDoc.includes("context-pack --repo <target-repo>"), "Testing docs must document context-pack command");
   assert(testingDoc.includes("resume --input <context-pack-dir>"), "Testing docs must document resume command");
+  assert(testingDoc.includes("context-pack.md"), "Testing docs must mention context-pack.md");
+  assert(testingDoc.includes("context.json"), "Testing docs must mention context.json");
   assert(testingDoc.includes("../examples/context-pack-lite/README.md"), "Testing docs must link context pack example kit");
   assert(testingDoc.includes("dogfooding/context-pack-lite-fresh-receiver-v2.0.0.md"), "Testing docs must link context pack dogfooding");
   assert(testingDoc.includes("dogfooding/context-pack-check-acceptance-v2.1.0.md"), "Testing docs must link v2.1 context pack check dogfooding");
@@ -1460,10 +1479,14 @@ function checkContentContracts() {
   assert(docsIndex.includes("releases/v2.0.0.md"), "Docs index must link v2.0.0 context pack closeout");
   assert(docsIndex.includes("releases/v2.1.0.md"), "Docs index must link v2.1.0 context pack check closeout");
   assert(docsIndex.includes("releases/v2.2.0-plan.md"), "Docs index must link v2.2.0 resume plan");
+  assert(docsIndex.includes("releases/v2.2.0.md"), "Docs index must link v2.2.0 resume closeout");
+  assert(docsIndex.includes("releases/v2.3.0-plan.md"), "Docs index must link v2.3.0 format plan");
   assert(docsIndex.includes("specs/context-pack-lite.md"), "Docs index must link context pack lite spec");
   assert(docsIndex.includes("specs/context-pack-resume.md"), "Docs index must link context pack resume spec");
+  assert(docsIndex.includes("specs/basebrief-format.md"), "Docs index must link basebrief format spec");
   assert(docsIndex.includes("dogfooding/context-pack-lite-fresh-receiver-v2.0.0.md"), "Docs index must link context pack dogfooding");
   assert(docsIndex.includes("dogfooding/context-pack-check-acceptance-v2.1.0.md"), "Docs index must link v2.1 context pack check dogfooding");
+  assert(docsIndex.includes("dogfooding/context-pack-resume-v2.2.0.md"), "Docs index must link v2.2 resume dogfooding");
   assert(docsIndex.includes("../examples/context-pack-lite/README.md"), "Docs index must link context pack example kit");
   assert(v2ContextPackRoadmapDoc.includes("BaseBrief v2.0 is Context Pack Lite"), "v2 roadmap must freeze Context Pack Lite direction");
   assert(v2ContextPackRoadmapDoc.includes("v1.x answers: what changed"), "v2 roadmap must define relationship to v1.x");
@@ -1473,6 +1496,10 @@ function checkContentContracts() {
   assert(v2ContextPackRoadmapDoc.includes("resume --input <context-pack-dir>"), "v2 roadmap must freeze resume command shape");
   assert(v2ContextPackRoadmapDoc.includes("docs/specs/context-pack-resume.md"), "v2 roadmap must link resume spec");
   assert(v2ContextPackRoadmapDoc.includes("v2.3 BaseBrief Format"), "v2 roadmap must reserve BaseBrief Format for v2.3");
+  assert(v2ContextPackRoadmapDoc.includes("context-pack.md"), "v2 roadmap must define context-pack.md");
+  assert(v2ContextPackRoadmapDoc.includes("context.json"), "v2 roadmap must define context.json");
+  assert(v2ContextPackRoadmapDoc.includes("docs/releases/v2.3.0-plan.md"), "v2 roadmap must link v2.3 plan");
+  assert(v2ContextPackRoadmapDoc.includes("docs/specs/basebrief-format.md"), "v2 roadmap must link v2.3 spec");
   assert(v2ContextPackRoadmapDoc.includes("Workflow Runner Lite or watcher/dashboard work"), "v2 roadmap must keep runner and watcher work later");
   assert(v2ContextPackRoadmapDoc.includes("MANIFEST.md"), "v2 roadmap must define manifest artifact");
   assert(v2ContextPackRoadmapDoc.includes("REPO_MAP.md"), "v2 roadmap must define repo map artifact");
@@ -1550,12 +1577,42 @@ function checkContentContracts() {
   assert(v220PlanDoc.includes("No `check --input <dir> --json` top-level shape change"), "v2.2 plan must preserve checker JSON shape");
   assert(v220PlanDoc.includes("No Workflow Runner"), "v2.2 plan must keep runner out of scope");
   assert(v220PlanDoc.includes("provider_probe_status=skipped"), "v2.2 plan must preserve skipped provider gate");
+  assert(v220ReleaseDoc.includes("v2.2.0 One-command Resume / New-window Prompt Local Closeout"), "v2.2 closeout doc must have stable title");
+  assert(v220ReleaseDoc.includes("v2.2-A"), "v2.2 closeout doc must record contract freeze");
+  assert(v220ReleaseDoc.includes("v2.2-B"), "v2.2 closeout doc must record minimal implementation");
+  assert(v220ReleaseDoc.includes("v2.2-C"), "v2.2 closeout doc must record dogfooding closeout");
+  assert(v220ReleaseDoc.includes("Warning-only Context Pack inputs still produce a prompt"), "v2.2 closeout doc must preserve warning-only behavior");
+  assert(v220ReleaseDoc.includes("Errored Context Pack inputs stop before prompt output"), "v2.2 closeout doc must preserve errored-pack blocking behavior");
+  assert(v220ReleaseDoc.includes("No Context Pack Lite generator output change"), "v2.2 closeout doc must preserve generator output");
+  assert(v220ReleaseDoc.includes("No `check --input <dir> --json` top-level shape change"), "v2.2 closeout doc must preserve checker JSON shape");
+  assert(v220ReleaseDoc.includes("No Workflow Runner"), "v2.2 closeout doc must keep runner out of scope");
+  assert(v220ReleaseDoc.includes("provider_probe_status=skipped"), "v2.2 closeout doc must preserve skipped provider gate");
+  assert(v230PlanDoc.includes("v2.3.0 BaseBrief Format Plan"), "v2.3 plan must have stable title");
+  assert(v230PlanDoc.includes("Status: v2.3-A contract freeze"), "v2.3 plan must mark contract freeze status");
+  assert(v230PlanDoc.includes("context-pack/"), "v2.3 plan must define context-pack directory");
+  assert(v230PlanDoc.includes("context-pack.md"), "v2.3 plan must define context-pack.md");
+  assert(v230PlanDoc.includes("context.json"), "v2.3 plan must define context.json");
+  assert(v230PlanDoc.includes("No command."), "v2.3 plan must stay docs-first");
+  assert(v230PlanDoc.includes("No implementation."), "v2.3 plan must avoid implementation");
+  assert(v230PlanDoc.includes("No JSON schema file."), "v2.3 plan must avoid schema-file work");
+  assert(v230PlanDoc.includes("No schema-v2."), "v2.3 plan must avoid schema-v2");
+  assert(v230PlanDoc.includes("No Workflow Runner."), "v2.3 plan must keep runner out of scope");
+  assert(v230PlanDoc.includes("provider_probe_status=skipped"), "v2.3 plan must preserve skipped provider gate");
   assert(contextPackResumeSpecDoc.includes("Context Pack Resume Spec"), "context pack resume spec must have stable title");
   assert(contextPackResumeSpecDoc.includes("Status: v2.2-A contract freeze"), "context pack resume spec must mark contract freeze status");
   assert(contextPackResumeSpecDoc.includes("basebrief-resume-v1"), "context pack resume spec must name contract version");
   assert(contextPackResumeSpecDoc.includes("warning-only findings"), "context pack resume spec must define warning behavior");
   assert(contextPackResumeSpecDoc.includes("one or more errors: stop before prompt output"), "context pack resume spec must define error behavior");
   assert(contextPackResumeSpecDoc.includes("does not change the checker command's own JSON shape"), "context pack resume spec must preserve checker shape");
+  assert(basebriefFormatSpecDoc.includes("BaseBrief Format Spec"), "basebrief format spec must have stable title");
+  assert(basebriefFormatSpecDoc.includes("Status: v2.3-A contract freeze"), "basebrief format spec must mark contract freeze status");
+  assert(basebriefFormatSpecDoc.includes("context-pack/"), "basebrief format spec must define context-pack directory");
+  assert(basebriefFormatSpecDoc.includes("context-pack.md"), "basebrief format spec must define context-pack.md");
+  assert(basebriefFormatSpecDoc.includes("context.json"), "basebrief format spec must define context.json");
+  assert(basebriefFormatSpecDoc.includes("does not implement a command"), "basebrief format spec must stay docs-first");
+  assert(basebriefFormatSpecDoc.includes("schema-v2"), "basebrief format spec must reject schema-v2");
+  assert(basebriefFormatSpecDoc.includes("Workflow Runner"), "basebrief format spec must keep runner out of scope");
+  assert(basebriefFormatSpecDoc.includes("Context Pack Lite generator output"), "basebrief format spec must preserve generator output");
   assert(contextPackLiteDogfoodingDoc.includes("Context Pack Lite Fresh Receiver Dogfooding v2.0.0"), "context pack dogfooding doc must have stable title");
   assert(contextPackLiteDogfoodingDoc.includes("receiver_task_status: completed"), "context pack dogfooding must record completed receiver status");
   assert(contextPackLiteDogfoodingDoc.includes("handoff_acceptance: pass"), "context pack dogfooding must record pass acceptance");
@@ -1573,6 +1630,13 @@ function checkContentContracts() {
   assert(contextPackCheckDogfoodingDoc.includes("No new top-level checker command"), "context pack check dogfooding must reject a new checker command");
   assert(contextPackCheckDogfoodingDoc.includes("No provider request"), "context pack check dogfooding must preserve provider boundary");
   assert(contextPackCheckDogfoodingDoc.includes("No raw private output"), "context pack check dogfooding must preserve raw-output boundary");
+  assert(contextPackResumeDogfoodingDoc.includes("Context Pack Resume Dogfooding v2.2.0"), "context pack resume dogfooding doc must have stable title");
+  assert(contextPackResumeDogfoodingDoc.includes("clean_resume_status: pass"), "context pack resume dogfooding must record clean-pack acceptance");
+  assert(contextPackResumeDogfoodingDoc.includes("warning_only_resume_status: pass"), "context pack resume dogfooding must record warning-only acceptance");
+  assert(contextPackResumeDogfoodingDoc.includes("error_resume_status: pass"), "context pack resume dogfooding must record errored-pack blocking acceptance");
+  assert(contextPackResumeDogfoodingDoc.includes("No raw private output"), "context pack resume dogfooding must preserve raw-output boundary");
+  assert(contextPackResumeDogfoodingDoc.includes("No Workflow Runner"), "context pack resume dogfooding must keep runner out of scope");
+  assert(contextPackResumeDogfoodingDoc.includes("provider_probe_status=skipped"), "context pack resume dogfooding must preserve skipped provider gate");
   assert(contextPackLiteExampleReadme.includes("Context Pack Lite Example Kit"), "context pack example readme must have stable title");
   assert(contextPackLiteExampleReadme.includes("context-pack --repo <target-repo>"), "context pack example readme must document command shape");
   assert(contextPackLiteExampleManifest.includes("MANIFEST.md"), "context pack example manifest must include reading order");

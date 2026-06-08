@@ -287,6 +287,9 @@ first slice, or modify files.
 v2.2-A is frozen in `docs/releases/v2.2.0-plan.md` and
 `docs/specs/context-pack-resume.md`.
 
+v2.2-C is closed in `docs/releases/v2.2.0.md` with dogfooding evidence in
+`docs/dogfooding/context-pack-resume-v2.2.0.md`.
+
 ### v2.3 BaseBrief Format
 
 After resume proves useful, define a stable local-first handoff format for AI
@@ -303,6 +306,11 @@ context-pack/
 
 This should not be schema-v2 and should not change
 `basebrief-project-state-v1` or `basebrief-sidecar-v1`.
+
+v2.3-A is docs-first only. It is frozen in `docs/releases/v2.3.0-plan.md` and
+`docs/specs/basebrief-format.md`; it does not implement a command, generator,
+JSON schema file, format emission, provider request, runtime integration,
+plugin, MCP, IDE, hosted service, cloud-memory feature, or Workflow Runner.
 
 ### v2.4 File-only Adapter / MCP-friendly Export
 
