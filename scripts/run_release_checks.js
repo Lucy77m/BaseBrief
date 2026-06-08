@@ -192,6 +192,7 @@ function checkRequiredFiles() {
     "docs/dogfooding/context-pack-adoption-scenario-matrix-v2.6.5.md",
     "docs/dogfooding/context-pack-first-run-fixture-lab-v2.6.6.md",
     "docs/dogfooding/context-pack-first-run-rehearsal-audit-v2.6.7.md",
+    "docs/dogfooding/context-pack-first-run-friction-repair-v2.6.8.md",
     "docs/testing-v0.4.x-test-matrix.md",
     "docs/testing-v0.6.x-test-matrix.md",
     "docs/testing-v0.7.x-test-matrix.md",
@@ -487,6 +488,7 @@ function checkContentContracts() {
   const contextPackAdoptionScenarioMatrixV265Doc = readText("docs/dogfooding/context-pack-adoption-scenario-matrix-v2.6.5.md");
   const contextPackFirstRunFixtureLabV266Doc = readText("docs/dogfooding/context-pack-first-run-fixture-lab-v2.6.6.md");
   const contextPackFirstRunRehearsalAuditV267Doc = readText("docs/dogfooding/context-pack-first-run-rehearsal-audit-v2.6.7.md");
+  const contextPackFirstRunFrictionRepairV268Doc = readText("docs/dogfooding/context-pack-first-run-friction-repair-v2.6.8.md");
   const postReleaseBaselineDoc = readText("docs/baselines/v0.4.0-post-release-baseline.md");
   const v060PostReleaseBaselineDoc = readText("docs/baselines/v0.6.0-post-release-baseline.md");
   const projectStateModelDoc = readText("docs/design/project-state-model.md");
@@ -679,8 +681,12 @@ function checkContentContracts() {
   assert(quickstartDoc.includes("路径 C"), "quickstart must document the Seal/Diff path");
   assert(quickstartDoc.includes("路径 D"), "quickstart must document the Receiver Safe Check path");
   assert(quickstartDoc.includes("第一次跑通：最短闭环"), "quickstart must put the first-run loop before advanced routes");
+  assert(quickstartDoc.includes("第一次只想跑通时，先按这个顺序走：`最短闭环 -> 路径 B -> 路径 B3`"), "quickstart must clarify the first-run route order");
+  assert(quickstartDoc.includes("不是首次闭环必跑步骤"), "quickstart must keep optional paths out of the first-run route");
   assert(quickstartDoc.includes("2 到 5 分钟"), "quickstart must preserve the first-run timebox");
   assert(quickstartDoc.includes("常见失败解释"), "quickstart must explain first-run failure modes");
+  assert(quickstartDoc.includes("Get-Content -Encoding UTF8 <file>"), "quickstart must explain Windows PowerShell UTF-8 display handling");
+  assert(quickstartDoc.includes("不要把终端显示乱码直接当成文档内容错误"), "quickstart must prevent terminal mojibake from becoming a document defect");
   assert(quickstartDoc.includes("receiver_entry_task"), "quickstart must teach receiver entry task semantics");
   assert(quickstartDoc.includes("post_acceptance_next_action"), "quickstart must teach post-acceptance action semantics");
   assert(quickstartDoc.includes("不要把它当成每次都必须跑的 status 命令"), "quickstart must keep Doctor out of always-on status scope");
@@ -998,6 +1004,9 @@ function checkContentContracts() {
   assert(testingDoc.includes("v2.6.7 Context Pack First-Run Rehearsal Audit"), "Testing docs must document v2.6.7 rehearsal audit");
   assert(testingDoc.includes("dogfooding/context-pack-first-run-rehearsal-audit-v2.6.7.md"), "Testing docs must link v2.6.7 rehearsal audit");
   assert(testingDoc.includes("clean generated pack") && testingDoc.includes("doctor.pack-head-stale") && testingDoc.includes("No blocking adoption friction was found"), "Testing docs must summarize v2.6.7 rehearsal results");
+  assert(testingDoc.includes("v2.6.8 Context Pack First-Run Friction Repair"), "Testing docs must document v2.6.8 friction repair");
+  assert(testingDoc.includes("dogfooding/context-pack-first-run-friction-repair-v2.6.8.md"), "Testing docs must link v2.6.8 friction repair");
+  assert(testingDoc.includes("Get-Content -Encoding UTF8 <file>") && testingDoc.includes("最短闭环 -> 路径 B -> 路径 B3"), "Testing docs must summarize v2.6.8 repair coverage");
   assert(testingDoc.includes("checker_error_propagation_status: pass"), "Testing docs must record checker-error propagation");
   assert(testingDoc.includes("context-pack --repo <target-repo>"), "Testing docs must document context-pack command");
   assert(testingDoc.includes("resume --input <context-pack-dir>"), "Testing docs must document resume command");
@@ -1527,6 +1536,7 @@ function checkContentContracts() {
   assert(docsIndex.includes("dogfooding/context-pack-adoption-scenario-matrix-v2.6.5.md"), "Docs index must link v2.6.5 scenario matrix");
   assert(docsIndex.includes("dogfooding/context-pack-first-run-fixture-lab-v2.6.6.md"), "Docs index must link v2.6.6 fixture lab");
   assert(docsIndex.includes("dogfooding/context-pack-first-run-rehearsal-audit-v2.6.7.md"), "Docs index must link v2.6.7 rehearsal audit");
+  assert(docsIndex.includes("dogfooding/context-pack-first-run-friction-repair-v2.6.8.md"), "Docs index must link v2.6.8 friction repair");
   assert(docsIndex.includes("specs/context-pack-lite.md"), "Docs index must link context pack lite spec");
   assert(docsIndex.includes("specs/context-pack-resume.md"), "Docs index must link context pack resume spec");
   assert(docsIndex.includes("specs/basebrief-format.md"), "Docs index must link basebrief format spec");
@@ -1586,6 +1596,9 @@ function checkContentContracts() {
   assert(v2ContextPackRoadmapDoc.includes("docs/dogfooding/context-pack-first-run-rehearsal-audit-v2.6.7.md"), "v2 roadmap must link v2.6.7 rehearsal audit");
   assert(v2ContextPackRoadmapDoc.includes("real first-run rehearsal through README, quickstart, minimal examples"), "v2 roadmap must summarize v2.6.7 rehearsal route");
   assert(v2ContextPackRoadmapDoc.includes("no blocking friction was found"), "v2 roadmap must record v2.6.7 blocking result");
+  assert(v2ContextPackRoadmapDoc.includes("docs/dogfooding/context-pack-first-run-friction-repair-v2.6.8.md"), "v2 roadmap must link v2.6.8 friction repair");
+  assert(v2ContextPackRoadmapDoc.includes("quickstart route") && v2ContextPackRoadmapDoc.includes("Windows/PowerShell UTF-8 display handling"), "v2 roadmap must summarize v2.6.8 repair coverage");
+  assert(v2ContextPackRoadmapDoc.includes("docs/examples") && v2ContextPackRoadmapDoc.includes("polish only"), "v2 roadmap must keep v2.6.8 in adoption polish scope");
   assert(v2ContextPackRoadmapDoc.includes("exports/manifest.json"), "v2 roadmap must define export manifest");
   assert(v2ContextPackRoadmapDoc.includes("exports/context-pack.md"), "v2 roadmap must define readable export");
   assert(v2ContextPackRoadmapDoc.includes("exports/context.json"), "v2 roadmap must define machine-readable export");
@@ -1970,6 +1983,26 @@ function checkContentContracts() {
   assert(contextPackFirstRunRehearsalAuditV267Doc.includes("provider_probe_status=skipped"), "v2.6.7 rehearsal audit must preserve skipped provider gate");
   assert(!/(^|[^A-Za-z])[A-Za-z]:[\\/]/.test(contextPackFirstRunRehearsalAuditV267Doc), "v2.6.7 rehearsal audit must not expose drive-letter absolute paths");
   assert(!/\\\\/.test(contextPackFirstRunRehearsalAuditV267Doc), "v2.6.7 rehearsal audit must not expose UNC paths");
+  assert(contextPackFirstRunFrictionRepairV268Doc.includes("Context Pack First-Run Friction Repair v2.6.8"), "v2.6.8 friction repair doc must have stable title");
+  assert(contextPackFirstRunFrictionRepairV268Doc.includes("v2.6.7 first-run rehearsal audit"), "v2.6.8 friction repair must cite v2.6.7 source evidence");
+  assert(contextPackFirstRunFrictionRepairV268Doc.includes("blocking_friction: none"), "v2.6.8 friction repair must record no blocking friction");
+  assert(contextPackFirstRunFrictionRepairV268Doc.includes("quickstart_primary_route: 最短闭环 -> 路径 B -> 路径 B3"), "v2.6.8 friction repair must record first-run route");
+  assert(contextPackFirstRunFrictionRepairV268Doc.includes("windows_utf8_note: Get-Content -Encoding UTF8 <file>"), "v2.6.8 friction repair must record Windows UTF-8 note");
+  assert(contextPackFirstRunFrictionRepairV268Doc.includes("behavior_change: none"), "v2.6.8 friction repair must avoid behavior changes");
+  assert(contextPackFirstRunFrictionRepairV268Doc.includes("No Status command"), "v2.6.8 friction repair must reject status command scope");
+  assert(contextPackFirstRunFrictionRepairV268Doc.includes("No Workflow Runner"), "v2.6.8 friction repair must reject workflow runner scope");
+  assert(contextPackFirstRunFrictionRepairV268Doc.includes("No provider request"), "v2.6.8 friction repair must reject provider requests");
+  assert(contextPackFirstRunFrictionRepairV268Doc.includes("No runtime integration"), "v2.6.8 friction repair must reject runtime integration");
+  assert(contextPackFirstRunFrictionRepairV268Doc.includes("No MCP server"), "v2.6.8 friction repair must reject MCP server scope");
+  assert(contextPackFirstRunFrictionRepairV268Doc.includes("No MCP tools"), "v2.6.8 friction repair must reject MCP tools scope");
+  assert(contextPackFirstRunFrictionRepairV268Doc.includes("No schema-v2"), "v2.6.8 friction repair must reject schema-v2");
+  assert(contextPackFirstRunFrictionRepairV268Doc.includes("No `check --input <dir> --json` top-level shape change"), "v2.6.8 friction repair must preserve checker JSON shape");
+  assert(contextPackFirstRunFrictionRepairV268Doc.includes("No Resume JSON contract change"), "v2.6.8 friction repair must preserve resume JSON contract");
+  assert(contextPackFirstRunFrictionRepairV268Doc.includes("No Doctor JSON contract change"), "v2.6.8 friction repair must preserve doctor JSON contract");
+  assert(contextPackFirstRunFrictionRepairV268Doc.includes("No Export JSON contract change"), "v2.6.8 friction repair must preserve export JSON contract");
+  assert(contextPackFirstRunFrictionRepairV268Doc.includes("provider_probe_status=skipped"), "v2.6.8 friction repair must preserve skipped provider gate");
+  assert(!/(^|[^A-Za-z])[A-Za-z]:[\\/]/.test(contextPackFirstRunFrictionRepairV268Doc), "v2.6.8 friction repair must not expose drive-letter absolute paths");
+  assert(!/\\\\/.test(contextPackFirstRunFrictionRepairV268Doc), "v2.6.8 friction repair must not expose UNC paths");
   assert(contextPackDoctorDogfoodingDoc.includes("Context Pack Doctor Dogfooding v2.5.0"), "doctor dogfooding doc must have stable title");
   assert(contextPackDoctorDogfoodingDoc.includes("doctor_contract_version: basebrief-doctor-v1"), "doctor dogfooding must record contract version");
   assert(contextPackDoctorDogfoodingDoc.includes("doctor_command_status: warning"), "doctor dogfooding must record warning status");

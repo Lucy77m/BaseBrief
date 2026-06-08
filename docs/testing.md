@@ -948,6 +948,25 @@ Expected release-check output without provider env remains:
 provider_probe_status=skipped
 ```
 
+## v2.6.8 Context Pack First-Run Friction Repair
+
+`v2.6.8` is local adoption repair, not a release closeout or new feature line.
+It closes the confusing items from the v2.6.7 rehearsal by clarifying the
+quickstart first-run route as `最短闭环 -> 路径 B -> 路径 B3` and adding a
+Windows/PowerShell UTF-8 display note with `Get-Content -Encoding UTF8 <file>`.
+
+The evidence is recorded in
+[Context Pack First-Run Friction Repair v2.6.8](dogfooding/context-pack-first-run-friction-repair-v2.6.8.md).
+It does not add a command, Status surface, Workflow Runner, provider request,
+runtime integration, MCP server/tools, schema-v2, fixture generation, or JSON
+contract change.
+
+Expected release-check output without provider env remains:
+
+```text
+provider_probe_status=skipped
+```
+
 ## v0.4.1 Stabilization Candidate
 
 `v0.4.1` is a stabilization-only cycle after the `v0.4.0` public release. It uses

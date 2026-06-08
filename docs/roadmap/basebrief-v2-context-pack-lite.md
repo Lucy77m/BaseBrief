@@ -434,6 +434,12 @@ Context Pack generation, Check, Resume, Doctor, and public example kits. It is
 adoption evidence only; no blocking friction was found, and it does not justify
 a Status command, Workflow Runner, or JSON contract change.
 
+`docs/dogfooding/context-pack-first-run-friction-repair-v2.6.8.md` repairs the
+confusing first-run items from v2.6.7 by clarifying the quickstart route and
+documenting Windows/PowerShell UTF-8 display handling. It is docs/examples
+polish only, not a new command, Status surface, Workflow Runner, or JSON
+contract change.
+
 ### Later Workflow Runner Lite
 
 Only after Context Pack Lite, Context Pack Check, One-command Resume,
