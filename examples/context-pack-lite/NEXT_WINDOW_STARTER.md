@@ -36,5 +36,6 @@ Continuation rules:
 Expected first response:
 
 - Report live repo facts.
+- Separate inherited pack facts from live rechecks.
 - State whether the pack is understandable enough to continue.
 - List any gaps before proposing implementation work.

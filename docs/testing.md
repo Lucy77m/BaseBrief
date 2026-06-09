@@ -1340,6 +1340,33 @@ Expected release-check output without provider env remains:
 provider_probe_status=skipped
 ```
 
+## v2.6.25 Context Pack Output UX Polish
+
+`v2.6.25` is local output UX polish only, not a command or contract change. It
+clarifies generated Context Pack Lite text for receiver windows without
+changing file names, reading order, metadata fields, JSON contracts, or command
+outputs.
+
+The plan is recorded in
+[Context Pack Output UX Polish v2.6.25](dogfooding/context-pack-output-ux-polish-v2.6.25.md).
+The polish clarifies that live repo facts are stale-prone and must be rechecked
+before edits, that `not_available`, `not_applicable`, and `needs-review` are
+missing-input semantics rather than failure states, and that the expected first
+response should report live repo facts, separate inherited pack facts from live
+rechecks, and list gaps before implementation.
+
+It does not add a CLI command, change package scripts, change release-check
+output, change Context Pack structure, change `check --input <dir> --json`,
+change Resume/Doctor/Export JSON contracts, start CI, or open Status, Workflow
+Runner, Doctor expansion, provider/runtime integration, MCP, plugin,
+schema-v2, daemon, watcher, hosted memory, push, tag, release, or PR work.
+
+Expected release-check output without provider env remains:
+
+```text
+provider_probe_status=skipped
+```
+
 ## v0.4.1 Stabilization Candidate
 
 `v0.4.1` is a stabilization-only cycle after the `v0.4.0` public release. It uses

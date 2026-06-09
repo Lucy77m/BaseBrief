@@ -15,6 +15,7 @@ Stale: false
 - Project State: not_available
 - Delta baseline: not_available
 - Receiver acceptance history: not_applicable
+- Missing-input semantics: `not_available`, `not_applicable`, and `needs-review` are review cues, not failure states.
 
 ## Lint State
 

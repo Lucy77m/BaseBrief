@@ -42,5 +42,6 @@ Stale: false
 
 - This pack is local-first and file-based.
 - This pack is not complete proof of repository state.
+- Live repo facts are stale-prone and must be rechecked before edits.
 - `needs-review`, `not_available`, and `not_applicable` sections must be checked before acting.
 - No provider request, runtime integration, plugin, MCP, IDE, schema-v2, Workflow Runner, or repo dump behavior is implied.

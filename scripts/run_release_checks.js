@@ -223,6 +223,7 @@ function checkRequiredFiles() {
     "docs/dogfooding/context-pack-release-check-maintainability-plan-v2.6.22.md",
     "docs/dogfooding/context-pack-runnable-recipes-plan-v2.6.23.md",
     "docs/dogfooding/context-pack-first-run-smoke-path-consolidation-v2.6.24.md",
+    "docs/dogfooding/context-pack-output-ux-polish-v2.6.25.md",
     "docs/testing-v0.4.x-test-matrix.md",
     "docs/testing-v0.6.x-test-matrix.md",
     "docs/testing-v0.7.x-test-matrix.md",
@@ -533,6 +534,13 @@ function checkV2ContextPackDocs(context) {
   assert(testingDoc.includes("npm run check"), "Testing docs must include v2.6.24 local validation gate");
   assertIncludesPhrase(testingDoc, "Doctor and File-only Export as follow-up recipes, not mandatory first-run steps", "Testing docs must keep v2.6.24 follow-up recipes out of mandatory first-run scope");
   assertIncludesPhrase(testingDoc, "does not add a CLI command, change package scripts, change release-check output", "Testing docs must preserve v2.6.24 command and output boundaries");
+  assert(testingDoc.includes("v2.6.25 Context Pack Output UX Polish"), "Testing docs must document v2.6.25 output UX polish");
+  assert(testingDoc.includes("dogfooding/context-pack-output-ux-polish-v2.6.25.md"), "Testing docs must link v2.6.25 output UX polish");
+  assertIncludesPhrase(testingDoc, "local output UX polish only, not a command or contract change", "Testing docs must keep v2.6.25 in output UX scope");
+  assertIncludesPhrase(testingDoc, "live repo facts are stale-prone and must be rechecked before edits", "Testing docs must summarize v2.6.25 stale-prone live facts wording");
+  assert(testingDoc.includes("not_available") && testingDoc.includes("not_applicable") && testingDoc.includes("needs-review") && testingDoc.includes("missing-input semantics rather than failure states"), "Testing docs must summarize v2.6.25 missing-input semantics");
+  assertIncludesPhrase(testingDoc, "separate inherited pack facts from live rechecks", "Testing docs must summarize v2.6.25 expected first response separation");
+  assertIncludesPhrase(testingDoc, "does not add a CLI command, change package scripts, change release-check output", "Testing docs must preserve v2.6.25 command and output boundaries");
   assert(testingDoc.includes("checker_error_propagation_status: pass"), "Testing docs must record checker-error propagation");
   assert(testingDoc.includes("context-pack --repo <target-repo>"), "Testing docs must document context-pack command");
   assert(testingDoc.includes("resume --input <context-pack-dir>"), "Testing docs must document resume command");
@@ -583,6 +591,7 @@ function checkV2ContextPackDocs(context) {
   assert(docsIndex.includes("dogfooding/context-pack-release-check-maintainability-plan-v2.6.22.md"), "Docs index must link v2.6.22 release-check maintainability plan");
   assert(docsIndex.includes("dogfooding/context-pack-runnable-recipes-plan-v2.6.23.md"), "Docs index must link v2.6.23 runnable recipes plan");
   assert(docsIndex.includes("dogfooding/context-pack-first-run-smoke-path-consolidation-v2.6.24.md"), "Docs index must link v2.6.24 first-run smoke path consolidation");
+  assert(docsIndex.includes("dogfooding/context-pack-output-ux-polish-v2.6.25.md"), "Docs index must link v2.6.25 output UX polish");
   assert(docsIndex.includes("specs/context-pack-lite.md"), "Docs index must link context pack lite spec");
   assert(docsIndex.includes("specs/context-pack-resume.md"), "Docs index must link context pack resume spec");
   assert(docsIndex.includes("specs/basebrief-format.md"), "Docs index must link basebrief format spec");
@@ -728,6 +737,12 @@ function checkV2ContextPackDocs(context) {
   assert(v2ContextPackRoadmapDoc.includes("examples/context-pack-lite") && v2ContextPackRoadmapDoc.includes("npm run check"), "v2 roadmap must include v2.6.24 Context Pack example and validation gate");
   assertIncludesPhrase(v2ContextPackRoadmapDoc, "Doctor and File-only Export as follow-up recipes, not mandatory first-run steps", "v2 roadmap must keep v2.6.24 follow-up recipes optional");
   assertIncludesPhrase(v2ContextPackRoadmapDoc, "does not add a command, change package scripts, change release-check output", "v2 roadmap must preserve v2.6.24 command and output boundaries");
+  assert(v2ContextPackRoadmapDoc.includes("docs/dogfooding/context-pack-output-ux-polish-v2.6.25.md"), "v2 roadmap must link v2.6.25 output UX polish");
+  assertIncludesPhrase(v2ContextPackRoadmapDoc, "polishes generated Context Pack Lite text without changing contracts", "v2 roadmap must summarize v2.6.25 output UX direction");
+  assertIncludesPhrase(v2ContextPackRoadmapDoc, "live repo facts are stale-prone and must be rechecked before edits", "v2 roadmap must summarize v2.6.25 stale-prone live facts wording");
+  assert(v2ContextPackRoadmapDoc.includes("not_available") && v2ContextPackRoadmapDoc.includes("not_applicable") && v2ContextPackRoadmapDoc.includes("needs-review") && v2ContextPackRoadmapDoc.includes("missing-input semantics rather than failure states"), "v2 roadmap must summarize v2.6.25 missing-input semantics");
+  assertIncludesPhrase(v2ContextPackRoadmapDoc, "separate inherited pack facts from live rechecks", "v2 roadmap must summarize v2.6.25 expected first response separation");
+  assertIncludesPhrase(v2ContextPackRoadmapDoc, "does not add a command, change package scripts, change release-check output", "v2 roadmap must preserve v2.6.25 command and output boundaries");
   assert(v2ContextPackRoadmapDoc.includes("exports/manifest.json"), "v2 roadmap must define export manifest");
   assert(v2ContextPackRoadmapDoc.includes("exports/context-pack.md"), "v2 roadmap must define readable export");
   assert(v2ContextPackRoadmapDoc.includes("exports/context.json"), "v2 roadmap must define machine-readable export");
@@ -770,6 +785,7 @@ function checkV26DogfoodingDocs(context) {
     contextPackReleaseCheckMaintainabilityPlanV2622Doc,
     contextPackRunnableRecipesPlanV2623Doc,
     contextPackFirstRunSmokePathConsolidationV2624Doc,
+    contextPackOutputUxPolishV2625Doc,
   } = context;
 
   assert(contextPackAdoptionNotesV261Doc.includes("Context Pack Adoption Notes v2.6.1"), "v2.6.1 adoption notes doc must have stable title");
@@ -1648,6 +1664,42 @@ function checkV26DogfoodingDocs(context) {
   assert(contextPackFirstRunSmokePathConsolidationV2624Doc.includes("mode_cases") && contextPackFirstRunSmokePathConsolidationV2624Doc.includes("checked_links") && contextPackFirstRunSmokePathConsolidationV2624Doc.includes("cli_lite_commands") && contextPackFirstRunSmokePathConsolidationV2624Doc.includes("independent_test_files"), "v2.6.24 first-run smoke path consolidation must preserve release-check metric lines");
   assert(!/(^|[^A-Za-z])[A-Za-z]:[\\/]/.test(contextPackFirstRunSmokePathConsolidationV2624Doc), "v2.6.24 first-run smoke path consolidation must not expose drive-letter absolute paths");
   assert(!/\\\\/.test(contextPackFirstRunSmokePathConsolidationV2624Doc), "v2.6.24 first-run smoke path consolidation must not expose UNC paths");
+  assert(contextPackOutputUxPolishV2625Doc.includes("Context Pack Output UX Polish v2.6.25"), "v2.6.25 output UX polish doc must have stable title");
+  assertIncludesPhrase(contextPackOutputUxPolishV2625Doc, "local output UX polish only, not a command or contract change", "v2.6.25 output UX polish must avoid command and contract claims");
+  assert(contextPackOutputUxPolishV2625Doc.includes("plan_status: implemented"), "v2.6.25 output UX polish must record implemented plan status");
+  assert(contextPackOutputUxPolishV2625Doc.includes("output_ux_status: documented"), "v2.6.25 output UX polish must record documented output UX status");
+  assert(contextPackOutputUxPolishV2625Doc.includes("command_status: unchanged"), "v2.6.25 output UX polish must keep command status unchanged");
+  assert(contextPackOutputUxPolishV2625Doc.includes("package_script_status: unchanged"), "v2.6.25 output UX polish must keep package scripts unchanged");
+  assert(contextPackOutputUxPolishV2625Doc.includes("json_contract_change_status: not_started"), "v2.6.25 output UX polish must keep JSON contract changes not started");
+  assert(contextPackOutputUxPolishV2625Doc.includes("context_pack_structure_status: unchanged"), "v2.6.25 output UX polish must keep Context Pack structure unchanged");
+  assert(contextPackOutputUxPolishV2625Doc.includes("provider_probe_status=skipped"), "v2.6.25 output UX polish must preserve skipped provider gate");
+  assertIncludesPhrase(contextPackOutputUxPolishV2625Doc, "live repo facts are stale-prone and must be rechecked before edits", "v2.6.25 output UX polish must document stale-prone live facts");
+  assert(contextPackOutputUxPolishV2625Doc.includes("not_available") && contextPackOutputUxPolishV2625Doc.includes("not_applicable") && contextPackOutputUxPolishV2625Doc.includes("needs-review") && contextPackOutputUxPolishV2625Doc.includes("missing-input semantics") && contextPackOutputUxPolishV2625Doc.includes("not failure states"), "v2.6.25 output UX polish must document missing-input semantics");
+  assertIncludesPhrase(contextPackOutputUxPolishV2625Doc, "separate inherited pack facts from live rechecks", "v2.6.25 output UX polish must document inherited versus live fact separation");
+  assert(contextPackOutputUxPolishV2625Doc.includes("No new CLI command"), "v2.6.25 output UX polish must reject new commands");
+  assert(contextPackOutputUxPolishV2625Doc.includes("No package script change"), "v2.6.25 output UX polish must preserve package scripts");
+  assert(contextPackOutputUxPolishV2625Doc.includes("No release-check output shape change"), "v2.6.25 output UX polish must preserve release-check output shape");
+  assert(contextPackOutputUxPolishV2625Doc.includes("No Context Pack seven-file structure change"), "v2.6.25 output UX polish must preserve seven-file structure");
+  assert(contextPackOutputUxPolishV2625Doc.includes("No `check --input <dir> --json` top-level shape change"), "v2.6.25 output UX polish must preserve checker JSON shape");
+  assert(contextPackOutputUxPolishV2625Doc.includes("No Resume JSON contract change"), "v2.6.25 output UX polish must preserve resume JSON contract");
+  assert(contextPackOutputUxPolishV2625Doc.includes("No Doctor JSON contract change"), "v2.6.25 output UX polish must preserve doctor JSON contract");
+  assert(contextPackOutputUxPolishV2625Doc.includes("No Export JSON contract change"), "v2.6.25 output UX polish must preserve export JSON contract");
+  assert(contextPackOutputUxPolishV2625Doc.includes("No Status command"), "v2.6.25 output UX polish must reject status command");
+  assert(contextPackOutputUxPolishV2625Doc.includes("No Workflow Runner"), "v2.6.25 output UX polish must reject workflow runner");
+  assert(contextPackOutputUxPolishV2625Doc.includes("No Doctor expansion"), "v2.6.25 output UX polish must reject doctor expansion");
+  assert(contextPackOutputUxPolishV2625Doc.includes("No provider request"), "v2.6.25 output UX polish must reject provider requests");
+  assert(contextPackOutputUxPolishV2625Doc.includes("No runtime integration"), "v2.6.25 output UX polish must reject runtime integration");
+  assert(contextPackOutputUxPolishV2625Doc.includes("No MCP server"), "v2.6.25 output UX polish must reject MCP server");
+  assert(contextPackOutputUxPolishV2625Doc.includes("No MCP tools"), "v2.6.25 output UX polish must reject MCP tools");
+  assert(contextPackOutputUxPolishV2625Doc.includes("No plugin"), "v2.6.25 output UX polish must reject plugin scope");
+  assert(contextPackOutputUxPolishV2625Doc.includes("No schema-v2"), "v2.6.25 output UX polish must reject schema-v2");
+  assert(contextPackOutputUxPolishV2625Doc.includes("No daemon"), "v2.6.25 output UX polish must reject daemon scope");
+  assert(contextPackOutputUxPolishV2625Doc.includes("No watcher"), "v2.6.25 output UX polish must reject watcher scope");
+  assert(contextPackOutputUxPolishV2625Doc.includes("No hosted memory"), "v2.6.25 output UX polish must reject hosted memory");
+  assert(contextPackOutputUxPolishV2625Doc.includes("npm run release-check") && contextPackOutputUxPolishV2625Doc.includes("npm test") && contextPackOutputUxPolishV2625Doc.includes("git diff --check"), "v2.6.25 output UX polish must preserve validation gate");
+  assert(contextPackOutputUxPolishV2625Doc.includes("mode_cases") && contextPackOutputUxPolishV2625Doc.includes("checked_links") && contextPackOutputUxPolishV2625Doc.includes("cli_lite_commands") && contextPackOutputUxPolishV2625Doc.includes("independent_test_files"), "v2.6.25 output UX polish must preserve release-check metric lines");
+  assert(!/(^|[^A-Za-z])[A-Za-z]:[\\/]/.test(contextPackOutputUxPolishV2625Doc), "v2.6.25 output UX polish must not expose drive-letter absolute paths");
+  assert(!/\\\\/.test(contextPackOutputUxPolishV2625Doc), "v2.6.25 output UX polish must not expose UNC paths");
 }
 
 function checkContentContracts() {
@@ -1768,6 +1820,7 @@ function checkContentContracts() {
   const fileOnlyExportSpecDoc = readText("docs/specs/file-only-export.md");
   const contextPackDoctorSpecDoc = readText("docs/specs/context-pack-doctor.md");
   const basebriefCliScript = readText("scripts/basebrief.js");
+  const basebriefContextPackScript = readText("scripts/basebrief_context_pack.js");
   const basebriefExportScript = readText("scripts/basebrief_export.js");
   const basebriefDoctorScript = readText("scripts/basebrief_doctor.js");
   const v2ContextPackRoadmapDoc = readText("docs/roadmap/basebrief-v2-context-pack-lite.md");
@@ -1801,6 +1854,7 @@ function checkContentContracts() {
   const contextPackReleaseCheckMaintainabilityPlanV2622Doc = readText("docs/dogfooding/context-pack-release-check-maintainability-plan-v2.6.22.md");
   const contextPackRunnableRecipesPlanV2623Doc = readText("docs/dogfooding/context-pack-runnable-recipes-plan-v2.6.23.md");
   const contextPackFirstRunSmokePathConsolidationV2624Doc = readText("docs/dogfooding/context-pack-first-run-smoke-path-consolidation-v2.6.24.md");
+  const contextPackOutputUxPolishV2625Doc = readText("docs/dogfooding/context-pack-output-ux-polish-v2.6.25.md");
   const postReleaseBaselineDoc = readText("docs/baselines/v0.4.0-post-release-baseline.md");
   const v060PostReleaseBaselineDoc = readText("docs/baselines/v0.6.0-post-release-baseline.md");
   const projectStateModelDoc = readText("docs/design/project-state-model.md");
@@ -3052,6 +3106,7 @@ function checkContentContracts() {
     contextPackReleaseCheckMaintainabilityPlanV2622Doc,
     contextPackRunnableRecipesPlanV2623Doc,
     contextPackFirstRunSmokePathConsolidationV2624Doc,
+    contextPackOutputUxPolishV2625Doc,
   });
   assert(contextPackDoctorDogfoodingDoc.includes("Context Pack Doctor Dogfooding v2.5.0"), "doctor dogfooding doc must have stable title");
   assert(contextPackDoctorDogfoodingDoc.includes("doctor_contract_version: basebrief-doctor-v1"), "doctor dogfooding must record contract version");
@@ -3124,12 +3179,18 @@ function checkContentContracts() {
   assert(contextPackResumeDogfoodingDoc.includes("provider_probe_status=skipped"), "context pack resume dogfooding must preserve skipped provider gate");
   assert(contextPackLiteExampleReadme.includes("Context Pack Lite Example Kit"), "context pack example readme must have stable title");
   assert(contextPackLiteExampleReadme.includes("context-pack --repo <target-repo>"), "context pack example readme must document command shape");
+  assert(basebriefContextPackScript.includes("Live repo facts are stale-prone and must be rechecked before edits."), "context pack generator must clarify stale-prone live repo facts");
+  assert(basebriefContextPackScript.includes("Missing-input semantics: `not_available`, `not_applicable`, and `needs-review` are review cues, not failure states."), "context pack generator must clarify missing-input semantics");
+  assert(basebriefContextPackScript.includes("Separate inherited pack facts from live rechecks."), "context pack generator must require inherited/live fact separation");
   assert(contextPackLiteExampleManifest.includes("MANIFEST.md"), "context pack example manifest must include reading order");
+  assert(contextPackLiteExampleManifest.includes("Live repo facts are stale-prone and must be rechecked before edits."), "context pack example manifest must clarify stale-prone live repo facts");
   assert(contextPackLiteExampleReceiverState.includes("not_available"), "context pack example receiver state must show missing input degradation");
   assert(contextPackLiteExampleReceiverState.includes("not_applicable"), "context pack example receiver state must show not applicable receiver history");
+  assert(contextPackLiteExampleReceiverState.includes("Missing-input semantics: `not_available`, `not_applicable`, and `needs-review` are review cues, not failure states."), "context pack example receiver state must clarify missing-input semantics");
   assert(contextPackLiteExampleStarter.includes("Continuation rules:"), "context pack example starter must use continuation rules");
   assert(contextPackLiteExampleStarter.includes("Treat this pack as inherited context"), "context pack example starter must treat the pack as inherited context");
   assert(contextPackLiteExampleStarter.includes("Use the latest user instruction as the real current goal"), "context pack example starter must preserve latest-user-goal wording");
+  assert(contextPackLiteExampleStarter.includes("Separate inherited pack facts from live rechecks."), "context pack example starter must require inherited/live fact separation");
   assert(!contextPackLiteExampleStarter.includes("v2.0 Context Pack Lite implementation slice"), "context pack example starter must not hard-code old v2.0 task wording");
   assert(fileOnlyExportExampleReadme.includes("File-only Export Example Kit"), "file-only export example readme must have stable title");
   assert(fileOnlyExportExampleReadme.includes("export --input examples/context-pack-lite --output-dir examples/file-only-export/exports --json"), "file-only export example readme must document command shape");

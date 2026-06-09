@@ -579,6 +579,19 @@ Status, Workflow Runner, Doctor expansion, provider/runtime integration, MCP,
 plugin, schema-v2, daemon, watcher, hosted memory, publish, push, tag, release,
 or PR work.
 
+`docs/dogfooding/context-pack-output-ux-polish-v2.6.25.md` polishes generated
+Context Pack Lite text without changing contracts. It clarifies that live repo
+facts are stale-prone and must be rechecked before edits, that `not_available`,
+`not_applicable`, and `needs-review` are
+missing-input semantics rather than failure states, and that the expected first
+response should report live repo facts, separate inherited pack facts from live
+rechecks, and list gaps before implementation. It does not add a command, change
+package scripts, change
+release-check output, change JSON contracts, alter the Context Pack seven-file
+structure, start CI, or open Status, Workflow Runner, Doctor expansion,
+provider/runtime integration, MCP, plugin, schema-v2, daemon, watcher, hosted
+memory, publish, push, tag, release, or PR work.
+
 ### Later Workflow Runner Lite
 
 Only after Context Pack Lite, Context Pack Check, One-command Resume,
