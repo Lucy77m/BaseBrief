@@ -120,6 +120,7 @@ npm run check
 - [Context Pack Release-Candidate Direction Decision v2.6.32](dogfooding/context-pack-release-candidate-decision-v2.6.32.md)
 - [Context Pack Release-Candidate Summary Draft v2.6.33](dogfooding/context-pack-release-candidate-summary-draft-v2.6.33.md)
 - [Context Pack Release Closeout Go/No-Go Plan v2.6.34](dogfooding/context-pack-release-closeout-go-no-go-plan-v2.6.34.md)
+- [Context Pack Release Closeout Prep Draft v2.6.35](dogfooding/context-pack-release-closeout-prep-draft-v2.6.35.md)
 
 ## v1 Delta / Receiver Line
 

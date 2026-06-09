@@ -715,6 +715,19 @@ contract, Status, Workflow Runner, Doctor expansion, provider/runtime
 integration, MCP, plugin, schema-v2, daemon, watcher, hosted memory, publish,
 push, tag, release, or PR work starts here.
 
+`docs/dogfooding/context-pack-release-closeout-prep-draft-v2.6.35.md` converts
+the public summary draft and go/no-go decision into closeout-prep wording. It
+keeps the release-candidate story focused on first-run discoverability,
+runnable examples, receiver-facing Context Pack wording, and validation
+confidence while preserving commands, package scripts, JSON contracts, Context
+Pack structure, and provider boundaries. It records the validation command set,
+expected current-slice results, preserved release-check metric lines, and a
+release action checklist with publish, push, tag, release, and PR actions
+not_started. No command, package script, release-check output, Context Pack
+structure, JSON contract, Status, Workflow Runner, Doctor expansion,
+provider/runtime integration, MCP, plugin, schema-v2, daemon, watcher, hosted
+memory, publish, push, tag, release, or PR work starts here.
+
 ### Later Workflow Runner Lite
 
 Only after Context Pack Lite, Context Pack Check, One-command Resume,
