@@ -601,6 +601,7 @@ function formatHuman(result) {
     return [
       `BaseBrief check ${result.check.status}: errors=${result.check.errorCount}, warnings=${result.check.warningCount}`,
       ...formatFindingLines(result.check.findings),
+      ...formatNextStepLines(result),
       "",
     ].join(os.EOL);
   }
@@ -746,6 +747,7 @@ function formatHuman(result) {
       `branch=${result.git.branch}`,
       `head=${result.git.head}`,
       `worktree_status=${result.git.worktree_status}`,
+      ...formatNextStepLines(result),
       "",
     ].join(os.EOL);
   }
@@ -759,6 +761,7 @@ function formatHuman(result) {
       `check_status=${result.check.status}`,
       `check_errors=${result.check.errorCount}`,
       `check_warnings=${result.check.warningCount}`,
+      ...formatNextStepLines(result),
       "",
     ].join(os.EOL);
   }
@@ -766,10 +769,45 @@ function formatHuman(result) {
     return [
       `BaseBrief doctor ${result.status}: errors=${result.summary.errorCount}, warnings=${result.summary.warningCount}, info=${result.summary.infoCount}`,
       ...result.findings.map((finding) => `${finding.severity} ${finding.ruleId} ${finding.source} ${finding.evidence} ${finding.message}`),
+      ...formatNextStepLines(result),
       "",
     ].join(os.EOL);
   }
   return `${JSON.stringify(result, null, 2)}${os.EOL}`;
+}
+
+function formatNextStepLines(result) {
+  if (result.command === "context-pack") {
+    return [`next_step=node scripts/basebrief.js check --input ${result.outputDir}`];
+  }
+  if (result.command === "check") {
+    if (result.check.errorCount > 0) {
+      return ["next_step=fix reported errors before resume, doctor, or export"];
+    }
+    if (result.check.warningCount > 0) {
+      return [
+        "next_step=review warnings before resume",
+        `optional_next_step=node scripts/basebrief.js resume --input ${result.input}`,
+      ];
+    }
+    return [
+      `next_step=node scripts/basebrief.js resume --input ${result.input}`,
+      `optional_next_step=node scripts/basebrief.js doctor --repo <target-repo> --context-pack ${result.input}`,
+    ];
+  }
+  if (result.command === "export") {
+    return [`next_step=node scripts/basebrief.js check --input ${result.outputDir}`];
+  }
+  if (result.command === "doctor") {
+    if (result.status === "failed") {
+      return ["next_step=repair the context pack before resume or export"];
+    }
+    if (result.status === "warning") {
+      return ["next_step=recheck live repo facts and refresh the context pack if stale"];
+    }
+    return ["next_step=continue only after live repo facts are rechecked"];
+  }
+  return [];
 }
 
 function formatFindingLines(findings = []) {

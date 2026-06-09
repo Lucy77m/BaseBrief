@@ -684,7 +684,9 @@ test("File-only Export writes four public-safe files from checked context-pack i
     assert.match(adapterNotes, /No provider request/);
     assert.match(adapterNotes, /No MCP server/);
     assert.match(adapterNotes, /No Workflow Runner/);
-    assert.match(formatHuman(commandExport({ input: packDir, "output-dir": runDir })), /BaseBrief file-only export written/);
+    const exportHuman = formatHuman(commandExport({ input: packDir, "output-dir": runDir }));
+    assert.match(exportHuman, /BaseBrief file-only export written/);
+    assert.match(exportHuman, /next_step=node scripts\/basebrief\.js check --input/);
     assert.match(HELP_TEXT, /export --input <context-pack-dir> --output-dir <dir>/);
     assert.equal(run(["node", "scripts/basebrief.js", "export", "--input", packDir, "--output-dir", path.join(tempRoot, "run-via-run")]).command, "export");
 
@@ -700,6 +702,7 @@ test("File-only Export writes four public-safe files from checked context-pack i
     assert.equal(cli.status, 0, cli.stderr);
     const cliResult = JSON.parse(cli.stdout);
     assert.equal(cliResult.command, "export");
+    assert.equal(Object.hasOwn(cliResult, "next_step"), false);
     assert.equal(cliResult.input.startsWith("tests"), true);
     assert.equal(cliResult.outputDir.startsWith("tests"), true);
     assert.equal(cliResult.outputFiles.contextPack.startsWith("tests"), true);
@@ -833,7 +836,10 @@ test("Context Pack Doctor reports conservative read-only diagnostics", () => {
     const missingBoundary = runDoctor({ repo: repoDir, "context-pack": missingBoundaryDir });
     assert(missingBoundary.findings.some((finding) => finding.ruleId === "doctor.no-provider-boundary"));
 
-    assert.match(formatHuman(commandDoctor({ repo: repoDir, "context-pack": dirtyPackDir })), /BaseBrief doctor warning/);
+    const doctorWarningHuman = formatHuman(commandDoctor({ repo: repoDir, "context-pack": dirtyPackDir }));
+    assert.match(doctorWarningHuman, /BaseBrief doctor warning/);
+    assert.match(doctorWarningHuman, /next_step=recheck live repo facts and refresh the context pack if stale/);
+    assert.match(formatHuman(commandDoctor({ repo: repoDir, "context-pack": brokenPackDir })), /next_step=repair the context pack before resume or export/);
     assert.match(HELP_TEXT, /doctor --repo <target-repo> --context-pack <context-pack-dir>/);
     assert.equal(run(["node", "scripts/basebrief.js", "doctor", "--repo", repoDir, "--context-pack", dirtyPackDir]).command, "doctor");
 
@@ -849,6 +855,7 @@ test("Context Pack Doctor reports conservative read-only diagnostics", () => {
     assert.equal(cli.status, 0, cli.stderr);
     const cliResult = JSON.parse(cli.stdout);
     assert.equal(cliResult.command, "doctor");
+    assert.equal(Object.hasOwn(cliResult, "next_step"), false);
     assert.equal(cliResult.contractVersion, DOCTOR_CONTRACT_VERSION);
     assert.equal(cliResult.repo.startsWith("tests"), true);
     assert.equal(cliResult.contextPack.startsWith("tests"), true);
@@ -941,7 +948,9 @@ test("Context Pack Lite writes seven reviewable artifacts without expanding scop
     assert.equal(cliResult.git.worktree_status, "dirty");
     assert.equal(cliResult.limits.maxFiles, 2);
 
-    assert.match(formatHuman(commandContextPack({ repo: repoDir, "output-dir": commandOutputDir })), /BaseBrief context pack written/);
+    const contextPackHuman = formatHuman(commandContextPack({ repo: repoDir, "output-dir": commandOutputDir }));
+    assert.match(contextPackHuman, /BaseBrief context pack written/);
+    assert.match(contextPackHuman, /next_step=node scripts\/basebrief\.js check --input/);
     assert.match(HELP_TEXT, /context-pack --repo <target-repo> --output-dir <dir>/);
 
     fs.mkdirSync(nonEmptyDir, { recursive: true });
@@ -1008,9 +1017,13 @@ test("Context Pack Check validates clean and broken pack directories through exi
     assert.equal(cli.status, 0, cli.stderr);
     const cliResult = JSON.parse(cli.stdout);
     assert.equal(cliResult.command, "check");
+    assert.equal(Object.hasOwn(cliResult, "next_step"), false);
     assert.equal(cliResult.check.status, "passed");
     assert.equal(cliResult.check.errorCount, 0);
     assert.equal(cliResult.check.findings.some((finding) => finding.ruleId.startsWith("context-pack.")), false);
+    const cleanHuman = formatHuman({ command: "check", input: packDir, check: clean });
+    assert.match(cleanHuman, /next_step=node scripts\/basebrief\.js resume --input/);
+    assert.match(cleanHuman, /optional_next_step=node scripts\/basebrief\.js doctor --repo <target-repo> --context-pack/);
 
     const brokenCases = [
       {
@@ -1111,6 +1124,7 @@ test("Context Pack Check validates clean and broken pack directories through exi
     assert.equal(thick.errorCount, 0);
     assert(thick.warningCount > 0);
     assert(thick.findings.some((finding) => finding.ruleId === "context-pack.too-thick"));
+    assert.match(formatHuman({ command: "check", input: thickDir, check: thick }), /next_step=review warnings before resume/);
 
     fs.cpSync(packDir, cliPackDir, { recursive: true });
     const cliMapPath = path.join(cliPackDir, "REPO_MAP.md");
@@ -1130,6 +1144,8 @@ test("Context Pack Check validates clean and broken pack directories through exi
     const failedCliResult = JSON.parse(failedCli.stdout);
     assert.equal(failedCliResult.check.status, "failed");
     assert(failedCliResult.check.findings.some((finding) => finding.ruleId === "context-pack.invalid-metadata"));
+    assert.equal(Object.hasOwn(failedCliResult, "next_step"), false);
+    assert.match(formatHuman({ command: "check", input: cliPackDir, check: failedCliResult.check }), /next_step=fix reported errors before resume, doctor, or export/);
 
     const thickCliDir = path.join(tempRoot, "cli-too-thick");
     fs.cpSync(packDir, thickCliDir, { recursive: true });

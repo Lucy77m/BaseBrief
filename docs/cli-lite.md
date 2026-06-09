@@ -367,6 +367,12 @@ See [Context Pack Lite Spec](specs/context-pack-lite.md),
 [Context Pack Lite example kit](../examples/context-pack-lite/README.md), and
 [v2.0.0 Context Pack Lite Local Closeout](releases/v2.0.0.md).
 
+Human output includes a `next_step=` hint pointing to:
+
+```text
+node scripts/basebrief.js check --input <context-pack-dir>
+```
+
 ### resume
 
 ```text
@@ -377,6 +383,11 @@ This command reads a Context Pack Lite directory, reuses the existing Artifact
 Checker result, and prints a copyable new-window prompt. Clean packs produce a
 prompt. Warning-only packs also produce a prompt and include the warning
 findings as review notes. Error findings stop the command before prompt output.
+
+Human `check` output includes `next_step=` guidance. Clean packs point to
+`resume`; warning-only packs ask the user to review warnings before `resume`;
+errored packs ask the user to fix reported errors before `resume`, `doctor`, or
+`export`.
 
 `resume` is read-only and stdout-only in the first v2.2 slice. It does not
 change Context Pack Lite generator output, does not change
@@ -420,6 +431,12 @@ See [v2.4.0 File-only Adapter / MCP-friendly Export Plan](releases/v2.4.0-plan.m
 For a public-safe bundle shape, see
 [File-only Export example kit](../examples/file-only-export/README.md).
 
+Human output includes a `next_step=` hint pointing to:
+
+```text
+node scripts/basebrief.js check --input <export-dir>
+```
+
 ### doctor
 
 ```text
@@ -445,11 +462,16 @@ See [v2.5.0 Context Pack Doctor Plan](releases/v2.5.0-plan.md),
 For a public-safe sample output, see
 [Context Pack Doctor example kit](../examples/context-pack-doctor/README.md).
 
+Human output includes `next_step=` guidance for warning and error findings, such
+as rechecking live repo facts, refreshing stale Context Packs, or repairing
+broken packs before continuing.
+
 ## JSON Output
 
 `--json` prints stable command metadata, output file names, and check status
 where relevant. `resume --json` includes the copyable prompt because the prompt
-is that command's primary output.
+is that command's primary output. Human `next_step=` and `optional_next_step=`
+hints are not added to JSON output.
 
 ## Boundary
 

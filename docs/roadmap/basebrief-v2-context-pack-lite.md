@@ -753,6 +753,30 @@ Pack structure, JSON contract, Status, Workflow Runner, Doctor expansion,
 provider/runtime integration, MCP, plugin, schema-v2, daemon, watcher, hosted
 memory, publish, push, tag, release, or PR work starts here.
 
+### v2.7 Context Pack Human Next-Step Hints
+
+`docs/releases/v2.7.0-plan.md` opens a narrow human-output usability line after
+the v2.6.x closeout review packet. v2.7 should add concise next-step hints to
+existing non-JSON CLI output for `context-pack`, `check`, `export`, and
+`doctor`, helping users see whether to run `check`, `resume`, `doctor`, repair a
+pack, or verify an export next.
+
+This is guidance text only. It must preserve `--json` output shape, command exit
+semantics, Context Pack Lite's seven-file structure, Context Pack Check, Resume,
+Export, and Doctor JSON contracts, and provider/runtime/plugin/MCP/schema-v2
+boundaries. It does not add Status, Workflow Runner, Doctor expansion,
+Continuation Harness Lite, daemon, watcher, hosted memory, publish, push, tag,
+release, or PR work.
+
+`docs/releases/v2.7.0.md` closes the first implementation slice. It adds
+human-only `next_step=` and `optional_next_step=` hints under the existing
+`formatHuman()` path while keeping `--json` output free of a `next_step` field.
+It preserves command exit semantics, Context Pack Lite structure, Context Pack
+Check, Resume, Export, and Doctor JSON contracts, and all provider/runtime,
+plugin, MCP, schema-v2, Status, Workflow Runner, Doctor expansion, Continuation
+Harness Lite, daemon, watcher, hosted memory, publish, push, tag, release, and
+PR boundaries.
+
 ### Later Workflow Runner Lite
 
 Only after Context Pack Lite, Context Pack Check, One-command Resume,

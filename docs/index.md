@@ -86,6 +86,8 @@ npm run check
 - [Context Pack Doctor Dogfooding v2.5.1](dogfooding/context-pack-doctor-v2.5.1.md)
 - [Context Pack Doctor example kit](../examples/context-pack-doctor/README.md)
 - [v2.6.0 First-Run / Adoption Polish Local Closeout](releases/v2.6.0.md)
+- [v2.7.0 Context Pack Human Next-Step Hints Plan](releases/v2.7.0-plan.md)
+- [v2.7.0 Context Pack Human Next-Step Hints Local Closeout](releases/v2.7.0.md)
 - [Context Pack Adoption Notes v2.6.1](dogfooding/context-pack-adoption-notes-v2.6.1.md)
 - [Context Engineering Reference Notes v2.6.4](dogfooding/context-engineering-reference-notes-v2.6.4.md)
 - [Context Pack Adoption Scenario Matrix v2.6.5](dogfooding/context-pack-adoption-scenario-matrix-v2.6.5.md)

@@ -1746,6 +1746,65 @@ output shape, change Context Pack structure, change `check --input <dir>
 tag, release, or PR work. Any actual publication action still requires separate
 explicit confirmation.
 
+## v2.7.0 Context Pack Human Next-Step Hints Plan
+
+`v2.7.0` opens a narrow human-output usability line after the v2.6.x local
+closeout review packet. The plan is recorded in
+[v2.7.0 Context Pack Human Next-Step Hints Plan](releases/v2.7.0-plan.md).
+
+The planned implementation should add concise next-step hints to existing
+non-JSON CLI output for `context-pack`, `check`, `export`, and `doctor` so a
+user can see the next recommended local command after running the current
+workflow. The hints are guidance text only.
+
+The plan preserves `--json` output shape, command exit semantics, Context Pack
+Lite's seven-file structure, Context Pack Check, Resume, Export, and Doctor JSON
+contracts, and all provider/runtime/plugin/MCP/schema-v2 boundaries. It does
+not add Status, Workflow Runner, Doctor expansion, Continuation Harness Lite,
+daemon, watcher, hosted memory, CI, publish, push, tag, release, or PR work.
+
+The planned validation gate remains:
+
+```text
+npm run release-check
+npm test
+git diff --check
+```
+
+Provider-free release checks must continue to print
+`provider_probe_status=skipped`. Implementation should additionally verify that
+non-JSON output contains next-step hints while `--json` output remains
+unchanged for the same command results.
+
+## v2.7.0 Context Pack Human Next-Step Hints Local Closeout
+
+`v2.7.0` closes the first human-output next-step hints implementation slice.
+The closeout is recorded in
+[v2.7.0 Context Pack Human Next-Step Hints Local Closeout](releases/v2.7.0.md).
+
+The implementation adds `next_step=` guidance to existing non-JSON CLI output
+for `context-pack`, `check`, `export`, and `doctor`, plus `optional_next_step=`
+guidance where a clean or warning-only `check` result can continue with
+`resume` or live repository comparison through `doctor`.
+
+Tests verify that human output contains the new hints and that `--json` output
+does not gain a `next_step` field. The change preserves command exit semantics,
+Context Pack Lite's seven-file structure, Context Pack Check, Resume, Export,
+and Doctor JSON contracts, and all provider/runtime/plugin/MCP/schema-v2
+boundaries.
+
+The local validation gate remains:
+
+```text
+node --test tests/context-pack.test.js --test-name-pattern "Context Pack|Export|Doctor"
+npm run release-check
+npm test
+git diff --check
+```
+
+Provider-free release checks must continue to print
+`provider_probe_status=skipped`.
+
 ## v0.4.1 Stabilization Candidate
 
 `v0.4.1` is a stabilization-only cycle after the `v0.4.0` public release. It uses

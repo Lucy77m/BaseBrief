@@ -239,6 +239,8 @@ function checkRequiredFiles() {
     "docs/releases/v2.5.0-plan.md",
     "docs/releases/v2.5.0.md",
     "docs/releases/v2.6.0.md",
+    "docs/releases/v2.7.0-plan.md",
+    "docs/releases/v2.7.0.md",
     "docs/specs/context-pack-resume.md",
     "docs/specs/basebrief-format.md",
     "docs/specs/file-only-export.md",
@@ -693,6 +695,21 @@ function checkV2ContextPackDocs(context) {
   assert(testingDoc.includes("git_diff_check_status:") && testingDoc.includes("independent_test_files=3"), "Testing docs must record v2.6.37 diff-check and independent files");
   assertIncludesPhrase(testingDoc, "Any actual publication action still requires separate explicit confirmation", "Testing docs must keep v2.6.37 publication separately confirmed");
   assertIncludesPhrase(testingDoc, "does not add a CLI command, change package scripts, change release-check output", "Testing docs must preserve v2.6.37 command and output boundaries");
+  assert(testingDoc.includes("v2.7.0 Context Pack Human Next-Step Hints Plan"), "Testing docs must document v2.7.0 human next-step hints plan");
+  assert(testingDoc.includes("releases/v2.7.0-plan.md"), "Testing docs must link v2.7.0 plan");
+  assertIncludesPhrase(testingDoc, "narrow human-output usability line after the v2.6.x local closeout review packet", "Testing docs must summarize v2.7.0 scope");
+  assertIncludesPhrase(testingDoc, "non-JSON CLI output for `context-pack`, `check`, `export`, and `doctor`", "Testing docs must name v2.7.0 human output targets");
+  assertIncludesPhrase(testingDoc, "hints are guidance text only", "Testing docs must keep v2.7.0 hints as guidance text only");
+  assertIncludesPhrase(testingDoc, "preserves `--json` output shape, command exit semantics", "Testing docs must preserve v2.7.0 JSON and exit semantics");
+  assertIncludesPhrase(testingDoc, "does not add Status, Workflow Runner", "Testing docs must reject v2.7.0 status and runner scope");
+  assert(testingDoc.includes("Continuation Harness Lite"), "Testing docs must reject v2.7.0 harness scope");
+  assert(testingDoc.includes("Provider-free release checks must continue to print") && testingDoc.includes("provider_probe_status=skipped"), "Testing docs must preserve v2.7.0 skipped provider gate");
+  assert(testingDoc.includes("v2.7.0 Context Pack Human Next-Step Hints Local Closeout"), "Testing docs must document v2.7.0 human next-step hints closeout");
+  assert(testingDoc.includes("releases/v2.7.0.md"), "Testing docs must link v2.7.0 closeout");
+  assertIncludesPhrase(testingDoc, "adds `next_step=` guidance to existing non-JSON CLI output for `context-pack`, `check`, `export`, and `doctor`", "Testing docs must summarize v2.7.0 implemented hints");
+  assert(testingDoc.includes("optional_next_step="), "Testing docs must mention v2.7.0 optional next-step hints");
+  assertIncludesPhrase(testingDoc, "human output contains the new hints and that `--json` output does not gain a `next_step` field", "Testing docs must preserve v2.7.0 human-only JSON boundary");
+  assertIncludesPhrase(testingDoc, "node --test tests/context-pack.test.js --test-name-pattern \"Context Pack|Export|Doctor\"", "Testing docs must record v2.7.0 focused test command");
   assert(testingDoc.includes("checker_error_propagation_status: pass"), "Testing docs must record checker-error propagation");
   assert(testingDoc.includes("context-pack --repo <target-repo>"), "Testing docs must document context-pack command");
   assert(testingDoc.includes("resume --input <context-pack-dir>"), "Testing docs must document resume command");
@@ -716,6 +733,8 @@ function checkV2ContextPackDocs(context) {
   assert(docsIndex.includes("releases/v2.5.0-plan.md"), "Docs index must link v2.5.0 doctor plan");
   assert(docsIndex.includes("releases/v2.5.0.md"), "Docs index must link v2.5.0 doctor closeout");
   assert(docsIndex.includes("releases/v2.6.0.md"), "Docs index must link v2.6.0 adoption polish closeout");
+  assert(docsIndex.includes("releases/v2.7.0-plan.md"), "Docs index must link v2.7.0 human next-step hints plan");
+  assert(docsIndex.includes("releases/v2.7.0.md"), "Docs index must link v2.7.0 human next-step hints closeout");
   assert(docsIndex.includes("specs/context-pack-doctor.md"), "Docs index must link context pack doctor spec");
   assert(docsIndex.includes("dogfooding/context-pack-doctor-v2.5.0.md"), "Docs index must link v2.5.0 doctor dogfooding");
   assert(docsIndex.includes("../examples/context-pack-doctor/README.md"), "Docs index must link context pack doctor example kit");
@@ -983,6 +1002,18 @@ function checkV2ContextPackDocs(context) {
   assert(v2ContextPackRoadmapDoc.includes("provider_probe_status=skipped") && v2ContextPackRoadmapDoc.includes("independent_test_files=3"), "v2 roadmap must preserve v2.6.37 validation metrics");
   assertIncludesPhrase(v2ContextPackRoadmapDoc, "publish, push, tag, release, and PR actions not_started", "v2 roadmap must keep v2.6.37 release actions not started");
   assertIncludesPhrase(v2ContextPackRoadmapDoc, "No command, package script, release-check output", "v2 roadmap must preserve v2.6.37 command and output boundaries");
+  assert(v2ContextPackRoadmapDoc.includes("v2.7 Context Pack Human Next-Step Hints"), "v2 roadmap must name v2.7 human next-step hints");
+  assert(v2ContextPackRoadmapDoc.includes("docs/releases/v2.7.0-plan.md"), "v2 roadmap must link v2.7.0 plan");
+  assertIncludesPhrase(v2ContextPackRoadmapDoc, "narrow human-output usability line after the v2.6.x closeout review packet", "v2 roadmap must summarize v2.7.0 scope");
+  assertIncludesPhrase(v2ContextPackRoadmapDoc, "existing non-JSON CLI output for `context-pack`, `check`, `export`, and `doctor`", "v2 roadmap must name v2.7.0 human output targets");
+  assertIncludesPhrase(v2ContextPackRoadmapDoc, "guidance text only", "v2 roadmap must keep v2.7.0 hints as guidance only");
+  assertIncludesPhrase(v2ContextPackRoadmapDoc, "preserve `--json` output shape, command exit semantics", "v2 roadmap must preserve v2.7.0 JSON and exit semantics");
+  assertIncludesPhrase(v2ContextPackRoadmapDoc, "does not add Status, Workflow Runner", "v2 roadmap must reject v2.7.0 status and runner scope");
+  assert(v2ContextPackRoadmapDoc.includes("Continuation Harness Lite"), "v2 roadmap must reject v2.7.0 harness scope");
+  assert(v2ContextPackRoadmapDoc.includes("docs/releases/v2.7.0.md"), "v2 roadmap must link v2.7.0 closeout");
+  assert(v2ContextPackRoadmapDoc.includes("next_step=") && v2ContextPackRoadmapDoc.includes("optional_next_step="), "v2 roadmap must summarize v2.7.0 hint line prefixes");
+  assertIncludesPhrase(v2ContextPackRoadmapDoc, "keeping `--json` output free of a `next_step` field", "v2 roadmap must keep v2.7.0 hints out of JSON");
+  assertIncludesPhrase(v2ContextPackRoadmapDoc, "human-only `next_step=` and `optional_next_step=` hints under the existing `formatHuman()` path", "v2 roadmap must keep v2.7.0 implementation under formatHuman");
   assert(v2ContextPackRoadmapDoc.includes("exports/manifest.json"), "v2 roadmap must define export manifest");
   assert(v2ContextPackRoadmapDoc.includes("exports/context-pack.md"), "v2 roadmap must define readable export");
   assert(v2ContextPackRoadmapDoc.includes("exports/context.json"), "v2 roadmap must define machine-readable export");
@@ -2279,6 +2310,8 @@ function checkContentContracts() {
   const v250PlanDoc = readText("docs/releases/v2.5.0-plan.md");
   const v250ReleaseDoc = readText("docs/releases/v2.5.0.md");
   const v260ReleaseDoc = readText("docs/releases/v2.6.0.md");
+  const v270PlanDoc = readText("docs/releases/v2.7.0-plan.md");
+  const v270ReleaseDoc = readText("docs/releases/v2.7.0.md");
   const contextPackResumeSpecDoc = readText("docs/specs/context-pack-resume.md");
   const basebriefFormatSpecDoc = readText("docs/specs/basebrief-format.md");
   const fileOnlyExportSpecDoc = readText("docs/specs/file-only-export.md");
@@ -2923,6 +2956,12 @@ function checkContentContracts() {
   assert(cliLiteDoc.includes("node scripts/basebrief.js resume --input <context-pack-dir>"), "cli-lite.md must document resume command");
   assert(cliLiteDoc.includes("node scripts/basebrief.js export --input <context-pack-dir> --output-dir <dir>"), "cli-lite.md must document export command");
   assert(cliLiteDoc.includes("node scripts/basebrief.js doctor --repo <target-repo> --context-pack <context-pack-dir>"), "cli-lite.md must document doctor command");
+  assert(cliLiteDoc.includes("node scripts/basebrief.js check --input <context-pack-dir>"), "cli-lite.md must document context-pack human next step");
+  assertIncludesPhrase(cliLiteDoc, "Human `check` output includes `next_step=` guidance", "cli-lite.md must document check human next-step guidance");
+  assertIncludesPhrase(cliLiteDoc, "errored packs ask the user to fix reported errors before `resume`, `doctor`, or `export`", "cli-lite.md must document errored check guidance");
+  assert(cliLiteDoc.includes("node scripts/basebrief.js check --input <export-dir>"), "cli-lite.md must document export human next step");
+  assertIncludesPhrase(cliLiteDoc, "Human output includes `next_step=` guidance for warning and error findings", "cli-lite.md must document doctor human next-step guidance");
+  assertIncludesPhrase(cliLiteDoc, "Human `next_step=` and `optional_next_step=` hints are not added to JSON output", "cli-lite.md must keep human hints out of JSON output");
   assert(cliLiteDoc.includes("manifest.json"), "cli-lite.md must document export manifest");
   assert(cliLiteDoc.includes("context-pack.md"), "cli-lite.md must document readable export file");
   assert(cliLiteDoc.includes("context.json"), "cli-lite.md must document machine-readable export file");
@@ -3557,6 +3596,74 @@ function checkContentContracts() {
   assert(v260ReleaseDoc.includes("provider_probe_status=skipped"), "v2.6 closeout doc must preserve skipped provider gate");
   assert(v260ReleaseDoc.includes("docs/examples/release-check polish"), "v2.6 closeout doc must scope release prep as polish");
   assert(v260ReleaseDoc.includes("does not reopen v2.2 resume scope"), "v2.6 closeout doc must avoid reopening earlier v2 scopes");
+  assert(v270PlanDoc.includes("v2.7.0 Context Pack Human Next-Step Hints Plan"), "v2.7 plan must have stable title");
+  assert(v270PlanDoc.includes("Status: v2.7-A human-output planning"), "v2.7 plan must mark human-output planning status");
+  assert(v270PlanDoc.includes("concise next-step hints to existing non-JSON CLI output"), "v2.7 plan must scope hints to non-JSON output");
+  assert(v270PlanDoc.includes("context-pack` success should point to `check --input <context-pack-dir>`"), "v2.7 plan must define context-pack hint");
+  assert(v270PlanDoc.includes("check` pass with zero errors should point to `resume --input"), "v2.7 plan must define check pass hint");
+  assert(v270PlanDoc.includes("export` success should point to `check --input <export-dir>`"), "v2.7 plan must define export hint");
+  assert(v270PlanDoc.includes("doctor` warning or error output should point back to live repo recheck"), "v2.7 plan must define doctor hint");
+  assert(v270PlanDoc.includes("affect human output only"), "v2.7 plan must keep scope human-output only");
+  assert(v270PlanDoc.includes("keep `--json` output byte-shape-compatible"), "v2.7 plan must preserve JSON output shape");
+  assert(v270PlanDoc.includes("keep command exit semantics unchanged"), "v2.7 plan must preserve exit semantics");
+  assert(v270PlanDoc.includes("No new CLI command"), "v2.7 plan must reject new command scope");
+  assert(v270PlanDoc.includes("No Context Pack seven-file structure change"), "v2.7 plan must preserve Context Pack structure");
+  assert(v270PlanDoc.includes("No `check --input <dir> --json` top-level shape change"), "v2.7 plan must preserve checker JSON shape");
+  assert(v270PlanDoc.includes("No Status command"), "v2.7 plan must reject status scope");
+  assert(v270PlanDoc.includes("No Workflow Runner"), "v2.7 plan must keep runner out of scope");
+  assert(v270PlanDoc.includes("No Doctor expansion"), "v2.7 plan must reject doctor expansion");
+  assert(v270PlanDoc.includes("No provider request"), "v2.7 plan must reject provider requests");
+  assert(v270PlanDoc.includes("No MCP server"), "v2.7 plan must reject MCP server scope");
+  assert(v270PlanDoc.includes("No MCP tools"), "v2.7 plan must reject MCP tools scope");
+  assert(v270PlanDoc.includes("No schema-v2"), "v2.7 plan must reject schema-v2");
+  assert(v270PlanDoc.includes("No daemon") && v270PlanDoc.includes("No watcher") && v270PlanDoc.includes("No hosted service"), "v2.7 plan must reject daemon, watcher, and hosted scope");
+  assert(v270PlanDoc.includes("npm run release-check") && v270PlanDoc.includes("npm test") && v270PlanDoc.includes("git diff --check"), "v2.7 plan must include validation gate");
+  assert(v270PlanDoc.includes("provider_probe_status=skipped"), "v2.7 plan must preserve skipped provider gate");
+  assertIncludesPhrase(v270PlanDoc, "If implementation would require JSON, command, or contract changes, stop", "v2.7 plan must define rollback stop condition");
+  assert(v270ReleaseDoc.includes("v2.7.0 Context Pack Human Next-Step Hints Local Closeout"), "v2.7 closeout doc must have stable title");
+  assert(v270ReleaseDoc.includes("Status: local closeout"), "v2.7 closeout doc must mark local closeout status");
+  assertIncludesPhrase(v270ReleaseDoc, "adds concise next-step hints to existing non-JSON CLI output only", "v2.7 closeout doc must scope hints to non-JSON output");
+  assert(v270ReleaseDoc.includes("next_step=") && v270ReleaseDoc.includes("optional_next_step="), "v2.7 closeout doc must name hint line prefixes");
+  assert(v270ReleaseDoc.includes("next_step=node scripts/basebrief.js check --input <context-pack-dir>"), "v2.7 closeout doc must document context-pack next step");
+  assert(v270ReleaseDoc.includes("next_step=node scripts/basebrief.js resume --input <context-pack-dir>"), "v2.7 closeout doc must document check next step");
+  assert(v270ReleaseDoc.includes("optional_next_step=node scripts/basebrief.js doctor --repo <target-repo> --context-pack <context-pack-dir>"), "v2.7 closeout doc must document optional doctor next step");
+  assert(v270ReleaseDoc.includes("next_step=node scripts/basebrief.js check --input <export-dir>"), "v2.7 closeout doc must document export next step");
+  assert(v270ReleaseDoc.includes("next_step=recheck live repo facts and refresh the context pack if stale"), "v2.7 closeout doc must document doctor warning next step");
+  assert(v270ReleaseDoc.includes("next_step=repair the context pack before resume or export"), "v2.7 closeout doc must document doctor error next step");
+  assertIncludesPhrase(v270ReleaseDoc, "guidance text, not machine-readable contracts", "v2.7 closeout doc must keep hints non-contractual");
+  assertIncludesPhrase(v270ReleaseDoc, "`--json` output does not gain a `next_step` field", "v2.7 closeout doc must preserve JSON output shape");
+  assert(v270ReleaseDoc.includes("No new CLI command"), "v2.7 closeout doc must reject new command scope");
+  assert(v270ReleaseDoc.includes("No package script change"), "v2.7 closeout doc must preserve package scripts");
+  assert(v270ReleaseDoc.includes("No release-check output shape change"), "v2.7 closeout doc must preserve release-check output shape");
+  assert(v270ReleaseDoc.includes("No Context Pack seven-file structure change"), "v2.7 closeout doc must preserve Context Pack structure");
+  assert(v270ReleaseDoc.includes("No Context Pack Lite generator output change"), "v2.7 closeout doc must preserve generator output");
+  assert(v270ReleaseDoc.includes("No `check --input <dir> --json` top-level shape change"), "v2.7 closeout doc must preserve checker JSON shape");
+  assert(v270ReleaseDoc.includes("No `resume --input <context-pack-dir>` JSON contract change"), "v2.7 closeout doc must preserve resume JSON contract");
+  assert(v270ReleaseDoc.includes("No `export --input <context-pack-dir> --output-dir <dir>` JSON contract"), "v2.7 closeout doc must preserve export JSON contract");
+  assert(v270ReleaseDoc.includes("No `doctor --repo <target-repo> --context-pack <context-pack-dir>` JSON"), "v2.7 closeout doc must preserve doctor JSON contract");
+  assert(v270ReleaseDoc.includes("No Status command"), "v2.7 closeout doc must reject status scope");
+  assert(v270ReleaseDoc.includes("No Workflow Runner"), "v2.7 closeout doc must reject workflow runner scope");
+  assert(v270ReleaseDoc.includes("No Doctor expansion"), "v2.7 closeout doc must reject doctor expansion");
+  assert(v270ReleaseDoc.includes("No Continuation Harness Lite implementation"), "v2.7 closeout doc must reject harness implementation");
+  assert(v270ReleaseDoc.includes("No provider request"), "v2.7 closeout doc must reject provider requests");
+  assert(v270ReleaseDoc.includes("No runtime integration"), "v2.7 closeout doc must reject runtime integration");
+  assert(v270ReleaseDoc.includes("No plugin"), "v2.7 closeout doc must reject plugin scope");
+  assert(v270ReleaseDoc.includes("No MCP server") && v270ReleaseDoc.includes("No MCP tools"), "v2.7 closeout doc must reject MCP scope");
+  assert(v270ReleaseDoc.includes("No schema-v2"), "v2.7 closeout doc must reject schema-v2");
+  assert(v270ReleaseDoc.includes("No daemon") && v270ReleaseDoc.includes("No watcher"), "v2.7 closeout doc must reject daemon and watcher scope");
+  assert(v270ReleaseDoc.includes("No push, tag, release, pull request, npm publish, or global CLI install"), "v2.7 closeout doc must reject external release actions");
+  assert(v270ReleaseDoc.includes("node --test tests/context-pack.test.js --test-name-pattern \"Context Pack|Export|Doctor\""), "v2.7 closeout doc must include focused test gate");
+  assert(v270ReleaseDoc.includes("npm run release-check") && v270ReleaseDoc.includes("npm test") && v270ReleaseDoc.includes("git diff --check"), "v2.7 closeout doc must include validation gate");
+  assert(v270ReleaseDoc.includes("provider_probe_status=skipped"), "v2.7 closeout doc must preserve skipped provider gate");
+  assert(basebriefCliScript.includes("function formatNextStepLines(result)"), "CLI formatter must define human next-step helper");
+  assert(basebriefCliScript.includes("...formatNextStepLines(result)"), "CLI human output must append next-step hints through formatHuman");
+  assert(basebriefCliScript.includes("next_step=node scripts/basebrief.js check --input ${result.outputDir}"), "CLI formatter must point context-pack and export output to check");
+  assert(basebriefCliScript.includes("next_step=node scripts/basebrief.js resume --input ${result.input}"), "CLI formatter must point clean checks to resume");
+  assert(basebriefCliScript.includes("optional_next_step=node scripts/basebrief.js doctor --repo <target-repo> --context-pack ${result.input}"), "CLI formatter must expose optional doctor next step for clean checks");
+  assert(basebriefCliScript.includes("next_step=review warnings before resume"), "CLI formatter must guide warning checks to human review");
+  assert(basebriefCliScript.includes("next_step=fix reported errors before resume, doctor, or export"), "CLI formatter must guide errored checks to repair");
+  assert(basebriefCliScript.includes("next_step=recheck live repo facts and refresh the context pack if stale"), "CLI formatter must guide warning doctor output to live recheck");
+  assert(basebriefCliScript.includes("next_step=repair the context pack before resume or export"), "CLI formatter must guide failed doctor output to repair");
   checkV26DogfoodingDocs({
     contextPackAdoptionNotesV261Doc,
     contextEngineeringReferenceNotesV264Doc,
