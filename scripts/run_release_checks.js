@@ -217,6 +217,7 @@ function checkRequiredFiles() {
     "docs/dogfooding/context-pack-minimal-feature-candidate-decision-v2.6.18.md",
     "docs/dogfooding/context-pack-first-run-handoff-validation.md",
     "docs/dogfooding/context-pack-continuation-harness-lite-design-sketch.md",
+    "docs/dogfooding/context-pack-continuation-harness-lite-paper-rehearsal.md",
     "docs/testing-v0.4.x-test-matrix.md",
     "docs/testing-v0.6.x-test-matrix.md",
     "docs/testing-v0.7.x-test-matrix.md",
@@ -525,6 +526,7 @@ function checkContentContracts() {
   const contextPackMinimalFeatureCandidateDecisionV2618Doc = readText("docs/dogfooding/context-pack-minimal-feature-candidate-decision-v2.6.18.md");
   const contextPackFirstRunHandoffValidationDoc = readText("docs/dogfooding/context-pack-first-run-handoff-validation.md");
   const contextPackContinuationHarnessLiteDesignSketchDoc = readText("docs/dogfooding/context-pack-continuation-harness-lite-design-sketch.md");
+  const contextPackContinuationHarnessLitePaperRehearsalDoc = readText("docs/dogfooding/context-pack-continuation-harness-lite-paper-rehearsal.md");
   const postReleaseBaselineDoc = readText("docs/baselines/v0.4.0-post-release-baseline.md");
   const v060PostReleaseBaselineDoc = readText("docs/baselines/v0.6.0-post-release-baseline.md");
   const projectStateModelDoc = readText("docs/design/project-state-model.md");
@@ -1100,6 +1102,16 @@ function checkContentContracts() {
   assert(testingDoc.includes("user_goal_required"), "Testing docs must include harness lite final state");
   assert(testingDoc.includes("command_status: not_started") && testingDoc.includes("implementation_status: not_started"), "Testing docs must keep harness lite command and implementation not started");
   assert(testingDoc.includes("Status") && testingDoc.includes("Workflow Runner") && testingDoc.includes("JSON contract changes out of scope"), "Testing docs must keep harness lite out of behavior scope");
+  assert(testingDoc.includes("Context Pack Continuation Harness Lite Paper Rehearsal"), "Testing docs must document harness lite paper rehearsal");
+  assert(testingDoc.includes("dogfooding/context-pack-continuation-harness-lite-paper-rehearsal.md"), "Testing docs must link harness lite paper rehearsal");
+  assertIncludesPhrase(testingDoc, "planning validation only, not an implementation", "Testing docs must keep harness lite rehearsal non-implementation");
+  assert(testingDoc.includes("clean pack") && testingDoc.includes("too-thick warning") && testingDoc.includes("broken pack") && testingDoc.includes("stale/live drift") && testingDoc.includes("missing pack"), "Testing docs must summarize harness lite rehearsal scenarios");
+  assert(testingDoc.includes("check_passed + live_match -> resume_ready -> user_goal_required"), "Testing docs must include harness lite clean-pack transition");
+  assert(testingDoc.includes("check_warning -> human_review"), "Testing docs must include harness lite warning transition");
+  assert(testingDoc.includes("check_failed -> repair_pack"), "Testing docs must include harness lite broken transition");
+  assert(testingDoc.includes("check_passed + live_drift -> doctor_or_refresh"), "Testing docs must include harness lite drift transition");
+  assert(testingDoc.includes("pack_missing -> blocked"), "Testing docs must include harness lite missing-pack transition");
+  assert(testingDoc.includes("implementation_status: not_started") && testingDoc.includes("command_status: not_started"), "Testing docs must keep harness lite paper rehearsal command and implementation not started");
   assert(testingDoc.includes("checker_error_propagation_status: pass"), "Testing docs must record checker-error propagation");
   assert(testingDoc.includes("context-pack --repo <target-repo>"), "Testing docs must document context-pack command");
   assert(testingDoc.includes("resume --input <context-pack-dir>"), "Testing docs must document resume command");
@@ -1642,6 +1654,7 @@ function checkContentContracts() {
   assert(docsIndex.includes("dogfooding/context-pack-minimal-feature-candidate-decision-v2.6.18.md"), "Docs index must link v2.6.18 minimal feature candidate decision");
   assert(docsIndex.includes("dogfooding/context-pack-first-run-handoff-validation.md"), "Docs index must link first-run handoff validation");
   assert(docsIndex.includes("dogfooding/context-pack-continuation-harness-lite-design-sketch.md"), "Docs index must link harness lite design sketch");
+  assert(docsIndex.includes("dogfooding/context-pack-continuation-harness-lite-paper-rehearsal.md"), "Docs index must link harness lite paper rehearsal");
   assert(docsIndex.includes("specs/context-pack-lite.md"), "Docs index must link context pack lite spec");
   assert(docsIndex.includes("specs/context-pack-resume.md"), "Docs index must link context pack resume spec");
   assert(docsIndex.includes("specs/basebrief-format.md"), "Docs index must link basebrief format spec");
@@ -1752,6 +1765,14 @@ function checkContentContracts() {
   assert(v2ContextPackRoadmapDoc.includes("pack_missing") && v2ContextPackRoadmapDoc.includes("user_goal_required"), "v2 roadmap must summarize harness lite state machine");
   assertIncludesPhrase(v2ContextPackRoadmapDoc, "command_status: not_started, implementation_status: not_started", "v2 roadmap must keep harness lite command and implementation not started");
   assertIncludesPhrase(v2ContextPackRoadmapDoc, "Status, Workflow Runner, provider/runtime/MCP/plugin/schema-v2/hosted-memory scope, and JSON contract changes closed", "v2 roadmap must keep harness lite out of behavior and integration scope");
+  assert(v2ContextPackRoadmapDoc.includes("docs/dogfooding/context-pack-continuation-harness-lite-paper-rehearsal.md"), "v2 roadmap must link harness lite paper rehearsal");
+  assertIncludesPhrase(v2ContextPackRoadmapDoc, "rehearses the sketch against clean pack, too-thick warning, broken pack, stale/live drift, and missing pack scenarios", "v2 roadmap must summarize harness lite paper rehearsal scenarios");
+  assert(v2ContextPackRoadmapDoc.includes("check_passed + live_match -> resume_ready -> user_goal_required"), "v2 roadmap must include harness lite clean-pack transition");
+  assert(v2ContextPackRoadmapDoc.includes("check_warning -> human_review"), "v2 roadmap must include harness lite warning transition");
+  assert(v2ContextPackRoadmapDoc.includes("check_failed -> repair_pack"), "v2 roadmap must include harness lite broken transition");
+  assert(v2ContextPackRoadmapDoc.includes("check_passed + live_drift -> doctor_or_refresh"), "v2 roadmap must include harness lite drift transition");
+  assert(v2ContextPackRoadmapDoc.includes("pack_missing -> blocked"), "v2 roadmap must include harness lite missing-pack transition");
+  assertIncludesPhrase(v2ContextPackRoadmapDoc, "does not trigger implementation and keeps implementation_status: not_started, command_status: not_started", "v2 roadmap must keep harness lite paper rehearsal not started");
   assert(v2ContextPackRoadmapDoc.includes("exports/manifest.json"), "v2 roadmap must define export manifest");
   assert(v2ContextPackRoadmapDoc.includes("exports/context-pack.md"), "v2 roadmap must define readable export");
   assert(v2ContextPackRoadmapDoc.includes("exports/context.json"), "v2 roadmap must define machine-readable export");
@@ -2627,6 +2648,52 @@ function checkContentContracts() {
   assert(contextPackContinuationHarnessLiteDesignSketchDoc.includes("provider_probe_status=skipped"), "harness lite design sketch must preserve skipped provider gate");
   assert(!/(^|[^A-Za-z])[A-Za-z]:[\\/]/.test(contextPackContinuationHarnessLiteDesignSketchDoc), "harness lite design sketch must not expose drive-letter absolute paths");
   assert(!/\\\\/.test(contextPackContinuationHarnessLiteDesignSketchDoc), "harness lite design sketch must not expose UNC paths");
+  assert(contextPackContinuationHarnessLitePaperRehearsalDoc.includes("Context Pack Continuation Harness Lite Paper Rehearsal"), "harness lite paper rehearsal doc must have stable title");
+  assertIncludesPhrase(contextPackContinuationHarnessLitePaperRehearsalDoc, "local paper rehearsal only, not implementation", "harness lite paper rehearsal must avoid implementation claims");
+  assert(contextPackContinuationHarnessLitePaperRehearsalDoc.includes("paper_rehearsal_status: completed"), "harness lite paper rehearsal must record completed paper rehearsal");
+  assert(contextPackContinuationHarnessLitePaperRehearsalDoc.includes("implementation_status: not_started"), "harness lite paper rehearsal must keep implementation not started");
+  assert(contextPackContinuationHarnessLitePaperRehearsalDoc.includes("command_status: not_started"), "harness lite paper rehearsal must keep command not started");
+  assert(contextPackContinuationHarnessLitePaperRehearsalDoc.includes("status_command_status: not_started"), "harness lite paper rehearsal must keep status command not started");
+  assert(contextPackContinuationHarnessLitePaperRehearsalDoc.includes("workflow_runner_status: not_started"), "harness lite paper rehearsal must keep workflow runner not started");
+  assert(contextPackContinuationHarnessLitePaperRehearsalDoc.includes("json_contract_change_status: not_started"), "harness lite paper rehearsal must keep JSON contract change not started");
+  assert(contextPackContinuationHarnessLitePaperRehearsalDoc.includes("provider_probe_status=skipped"), "harness lite paper rehearsal must preserve skipped provider gate");
+  assert(contextPackContinuationHarnessLitePaperRehearsalDoc.includes("clean pack"), "harness lite paper rehearsal must cover clean pack");
+  assert(contextPackContinuationHarnessLitePaperRehearsalDoc.includes("too-thick warning"), "harness lite paper rehearsal must cover too-thick warning");
+  assert(contextPackContinuationHarnessLitePaperRehearsalDoc.includes("broken pack"), "harness lite paper rehearsal must cover broken pack");
+  assert(contextPackContinuationHarnessLitePaperRehearsalDoc.includes("stale/live drift"), "harness lite paper rehearsal must cover stale/live drift");
+  assert(contextPackContinuationHarnessLitePaperRehearsalDoc.includes("missing pack"), "harness lite paper rehearsal must cover missing pack");
+  assert(contextPackContinuationHarnessLitePaperRehearsalDoc.includes("check_passed + live_match -> resume_ready -> user_goal_required"), "harness lite paper rehearsal must include clean-pack transition");
+  assert(contextPackContinuationHarnessLitePaperRehearsalDoc.includes("check_warning -> human_review"), "harness lite paper rehearsal must include warning transition");
+  assert(contextPackContinuationHarnessLitePaperRehearsalDoc.includes("check_failed -> repair_pack"), "harness lite paper rehearsal must include broken-pack transition");
+  assert(contextPackContinuationHarnessLitePaperRehearsalDoc.includes("check_passed + live_drift -> doctor_or_refresh"), "harness lite paper rehearsal must include live-drift transition");
+  assert(contextPackContinuationHarnessLitePaperRehearsalDoc.includes("pack_missing -> blocked"), "harness lite paper rehearsal must include missing-pack transition");
+  assert((contextPackContinuationHarnessLitePaperRehearsalDoc.match(/input signal:/g) || []).length === 5, "harness lite paper rehearsal must record five input signals");
+  assert((contextPackContinuationHarnessLitePaperRehearsalDoc.match(/state transition:/g) || []).length === 5, "harness lite paper rehearsal must record five state transitions");
+  assert((contextPackContinuationHarnessLitePaperRehearsalDoc.match(/recommended next step:/g) || []).length === 5, "harness lite paper rehearsal must record five recommended next steps");
+  assert((contextPackContinuationHarnessLitePaperRehearsalDoc.match(/not-a-trigger:/g) || []).length === 5, "harness lite paper rehearsal must record five not-a-trigger notes");
+  assert(contextPackContinuationHarnessLitePaperRehearsalDoc.includes("Current evidence still does not trigger implementation"), "harness lite paper rehearsal must keep current evidence below implementation threshold");
+  assertIncludesPhrase(contextPackContinuationHarnessLitePaperRehearsalDoc, "Harness Lite remains design sketch only", "harness lite paper rehearsal must keep harness as design sketch only");
+  assert(contextPackContinuationHarnessLitePaperRehearsalDoc.includes("No new CLI command"), "harness lite paper rehearsal must reject new commands");
+  assert(contextPackContinuationHarnessLitePaperRehearsalDoc.includes("No Context Pack seven-file structure change"), "harness lite paper rehearsal must preserve seven-file structure");
+  assert(contextPackContinuationHarnessLitePaperRehearsalDoc.includes("No `check --input <dir> --json` top-level shape change"), "harness lite paper rehearsal must preserve checker JSON shape");
+  assert(contextPackContinuationHarnessLitePaperRehearsalDoc.includes("No Resume JSON contract change"), "harness lite paper rehearsal must preserve resume JSON contract");
+  assert(contextPackContinuationHarnessLitePaperRehearsalDoc.includes("No Doctor JSON contract change"), "harness lite paper rehearsal must preserve doctor JSON contract");
+  assert(contextPackContinuationHarnessLitePaperRehearsalDoc.includes("No Export JSON contract change"), "harness lite paper rehearsal must preserve export JSON contract");
+  assert(contextPackContinuationHarnessLitePaperRehearsalDoc.includes("No JSON shape change"), "harness lite paper rehearsal must reject JSON shape changes");
+  assert(contextPackContinuationHarnessLitePaperRehearsalDoc.includes("No Status command"), "harness lite paper rehearsal must reject status command");
+  assert(contextPackContinuationHarnessLitePaperRehearsalDoc.includes("No Workflow Runner"), "harness lite paper rehearsal must reject workflow runner");
+  assert(contextPackContinuationHarnessLitePaperRehearsalDoc.includes("No Continuation Harness Lite implementation"), "harness lite paper rehearsal must reject harness implementation");
+  assert(contextPackContinuationHarnessLitePaperRehearsalDoc.includes("No provider request"), "harness lite paper rehearsal must reject provider requests");
+  assert(contextPackContinuationHarnessLitePaperRehearsalDoc.includes("No runtime integration"), "harness lite paper rehearsal must reject runtime integration");
+  assert(contextPackContinuationHarnessLitePaperRehearsalDoc.includes("No MCP server"), "harness lite paper rehearsal must reject MCP server");
+  assert(contextPackContinuationHarnessLitePaperRehearsalDoc.includes("No MCP tools"), "harness lite paper rehearsal must reject MCP tools");
+  assert(contextPackContinuationHarnessLitePaperRehearsalDoc.includes("No plugin"), "harness lite paper rehearsal must reject plugin scope");
+  assert(contextPackContinuationHarnessLitePaperRehearsalDoc.includes("No schema-v2"), "harness lite paper rehearsal must reject schema-v2");
+  assert(contextPackContinuationHarnessLitePaperRehearsalDoc.includes("No daemon"), "harness lite paper rehearsal must reject daemon scope");
+  assert(contextPackContinuationHarnessLitePaperRehearsalDoc.includes("No watcher"), "harness lite paper rehearsal must reject watcher scope");
+  assert(contextPackContinuationHarnessLitePaperRehearsalDoc.includes("No hosted memory"), "harness lite paper rehearsal must reject hosted memory");
+  assert(!/(^|[^A-Za-z])[A-Za-z]:[\\/]/.test(contextPackContinuationHarnessLitePaperRehearsalDoc), "harness lite paper rehearsal must not expose drive-letter absolute paths");
+  assert(!/\\\\/.test(contextPackContinuationHarnessLitePaperRehearsalDoc), "harness lite paper rehearsal must not expose UNC paths");
   assert(contextPackDoctorDogfoodingDoc.includes("Context Pack Doctor Dogfooding v2.5.0"), "doctor dogfooding doc must have stable title");
   assert(contextPackDoctorDogfoodingDoc.includes("doctor_contract_version: basebrief-doctor-v1"), "doctor dogfooding must record contract version");
   assert(contextPackDoctorDogfoodingDoc.includes("doctor_command_status: warning"), "doctor dogfooding must record warning status");

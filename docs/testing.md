@@ -1195,6 +1195,29 @@ Expected release-check output without provider env remains:
 provider_probe_status=skipped
 ```
 
+## Context Pack Continuation Harness Lite Paper Rehearsal
+
+The Continuation Harness Lite paper rehearsal is planning validation only, not
+an implementation. It tests whether the design sketch can explain clean pack,
+too-thick warning, broken pack, stale/live drift, and missing pack scenarios
+using existing BaseBrief surfaces.
+
+The rehearsal is recorded in
+[Context Pack Continuation Harness Lite Paper Rehearsal](dogfooding/context-pack-continuation-harness-lite-paper-rehearsal.md).
+It covers `check_passed + live_match -> resume_ready -> user_goal_required`,
+`check_warning -> human_review`, `check_failed -> repair_pack`,
+`check_passed + live_drift -> doctor_or_refresh`, and
+`pack_missing -> blocked`, while keeping implementation_status: not_started,
+command_status: not_started, Status, Workflow Runner, provider request, runtime
+integration, MCP server/tools, plugin, schema-v2, hosted memory, and JSON
+contract changes out of scope.
+
+Expected release-check output without provider env remains:
+
+```text
+provider_probe_status=skipped
+```
+
 ## v0.4.1 Stabilization Candidate
 
 `v0.4.1` is a stabilization-only cycle after the `v0.4.0` public release. It uses

@@ -515,6 +515,17 @@ not_started, implementation_status: not_started, Status, Workflow Runner,
 provider/runtime/MCP/plugin/schema-v2/hosted-memory scope, and JSON contract
 changes closed.
 
+`docs/dogfooding/context-pack-continuation-harness-lite-paper-rehearsal.md`
+rehearses the sketch against clean pack, too-thick warning, broken pack,
+stale/live drift, and missing pack scenarios. The paper rehearsal covers
+`check_passed + live_match -> resume_ready -> user_goal_required`,
+`check_warning -> human_review`, `check_failed -> repair_pack`,
+`check_passed + live_drift -> doctor_or_refresh`, and
+`pack_missing -> blocked`. It does not trigger implementation and keeps
+implementation_status: not_started, command_status: not_started, Status,
+Workflow Runner, provider/runtime/MCP/plugin/schema-v2/hosted-memory scope, and
+JSON contract changes closed.
+
 ### Later Workflow Runner Lite
 
 Only after Context Pack Lite, Context Pack Check, One-command Resume,
