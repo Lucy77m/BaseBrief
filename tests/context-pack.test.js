@@ -720,6 +720,18 @@ test("File-only Export writes four public-safe files from checked context-pack i
     const checkedExportResult = JSON.parse(checkedExport.stdout);
     assert.equal(checkedExportResult.check.status, "passed");
     assert.equal(checkedExportResult.check.errorCount, 0);
+    assert.equal(Object.hasOwn(checkedExportResult, "inputKind"), false);
+
+    const checkedExportHuman = spawnSync(process.execPath, [
+      "scripts/basebrief.js",
+      "check",
+      "--input",
+      exportDir,
+    ], { cwd: repoRoot, encoding: "utf8" });
+    assert.equal(checkedExportHuman.status, 0, checkedExportHuman.stderr);
+    assert.match(checkedExportHuman.stdout, /next_step=review checked export files before sharing or tool intake/);
+    assert.doesNotMatch(checkedExportHuman.stdout, /resume --input/);
+    assert.doesNotMatch(checkedExportHuman.stdout, /doctor --repo <target-repo> --context-pack/);
 
     fs.cpSync(packDir, thickDir, { recursive: true });
     fs.appendFileSync(path.join(thickDir, "REPO_MAP.md"), `\n${"D".repeat(21050)}\n`, "utf8");

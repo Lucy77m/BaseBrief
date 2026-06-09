@@ -251,6 +251,7 @@ function checkRequiredFiles() {
     "docs/dogfooding/context-pack-resume-v2.2.0.md",
     "docs/dogfooding/file-only-export-v2.4.0.md",
     "docs/dogfooding/context-pack-doctor-v2.5.0.md",
+    "docs/dogfooding/context-pack-human-next-step-hints-dogfooding-v2.7.1.md",
     "docs/dogfooding/context-pack-adoption-notes-v2.6.1.md",
     "docs/dogfooding/context-engineering-reference-notes-v2.6.4.md",
     "docs/dogfooding/context-pack-adoption-scenario-matrix-v2.6.5.md",
@@ -456,6 +457,7 @@ function checkV2ContextPackDocs(context) {
     docsIndex,
     testingDoc,
     v2ContextPackRoadmapDoc,
+    contextPackHumanNextStepHintsDogfoodingV271Doc,
   } = context;
 
   assert(testingDoc.includes("v2.0.0 Context Pack Lite Local Closeout"), "Testing docs must document v2.0.0 context pack closeout");
@@ -710,6 +712,12 @@ function checkV2ContextPackDocs(context) {
   assert(testingDoc.includes("optional_next_step="), "Testing docs must mention v2.7.0 optional next-step hints");
   assertIncludesPhrase(testingDoc, "human output contains the new hints and that `--json` output does not gain a `next_step` field", "Testing docs must preserve v2.7.0 human-only JSON boundary");
   assertIncludesPhrase(testingDoc, "node --test tests/context-pack.test.js --test-name-pattern \"Context Pack|Export|Doctor\"", "Testing docs must record v2.7.0 focused test command");
+  assert(testingDoc.includes("v2.7.1 Context Pack Human Next-Step Hints Dogfooding"), "Testing docs must document v2.7.1 human next-step hints dogfooding");
+  assert(testingDoc.includes("dogfooding/context-pack-human-next-step-hints-dogfooding-v2.7.1.md"), "Testing docs must link v2.7.1 dogfooding");
+  assertIncludesPhrase(testingDoc, "export -> check", "Testing docs must document v2.7.1 export check path");
+  assertIncludesPhrase(testingDoc, "should not suggest `resume --input <export-dir>` or `doctor --context-pack <export-dir>`", "Testing docs must record v2.7.1 misleading hint repair");
+  assertIncludesPhrase(testingDoc, "narrows human `check` hints by input kind", "Testing docs must summarize v2.7.1 input-kind repair");
+  assertIncludesPhrase(testingDoc, "hidden input-kind helper does not appear in `--json` output", "Testing docs must preserve v2.7.1 JSON boundary");
   assert(testingDoc.includes("checker_error_propagation_status: pass"), "Testing docs must record checker-error propagation");
   assert(testingDoc.includes("context-pack --repo <target-repo>"), "Testing docs must document context-pack command");
   assert(testingDoc.includes("resume --input <context-pack-dir>"), "Testing docs must document resume command");
@@ -735,6 +743,7 @@ function checkV2ContextPackDocs(context) {
   assert(docsIndex.includes("releases/v2.6.0.md"), "Docs index must link v2.6.0 adoption polish closeout");
   assert(docsIndex.includes("releases/v2.7.0-plan.md"), "Docs index must link v2.7.0 human next-step hints plan");
   assert(docsIndex.includes("releases/v2.7.0.md"), "Docs index must link v2.7.0 human next-step hints closeout");
+  assert(docsIndex.includes("dogfooding/context-pack-human-next-step-hints-dogfooding-v2.7.1.md"), "Docs index must link v2.7.1 human next-step hints dogfooding");
   assert(docsIndex.includes("specs/context-pack-doctor.md"), "Docs index must link context pack doctor spec");
   assert(docsIndex.includes("dogfooding/context-pack-doctor-v2.5.0.md"), "Docs index must link v2.5.0 doctor dogfooding");
   assert(docsIndex.includes("../examples/context-pack-doctor/README.md"), "Docs index must link context pack doctor example kit");
@@ -1014,6 +1023,21 @@ function checkV2ContextPackDocs(context) {
   assert(v2ContextPackRoadmapDoc.includes("next_step=") && v2ContextPackRoadmapDoc.includes("optional_next_step="), "v2 roadmap must summarize v2.7.0 hint line prefixes");
   assertIncludesPhrase(v2ContextPackRoadmapDoc, "keeping `--json` output free of a `next_step` field", "v2 roadmap must keep v2.7.0 hints out of JSON");
   assertIncludesPhrase(v2ContextPackRoadmapDoc, "human-only `next_step=` and `optional_next_step=` hints under the existing `formatHuman()` path", "v2 roadmap must keep v2.7.0 implementation under formatHuman");
+  assert(v2ContextPackRoadmapDoc.includes("docs/dogfooding/context-pack-human-next-step-hints-dogfooding-v2.7.1.md"), "v2 roadmap must link v2.7.1 human next-step hints dogfooding");
+  assertIncludesPhrase(v2ContextPackRoadmapDoc, "reality-check pass through `context-pack -> check -> resume`, `context-pack -> check -> doctor`, `export -> check`, warning-only pack, and broken pack paths", "v2 roadmap must summarize v2.7.1 dogfooding paths");
+  assertIncludesPhrase(v2ContextPackRoadmapDoc, "should not suggest `resume --input <export-dir>` or `doctor --context-pack <export-dir>`", "v2 roadmap must record v2.7.1 export-check repair");
+  assertIncludesPhrase(v2ContextPackRoadmapDoc, "narrows human `check` hints by input kind", "v2 roadmap must summarize v2.7.1 input-kind repair");
+  assertIncludesPhrase(v2ContextPackRoadmapDoc, "preserving command surfaces, JSON contracts, Context Pack structure", "v2 roadmap must preserve v2.7.1 contract boundaries");
+
+  assert(contextPackHumanNextStepHintsDogfoodingV271Doc.includes("Context Pack Human Next-Step Hints Dogfooding v2.7.1"), "v2.7.1 dogfooding doc must have stable title");
+  assert(contextPackHumanNextStepHintsDogfoodingV271Doc.includes("context_pack_hint_status: pass"), "v2.7.1 dogfooding doc must record context-pack hint pass");
+  assert(contextPackHumanNextStepHintsDogfoodingV271Doc.includes("export_check_hint_status: repaired"), "v2.7.1 dogfooding doc must record repaired export check hint");
+  assert(contextPackHumanNextStepHintsDogfoodingV271Doc.includes("json_hint_leak_status: absent"), "v2.7.1 dogfooding doc must record JSON hint absence");
+  assertIncludesPhrase(contextPackHumanNextStepHintsDogfoodingV271Doc, "file-only export directory is not a seven-file Context Pack Lite directory", "v2.7.1 dogfooding doc must explain export-check mismatch");
+  assertIncludesPhrase(contextPackHumanNextStepHintsDogfoodingV271Doc, "The hidden input-kind helper is not serialized into `--json` output", "v2.7.1 dogfooding doc must keep input kind out of JSON");
+  assertDogfoodingDocCommonBoundaries(contextPackHumanNextStepHintsDogfoodingV271Doc, "v2.7.1 human next-step hints dogfooding", { doctorExpansion: true });
+  assertDogfoodingDocSharedReleaseChecks(contextPackHumanNextStepHintsDogfoodingV271Doc, "v2.7.1 human next-step hints dogfooding");
+
   assert(v2ContextPackRoadmapDoc.includes("exports/manifest.json"), "v2 roadmap must define export manifest");
   assert(v2ContextPackRoadmapDoc.includes("exports/context-pack.md"), "v2 roadmap must define readable export");
   assert(v2ContextPackRoadmapDoc.includes("exports/context.json"), "v2 roadmap must define machine-readable export");
@@ -2327,6 +2351,7 @@ function checkContentContracts() {
   const fileOnlyExportDogfoodingDoc = readText("docs/dogfooding/file-only-export-v2.4.0.md");
   const contextPackDoctorDogfoodingDoc = readText("docs/dogfooding/context-pack-doctor-v2.5.0.md");
   const contextPackDoctorDogfoodingV251Doc = readText("docs/dogfooding/context-pack-doctor-v2.5.1.md");
+  const contextPackHumanNextStepHintsDogfoodingV271Doc = readText("docs/dogfooding/context-pack-human-next-step-hints-dogfooding-v2.7.1.md");
   const contextPackAdoptionNotesV261Doc = readText("docs/dogfooding/context-pack-adoption-notes-v2.6.1.md");
   const contextEngineeringReferenceNotesV264Doc = readText("docs/dogfooding/context-engineering-reference-notes-v2.6.4.md");
   const contextPackAdoptionScenarioMatrixV265Doc = readText("docs/dogfooding/context-pack-adoption-scenario-matrix-v2.6.5.md");
@@ -2872,6 +2897,7 @@ function checkContentContracts() {
     docsIndex,
     testingDoc,
     v2ContextPackRoadmapDoc,
+    contextPackHumanNextStepHintsDogfoodingV271Doc,
   });
   assert(testingDoc.includes("v1.5 Delta Receiver Lint Mini Plan"), "Testing docs must document the v1.5 lint mini plan");
   assert(testingDoc.includes("v1.5 Delta Receiver Lint Mini Local Closeout"), "Testing docs must document the v1.5 lint mini closeout");
@@ -3656,10 +3682,14 @@ function checkContentContracts() {
   assert(v270ReleaseDoc.includes("npm run release-check") && v270ReleaseDoc.includes("npm test") && v270ReleaseDoc.includes("git diff --check"), "v2.7 closeout doc must include validation gate");
   assert(v270ReleaseDoc.includes("provider_probe_status=skipped"), "v2.7 closeout doc must preserve skipped provider gate");
   assert(basebriefCliScript.includes("function formatNextStepLines(result)"), "CLI formatter must define human next-step helper");
+  assert(basebriefCliScript.includes("function detectCheckInputKind(inputPath)"), "CLI formatter must detect check input kind for human hints");
+  assert(basebriefCliScript.includes("file-only-export"), "CLI formatter must distinguish file-only export check inputs");
   assert(basebriefCliScript.includes("...formatNextStepLines(result)"), "CLI human output must append next-step hints through formatHuman");
   assert(basebriefCliScript.includes("next_step=node scripts/basebrief.js check --input ${result.outputDir}"), "CLI formatter must point context-pack and export output to check");
   assert(basebriefCliScript.includes("next_step=node scripts/basebrief.js resume --input ${result.input}"), "CLI formatter must point clean checks to resume");
   assert(basebriefCliScript.includes("optional_next_step=node scripts/basebrief.js doctor --repo <target-repo> --context-pack ${result.input}"), "CLI formatter must expose optional doctor next step for clean checks");
+  assert(basebriefCliScript.includes("next_step=review checked export files before sharing or tool intake"), "CLI formatter must avoid resume/doctor hints for checked export directories");
+  assert(basebriefCliScript.includes("next_step=review check results before sharing"), "CLI formatter must keep generic checks from pointing to Context Pack commands");
   assert(basebriefCliScript.includes("next_step=review warnings before resume"), "CLI formatter must guide warning checks to human review");
   assert(basebriefCliScript.includes("next_step=fix reported errors before resume, doctor, or export"), "CLI formatter must guide errored checks to repair");
   assert(basebriefCliScript.includes("next_step=recheck live repo facts and refresh the context pack if stale"), "CLI formatter must guide warning doctor output to live recheck");
@@ -5226,6 +5256,7 @@ function checkArtifactChecker() {
     "docs/dogfooding/delta-receiver-lint-dogfooding-v1.8.md",
     "docs/dogfooding/context-pack-lite-fresh-receiver-v2.0.0.md",
     "docs/dogfooding/context-pack-check-acceptance-v2.1.0.md",
+    "docs/dogfooding/context-pack-human-next-step-hints-dogfooding-v2.7.1.md",
     "docs/releases/v2.0.0.md",
     "docs/releases/v2.1.0.md",
     "docs/releases/v2.1.0-plan.md",

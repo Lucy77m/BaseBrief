@@ -22,9 +22,9 @@ const {
 const { commandDiff: commandSealDiff, commandSeal: commandCreateSeal } = require("./basebrief_seal");
 const { buildSidecarBundle, checkSidecarBundle } = require("./basebrief_sidecar");
 const { runDelta } = require("./basebrief_delta");
-const { buildContextPack } = require("./basebrief_context_pack");
+const { CONTEXT_PACK_FILES, buildContextPack } = require("./basebrief_context_pack");
 const { runResume } = require("./basebrief_resume");
-const { runExport } = require("./basebrief_export");
+const { EXPORT_FILES, runExport } = require("./basebrief_export");
 const { runDoctor } = require("./basebrief_doctor");
 
 const STARTER_FILE = "basebrief-handoff-input.json";
@@ -242,6 +242,36 @@ function commandCheck(options) {
   };
 }
 
+function directoryHasFiles(inputPath, fileNames) {
+  if (!inputPath || !fs.existsSync(inputPath)) {
+    return false;
+  }
+  const stat = fs.statSync(inputPath);
+  if (!stat.isDirectory()) {
+    return false;
+  }
+  return fileNames.every((fileName) => fs.existsSync(path.join(inputPath, fileName)));
+}
+
+function detectCheckInputKind(inputPath) {
+  const resolved = path.resolve(inputPath || "");
+  if (directoryHasFiles(resolved, Object.values(CONTEXT_PACK_FILES))) {
+    return "context-pack";
+  }
+  if (directoryHasFiles(resolved, Object.values(EXPORT_FILES))) {
+    return "file-only-export";
+  }
+  return "generic";
+}
+
+function withHiddenCheckInputKind(result, inputPath) {
+  Object.defineProperty(result, "inputKind", {
+    value: detectCheckInputKind(inputPath),
+    enumerable: false,
+  });
+  return result;
+}
+
 function commandReceiverCheck(options) {
   return {
     command: "receiver-check",
@@ -444,10 +474,10 @@ function toPublicResult(result) {
     };
   }
   if (result.command === "check") {
-    return {
+    return withHiddenCheckInputKind({
       ...result,
       input: publicPath(result.input, cwd),
-    };
+    }, result.input);
   }
   if (result.command === "receiver-check") return result;
   if (result.command === "receiver-init") {
@@ -781,18 +811,41 @@ function formatNextStepLines(result) {
     return [`next_step=node scripts/basebrief.js check --input ${result.outputDir}`];
   }
   if (result.command === "check") {
+    const inputKind = result.inputKind || detectCheckInputKind(result.input);
     if (result.check.errorCount > 0) {
-      return ["next_step=fix reported errors before resume, doctor, or export"];
+      if (inputKind === "context-pack") {
+        return ["next_step=fix reported errors before resume, doctor, or export"];
+      }
+      if (inputKind === "file-only-export") {
+        return ["next_step=fix reported export errors before sharing or tool intake"];
+      }
+      return ["next_step=fix reported errors before sharing"];
     }
     if (result.check.warningCount > 0) {
+      if (inputKind === "context-pack") {
+        return [
+          "next_step=review warnings before resume",
+          `optional_next_step=node scripts/basebrief.js resume --input ${result.input}`,
+        ];
+      }
+      if (inputKind === "file-only-export") {
+        return ["next_step=review export warnings before sharing or tool intake"];
+      }
+      return ["next_step=review warnings before sharing"];
+    }
+    if (inputKind === "context-pack") {
       return [
-        "next_step=review warnings before resume",
-        `optional_next_step=node scripts/basebrief.js resume --input ${result.input}`,
+        `next_step=node scripts/basebrief.js resume --input ${result.input}`,
+        `optional_next_step=node scripts/basebrief.js doctor --repo <target-repo> --context-pack ${result.input}`,
+      ];
+    }
+    if (inputKind === "file-only-export") {
+      return [
+        "next_step=review checked export files before sharing or tool intake",
       ];
     }
     return [
-      `next_step=node scripts/basebrief.js resume --input ${result.input}`,
-      `optional_next_step=node scripts/basebrief.js doctor --repo <target-repo> --context-pack ${result.input}`,
+      "next_step=review check results before sharing",
     ];
   }
   if (result.command === "export") {

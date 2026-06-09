@@ -1805,6 +1805,42 @@ git diff --check
 Provider-free release checks must continue to print
 `provider_probe_status=skipped`.
 
+## v2.7.1 Context Pack Human Next-Step Hints Dogfooding
+
+`v2.7.1` records a dogfooding and reality-check pass for the human-only
+next-step hints. The evidence is recorded in
+[Context Pack Human Next-Step Hints Dogfooding v2.7.1](dogfooding/context-pack-human-next-step-hints-dogfooding-v2.7.1.md).
+
+The pass exercises `context-pack -> check -> resume`,
+`context-pack -> check -> doctor`, `export -> check`, warning-only pack, and
+broken pack paths. It found one concrete misleading hint: a clean check of a
+four-file File-only Export directory should not suggest
+`resume --input <export-dir>` or `doctor --context-pack <export-dir>`.
+
+The v2.7.1 repair narrows human `check` hints by input kind. Seven-file Context
+Pack Lite directories keep `resume` and optional `doctor` guidance. Four-file
+File-only Export directories now ask the user to review the checked export files
+before sharing or tool intake. Generic checked files or directories ask the user
+to review check results before sharing.
+
+Tests verify that the hidden input-kind helper does not appear in `--json`
+output and that `export -> check` human output no longer recommends `resume` or
+`doctor`. The change preserves command exit semantics, Context Pack Lite's
+seven-file structure, Context Pack Check, Resume, Export, and Doctor JSON
+contracts, and all provider/runtime/plugin/MCP/schema-v2 boundaries.
+
+The local validation gate remains:
+
+```text
+node --test tests/context-pack.test.js --test-name-pattern "Context Pack|Export|Doctor"
+npm run release-check
+npm test
+git diff --check
+```
+
+Provider-free release checks must continue to print
+`provider_probe_status=skipped`.
+
 ## v0.4.1 Stabilization Candidate
 
 `v0.4.1` is a stabilization-only cycle after the `v0.4.0` public release. It uses

@@ -777,6 +777,17 @@ plugin, MCP, schema-v2, Status, Workflow Runner, Doctor expansion, Continuation
 Harness Lite, daemon, watcher, hosted memory, publish, push, tag, release, and
 PR boundaries.
 
+`docs/dogfooding/context-pack-human-next-step-hints-dogfooding-v2.7.1.md`
+records a reality-check pass through `context-pack -> check -> resume`,
+`context-pack -> check -> doctor`, `export -> check`, warning-only pack, and
+broken pack paths. The pass found one concrete misleading hint: a clean check
+of a four-file File-only Export directory should not suggest
+`resume --input <export-dir>` or `doctor --context-pack <export-dir>`. v2.7.1
+narrows human `check` hints by input kind while keeping `--json` output free of
+`next_step` and preserving command surfaces, JSON contracts, Context Pack
+structure, provider/runtime/MCP/plugin/schema-v2 boundaries, and release
+actions not_started.
+
 ### Later Workflow Runner Lite
 
 Only after Context Pack Lite, Context Pack Check, One-command Resume,
