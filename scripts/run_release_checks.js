@@ -212,6 +212,7 @@ function checkRequiredFiles() {
     "docs/dogfooding/context-pack-local-bundle-compression-v2.6.13.md",
     "docs/dogfooding/context-pack-release-check-maintainability-v2.6.14.md",
     "docs/dogfooding/context-pack-major-release-candidate-shape-v2.6.15.md",
+    "docs/dogfooding/context-pack-continuation-harness-decision-spec-v2.6.16.md",
     "docs/testing-v0.4.x-test-matrix.md",
     "docs/testing-v0.6.x-test-matrix.md",
     "docs/testing-v0.7.x-test-matrix.md",
@@ -515,6 +516,7 @@ function checkContentContracts() {
   const contextPackLocalBundleCompressionV2613Doc = readText("docs/dogfooding/context-pack-local-bundle-compression-v2.6.13.md");
   const contextPackReleaseCheckMaintainabilityV2614Doc = readText("docs/dogfooding/context-pack-release-check-maintainability-v2.6.14.md");
   const contextPackMajorReleaseCandidateShapeV2615Doc = readText("docs/dogfooding/context-pack-major-release-candidate-shape-v2.6.15.md");
+  const contextPackContinuationHarnessDecisionSpecV2616Doc = readText("docs/dogfooding/context-pack-continuation-harness-decision-spec-v2.6.16.md");
   const postReleaseBaselineDoc = readText("docs/baselines/v0.4.0-post-release-baseline.md");
   const v060PostReleaseBaselineDoc = readText("docs/baselines/v0.6.0-post-release-baseline.md");
   const projectStateModelDoc = readText("docs/design/project-state-model.md");
@@ -1060,6 +1062,12 @@ function checkContentContracts() {
   assertIncludesPhrase(testingDoc, "separates public release-note material from details that should remain dogfooding evidence", "Testing docs must summarize v2.6.15 release-note separation");
   assertIncludesPhrase(testingDoc, "first-run adoption polish, Context Pack interpretation, diagnostics confidence", "Testing docs must summarize v2.6.15 public story");
   assert(testingDoc.includes("commit hashes") && testingDoc.includes("private output paths") && testingDoc.includes("assertion wording"), "Testing docs must keep dogfooding-only details out of release notes");
+  assert(testingDoc.includes("v2.6.16 Context Pack Continuation Harness Decision Spec"), "Testing docs must document v2.6.16 harness decision spec");
+  assert(testingDoc.includes("dogfooding/context-pack-continuation-harness-decision-spec-v2.6.16.md"), "Testing docs must link v2.6.16 harness decision spec");
+  assert(testingDoc.includes("implementation_status: not_started"), "Testing docs must keep v2.6.16 implementation not started");
+  assertIncludesPhrase(testingDoc, "evidence thresholds that must be met before any future harness work begins", "Testing docs must summarize v2.6.16 evidence threshold");
+  assertIncludesPhrase(testingDoc, "context-pack -> check -> resume -> live recheck", "Testing docs must summarize v2.6.16 handoff sequence");
+  assert(testingDoc.includes("Status") && testingDoc.includes("Workflow Runner") && testingDoc.includes("JSON contract changes out of scope"), "Testing docs must keep v2.6.16 out of behavior scope");
   assert(testingDoc.includes("checker_error_propagation_status: pass"), "Testing docs must record checker-error propagation");
   assert(testingDoc.includes("context-pack --repo <target-repo>"), "Testing docs must document context-pack command");
   assert(testingDoc.includes("resume --input <context-pack-dir>"), "Testing docs must document resume command");
@@ -1597,6 +1605,7 @@ function checkContentContracts() {
   assert(docsIndex.includes("dogfooding/context-pack-local-bundle-compression-v2.6.13.md"), "Docs index must link v2.6.13 bundle compression");
   assert(docsIndex.includes("dogfooding/context-pack-release-check-maintainability-v2.6.14.md"), "Docs index must link v2.6.14 release-check maintainability");
   assert(docsIndex.includes("dogfooding/context-pack-major-release-candidate-shape-v2.6.15.md"), "Docs index must link v2.6.15 major-release candidate shape");
+  assert(docsIndex.includes("dogfooding/context-pack-continuation-harness-decision-spec-v2.6.16.md"), "Docs index must link v2.6.16 harness decision spec");
   assert(docsIndex.includes("specs/context-pack-lite.md"), "Docs index must link context pack lite spec");
   assert(docsIndex.includes("specs/context-pack-resume.md"), "Docs index must link context pack resume spec");
   assert(docsIndex.includes("specs/basebrief-format.md"), "Docs index must link basebrief format spec");
@@ -1682,6 +1691,11 @@ function checkContentContracts() {
   assertIncludesPhrase(v2ContextPackRoadmapDoc, "future major-release candidate outline", "v2 roadmap must summarize v2.6.15 candidate shape");
   assertIncludesPhrase(v2ContextPackRoadmapDoc, "not a release closeout, publish action, feature implementation", "v2 roadmap must keep v2.6.15 out of release scope");
   assertIncludesPhrase(v2ContextPackRoadmapDoc, "Continuation Harness implementation, or JSON contract change", "v2 roadmap must keep v2.6.15 out of harness and JSON scope");
+  assert(v2ContextPackRoadmapDoc.includes("docs/dogfooding/context-pack-continuation-harness-decision-spec-v2.6.16.md"), "v2 roadmap must link v2.6.16 harness decision spec");
+  assertIncludesPhrase(v2ContextPackRoadmapDoc, "defines the evidence thresholds for considering Continuation Harness Lite", "v2 roadmap must summarize v2.6.16 evidence thresholds");
+  assert(v2ContextPackRoadmapDoc.includes("implementation_status: not_started"), "v2 roadmap must keep v2.6.16 implementation not started");
+  assertIncludesPhrase(v2ContextPackRoadmapDoc, "does not add a command, Status command, Workflow Runner", "v2 roadmap must keep v2.6.16 out of command and runner scope");
+  assertIncludesPhrase(v2ContextPackRoadmapDoc, "provider request, runtime integration, MCP server/tools, plugin, schema-v2, hosted memory, or JSON contract change", "v2 roadmap must keep v2.6.16 out of integration and JSON scope");
   assert(v2ContextPackRoadmapDoc.includes("exports/manifest.json"), "v2 roadmap must define export manifest");
   assert(v2ContextPackRoadmapDoc.includes("exports/context-pack.md"), "v2 roadmap must define readable export");
   assert(v2ContextPackRoadmapDoc.includes("exports/context.json"), "v2 roadmap must define machine-readable export");
@@ -2343,6 +2357,43 @@ function checkContentContracts() {
   assert(contextPackMajorReleaseCandidateShapeV2615Doc.includes("provider_probe_status=skipped"), "v2.6.15 major-release candidate shape must preserve skipped provider gate");
   assert(!/(^|[^A-Za-z])[A-Za-z]:[\\/]/.test(contextPackMajorReleaseCandidateShapeV2615Doc), "v2.6.15 major-release candidate shape must not expose drive-letter absolute paths");
   assert(!/\\\\/.test(contextPackMajorReleaseCandidateShapeV2615Doc), "v2.6.15 major-release candidate shape must not expose UNC paths");
+  assert(contextPackContinuationHarnessDecisionSpecV2616Doc.includes("Context Pack Continuation Harness Decision Spec v2.6.16"), "v2.6.16 harness decision spec doc must have stable title");
+  assertIncludesPhrase(contextPackContinuationHarnessDecisionSpecV2616Doc, "local decision spec only, not a feature implementation", "v2.6.16 harness decision spec must avoid feature claims");
+  assert(contextPackContinuationHarnessDecisionSpecV2616Doc.includes("decision_spec_status: draft_only"), "v2.6.16 harness decision spec must stay draft only");
+  assert(contextPackContinuationHarnessDecisionSpecV2616Doc.includes("implementation_status: not_started"), "v2.6.16 harness decision spec must keep implementation not started");
+  assert(contextPackContinuationHarnessDecisionSpecV2616Doc.includes("release_closeout_status: not_started"), "v2.6.16 harness decision spec must keep release closeout not started");
+  assert(contextPackContinuationHarnessDecisionSpecV2616Doc.includes("push_status: not_started"), "v2.6.16 harness decision spec must keep push not started");
+  assert(contextPackContinuationHarnessDecisionSpecV2616Doc.includes("tag_status: not_started"), "v2.6.16 harness decision spec must keep tag not started");
+  assert(contextPackContinuationHarnessDecisionSpecV2616Doc.includes("release_status: not_started"), "v2.6.16 harness decision spec must keep release not started");
+  assert(contextPackContinuationHarnessDecisionSpecV2616Doc.includes("continuation_harness_lite_status: not_started"), "v2.6.16 harness decision spec must keep harness not started");
+  assert(contextPackContinuationHarnessDecisionSpecV2616Doc.includes("status_command_status: not_started"), "v2.6.16 harness decision spec must keep status command not started");
+  assert(contextPackContinuationHarnessDecisionSpecV2616Doc.includes("workflow_runner_status: not_started"), "v2.6.16 harness decision spec must keep workflow runner not started");
+  assert(contextPackContinuationHarnessDecisionSpecV2616Doc.includes("json_contract_change_status: not_started"), "v2.6.16 harness decision spec must keep JSON contract change not started");
+  assertIncludesPhrase(contextPackContinuationHarnessDecisionSpecV2616Doc, "context-pack -> check -> resume -> live recheck", "v2.6.16 harness decision spec must define sequence under review");
+  assert(contextPackContinuationHarnessDecisionSpecV2616Doc.includes("blocking_threshold: at least three public-safe real handoff observations"), "v2.6.16 harness decision spec must define blocking threshold");
+  assertIncludesPhrase(contextPackContinuationHarnessDecisionSpecV2616Doc, "confusion_threshold: repeated confusing friction survives a docs/examples repair attempt", "v2.6.16 harness decision spec must define confusion threshold");
+  assertIncludesPhrase(contextPackContinuationHarnessDecisionSpecV2616Doc, "command_threshold: the user cannot reliably choose between `check`, `resume`, and `doctor`", "v2.6.16 harness decision spec must define command threshold");
+  assertIncludesPhrase(contextPackContinuationHarnessDecisionSpecV2616Doc, "safety_threshold: the proposed helper can preserve live recheck", "v2.6.16 harness decision spec must define safety threshold");
+  assertIncludesPhrase(contextPackContinuationHarnessDecisionSpecV2616Doc, "Do not implement Continuation Harness Lite yet", "v2.6.16 harness decision spec must keep harness closed");
+  assertIncludesPhrase(contextPackContinuationHarnessDecisionSpecV2616Doc, "No new CLI command", "v2.6.16 harness decision spec must reject new commands");
+  assert(contextPackContinuationHarnessDecisionSpecV2616Doc.includes("No Context Pack seven-file structure change"), "v2.6.16 harness decision spec must preserve seven-file structure");
+  assert(contextPackContinuationHarnessDecisionSpecV2616Doc.includes("No `check --input <dir> --json` top-level shape change"), "v2.6.16 harness decision spec must preserve checker JSON shape");
+  assert(contextPackContinuationHarnessDecisionSpecV2616Doc.includes("No Resume JSON contract change"), "v2.6.16 harness decision spec must preserve resume JSON contract");
+  assert(contextPackContinuationHarnessDecisionSpecV2616Doc.includes("No Doctor JSON contract change"), "v2.6.16 harness decision spec must preserve doctor JSON contract");
+  assert(contextPackContinuationHarnessDecisionSpecV2616Doc.includes("No Export JSON contract change"), "v2.6.16 harness decision spec must preserve export JSON contract");
+  assert(contextPackContinuationHarnessDecisionSpecV2616Doc.includes("No Status command"), "v2.6.16 harness decision spec must reject status command");
+  assert(contextPackContinuationHarnessDecisionSpecV2616Doc.includes("No Workflow Runner"), "v2.6.16 harness decision spec must reject workflow runner");
+  assert(contextPackContinuationHarnessDecisionSpecV2616Doc.includes("No Continuation Harness Lite implementation"), "v2.6.16 harness decision spec must reject harness implementation");
+  assert(contextPackContinuationHarnessDecisionSpecV2616Doc.includes("No provider request"), "v2.6.16 harness decision spec must reject provider requests");
+  assert(contextPackContinuationHarnessDecisionSpecV2616Doc.includes("No runtime integration"), "v2.6.16 harness decision spec must reject runtime integration");
+  assert(contextPackContinuationHarnessDecisionSpecV2616Doc.includes("No MCP server"), "v2.6.16 harness decision spec must reject MCP server");
+  assert(contextPackContinuationHarnessDecisionSpecV2616Doc.includes("No MCP tools"), "v2.6.16 harness decision spec must reject MCP tools");
+  assert(contextPackContinuationHarnessDecisionSpecV2616Doc.includes("No plugin"), "v2.6.16 harness decision spec must reject plugin scope");
+  assert(contextPackContinuationHarnessDecisionSpecV2616Doc.includes("No schema-v2"), "v2.6.16 harness decision spec must reject schema-v2");
+  assert(contextPackContinuationHarnessDecisionSpecV2616Doc.includes("No hosted memory"), "v2.6.16 harness decision spec must reject hosted memory");
+  assert(contextPackContinuationHarnessDecisionSpecV2616Doc.includes("provider_probe_status=skipped"), "v2.6.16 harness decision spec must preserve skipped provider gate");
+  assert(!/(^|[^A-Za-z])[A-Za-z]:[\\/]/.test(contextPackContinuationHarnessDecisionSpecV2616Doc), "v2.6.16 harness decision spec must not expose drive-letter absolute paths");
+  assert(!/\\\\/.test(contextPackContinuationHarnessDecisionSpecV2616Doc), "v2.6.16 harness decision spec must not expose UNC paths");
   assert(contextPackDoctorDogfoodingDoc.includes("Context Pack Doctor Dogfooding v2.5.0"), "doctor dogfooding doc must have stable title");
   assert(contextPackDoctorDogfoodingDoc.includes("doctor_contract_version: basebrief-doctor-v1"), "doctor dogfooding must record contract version");
   assert(contextPackDoctorDogfoodingDoc.includes("doctor_command_status: warning"), "doctor dogfooding must record warning status");

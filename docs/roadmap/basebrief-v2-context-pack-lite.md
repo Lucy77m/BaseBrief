@@ -481,6 +481,12 @@ staging outline only, not a release closeout, publish action, feature
 implementation, Status command, Workflow Runner, Continuation Harness
 implementation, or JSON contract change.
 
+`docs/dogfooding/context-pack-continuation-harness-decision-spec-v2.6.16.md`
+defines the evidence thresholds for considering Continuation Harness Lite. It is
+a decision spec only with implementation_status: not_started; it does not add a
+command, Status command, Workflow Runner, provider request, runtime integration,
+MCP server/tools, plugin, schema-v2, hosted memory, or JSON contract change.
+
 ### Later Workflow Runner Lite
 
 Only after Context Pack Lite, Context Pack Check, One-command Resume,

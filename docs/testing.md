@@ -1100,6 +1100,25 @@ Expected release-check output without provider env remains:
 provider_probe_status=skipped
 ```
 
+## v2.6.16 Context Pack Continuation Harness Decision Spec
+
+`v2.6.16` is a local decision spec for Continuation Harness Lite, not a feature
+implementation. It records implementation_status: not_started and defines the
+evidence thresholds that must be met before any future harness work begins.
+
+The evidence is recorded in
+[Context Pack Continuation Harness Decision Spec v2.6.16](dogfooding/context-pack-continuation-harness-decision-spec-v2.6.16.md).
+The gate focuses on repeated real handoff friction across `context-pack ->
+check -> resume -> live recheck`, while keeping Status, Workflow Runner,
+provider request, runtime integration, MCP server/tools, plugin, schema-v2,
+hosted memory, and JSON contract changes out of scope.
+
+Expected release-check output without provider env remains:
+
+```text
+provider_probe_status=skipped
+```
+
 ## v0.4.1 Stabilization Candidate
 
 `v0.4.1` is a stabilization-only cycle after the `v0.4.0` public release. It uses
