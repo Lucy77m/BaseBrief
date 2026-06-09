@@ -196,6 +196,7 @@ function checkRequiredFiles() {
     "docs/dogfooding/context-pack-adoption-decision-checkpoint-v2.6.9.md",
     "docs/dogfooding/context-pack-pre-release-bundle-audit-v2.6.10.md",
     "docs/dogfooding/context-pack-feature-feasibility-spike-v2.6.11.md",
+    "docs/dogfooding/context-pack-local-bundle-review-rehearsal-v2.6.12.md",
     "docs/testing-v0.4.x-test-matrix.md",
     "docs/testing-v0.6.x-test-matrix.md",
     "docs/testing-v0.7.x-test-matrix.md",
@@ -495,6 +496,7 @@ function checkContentContracts() {
   const contextPackAdoptionDecisionCheckpointV269Doc = readText("docs/dogfooding/context-pack-adoption-decision-checkpoint-v2.6.9.md");
   const contextPackPreReleaseBundleAuditV2610Doc = readText("docs/dogfooding/context-pack-pre-release-bundle-audit-v2.6.10.md");
   const contextPackFeatureFeasibilitySpikeV2611Doc = readText("docs/dogfooding/context-pack-feature-feasibility-spike-v2.6.11.md");
+  const contextPackLocalBundleReviewRehearsalV2612Doc = readText("docs/dogfooding/context-pack-local-bundle-review-rehearsal-v2.6.12.md");
   const postReleaseBaselineDoc = readText("docs/baselines/v0.4.0-post-release-baseline.md");
   const v060PostReleaseBaselineDoc = readText("docs/baselines/v0.6.0-post-release-baseline.md");
   const projectStateModelDoc = readText("docs/design/project-state-model.md");
@@ -1023,6 +1025,10 @@ function checkContentContracts() {
   assert(testingDoc.includes("dogfooding/context-pack-feature-feasibility-spike-v2.6.11.md"), "Testing docs must link v2.6.11 feasibility spike");
   assert(testingDoc.includes("Continuation Harness Lite") && testingDoc.includes("implementation_status: not_started"), "Testing docs must keep v2.6.11 not started");
   assert(testingDoc.includes("context-pack -> check -> resume -> live recheck"), "Testing docs must summarize v2.6.11 feasibility question");
+  assert(testingDoc.includes("v2.6.12 Context Pack Local Bundle Review / Handoff Rehearsal"), "Testing docs must document v2.6.12 bundle review rehearsal");
+  assert(testingDoc.includes("dogfooding/context-pack-local-bundle-review-rehearsal-v2.6.12.md"), "Testing docs must link v2.6.12 bundle review rehearsal");
+  assert(testingDoc.includes("ahead-9 local adoption bundle") && testingDoc.includes("context_pack_status: generated"), "Testing docs must summarize v2.6.12 bundle and rehearsal");
+  assert(testingDoc.includes("doctor_info_findings: doctor.live-recheck-required"), "Testing docs must record v2.6.12 doctor info finding");
   assert(testingDoc.includes("checker_error_propagation_status: pass"), "Testing docs must record checker-error propagation");
   assert(testingDoc.includes("context-pack --repo <target-repo>"), "Testing docs must document context-pack command");
   assert(testingDoc.includes("resume --input <context-pack-dir>"), "Testing docs must document resume command");
@@ -1556,6 +1562,7 @@ function checkContentContracts() {
   assert(docsIndex.includes("dogfooding/context-pack-adoption-decision-checkpoint-v2.6.9.md"), "Docs index must link v2.6.9 decision checkpoint");
   assert(docsIndex.includes("dogfooding/context-pack-pre-release-bundle-audit-v2.6.10.md"), "Docs index must link v2.6.10 bundle audit");
   assert(docsIndex.includes("dogfooding/context-pack-feature-feasibility-spike-v2.6.11.md"), "Docs index must link v2.6.11 feasibility spike");
+  assert(docsIndex.includes("dogfooding/context-pack-local-bundle-review-rehearsal-v2.6.12.md"), "Docs index must link v2.6.12 bundle review rehearsal");
   assert(docsIndex.includes("specs/context-pack-lite.md"), "Docs index must link context pack lite spec");
   assert(docsIndex.includes("specs/context-pack-resume.md"), "Docs index must link context pack resume spec");
   assert(docsIndex.includes("specs/basebrief-format.md"), "Docs index must link basebrief format spec");
@@ -1627,6 +1634,9 @@ function checkContentContracts() {
   assert(v2ContextPackRoadmapDoc.includes("docs/dogfooding/context-pack-feature-feasibility-spike-v2.6.11.md"), "v2 roadmap must link v2.6.11 feasibility spike");
   assert(v2ContextPackRoadmapDoc.includes("Continuation Harness Lite") && v2ContextPackRoadmapDoc.includes("implementation_status: not_started"), "v2 roadmap must keep v2.6.11 not started");
   assert(v2ContextPackRoadmapDoc.includes("context-pack -> check -> resume -> live recheck") && v2ContextPackRoadmapDoc.includes("not a feature implementation, new command, Status command, Workflow Runner, or JSON contract change"), "v2 roadmap must keep v2.6.11 in feasibility scope");
+  assert(v2ContextPackRoadmapDoc.includes("docs/dogfooding/context-pack-local-bundle-review-rehearsal-v2.6.12.md"), "v2 roadmap must link v2.6.12 bundle review rehearsal");
+  assert(v2ContextPackRoadmapDoc.includes("ahead-9 local adoption bundle") && v2ContextPackRoadmapDoc.includes("check_status: passed") && v2ContextPackRoadmapDoc.includes("resume_status: ready"), "v2 roadmap must summarize v2.6.12 rehearsal results");
+  assert(v2ContextPackRoadmapDoc.includes("doctor_info_findings: doctor.live-recheck-required") && v2ContextPackRoadmapDoc.includes("Continuation Harness Lite, Status, Workflow Runner, and JSON contract changes"), "v2 roadmap must keep v2.6.12 feature gates closed");
   assert(v2ContextPackRoadmapDoc.includes("exports/manifest.json"), "v2 roadmap must define export manifest");
   assert(v2ContextPackRoadmapDoc.includes("exports/context-pack.md"), "v2 roadmap must define readable export");
   assert(v2ContextPackRoadmapDoc.includes("exports/context.json"), "v2 roadmap must define machine-readable export");
@@ -2130,6 +2140,53 @@ function checkContentContracts() {
   assert(contextPackFeatureFeasibilitySpikeV2611Doc.includes("provider_probe_status=skipped"), "v2.6.11 feasibility spike must preserve skipped provider gate");
   assert(!/(^|[^A-Za-z])[A-Za-z]:[\\/]/.test(contextPackFeatureFeasibilitySpikeV2611Doc), "v2.6.11 feasibility spike must not expose drive-letter absolute paths");
   assert(!/\\\\/.test(contextPackFeatureFeasibilitySpikeV2611Doc), "v2.6.11 feasibility spike must not expose UNC paths");
+  assert(contextPackLocalBundleReviewRehearsalV2612Doc.includes("Context Pack Local Bundle Review / Handoff Rehearsal v2.6.12"), "v2.6.12 bundle review rehearsal doc must have stable title");
+  assert(contextPackLocalBundleReviewRehearsalV2612Doc.includes("local adoption evidence, not a release closeout"), "v2.6.12 bundle review rehearsal must avoid release closeout claims");
+  assert(contextPackLocalBundleReviewRehearsalV2612Doc.includes("ahead-9 v2.6.x adoption bundle"), "v2.6.12 bundle review rehearsal must name ahead-9 bundle");
+  assert(contextPackLocalBundleReviewRehearsalV2612Doc.includes("bundle_status: local_adoption_bundle"), "v2.6.12 bundle review rehearsal must record local bundle status");
+  assert(contextPackLocalBundleReviewRehearsalV2612Doc.includes("bundle_scope: docs/examples/release-check/adoption polish"), "v2.6.12 bundle review rehearsal must scope bundle");
+  assert(contextPackLocalBundleReviewRehearsalV2612Doc.includes("release_closeout_status: not_started"), "v2.6.12 bundle review rehearsal must keep release closeout not started");
+  assert(contextPackLocalBundleReviewRehearsalV2612Doc.includes("push_status: not_started"), "v2.6.12 bundle review rehearsal must keep push not started");
+  assert(contextPackLocalBundleReviewRehearsalV2612Doc.includes("tag_status: not_started"), "v2.6.12 bundle review rehearsal must keep tag not started");
+  assert(contextPackLocalBundleReviewRehearsalV2612Doc.includes("release_status: not_started"), "v2.6.12 bundle review rehearsal must keep release not started");
+  assert(contextPackLocalBundleReviewRehearsalV2612Doc.includes("50c3565") && contextPackLocalBundleReviewRehearsalV2612Doc.includes("75185e6") && contextPackLocalBundleReviewRehearsalV2612Doc.includes("00a787e"), "v2.6.12 bundle review rehearsal must summarize local bundle commits");
+  assert(contextPackLocalBundleReviewRehearsalV2612Doc.includes("No commit in this bundle is intended to add CLI behavior"), "v2.6.12 bundle review rehearsal must reject CLI behavior changes");
+  assert(contextPackLocalBundleReviewRehearsalV2612Doc.includes("context_pack_status: generated"), "v2.6.12 bundle review rehearsal must record context pack generation");
+  assert(contextPackLocalBundleReviewRehearsalV2612Doc.includes("context_pack_git_status: clean"), "v2.6.12 bundle review rehearsal must record clean source state");
+  assert(contextPackLocalBundleReviewRehearsalV2612Doc.includes("context_pack_included_files: 23"), "v2.6.12 bundle review rehearsal must record included file count");
+  assert(contextPackLocalBundleReviewRehearsalV2612Doc.includes("context_pack_truncated: false"), "v2.6.12 bundle review rehearsal must record no truncation");
+  assert(contextPackLocalBundleReviewRehearsalV2612Doc.includes("check_status: passed"), "v2.6.12 bundle review rehearsal must record check pass");
+  assert(contextPackLocalBundleReviewRehearsalV2612Doc.includes("check_error_count: 0"), "v2.6.12 bundle review rehearsal must record zero check errors");
+  assert(contextPackLocalBundleReviewRehearsalV2612Doc.includes("check_warning_count: 0"), "v2.6.12 bundle review rehearsal must record zero check warnings");
+  assert(contextPackLocalBundleReviewRehearsalV2612Doc.includes("resume_status: ready"), "v2.6.12 bundle review rehearsal must record resume ready");
+  assert(contextPackLocalBundleReviewRehearsalV2612Doc.includes("resume_contract_version: basebrief-resume-v1"), "v2.6.12 bundle review rehearsal must preserve resume contract version");
+  assert(contextPackLocalBundleReviewRehearsalV2612Doc.includes("resume_prompt_contains: Continuation rules:"), "v2.6.12 bundle review rehearsal must record starter continuation rules");
+  assert(contextPackLocalBundleReviewRehearsalV2612Doc.includes("doctor_status: passed"), "v2.6.12 bundle review rehearsal must record doctor pass");
+  assert(contextPackLocalBundleReviewRehearsalV2612Doc.includes("doctor_contract_version: basebrief-doctor-v1"), "v2.6.12 bundle review rehearsal must preserve doctor contract version");
+  assert(contextPackLocalBundleReviewRehearsalV2612Doc.includes("doctor_info_findings: doctor.live-recheck-required"), "v2.6.12 bundle review rehearsal must record doctor live recheck info");
+  assert(contextPackLocalBundleReviewRehearsalV2612Doc.includes("did not reproduce blocking or high-frequency confusing friction"), "v2.6.12 bundle review rehearsal must record no repeated friction");
+  assert(contextPackLocalBundleReviewRehearsalV2612Doc.includes("continuation_harness_lite_status: not_started"), "v2.6.12 bundle review rehearsal must keep continuation harness not started");
+  assert(contextPackLocalBundleReviewRehearsalV2612Doc.includes("status_command_status: not_started"), "v2.6.12 bundle review rehearsal must keep status command not started");
+  assert(contextPackLocalBundleReviewRehearsalV2612Doc.includes("workflow_runner_status: not_started"), "v2.6.12 bundle review rehearsal must keep workflow runner not started");
+  assert(contextPackLocalBundleReviewRehearsalV2612Doc.includes("feature_implementation_status: not_started"), "v2.6.12 bundle review rehearsal must keep feature implementation not started");
+  assert(contextPackLocalBundleReviewRehearsalV2612Doc.includes("No new CLI command"), "v2.6.12 bundle review rehearsal must reject new commands");
+  assert(contextPackLocalBundleReviewRehearsalV2612Doc.includes("No Context Pack seven-file structure change"), "v2.6.12 bundle review rehearsal must preserve seven-file structure");
+  assert(contextPackLocalBundleReviewRehearsalV2612Doc.includes("No `check --input <dir> --json` top-level shape change"), "v2.6.12 bundle review rehearsal must preserve checker JSON shape");
+  assert(contextPackLocalBundleReviewRehearsalV2612Doc.includes("No Resume JSON contract change"), "v2.6.12 bundle review rehearsal must preserve resume JSON contract");
+  assert(contextPackLocalBundleReviewRehearsalV2612Doc.includes("No Doctor JSON contract change"), "v2.6.12 bundle review rehearsal must preserve doctor JSON contract");
+  assert(contextPackLocalBundleReviewRehearsalV2612Doc.includes("No Export JSON contract change"), "v2.6.12 bundle review rehearsal must preserve export JSON contract");
+  assert(contextPackLocalBundleReviewRehearsalV2612Doc.includes("No Continuation Harness Lite implementation"), "v2.6.12 bundle review rehearsal must reject harness implementation");
+  assert(contextPackLocalBundleReviewRehearsalV2612Doc.includes("No provider request"), "v2.6.12 bundle review rehearsal must reject provider requests");
+  assert(contextPackLocalBundleReviewRehearsalV2612Doc.includes("No runtime integration"), "v2.6.12 bundle review rehearsal must reject runtime scope");
+  assert(contextPackLocalBundleReviewRehearsalV2612Doc.includes("No MCP server"), "v2.6.12 bundle review rehearsal must reject MCP server scope");
+  assert(contextPackLocalBundleReviewRehearsalV2612Doc.includes("No MCP tools"), "v2.6.12 bundle review rehearsal must reject MCP tools scope");
+  assert(contextPackLocalBundleReviewRehearsalV2612Doc.includes("No schema-v2"), "v2.6.12 bundle review rehearsal must reject schema-v2");
+  assert(contextPackLocalBundleReviewRehearsalV2612Doc.includes("No daemon"), "v2.6.12 bundle review rehearsal must reject daemon scope");
+  assert(contextPackLocalBundleReviewRehearsalV2612Doc.includes("No watcher"), "v2.6.12 bundle review rehearsal must reject watcher scope");
+  assert(contextPackLocalBundleReviewRehearsalV2612Doc.includes("No hosted memory"), "v2.6.12 bundle review rehearsal must reject hosted memory");
+  assert(contextPackLocalBundleReviewRehearsalV2612Doc.includes("provider_probe_status=skipped"), "v2.6.12 bundle review rehearsal must preserve skipped provider gate");
+  assert(!/(^|[^A-Za-z])[A-Za-z]:[\\/]/.test(contextPackLocalBundleReviewRehearsalV2612Doc), "v2.6.12 bundle review rehearsal must not expose drive-letter absolute paths");
+  assert(!/\\\\/.test(contextPackLocalBundleReviewRehearsalV2612Doc), "v2.6.12 bundle review rehearsal must not expose UNC paths");
   assert(contextPackDoctorDogfoodingDoc.includes("Context Pack Doctor Dogfooding v2.5.0"), "doctor dogfooding doc must have stable title");
   assert(contextPackDoctorDogfoodingDoc.includes("doctor_contract_version: basebrief-doctor-v1"), "doctor dogfooding must record contract version");
   assert(contextPackDoctorDogfoodingDoc.includes("doctor_command_status: warning"), "doctor dogfooding must record warning status");

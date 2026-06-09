@@ -1024,6 +1024,26 @@ Expected release-check output without provider env remains:
 provider_probe_status=skipped
 ```
 
+## v2.6.12 Context Pack Local Bundle Review / Handoff Rehearsal
+
+`v2.6.12` is local adoption evidence, not a release closeout or feature
+implementation. It reviews the ahead-9 local adoption bundle and rehearses the
+current `context-pack -> check -> resume -> live recheck` chain.
+
+The evidence is recorded in
+[Context Pack Local Bundle Review / Handoff Rehearsal v2.6.12](dogfooding/context-pack-local-bundle-review-rehearsal-v2.6.12.md).
+The rehearsal records `context_pack_status: generated`, `check_status: passed`,
+`resume_status: ready`, and `doctor_info_findings: doctor.live-recheck-required`.
+It keeps Continuation Harness Lite, Status, Workflow Runner, provider request,
+runtime integration, MCP server/tools, schema-v2, daemon, watcher, hosted
+memory, and JSON contract changes out of scope.
+
+Expected release-check output without provider env remains:
+
+```text
+provider_probe_status=skipped
+```
+
 ## v0.4.1 Stabilization Candidate
 
 `v0.4.1` is a stabilization-only cycle after the `v0.4.0` public release. It uses

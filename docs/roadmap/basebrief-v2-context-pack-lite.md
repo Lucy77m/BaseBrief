@@ -456,6 +456,13 @@ Continuation Harness Lite as a feasibility spike with implementation_status: not
 It asks whether real users need a narrower helper around `context-pack -> check -> resume -> live recheck`.
 It is not a feature implementation, new command, Status command, Workflow Runner, or JSON contract change.
 
+`docs/dogfooding/context-pack-local-bundle-review-rehearsal-v2.6.12.md` reviews
+the ahead-9 local adoption bundle and rehearses `context-pack -> check -> resume -> live recheck`.
+The rehearsal passed with `check_status: passed`, `resume_status: ready`, and
+`doctor_info_findings: doctor.live-recheck-required`; it keeps
+Continuation Harness Lite, Status, Workflow Runner, and JSON contract changes
+not started.
+
 ### Later Workflow Runner Lite
 
 Only after Context Pack Lite, Context Pack Check, One-command Resume,
