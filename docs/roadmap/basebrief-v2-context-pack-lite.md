@@ -651,6 +651,22 @@ alter the Context Pack seven-file structure, start CI, or open Status, Workflow
 Runner, Doctor expansion, provider/runtime integration, MCP, plugin, schema-v2,
 daemon, watcher, hosted memory, publish, push, tag, release, or PR work.
 
+`docs/dogfooding/context-pack-test-split-stability-check-v2.6.30.md` checks
+the three-file test baseline after the Context Pack and cache-ready benchmark
+splits. The current distribution is `tests/basebrief.test.js` with 118 tests,
+`tests/context-pack.test.js` with 11 tests, and
+`tests/cache-ready-benchmark.test.js` with 46 tests. The public validation entry
+remains `node --test tests/basebrief.test.js tests/context-pack.test.js tests/cache-ready-benchmark.test.js`,
+with expected test count still 175 and `independent_test_files=3`. The
+three-file baseline is kept as useful, while Receiver, Project State, Sidecar,
+and docs/release-line assertion splits remain deferred until this baseline
+proves stable across more local slices. It does not add a CLI command, add a
+new test file, change package scripts, change release-check output shape,
+change JSON contracts, alter the Context Pack seven-file structure, start CI,
+or open Status, Workflow Runner, Doctor expansion, provider/runtime integration,
+MCP, plugin, schema-v2, daemon, watcher, hosted memory, publish, push, tag,
+release, or PR work.
+
 ### Later Workflow Runner Lite
 
 Only after Context Pack Lite, Context Pack Check, One-command Resume,

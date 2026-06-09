@@ -1477,6 +1477,40 @@ Resume/Doctor/Export JSON contracts, start CI, or open Status, Workflow
 Runner, Doctor expansion, provider/runtime integration, MCP, plugin,
 schema-v2, daemon, watcher, hosted memory, push, tag, release, or PR work.
 
+## v2.6.30 Context Pack Test Split Stability Check
+
+`v2.6.30` checks the three-file test baseline after `v2.6.27` and `v2.6.29`.
+The stability check is recorded in
+[Context Pack Test Split Stability Check v2.6.30](dogfooding/context-pack-test-split-stability-check-v2.6.30.md).
+
+The current distribution is:
+
+```text
+tests/basebrief.test.js: 118 tests
+tests/context-pack.test.js: 11 tests
+tests/cache-ready-benchmark.test.js: 46 tests
+```
+
+The public validation entry remains:
+
+```text
+node --test tests/basebrief.test.js tests/context-pack.test.js tests/cache-ready-benchmark.test.js
+```
+
+Expected test count remains 175 tests. `npm run release-check` should continue
+to report `independent_test_files=3` and `provider_probe_status=skipped`.
+
+The three-file baseline is kept as useful. Receiver, Project State, Sidecar,
+and docs/release-line assertion splits remain deferred until this baseline
+proves stable across more local slices.
+
+It does not add a CLI command, add a new test file, change package scripts,
+change release-check output shape, change Context Pack structure, change
+`check --input <dir> --json`, change Resume/Doctor/Export JSON contracts,
+start CI, or open Status, Workflow Runner, Doctor expansion, provider/runtime
+integration, MCP, plugin, schema-v2, daemon, watcher, hosted memory, push, tag,
+release, or PR work.
+
 ## v0.4.1 Stabilization Candidate
 
 `v0.4.1` is a stabilization-only cycle after the `v0.4.0` public release. It uses
