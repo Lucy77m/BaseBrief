@@ -741,6 +741,18 @@ Workflow Runner, Doctor expansion, provider/runtime integration, MCP, plugin,
 schema-v2, daemon, watcher, hosted memory, publish, push, tag, release, or PR
 work starts here.
 
+`docs/dogfooding/context-pack-release-closeout-review-packet-v2.6.37.md`
+prepares a local release closeout review packet. It packages the release story,
+validation evidence, protected boundaries, and remaining external actions into
+one reviewable reference while keeping the same first-run discoverability,
+runnable examples, receiver-facing Context Pack wording, and validation
+confidence story. It preserves `provider_probe_status=skipped`, keeps
+`independent_test_files=3`, and keeps publish, push, tag, release, and PR
+actions not_started. No command, package script, release-check output, Context
+Pack structure, JSON contract, Status, Workflow Runner, Doctor expansion,
+provider/runtime integration, MCP, plugin, schema-v2, daemon, watcher, hosted
+memory, publish, push, tag, release, or PR work starts here.
+
 ### Later Workflow Runner Lite
 
 Only after Context Pack Lite, Context Pack Check, One-command Resume,

@@ -122,6 +122,7 @@ npm run check
 - [Context Pack Release Closeout Go/No-Go Plan v2.6.34](dogfooding/context-pack-release-closeout-go-no-go-plan-v2.6.34.md)
 - [Context Pack Release Closeout Prep Draft v2.6.35](dogfooding/context-pack-release-closeout-prep-draft-v2.6.35.md)
 - [Context Pack Formal Local Release Closeout Draft v2.6.36](dogfooding/context-pack-formal-local-release-closeout-draft-v2.6.36.md)
+- [Context Pack Release Closeout Review Packet v2.6.37](dogfooding/context-pack-release-closeout-review-packet-v2.6.37.md)
 
 ## v1 Delta / Receiver Line
 

@@ -1714,6 +1714,38 @@ output shape, change Context Pack structure, change `check --input <dir>
 tag, release, or PR work. Any actual publication action still requires separate
 explicit confirmation.
 
+## v2.6.37 Context Pack Release Closeout Review Packet
+
+`v2.6.37` prepares a local review packet for the Context Pack Lite v2.6.x
+release closeout. The packet is recorded in
+[Context Pack Release Closeout Review Packet v2.6.37](dogfooding/context-pack-release-closeout-review-packet-v2.6.37.md).
+
+The packet packages the release story, validation evidence, protected
+boundaries, and remaining external actions into one reviewable reference. The
+release story remains focused on first-run discoverability, runnable examples,
+receiver-facing Context Pack wording, and validation confidence.
+
+Current local validation remains:
+
+```text
+npm run release-check
+npm test
+git diff --check
+```
+
+Recorded result is `release_check_status: passed_current_slice`,
+`provider_probe_status=skipped`, `npm_test_status:
+passed_175_tests_current_slice`, `git_diff_check_status:
+passed_existing_crlf_warnings_only`, and `independent_test_files=3`.
+Release-check metric lines such as `mode_cases`, `checked_links`,
+`cli_lite_commands`, and `independent_test_files` remain preserved.
+
+It does not add a CLI command, change package scripts, change release-check
+output shape, change Context Pack structure, change `check --input <dir>
+--json`, change Resume/Doctor/Export JSON contracts, start CI, publish, push,
+tag, release, or PR work. Any actual publication action still requires separate
+explicit confirmation.
+
 ## v0.4.1 Stabilization Candidate
 
 `v0.4.1` is a stabilization-only cycle after the `v0.4.0` public release. It uses
