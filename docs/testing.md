@@ -1064,6 +1064,23 @@ Expected release-check output without provider env remains:
 provider_probe_status=skipped
 ```
 
+## v2.6.14 Context Pack Release-Check Maintainability
+
+`v2.6.14` is a release-check maintainability repair, not a release closeout or
+feature implementation. It adds whitespace-normalized phrase matching for long
+prose assertions so Markdown wrapping does not break stable docs contracts.
+
+The evidence is recorded in
+[Context Pack Release-Check Maintainability v2.6.14](dogfooding/context-pack-release-check-maintainability-v2.6.14.md).
+It keeps exact technical literals exact, including rule IDs, command names,
+contract versions, JSON keys, and status values.
+
+Expected release-check output without provider env remains:
+
+```text
+provider_probe_status=skipped
+```
+
 ## v0.4.1 Stabilization Candidate
 
 `v0.4.1` is a stabilization-only cycle after the `v0.4.0` public release. It uses
