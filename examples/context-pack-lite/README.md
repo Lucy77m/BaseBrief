@@ -25,6 +25,32 @@ Command shape:
 node scripts/basebrief.js context-pack --repo <target-repo> --output-dir <dir> [--since <commit>] [--max-files <n>] [--json]
 ```
 
+## Runnable Recipe
+
+Shortest Context Pack handoff path:
+
+```text
+node scripts/basebrief.js context-pack --repo <target-repo> --output-dir <context-pack-dir> [--since <commit>] [--max-files <n>]
+node scripts/basebrief.js check --input <context-pack-dir> --json
+node scripts/basebrief.js resume --input <context-pack-dir>
+node scripts/basebrief.js doctor --repo <target-repo> --context-pack <context-pack-dir> --json
+```
+
+Recipe chain: `context-pack -> check -> resume -> doctor`. Generate the pack,
+verify the seven-file structure, produce the copyable receiver starter, then
+compare inherited pack facts with live repo facts before implementation.
+
+Canonical first-run smoke path:
+
+```text
+README -> docs/index.md -> docs/quickstart-5min.md -> examples/minimal -> examples/context-pack-lite
+npm run check
+```
+
+Use this example after the minimal Lite smoke to understand the seven-file
+Context Pack shape. Doctor and File-only Export remain follow-up recipes, not
+mandatory first-run steps.
+
 ## First-run scenarios
 
 Use `check` when you already have a Context Pack directory and need to decide

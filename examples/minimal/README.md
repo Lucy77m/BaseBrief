@@ -15,6 +15,32 @@
 - 接收窗口区分“来源窗口已验证”和“接收窗口本轮已验证”。
 - `receiver_entry_task` 完成后，才进入 `post_acceptance_next_action`。
 
+## Runnable Recipe
+
+Shortest first-run path:
+
+```text
+README -> docs/quickstart-5min.md -> examples/minimal
+npm run check
+```
+
+Use the three files in this directory as the manual handoff recipe: read
+`input-project-notes.md`, review `output-basebrief-lite.md`, then copy the
+receiver-facing shape from `next-chat-prompt.md`. `npm run check` is the local
+repo validation gate; it does not call a provider or add runtime behavior.
+
+Canonical first-run smoke path:
+
+```text
+README -> docs/index.md -> docs/quickstart-5min.md -> examples/minimal -> examples/context-pack-lite
+npm run check
+```
+
+After this manual Lite smoke, continue to
+[`examples/context-pack-lite`](../context-pack-lite/README.md) to see the
+seven-file Context Pack reading order. Doctor and File-only Export are
+follow-up recipes, not required first-run steps.
+
 ## 文件顺序
 
 阅读顺序：

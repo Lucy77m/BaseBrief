@@ -11,6 +11,19 @@ Command shape:
 node scripts/basebrief.js doctor --repo examples/example-repo --context-pack examples/context-pack-lite --json
 ```
 
+## Runnable Recipe
+
+Shortest diagnostic path:
+
+```text
+node scripts/basebrief.js check --input examples/context-pack-lite --json
+node scripts/basebrief.js doctor --repo examples/example-repo --context-pack examples/context-pack-lite --json
+```
+
+Recipe chain: `check -> doctor`. First confirm the Context Pack is complete and
+structurally reviewable, then compare it with live repository facts for stale
+HEAD, branch mismatch, and required live recheck findings.
+
 ## Check vs Doctor
 
 Run `check` first when the question is whether a Context Pack directory is

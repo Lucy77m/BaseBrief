@@ -1218,6 +1218,128 @@ Expected release-check output without provider env remains:
 provider_probe_status=skipped
 ```
 
+## v2.6.20 Context Pack Local Bundle Compression
+
+`v2.6.20` compresses the ahead-19 local adoption and design bundle into
+future release-note candidates, dogfooding-only evidence, release-check /
+contract protections, and feature gates / deferred candidates. It is local
+bundle compression only, not a release closeout, push, tag, release, PR, or
+feature implementation.
+
+The evidence is recorded in
+[Context Pack Local Bundle Compression v2.6.20](dogfooding/context-pack-local-bundle-compression-v2.6.20.md).
+It keeps Continuation Harness Lite as a design-sketch candidate, preserves
+Context Pack seven-file structure, `check --input <dir> --json`, Resume,
+Doctor, and Export JSON contracts, and keeps Status, Workflow Runner,
+provider/runtime integration, MCP server/tools, plugin, schema-v2, daemon,
+watcher, hosted memory, and JSON contract changes out of scope.
+
+Expected release-check output without provider env remains:
+
+```text
+provider_probe_status=skipped
+```
+
+## v2.6.21 Context Pack Implementation Gate Decision
+
+`v2.6.21` closes the current implementation gate for Continuation Harness Lite.
+The paper rehearsal can explain clean pack, too-thick warning, broken pack,
+stale/live drift, and missing pack scenarios, but current evidence still lacks
+repeated real blocking or high-frequency confusing friction that survives a
+docs/examples/release-check repair attempt.
+
+The decision is recorded in
+[Context Pack Implementation Gate Decision v2.6.21](dogfooding/context-pack-implementation-gate-decision-v2.6.21.md).
+It keeps Harness Lite as a future candidate only: no new CLI command, no JSON
+shape change, no Status, no Workflow Runner, no Doctor expansion, no provider
+request, no runtime integration, no MCP server/tools, no plugin, no schema-v2,
+no daemon, no watcher, and no hosted memory.
+
+Expected release-check output without provider env remains:
+
+```text
+provider_probe_status=skipped
+```
+
+## v2.6.22 Context Pack Release-Check Maintainability Plan
+
+`v2.6.22` is a local maintainability plan, not an implementation. It selects
+release-check maintainability modularization as the next near-term direction
+after the ahead-19 bundle compression and implementation gate decision.
+
+The plan is recorded in
+[Context Pack Release-Check Maintainability Plan v2.6.22](dogfooding/context-pack-release-check-maintainability-plan-v2.6.22.md).
+It recommends starting with the v2.x dogfooding/documentation assertion cluster
+inside `scripts/run_release_checks.js`, keeping `npm run release-check` output
+unchanged and deferring a separate helper file until internal grouping is
+proven useful.
+
+It does not add a command, change release-check output, change test commands,
+change Context Pack structure, change `check --input <dir> --json`, change
+Resume/Doctor/Export JSON contracts, start CI, or open Status, Workflow Runner,
+Continuation Harness Lite implementation, provider/runtime integration, MCP,
+plugin, schema-v2, daemon, watcher, hosted memory, push, tag, release, or PR
+work.
+
+Expected release-check output without provider env remains:
+
+```text
+provider_probe_status=skipped
+```
+
+## v2.6.23 Context Pack Runnable Recipes
+
+`v2.6.23` is a local examples recipe enhancement, not a command or contract
+change. It turns the existing minimal, Context Pack Lite, Context Pack Doctor,
+and File-only Export examples into more copyable runnable recipes using only
+existing commands and files.
+
+The plan is recorded in
+[Context Pack Runnable Recipes Plan v2.6.23](dogfooding/context-pack-runnable-recipes-plan-v2.6.23.md).
+It documents the short paths `README -> quickstart -> examples/minimal`,
+`context-pack -> check -> resume -> doctor`, `check -> doctor`, and
+`check -> export`.
+
+It does not add a CLI command, change package scripts, change release-check
+output, change Context Pack structure, change `check --input <dir> --json`,
+change Resume/Doctor/Export JSON contracts, start CI, or open Status, Workflow
+Runner, provider/runtime integration, MCP, plugin, schema-v2, daemon, watcher,
+hosted memory, push, tag, release, or PR work.
+
+Expected release-check output without provider env remains:
+
+```text
+provider_probe_status=skipped
+```
+
+## v2.6.24 Context Pack First-Run Smoke Path Consolidation
+
+`v2.6.24` is a local first-run path consolidation, not a command or contract
+change. It makes the canonical route explicit before optional diagnostics,
+advanced handoff flows, or historical release archives:
+
+```text
+README -> docs/index.md -> docs/quickstart-5min.md -> examples/minimal -> examples/context-pack-lite
+npm run check
+```
+
+The plan is recorded in
+[Context Pack First-Run Smoke Path Consolidation v2.6.24](dogfooding/context-pack-first-run-smoke-path-consolidation-v2.6.24.md).
+It keeps Doctor and File-only Export as follow-up recipes, not mandatory
+first-run steps.
+
+It does not add a CLI command, change package scripts, change release-check
+output, change Context Pack structure, change `check --input <dir> --json`,
+change Resume/Doctor/Export JSON contracts, start CI, or open Status, Workflow
+Runner, Doctor expansion, provider/runtime integration, MCP, plugin,
+schema-v2, daemon, watcher, hosted memory, push, tag, release, or PR work.
+
+Expected release-check output without provider env remains:
+
+```text
+provider_probe_status=skipped
+```
+
 ## v0.4.1 Stabilization Candidate
 
 `v0.4.1` is a stabilization-only cycle after the `v0.4.0` public release. It uses

@@ -526,6 +526,59 @@ implementation_status: not_started, command_status: not_started, Status,
 Workflow Runner, provider/runtime/MCP/plugin/schema-v2/hosted-memory scope, and
 JSON contract changes closed.
 
+`docs/dogfooding/context-pack-local-bundle-compression-v2.6.20.md` compresses
+the ahead-19 local adoption and design bundle into future release-note
+candidates, dogfooding-only evidence, release-check / contract protections, and
+feature gates / deferred candidates. It is local bundle compression only, not a
+release closeout, push/tag/release action, PR, feature implementation, new
+command, Continuation Harness Lite implementation, Status command, Workflow
+Runner, or JSON contract change.
+
+`docs/dogfooding/context-pack-implementation-gate-decision-v2.6.21.md` keeps
+Continuation Harness Lite as a future candidate but closes the implementation
+gate for now. The paper rehearsal explains clean pack, too-thick warning,
+broken pack, stale/live drift, and missing pack scenarios, but current evidence
+does not show repeated real blocking or high-frequency confusing friction. The
+decision adds no new CLI command, no JSON shape change, no Status, no Workflow
+Runner, no Doctor expansion, no provider/runtime integration, no MCP
+server/tools, no plugin, no schema-v2, no daemon, no watcher, and no hosted
+memory.
+
+`docs/dogfooding/context-pack-release-check-maintainability-plan-v2.6.22.md`
+selects release-check maintainability modularization as the next near-term
+direction after the ahead-19 compression and implementation gate decision. It
+is a plan only, not implementation. The recommended first slice starts with the
+v2.x dogfooding/documentation assertion cluster inside
+`scripts/run_release_checks.js`, keeps release-check output unchanged, and
+defers a separate helper file until internal grouping is proven useful. It
+does not add a command, change JSON contracts, start CI, or open Status,
+Workflow Runner, Continuation Harness Lite implementation, provider/runtime
+integration, MCP, plugin, schema-v2, daemon, watcher, hosted memory, publish,
+push, tag, release, or PR work.
+
+`docs/dogfooding/context-pack-runnable-recipes-plan-v2.6.23.md` selects
+examples as runnable recipes as the next small usability direction after the
+release-check maintainability slice. It tightens the existing minimal,
+Context Pack Lite, Context Pack Doctor, and File-only Export README paths with
+copyable command chains: `README -> quickstart -> examples/minimal`,
+`context-pack -> check -> resume -> doctor`, `check -> doctor`, and
+`check -> export`. It does not add a command, change package scripts, change
+release-check output, change JSON contracts, alter the Context Pack seven-file
+structure, start CI, or open Status, Workflow Runner, provider/runtime
+integration, MCP, plugin, schema-v2, daemon, watcher, hosted memory, publish,
+push, tag, release, or PR work.
+
+`docs/dogfooding/context-pack-first-run-smoke-path-consolidation-v2.6.24.md`
+consolidates the canonical first-run smoke path after the runnable recipe pass:
+`README -> docs/index.md -> docs/quickstart-5min.md -> examples/minimal ->
+examples/context-pack-lite`, followed by `npm run check`. It keeps Doctor and
+File-only Export as follow-up recipes, not mandatory first-run steps. It does
+not add a command, change package scripts, change release-check output, change
+JSON contracts, alter the Context Pack seven-file structure, start CI, or open
+Status, Workflow Runner, Doctor expansion, provider/runtime integration, MCP,
+plugin, schema-v2, daemon, watcher, hosted memory, publish, push, tag, release,
+or PR work.
+
 ### Later Workflow Runner Lite
 
 Only after Context Pack Lite, Context Pack Check, One-command Resume,

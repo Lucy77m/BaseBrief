@@ -13,6 +13,19 @@ node scripts/basebrief.js export --input examples/context-pack-lite --output-dir
 four export files directly under the explicit `--output-dir` you provide; it
 does not create or discover a nested `exports/` directory by itself.
 
+## Runnable Recipe
+
+Shortest file-only export path:
+
+```text
+node scripts/basebrief.js check --input examples/context-pack-lite --json
+node scripts/basebrief.js export --input examples/context-pack-lite --output-dir examples/file-only-export/exports --json
+```
+
+Recipe chain: `check -> export`. First verify the source Context Pack, then
+write the four file-only export artifacts directly under the explicit
+`--output-dir`.
+
 ## Files
 
 ```text

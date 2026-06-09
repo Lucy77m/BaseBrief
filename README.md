@@ -75,7 +75,7 @@ npm run check
 
 ## 继续阅读
 
-- [5 分钟上手](docs/quickstart-5min.md)
+- [5 分钟上手](docs/quickstart-5min.md)：第一次只想跑通时，走这里的 first-run smoke path；Doctor 和 File-only Export 是后续 recipe。
 - [CLI Lite](docs/cli-lite.md)
 - [完整文档索引与历史档案](docs/index.md)
 
