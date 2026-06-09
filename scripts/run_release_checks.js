@@ -281,6 +281,7 @@ function checkRequiredFiles() {
     "docs/dogfooding/context-pack-test-split-stability-check-v2.6.30.md",
     "docs/dogfooding/context-pack-v2.6x-local-closeout-gate-v2.6.31.md",
     "docs/dogfooding/context-pack-release-candidate-decision-v2.6.32.md",
+    "docs/dogfooding/context-pack-release-candidate-summary-draft-v2.6.33.md",
     "docs/testing-v0.4.x-test-matrix.md",
     "docs/testing-v0.6.x-test-matrix.md",
     "docs/testing-v0.7.x-test-matrix.md",
@@ -647,6 +648,14 @@ function checkV2ContextPackDocs(context) {
   assert(testingDoc.includes("release_candidate_status: decision_ready_not_published"), "Testing docs must record v2.6.32 release-candidate status");
   assertIncludesPhrase(testingDoc, "keeps v2.7 implementation deferred until the release-candidate decision explains any remaining user-facing gap", "Testing docs must defer v2.7 after v2.6.32 decision");
   assertIncludesPhrase(testingDoc, "does not add a CLI command, change package scripts, change release-check output", "Testing docs must preserve v2.6.32 command and output boundaries");
+  assert(testingDoc.includes("v2.6.33 Context Pack Release-Candidate Summary Draft"), "Testing docs must document v2.6.33 release-candidate summary draft");
+  assert(testingDoc.includes("dogfooding/context-pack-release-candidate-summary-draft-v2.6.33.md"), "Testing docs must link v2.6.33 release-candidate summary draft");
+  assertIncludesPhrase(testingDoc, "separates a public release-note draft from dogfooding-only evidence", "Testing docs must summarize v2.6.33 public and dogfooding split");
+  assert(testingDoc.includes("first-run discoverability") && testingDoc.includes("runnable recipes") && testingDoc.includes("receiver-facing Context Pack wording"), "Testing docs must summarize v2.6.33 public story");
+  assert(testingDoc.includes("three independent test files") && testingDoc.includes("release-check assertions"), "Testing docs must summarize v2.6.33 validation confidence");
+  assertIncludesPhrase(testingDoc, "release closeout prep versus a narrow v2.7 implementation plan", "Testing docs must preserve v2.6.33 open decision");
+  assert(testingDoc.includes("decision_ready_not_published"), "Testing docs must keep v2.6.33 not published");
+  assertIncludesPhrase(testingDoc, "does not add a CLI command, change package scripts, change release-check output", "Testing docs must preserve v2.6.33 command and output boundaries");
   assert(testingDoc.includes("checker_error_propagation_status: pass"), "Testing docs must record checker-error propagation");
   assert(testingDoc.includes("context-pack --repo <target-repo>"), "Testing docs must document context-pack command");
   assert(testingDoc.includes("resume --input <context-pack-dir>"), "Testing docs must document resume command");
@@ -705,6 +714,7 @@ function checkV2ContextPackDocs(context) {
   assert(docsIndex.includes("dogfooding/context-pack-test-split-stability-check-v2.6.30.md"), "Docs index must link v2.6.30 test split stability check");
   assert(docsIndex.includes("dogfooding/context-pack-v2.6x-local-closeout-gate-v2.6.31.md"), "Docs index must link v2.6.31 local closeout gate");
   assert(docsIndex.includes("dogfooding/context-pack-release-candidate-decision-v2.6.32.md"), "Docs index must link v2.6.32 release-candidate direction decision");
+  assert(docsIndex.includes("dogfooding/context-pack-release-candidate-summary-draft-v2.6.33.md"), "Docs index must link v2.6.33 release-candidate summary draft");
   assert(docsIndex.includes("specs/context-pack-lite.md"), "Docs index must link context pack lite spec");
   assert(docsIndex.includes("specs/context-pack-resume.md"), "Docs index must link context pack resume spec");
   assert(docsIndex.includes("specs/basebrief-format.md"), "Docs index must link basebrief format spec");
@@ -900,6 +910,13 @@ function checkV2ContextPackDocs(context) {
   assert(v2ContextPackRoadmapDoc.includes("release_candidate_status: decision_ready_not_published"), "v2 roadmap must record v2.6.32 release-candidate status");
   assertIncludesPhrase(v2ContextPackRoadmapDoc, "keeps v2.7 implementation deferred until the decision explains any remaining user-facing gap", "v2 roadmap must defer v2.7 after v2.6.32 decision");
   assertIncludesPhrase(v2ContextPackRoadmapDoc, "new commands, package scripts, release-check output shape", "v2 roadmap must preserve v2.6.32 command and output boundaries");
+  assert(v2ContextPackRoadmapDoc.includes("docs/dogfooding/context-pack-release-candidate-summary-draft-v2.6.33.md"), "v2 roadmap must link v2.6.33 release-candidate summary draft");
+  assertIncludesPhrase(v2ContextPackRoadmapDoc, "drafts the release-candidate story without starting release closeout", "v2 roadmap must summarize v2.6.33 local draft status");
+  assertIncludesPhrase(v2ContextPackRoadmapDoc, "separates a public release-note draft from dogfooding-only evidence", "v2 roadmap must summarize v2.6.33 public and dogfooding split");
+  assert(v2ContextPackRoadmapDoc.includes("first-run discoverability") && v2ContextPackRoadmapDoc.includes("runnable recipes") && v2ContextPackRoadmapDoc.includes("receiver-facing Context Pack wording"), "v2 roadmap must summarize v2.6.33 public story");
+  assert(v2ContextPackRoadmapDoc.includes("three independent test files") && v2ContextPackRoadmapDoc.includes("release-check assertions"), "v2 roadmap must summarize v2.6.33 validation confidence");
+  assertIncludesPhrase(v2ContextPackRoadmapDoc, "release closeout prep versus a narrow v2.7 implementation plan", "v2 roadmap must preserve v2.6.33 open decision");
+  assertIncludesPhrase(v2ContextPackRoadmapDoc, "no command, package script, release-check output", "v2 roadmap must preserve v2.6.33 command and output boundaries");
   assert(v2ContextPackRoadmapDoc.includes("exports/manifest.json"), "v2 roadmap must define export manifest");
   assert(v2ContextPackRoadmapDoc.includes("exports/context-pack.md"), "v2 roadmap must define readable export");
   assert(v2ContextPackRoadmapDoc.includes("exports/context.json"), "v2 roadmap must define machine-readable export");
@@ -950,6 +967,7 @@ function checkV26DogfoodingDocs(context) {
     contextPackTestSplitStabilityCheckV2630Doc,
     contextPackV26xLocalCloseoutGateV2631Doc,
     contextPackReleaseCandidateDecisionV2632Doc,
+    contextPackReleaseCandidateSummaryDraftV2633Doc,
   } = context;
 
   assert(contextPackAdoptionNotesV261Doc.includes("Context Pack Adoption Notes v2.6.1"), "v2.6.1 adoption notes doc must have stable title");
@@ -1940,6 +1958,33 @@ function checkV26DogfoodingDocs(context) {
   assertDogfoodingDocCommonBoundaries(contextPackReleaseCandidateDecisionV2632Doc, "v2.6.32 release-candidate decision", { doctorExpansion: true });
   assert(contextPackReleaseCandidateDecisionV2632Doc.includes("No Continuation Harness Lite implementation"), "v2.6.32 release-candidate decision must reject harness implementation");
   assertDogfoodingDocSharedReleaseChecks(contextPackReleaseCandidateDecisionV2632Doc, "v2.6.32 release-candidate decision");
+  assert(contextPackReleaseCandidateSummaryDraftV2633Doc.includes("Context Pack Release-Candidate Summary Draft v2.6.33"), "v2.6.33 release-candidate summary draft doc must have stable title");
+  assertIncludesPhrase(contextPackReleaseCandidateSummaryDraftV2633Doc, "local release-candidate summary draft only, not a release closeout or publish action", "v2.6.33 release-candidate summary draft must avoid release and publish claims");
+  assert(contextPackReleaseCandidateSummaryDraftV2633Doc.includes("release_candidate_summary_status: drafted_not_published"), "v2.6.33 release-candidate summary draft must record drafted-not-published status");
+  assert(contextPackReleaseCandidateSummaryDraftV2633Doc.includes("release_candidate_status: decision_ready_not_published"), "v2.6.33 release-candidate summary draft must keep decision-ready not published status");
+  assert(contextPackReleaseCandidateSummaryDraftV2633Doc.includes("local_bundle_status: ahead_29_summarized"), "v2.6.33 release-candidate summary draft must record ahead-29 summary");
+  assert(contextPackReleaseCandidateSummaryDraftV2633Doc.includes("v2_7_implementation_status: deferred_until_release_candidate_review_finds_gap"), "v2.6.33 release-candidate summary draft must defer v2.7 until review finds a gap");
+  assert(contextPackReleaseCandidateSummaryDraftV2633Doc.includes("release_closeout_status: not_started"), "v2.6.33 release-candidate summary draft must keep release closeout not started");
+  assert(contextPackReleaseCandidateSummaryDraftV2633Doc.includes("push_status: not_started"), "v2.6.33 release-candidate summary draft must keep push not started");
+  assert(contextPackReleaseCandidateSummaryDraftV2633Doc.includes("tag_status: not_started"), "v2.6.33 release-candidate summary draft must keep tag not started");
+  assert(contextPackReleaseCandidateSummaryDraftV2633Doc.includes("release_status: not_started"), "v2.6.33 release-candidate summary draft must keep release not started");
+  assert(contextPackReleaseCandidateSummaryDraftV2633Doc.includes("pr_status: not_started"), "v2.6.33 release-candidate summary draft must keep PR not started");
+  assert(contextPackReleaseCandidateSummaryDraftV2633Doc.includes("provider_probe_status=skipped"), "v2.6.33 release-candidate summary draft must preserve skipped provider gate");
+  assert(contextPackReleaseCandidateSummaryDraftV2633Doc.includes("command_status: unchanged"), "v2.6.33 release-candidate summary draft must keep command status unchanged");
+  assert(contextPackReleaseCandidateSummaryDraftV2633Doc.includes("package_script_status: unchanged"), "v2.6.33 release-candidate summary draft must keep package scripts unchanged");
+  assert(contextPackReleaseCandidateSummaryDraftV2633Doc.includes("json_contract_change_status: not_started"), "v2.6.33 release-candidate summary draft must keep JSON contract changes not started");
+  assert(contextPackReleaseCandidateSummaryDraftV2633Doc.includes("context_pack_structure_status: unchanged"), "v2.6.33 release-candidate summary draft must keep Context Pack structure unchanged");
+  assert(contextPackReleaseCandidateSummaryDraftV2633Doc.includes("continuation_harness_lite_status: future_candidate_only"), "v2.6.33 release-candidate summary draft must keep harness future candidate only");
+  assertIncludesPhrase(contextPackReleaseCandidateSummaryDraftV2633Doc, "Potential public release-note summary", "v2.6.33 release-candidate summary draft must include public release-note draft");
+  assert(contextPackReleaseCandidateSummaryDraftV2633Doc.includes("first-run discoverability") && contextPackReleaseCandidateSummaryDraftV2633Doc.includes("runnable example recipes") && contextPackReleaseCandidateSummaryDraftV2633Doc.includes("receiver-facing Context Pack wording"), "v2.6.33 release-candidate summary draft must summarize public story");
+  assert(contextPackReleaseCandidateSummaryDraftV2633Doc.includes("maintained `provider_probe_status=skipped` semantics") && contextPackReleaseCandidateSummaryDraftV2633Doc.includes("expected 175-test baseline"), "v2.6.33 release-candidate summary draft must preserve validation story");
+  assertIncludesPhrase(contextPackReleaseCandidateSummaryDraftV2633Doc, "avoid per-slice chronology, local ahead counts, private paths", "v2.6.33 release-candidate summary draft must keep local details out of release notes");
+  assertIncludesPhrase(contextPackReleaseCandidateSummaryDraftV2633Doc, "Dogfooding-Only Appendix", "v2.6.33 release-candidate summary draft must include dogfooding-only appendix");
+  assertIncludesPhrase(contextPackReleaseCandidateSummaryDraftV2633Doc, "release closeout prep", "v2.6.33 release-candidate summary draft must preserve release closeout prep option");
+  assertIncludesPhrase(contextPackReleaseCandidateSummaryDraftV2633Doc, "a narrow v2.7 implementation plan", "v2.6.33 release-candidate summary draft must preserve narrow v2.7 option");
+  assertDogfoodingDocCommonBoundaries(contextPackReleaseCandidateSummaryDraftV2633Doc, "v2.6.33 release-candidate summary draft", { doctorExpansion: true });
+  assert(contextPackReleaseCandidateSummaryDraftV2633Doc.includes("No Continuation Harness Lite implementation"), "v2.6.33 release-candidate summary draft must reject harness implementation");
+  assertDogfoodingDocSharedReleaseChecks(contextPackReleaseCandidateSummaryDraftV2633Doc, "v2.6.33 release-candidate summary draft");
 }
 
 function checkContentContracts() {
@@ -2102,6 +2147,7 @@ function checkContentContracts() {
   const contextPackTestSplitStabilityCheckV2630Doc = readText("docs/dogfooding/context-pack-test-split-stability-check-v2.6.30.md");
   const contextPackV26xLocalCloseoutGateV2631Doc = readText("docs/dogfooding/context-pack-v2.6x-local-closeout-gate-v2.6.31.md");
   const contextPackReleaseCandidateDecisionV2632Doc = readText("docs/dogfooding/context-pack-release-candidate-decision-v2.6.32.md");
+  const contextPackReleaseCandidateSummaryDraftV2633Doc = readText("docs/dogfooding/context-pack-release-candidate-summary-draft-v2.6.33.md");
   const postReleaseBaselineDoc = readText("docs/baselines/v0.4.0-post-release-baseline.md");
   const v060PostReleaseBaselineDoc = readText("docs/baselines/v0.6.0-post-release-baseline.md");
   const projectStateModelDoc = readText("docs/design/project-state-model.md");
@@ -3361,6 +3407,7 @@ function checkContentContracts() {
     contextPackTestSplitStabilityCheckV2630Doc,
     contextPackV26xLocalCloseoutGateV2631Doc,
     contextPackReleaseCandidateDecisionV2632Doc,
+    contextPackReleaseCandidateSummaryDraftV2633Doc,
   });
   assert(contextPackDoctorDogfoodingDoc.includes("Context Pack Doctor Dogfooding v2.5.0"), "doctor dogfooding doc must have stable title");
   assert(contextPackDoctorDogfoodingDoc.includes("doctor_contract_version: basebrief-doctor-v1"), "doctor dogfooding must record contract version");

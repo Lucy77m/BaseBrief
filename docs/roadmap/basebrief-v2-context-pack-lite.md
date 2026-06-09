@@ -689,6 +689,19 @@ Context Pack structure, JSON contracts, Status, Workflow Runner, Doctor
 expansion, provider/runtime integration, MCP, plugin, schema-v2, daemon,
 watcher, hosted memory, publish, push, tag, release, and PR work closed.
 
+`docs/dogfooding/context-pack-release-candidate-summary-draft-v2.6.33.md`
+drafts the release-candidate story without starting release closeout. It
+separates a public release-note draft from dogfooding-only evidence, keeping the
+public story focused on first-run discoverability, runnable recipes,
+receiver-facing Context Pack wording, maintained `provider_probe_status=skipped`
+semantics, three independent test files, and release-check assertions that
+protect docs, examples, commands, and contracts. The next decision remains
+release closeout prep versus a narrow v2.7 implementation plan if review finds
+one concrete usability gap; no command, package script, release-check output,
+Context Pack structure, JSON contract, Status, Workflow Runner, Doctor
+expansion, provider/runtime integration, MCP, plugin, schema-v2, daemon,
+watcher, hosted memory, publish, push, tag, release, or PR work starts here.
+
 ### Later Workflow Runner Lite
 
 Only after Context Pack Lite, Context Pack Check, One-command Resume,

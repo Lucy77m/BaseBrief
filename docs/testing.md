@@ -1576,6 +1576,42 @@ candidate only and keeps Status, Workflow Runner, Doctor expansion,
 provider/runtime integration, MCP, plugin, schema-v2, daemon, watcher, and
 hosted memory closed.
 
+## v2.6.33 Context Pack Release-Candidate Summary Draft
+
+`v2.6.33` drafts the release-candidate story after the v2.6.32 direction
+decision. The draft is recorded in
+[Context Pack Release-Candidate Summary Draft v2.6.33](dogfooding/context-pack-release-candidate-summary-draft-v2.6.33.md).
+
+The summary separates a public release-note draft from dogfooding-only evidence.
+It keeps the public story focused on first-run discoverability, runnable
+recipes, receiver-facing Context Pack wording, maintained
+`provider_probe_status=skipped` semantics, three independent test files, and
+release-check assertions that protect docs, examples, commands, and contracts.
+
+The open decision after this draft is release closeout prep versus a narrow
+v2.7 implementation plan if review finds one concrete usability gap. Until that
+decision is made, the bundle remains `decision_ready_not_published`.
+
+The public validation entry remains:
+
+```text
+npm run release-check
+npm test
+git diff --check
+```
+
+`npm run release-check` should continue to report
+`provider_probe_status=skipped`, `mode_cases`, `checked_links`,
+`cli_lite_commands`, and `independent_test_files`.
+
+It does not add a CLI command, change package scripts, change release-check
+output shape, change Context Pack structure, change `check --input <dir>
+--json`, change Resume/Doctor/Export JSON contracts, start CI, publish, push,
+tag, release, or PR work. It keeps Continuation Harness Lite as a future
+candidate only and keeps Status, Workflow Runner, Doctor expansion,
+provider/runtime integration, MCP, plugin, schema-v2, daemon, watcher, and
+hosted memory closed.
+
 ## v0.4.1 Stabilization Candidate
 
 `v0.4.1` is a stabilization-only cycle after the `v0.4.0` public release. It uses
