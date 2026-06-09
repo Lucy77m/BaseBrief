@@ -111,6 +111,7 @@ npm run check
 - [Context Pack Runnable Recipes Plan v2.6.23](dogfooding/context-pack-runnable-recipes-plan-v2.6.23.md)
 - [Context Pack First-Run Smoke Path Consolidation v2.6.24](dogfooding/context-pack-first-run-smoke-path-consolidation-v2.6.24.md)
 - [Context Pack Output UX Polish v2.6.25](dogfooding/context-pack-output-ux-polish-v2.6.25.md)
+- [Context Pack Test-File Split Plan v2.6.26](dogfooding/context-pack-test-file-split-plan-v2.6.26.md)
 
 ## v1 Delta / Receiver Line
 

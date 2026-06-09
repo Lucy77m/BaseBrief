@@ -592,6 +592,20 @@ structure, start CI, or open Status, Workflow Runner, Doctor expansion,
 provider/runtime integration, MCP, plugin, schema-v2, daemon, watcher, hosted
 memory, publish, push, tag, release, or PR work.
 
+`docs/dogfooding/context-pack-test-file-split-plan-v2.6.26.md` plans the first
+safe split path for the large `tests/basebrief.test.js` file without changing
+test-runner behavior or contracts. It identifies current clusters across
+docs/release-line assertions, quickstart examples, BB9 handoff, CLI Lite,
+Receiver workflows, Project State, Sidecar, Context Pack v2, cache-ready
+generators, benchmark summaries, and relay usage audit. The recommended first
+implementation slice is `tests/context-pack.test.js` for Context Pack v2 tests,
+with cache-ready / benchmark tests and Receiver / Project State workflow tests
+deferred until the first split proves useful. It does not split tests yet,
+change package scripts, change release-check output, change JSON contracts,
+alter the Context Pack seven-file structure, start CI, or open Status, Workflow
+Runner, Doctor expansion, provider/runtime integration, MCP, plugin, schema-v2,
+daemon, watcher, hosted memory, publish, push, tag, release, or PR work.
+
 ### Later Workflow Runner Lite
 
 Only after Context Pack Lite, Context Pack Check, One-command Resume,

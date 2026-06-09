@@ -1367,6 +1367,37 @@ Expected release-check output without provider env remains:
 provider_probe_status=skipped
 ```
 
+## v2.6.26 Context Pack Test-File Split Plan
+
+`v2.6.26` is a local test maintainability plan only, not a test-runner or
+contract change. It plans the first safe split path for the large
+`tests/basebrief.test.js` file while keeping the current `npm test` behavior
+unchanged.
+
+The plan is recorded in
+[Context Pack Test-File Split Plan v2.6.26](dogfooding/context-pack-test-file-split-plan-v2.6.26.md).
+It identifies current test clusters across docs/release-line assertions,
+quickstart examples, BB9 handoff, CLI Lite, Receiver workflows, Project State,
+Sidecar, Context Pack v2, cache-ready generators, benchmark summaries, and
+relay usage audit.
+
+The recommended first implementation slice is `tests/context-pack.test.js` for
+Context Pack v2 tests, with cache-ready / benchmark tests and Receiver /
+Project State workflow tests deferred until the first split proves useful.
+
+It does not split tests yet, add a CLI command, change package scripts, change
+release-check output, change Context Pack structure, change
+`check --input <dir> --json`, change Resume/Doctor/Export JSON contracts, start
+CI, or open Status, Workflow Runner, Doctor expansion, provider/runtime
+integration, MCP, plugin, schema-v2, daemon, watcher, hosted memory, push, tag,
+release, or PR work.
+
+Expected release-check output without provider env remains:
+
+```text
+provider_probe_status=skipped
+```
+
 ## v0.4.1 Stabilization Candidate
 
 `v0.4.1` is a stabilization-only cycle after the `v0.4.0` public release. It uses
