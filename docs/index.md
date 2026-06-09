@@ -116,6 +116,7 @@ npm run check
 - [Context Pack Test-File Split Second Candidate v2.6.28](dogfooding/context-pack-test-file-split-second-candidate-v2.6.28.md)
 - [Context Pack Cache-Ready Benchmark Test Split v2.6.29](dogfooding/context-pack-cache-ready-benchmark-test-split-v2.6.29.md)
 - [Context Pack Test Split Stability Check v2.6.30](dogfooding/context-pack-test-split-stability-check-v2.6.30.md)
+- [Context Pack v2.6.x Local Closeout Gate v2.6.31](dogfooding/context-pack-v2.6x-local-closeout-gate-v2.6.31.md)
 
 ## v1 Delta / Receiver Line
 

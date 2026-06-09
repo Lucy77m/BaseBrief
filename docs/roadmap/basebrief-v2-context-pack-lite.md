@@ -667,6 +667,17 @@ or open Status, Workflow Runner, Doctor expansion, provider/runtime integration,
 MCP, plugin, schema-v2, daemon, watcher, hosted memory, publish, push, tag,
 release, or PR work.
 
+`docs/dogfooding/context-pack-v2.6x-local-closeout-gate-v2.6.31.md` closes the
+current local v2.6.x dogfooding and maintainability line for now. It records
+the three recommended items as completed: cache-ready benchmark test split
+implementation, post-split stability check, and release-check maintainability
+helper refactor. The next work should move to either a v2.7
+planning/implementation line or a release-candidate decision instead of more
+small v2.6.x adoption notes. Continuation Harness Lite remains a future
+candidate only, while Status, Workflow Runner, Doctor expansion,
+provider/runtime integration, MCP, plugin, schema-v2, daemon, watcher, hosted
+memory, publish, push, tag, release, and PR work stay closed.
+
 ### Later Workflow Runner Lite
 
 Only after Context Pack Lite, Context Pack Check, One-command Resume,

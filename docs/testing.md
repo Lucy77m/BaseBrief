@@ -1511,6 +1511,37 @@ start CI, or open Status, Workflow Runner, Doctor expansion, provider/runtime
 integration, MCP, plugin, schema-v2, daemon, watcher, hosted memory, push, tag,
 release, or PR work.
 
+## v2.6.31 Context Pack v2.6.x Local Closeout Gate
+
+`v2.6.31` closes the current local v2.6.x dogfooding and maintainability line
+for now. The closeout gate is recorded in
+[Context Pack v2.6.x Local Closeout Gate v2.6.31](dogfooding/context-pack-v2.6x-local-closeout-gate-v2.6.31.md).
+
+The gate records that the three recommended items are completed: cache-ready
+benchmark test split implementation, post-split stability check, and
+release-check maintainability helper refactor.
+
+The v2.6.x local line can stop here. Further work should move to either a v2.7
+planning/implementation line or a release-candidate decision, rather than
+continuing to add small v2.6.x adoption notes.
+
+The public validation entry remains:
+
+```text
+node --test tests/basebrief.test.js tests/context-pack.test.js tests/cache-ready-benchmark.test.js
+```
+
+Expected test count remains 175 tests. `npm run release-check` should continue
+to report `independent_test_files=3` and `provider_probe_status=skipped`.
+
+It does not add a CLI command, change package scripts, change release-check
+output shape, change Context Pack structure, change `check --input <dir>
+--json`, change Resume/Doctor/Export JSON contracts, start CI, publish, push,
+tag, release, or PR work. It keeps Continuation Harness Lite as a future
+candidate only and keeps Status, Workflow Runner, Doctor expansion,
+provider/runtime integration, MCP, plugin, schema-v2, daemon, watcher, and
+hosted memory closed.
+
 ## v0.4.1 Stabilization Candidate
 
 `v0.4.1` is a stabilization-only cycle after the `v0.4.0` public release. It uses
