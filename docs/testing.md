@@ -1612,6 +1612,42 @@ candidate only and keeps Status, Workflow Runner, Doctor expansion,
 provider/runtime integration, MCP, plugin, schema-v2, daemon, watcher, and
 hosted memory closed.
 
+## v2.6.34 Context Pack Release Closeout Go/No-Go Plan
+
+`v2.6.34` reviews the v2.6.32 direction decision and v2.6.33
+release-candidate summary draft. The plan is recorded in
+[Context Pack Release Closeout Go/No-Go Plan v2.6.34](dogfooding/context-pack-release-closeout-go-no-go-plan-v2.6.34.md).
+
+The go/no-go result is `go_to_release_closeout_prep`: the current story is
+coherent enough to prepare a release closeout draft, and no concrete
+user-facing gap has been identified that would justify starting v2.7 first.
+
+The recommended next slice is release closeout prep. It should convert the
+public release-note draft into closeout-ready wording, keep dogfooding-only
+evidence in references, record exact validation commands and results, and keep
+publish, push, tag, release, and PR actions `not_started` until separately
+confirmed.
+
+The public validation entry remains:
+
+```text
+npm run release-check
+npm test
+git diff --check
+```
+
+`npm run release-check` should continue to report
+`provider_probe_status=skipped`, `mode_cases`, `checked_links`,
+`cli_lite_commands`, and `independent_test_files`.
+
+It does not add a CLI command, change package scripts, change release-check
+output shape, change Context Pack structure, change `check --input <dir>
+--json`, change Resume/Doctor/Export JSON contracts, start CI, publish, push,
+tag, release, or PR work. It keeps Continuation Harness Lite as a future
+candidate only and keeps Status, Workflow Runner, Doctor expansion,
+provider/runtime integration, MCP, plugin, schema-v2, daemon, watcher, and
+hosted memory closed.
+
 ## v0.4.1 Stabilization Candidate
 
 `v0.4.1` is a stabilization-only cycle after the `v0.4.0` public release. It uses

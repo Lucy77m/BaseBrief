@@ -702,6 +702,19 @@ Context Pack structure, JSON contract, Status, Workflow Runner, Doctor
 expansion, provider/runtime integration, MCP, plugin, schema-v2, daemon,
 watcher, hosted memory, publish, push, tag, release, or PR work starts here.
 
+`docs/dogfooding/context-pack-release-closeout-go-no-go-plan-v2.6.34.md`
+reviews the release-candidate decision and summary draft, then records
+`release_closeout_go_no_go_status: go_to_release_closeout_prep`. It recommends
+release closeout prep because the public story is coherent and no concrete
+user-facing v2.7 gap has been found. The next slice should convert the public
+release-note draft into closeout-ready wording, keep dogfooding-only evidence in
+references, record exact validation commands and results, and keep publish,
+push, tag, release, and PR actions not_started until separately confirmed. No
+command, package script, release-check output, Context Pack structure, JSON
+contract, Status, Workflow Runner, Doctor expansion, provider/runtime
+integration, MCP, plugin, schema-v2, daemon, watcher, hosted memory, publish,
+push, tag, release, or PR work starts here.
+
 ### Later Workflow Runner Lite
 
 Only after Context Pack Lite, Context Pack Check, One-command Resume,
