@@ -475,6 +475,12 @@ long prose assertions. It is release-check maintainability only, not a command,
 feature implementation, Status command, Workflow Runner, or JSON contract
 change.
 
+`docs/dogfooding/context-pack-major-release-candidate-shape-v2.6.15.md` shapes
+the local v2.6.x bundle into a future major-release candidate outline. It is a
+staging outline only, not a release closeout, publish action, feature
+implementation, Status command, Workflow Runner, Continuation Harness
+implementation, or JSON contract change.
+
 ### Later Workflow Runner Lite
 
 Only after Context Pack Lite, Context Pack Check, One-command Resume,

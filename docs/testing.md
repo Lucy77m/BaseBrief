@@ -1081,6 +1081,25 @@ Expected release-check output without provider env remains:
 provider_probe_status=skipped
 ```
 
+## v2.6.15 Context Pack Major-Release Candidate Shape
+
+`v2.6.15` is a future major-release candidate outline, not a release closeout or
+feature implementation. It separates public release-note material from details
+that should remain dogfooding evidence.
+
+The evidence is recorded in
+[Context Pack Major-Release Candidate Shape v2.6.15](dogfooding/context-pack-major-release-candidate-shape-v2.6.15.md).
+It keeps the public story focused on first-run adoption polish, Context Pack
+interpretation, diagnostics confidence, and release-check maintainability while
+leaving per-slice chronology, commit hashes, private output paths, raw generated
+handoff contents, and assertion wording out of front-page release notes.
+
+Expected release-check output without provider env remains:
+
+```text
+provider_probe_status=skipped
+```
+
 ## v0.4.1 Stabilization Candidate
 
 `v0.4.1` is a stabilization-only cycle after the `v0.4.0` public release. It uses
