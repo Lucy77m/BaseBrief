@@ -507,6 +507,14 @@ doctor`. It observed clean `check`, preserved `Continuation rules:`, confirmed
 feature trigger for Continuation Harness Lite, Status, Workflow Runner, or JSON
 contract changes.
 
+`docs/dogfooding/context-pack-continuation-harness-lite-design-sketch.md`
+defines a paper Continuation Harness Lite sketch only. It proposes a five-step
+human flow, a state machine from `pack_missing` to `user_goal_required`, and
+entry criteria before implementation, while keeping command_status:
+not_started, implementation_status: not_started, Status, Workflow Runner,
+provider/runtime/MCP/plugin/schema-v2/hosted-memory scope, and JSON contract
+changes closed.
+
 ### Later Workflow Runner Lite
 
 Only after Context Pack Lite, Context Pack Check, One-command Resume,

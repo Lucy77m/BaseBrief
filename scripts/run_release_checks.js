@@ -216,6 +216,7 @@ function checkRequiredFiles() {
     "docs/dogfooding/context-pack-ahead14-bundle-review-v2.6.17.md",
     "docs/dogfooding/context-pack-minimal-feature-candidate-decision-v2.6.18.md",
     "docs/dogfooding/context-pack-first-run-handoff-validation.md",
+    "docs/dogfooding/context-pack-continuation-harness-lite-design-sketch.md",
     "docs/testing-v0.4.x-test-matrix.md",
     "docs/testing-v0.6.x-test-matrix.md",
     "docs/testing-v0.7.x-test-matrix.md",
@@ -523,6 +524,7 @@ function checkContentContracts() {
   const contextPackAhead14BundleReviewV2617Doc = readText("docs/dogfooding/context-pack-ahead14-bundle-review-v2.6.17.md");
   const contextPackMinimalFeatureCandidateDecisionV2618Doc = readText("docs/dogfooding/context-pack-minimal-feature-candidate-decision-v2.6.18.md");
   const contextPackFirstRunHandoffValidationDoc = readText("docs/dogfooding/context-pack-first-run-handoff-validation.md");
+  const contextPackContinuationHarnessLiteDesignSketchDoc = readText("docs/dogfooding/context-pack-continuation-harness-lite-design-sketch.md");
   const postReleaseBaselineDoc = readText("docs/baselines/v0.4.0-post-release-baseline.md");
   const v060PostReleaseBaselineDoc = readText("docs/baselines/v0.6.0-post-release-baseline.md");
   const projectStateModelDoc = readText("docs/design/project-state-model.md");
@@ -1091,6 +1093,13 @@ function checkContentContracts() {
   assert(testingDoc.includes("clean `check`") && testingDoc.includes("Continuation rules:") && testingDoc.includes("basebrief-doctor-v1") && testingDoc.includes("doctor.live-recheck-required"), "Testing docs must summarize first-run validation results");
   assertIncludesPhrase(testingDoc, "did not observe blocking or repeated confusing friction", "Testing docs must record no repeated friction");
   assertIncludesPhrase(testingDoc, "does not trigger Continuation Harness Lite implementation, Status, Workflow Runner, or JSON contract changes", "Testing docs must keep validation out of feature implementation scope");
+  assert(testingDoc.includes("Context Pack Continuation Harness Lite Design Sketch"), "Testing docs must document harness lite design sketch");
+  assert(testingDoc.includes("dogfooding/context-pack-continuation-harness-lite-design-sketch.md"), "Testing docs must link harness lite design sketch");
+  assertIncludesPhrase(testingDoc, "planning material only, not an implementation", "Testing docs must keep harness lite design sketch non-implementation");
+  assertIncludesPhrase(testingDoc, "five-step human flow from inherited Context Pack to live recheck", "Testing docs must summarize harness lite five-step flow");
+  assert(testingDoc.includes("user_goal_required"), "Testing docs must include harness lite final state");
+  assert(testingDoc.includes("command_status: not_started") && testingDoc.includes("implementation_status: not_started"), "Testing docs must keep harness lite command and implementation not started");
+  assert(testingDoc.includes("Status") && testingDoc.includes("Workflow Runner") && testingDoc.includes("JSON contract changes out of scope"), "Testing docs must keep harness lite out of behavior scope");
   assert(testingDoc.includes("checker_error_propagation_status: pass"), "Testing docs must record checker-error propagation");
   assert(testingDoc.includes("context-pack --repo <target-repo>"), "Testing docs must document context-pack command");
   assert(testingDoc.includes("resume --input <context-pack-dir>"), "Testing docs must document resume command");
@@ -1632,6 +1641,7 @@ function checkContentContracts() {
   assert(docsIndex.includes("dogfooding/context-pack-ahead14-bundle-review-v2.6.17.md"), "Docs index must link v2.6.17 ahead-14 bundle review");
   assert(docsIndex.includes("dogfooding/context-pack-minimal-feature-candidate-decision-v2.6.18.md"), "Docs index must link v2.6.18 minimal feature candidate decision");
   assert(docsIndex.includes("dogfooding/context-pack-first-run-handoff-validation.md"), "Docs index must link first-run handoff validation");
+  assert(docsIndex.includes("dogfooding/context-pack-continuation-harness-lite-design-sketch.md"), "Docs index must link harness lite design sketch");
   assert(docsIndex.includes("specs/context-pack-lite.md"), "Docs index must link context pack lite spec");
   assert(docsIndex.includes("specs/context-pack-resume.md"), "Docs index must link context pack resume spec");
   assert(docsIndex.includes("specs/basebrief-format.md"), "Docs index must link basebrief format spec");
@@ -1736,6 +1746,12 @@ function checkContentContracts() {
   assertIncludesPhrase(v2ContextPackRoadmapDoc, "context-pack -> check -> resume -> doctor", "v2 roadmap must summarize first-run validation path");
   assert(v2ContextPackRoadmapDoc.includes("clean `check`") && v2ContextPackRoadmapDoc.includes("Continuation rules:") && v2ContextPackRoadmapDoc.includes("basebrief-doctor-v1") && v2ContextPackRoadmapDoc.includes("doctor.live-recheck-required"), "v2 roadmap must summarize first-run validation results");
   assertIncludesPhrase(v2ContextPackRoadmapDoc, "did not meet the feature trigger for Continuation Harness Lite, Status, Workflow Runner, or JSON contract changes", "v2 roadmap must keep first-run validation out of feature scope");
+  assert(v2ContextPackRoadmapDoc.includes("docs/dogfooding/context-pack-continuation-harness-lite-design-sketch.md"), "v2 roadmap must link harness lite design sketch");
+  assertIncludesPhrase(v2ContextPackRoadmapDoc, "paper Continuation Harness Lite sketch only", "v2 roadmap must keep harness lite design sketch paper-only");
+  assertIncludesPhrase(v2ContextPackRoadmapDoc, "five-step human flow", "v2 roadmap must summarize harness lite flow");
+  assert(v2ContextPackRoadmapDoc.includes("pack_missing") && v2ContextPackRoadmapDoc.includes("user_goal_required"), "v2 roadmap must summarize harness lite state machine");
+  assertIncludesPhrase(v2ContextPackRoadmapDoc, "command_status: not_started, implementation_status: not_started", "v2 roadmap must keep harness lite command and implementation not started");
+  assertIncludesPhrase(v2ContextPackRoadmapDoc, "Status, Workflow Runner, provider/runtime/MCP/plugin/schema-v2/hosted-memory scope, and JSON contract changes closed", "v2 roadmap must keep harness lite out of behavior and integration scope");
   assert(v2ContextPackRoadmapDoc.includes("exports/manifest.json"), "v2 roadmap must define export manifest");
   assert(v2ContextPackRoadmapDoc.includes("exports/context-pack.md"), "v2 roadmap must define readable export");
   assert(v2ContextPackRoadmapDoc.includes("exports/context.json"), "v2 roadmap must define machine-readable export");
@@ -2558,6 +2574,59 @@ function checkContentContracts() {
   assert(contextPackFirstRunHandoffValidationDoc.includes("provider_probe_status=skipped"), "first-run handoff validation must preserve skipped provider gate");
   assert(!/(^|[^A-Za-z])[A-Za-z]:[\\/]/.test(contextPackFirstRunHandoffValidationDoc), "first-run handoff validation must not expose drive-letter absolute paths");
   assert(!/\\\\/.test(contextPackFirstRunHandoffValidationDoc), "first-run handoff validation must not expose UNC paths");
+  assert(contextPackContinuationHarnessLiteDesignSketchDoc.includes("Context Pack Continuation Harness Lite Design Sketch"), "harness lite design sketch doc must have stable title");
+  assertIncludesPhrase(contextPackContinuationHarnessLiteDesignSketchDoc, "local design sketch only, not an implementation", "harness lite design sketch must avoid implementation claims");
+  assert(contextPackContinuationHarnessLiteDesignSketchDoc.includes("design_sketch_status: draft_only"), "harness lite design sketch must stay draft only");
+  assert(contextPackContinuationHarnessLiteDesignSketchDoc.includes("implementation_status: not_started"), "harness lite design sketch must keep implementation not started");
+  assert(contextPackContinuationHarnessLiteDesignSketchDoc.includes("command_status: not_started"), "harness lite design sketch must keep command not started");
+  assert(contextPackContinuationHarnessLiteDesignSketchDoc.includes("release_closeout_status: not_started"), "harness lite design sketch must keep release closeout not started");
+  assert(contextPackContinuationHarnessLiteDesignSketchDoc.includes("push_status: not_started"), "harness lite design sketch must keep push not started");
+  assert(contextPackContinuationHarnessLiteDesignSketchDoc.includes("tag_status: not_started"), "harness lite design sketch must keep tag not started");
+  assert(contextPackContinuationHarnessLiteDesignSketchDoc.includes("release_status: not_started"), "harness lite design sketch must keep release not started");
+  assert(contextPackContinuationHarnessLiteDesignSketchDoc.includes("continuation_harness_lite_status: design_sketch_only"), "harness lite design sketch must keep harness as design sketch only");
+  assert(contextPackContinuationHarnessLiteDesignSketchDoc.includes("status_command_status: not_started"), "harness lite design sketch must keep status command not started");
+  assert(contextPackContinuationHarnessLiteDesignSketchDoc.includes("workflow_runner_status: not_started"), "harness lite design sketch must keep workflow runner not started");
+  assert(contextPackContinuationHarnessLiteDesignSketchDoc.includes("json_contract_change_status: not_started"), "harness lite design sketch must keep JSON contract change not started");
+  assertIncludesPhrase(contextPackContinuationHarnessLiteDesignSketchDoc, "paper harness, not a CLI command or product surface", "harness lite design sketch must stay paper harness");
+  assert(contextPackContinuationHarnessLiteDesignSketchDoc.includes("Own the context window"), "harness lite design sketch must include context-window principle");
+  assert(contextPackContinuationHarnessLiteDesignSketchDoc.includes("Keep the reducer stateless"), "harness lite design sketch must include stateless reducer principle");
+  assert(contextPackContinuationHarnessLiteDesignSketchDoc.includes("Prefer handoff artifacts"), "harness lite design sketch must include handoff artifact principle");
+  assert(contextPackContinuationHarnessLiteDesignSketchDoc.includes("Practice memory hygiene"), "harness lite design sketch must include memory hygiene principle");
+  assert(contextPackContinuationHarnessLiteDesignSketchDoc.includes("Compress by decision"), "harness lite design sketch must include decision compression principle");
+  assert(contextPackContinuationHarnessLiteDesignSketchDoc.includes("Read the Context Pack as inherited context"), "harness lite design sketch must include read step");
+  assert(contextPackContinuationHarnessLiteDesignSketchDoc.includes("Run the existing pack validity gate with `check`"), "harness lite design sketch must include check step");
+  assert(contextPackContinuationHarnessLiteDesignSketchDoc.includes("Generate or point to the existing copyable `resume` prompt"), "harness lite design sketch must include resume step");
+  assert(contextPackContinuationHarnessLiteDesignSketchDoc.includes("Recheck live repo facts: cwd, branch, HEAD, and worktree status"), "harness lite design sketch must include live recheck step");
+  assert(contextPackContinuationHarnessLiteDesignSketchDoc.includes("Decide: continue, refresh pack, run Doctor, or stop"), "harness lite design sketch must include decide step");
+  assert(contextPackContinuationHarnessLiteDesignSketchDoc.includes("Doctor remains conditional"), "harness lite design sketch must keep Doctor conditional");
+  assert(contextPackContinuationHarnessLiteDesignSketchDoc.includes("pack_missing -> blocked"), "harness lite design sketch must include pack missing transition");
+  assert(contextPackContinuationHarnessLiteDesignSketchDoc.includes("check_failed -> repair_pack"), "harness lite design sketch must include check failed transition");
+  assert(contextPackContinuationHarnessLiteDesignSketchDoc.includes("check_warning -> human_review"), "harness lite design sketch must include check warning transition");
+  assert(contextPackContinuationHarnessLiteDesignSketchDoc.includes("check_passed + live_match -> resume_ready"), "harness lite design sketch must include live match transition");
+  assert(contextPackContinuationHarnessLiteDesignSketchDoc.includes("check_passed + live_drift -> doctor_or_refresh"), "harness lite design sketch must include live drift transition");
+  assert(contextPackContinuationHarnessLiteDesignSketchDoc.includes("resume_ready -> user_goal_required"), "harness lite design sketch must include user goal transition");
+  assert(contextPackContinuationHarnessLiteDesignSketchDoc.includes("This sketch does not define a new JSON shape"), "harness lite design sketch must avoid JSON shape claims");
+  assertIncludesPhrase(contextPackContinuationHarnessLiteDesignSketchDoc, "At least three public-safe real handoffs show the same blocking or high-frequency confusing friction", "harness lite design sketch must keep evidence threshold");
+  assertIncludesPhrase(contextPackContinuationHarnessLiteDesignSketchDoc, "latest first-run/handoff validation passed without blocking or repeated confusing friction", "harness lite design sketch must reference current validation result");
+  assert(contextPackContinuationHarnessLiteDesignSketchDoc.includes("No new CLI command"), "harness lite design sketch must reject new commands");
+  assert(contextPackContinuationHarnessLiteDesignSketchDoc.includes("No Context Pack seven-file structure change"), "harness lite design sketch must preserve seven-file structure");
+  assert(contextPackContinuationHarnessLiteDesignSketchDoc.includes("No `check --input <dir> --json` top-level shape change"), "harness lite design sketch must preserve checker JSON shape");
+  assert(contextPackContinuationHarnessLiteDesignSketchDoc.includes("No Resume JSON contract change"), "harness lite design sketch must preserve resume JSON contract");
+  assert(contextPackContinuationHarnessLiteDesignSketchDoc.includes("No Doctor JSON contract change"), "harness lite design sketch must preserve doctor JSON contract");
+  assert(contextPackContinuationHarnessLiteDesignSketchDoc.includes("No Export JSON contract change"), "harness lite design sketch must preserve export JSON contract");
+  assert(contextPackContinuationHarnessLiteDesignSketchDoc.includes("No Status command"), "harness lite design sketch must reject status command");
+  assert(contextPackContinuationHarnessLiteDesignSketchDoc.includes("No Workflow Runner"), "harness lite design sketch must reject workflow runner");
+  assert(contextPackContinuationHarnessLiteDesignSketchDoc.includes("No Continuation Harness Lite implementation"), "harness lite design sketch must reject harness implementation");
+  assert(contextPackContinuationHarnessLiteDesignSketchDoc.includes("No provider request"), "harness lite design sketch must reject provider requests");
+  assert(contextPackContinuationHarnessLiteDesignSketchDoc.includes("No runtime integration"), "harness lite design sketch must reject runtime integration");
+  assert(contextPackContinuationHarnessLiteDesignSketchDoc.includes("No MCP server"), "harness lite design sketch must reject MCP server");
+  assert(contextPackContinuationHarnessLiteDesignSketchDoc.includes("No MCP tools"), "harness lite design sketch must reject MCP tools");
+  assert(contextPackContinuationHarnessLiteDesignSketchDoc.includes("No plugin"), "harness lite design sketch must reject plugin scope");
+  assert(contextPackContinuationHarnessLiteDesignSketchDoc.includes("No schema-v2"), "harness lite design sketch must reject schema-v2");
+  assert(contextPackContinuationHarnessLiteDesignSketchDoc.includes("No hosted memory"), "harness lite design sketch must reject hosted memory");
+  assert(contextPackContinuationHarnessLiteDesignSketchDoc.includes("provider_probe_status=skipped"), "harness lite design sketch must preserve skipped provider gate");
+  assert(!/(^|[^A-Za-z])[A-Za-z]:[\\/]/.test(contextPackContinuationHarnessLiteDesignSketchDoc), "harness lite design sketch must not expose drive-letter absolute paths");
+  assert(!/\\\\/.test(contextPackContinuationHarnessLiteDesignSketchDoc), "harness lite design sketch must not expose UNC paths");
   assert(contextPackDoctorDogfoodingDoc.includes("Context Pack Doctor Dogfooding v2.5.0"), "doctor dogfooding doc must have stable title");
   assert(contextPackDoctorDogfoodingDoc.includes("doctor_contract_version: basebrief-doctor-v1"), "doctor dogfooding must record contract version");
   assert(contextPackDoctorDogfoodingDoc.includes("doctor_command_status: warning"), "doctor dogfooding must record warning status");

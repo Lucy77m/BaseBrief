@@ -1176,6 +1176,25 @@ Expected release-check output without provider env remains:
 provider_probe_status=skipped
 ```
 
+## Context Pack Continuation Harness Lite Design Sketch
+
+The Continuation Harness Lite design sketch is planning material only, not an
+implementation. It proposes a five-step human flow from inherited Context Pack
+to live recheck, plus a small state machine ending at `user_goal_required`.
+
+The sketch is recorded in
+[Context Pack Continuation Harness Lite Design Sketch](dogfooding/context-pack-continuation-harness-lite-design-sketch.md).
+It keeps command_status: not_started, implementation_status: not_started,
+Status, Workflow Runner, provider request, runtime integration, MCP
+server/tools, plugin, schema-v2, hosted memory, and JSON contract changes out
+of scope.
+
+Expected release-check output without provider env remains:
+
+```text
+provider_probe_status=skipped
+```
+
 ## v0.4.1 Stabilization Candidate
 
 `v0.4.1` is a stabilization-only cycle after the `v0.4.0` public release. It uses
