@@ -113,6 +113,7 @@ npm run check
 - [Context Pack Output UX Polish v2.6.25](dogfooding/context-pack-output-ux-polish-v2.6.25.md)
 - [Context Pack Test-File Split Plan v2.6.26](dogfooding/context-pack-test-file-split-plan-v2.6.26.md)
 - [Context Pack Test-File Split v2.6.27](dogfooding/context-pack-test-file-split-v2.6.27.md)
+- [Context Pack Test-File Split Second Candidate v2.6.28](dogfooding/context-pack-test-file-split-second-candidate-v2.6.28.md)
 
 ## v1 Delta / Receiver Line
 

@@ -619,6 +619,21 @@ the Context Pack seven-file structure, start CI, or open Status, Workflow
 Runner, Doctor expansion, provider/runtime integration, MCP, plugin, schema-v2,
 daemon, watcher, hosted memory, publish, push, tag, release, or PR work.
 
+`docs/dogfooding/context-pack-test-file-split-second-candidate-v2.6.28.md`
+reviews the stable two-file baseline and selects
+`tests/cache-ready-benchmark.test.js` as the second split candidate without
+moving tests yet. The selected scope is cache-ready generators, benchmark prompt
+variants, benchmark summaries, provider profiles, and relay usage audit
+assertions. Receiver, Project State, Sidecar, and docs/release-line assertion
+splits remain deferred. The public validation entry remains
+`node --test tests/basebrief.test.js tests/context-pack.test.js`, with expected
+test count still 175 and `independent_test_files=2`. It does not add a CLI
+command, add a new test file, change package scripts, change release-check
+output shape, change JSON contracts, alter the Context Pack seven-file
+structure, start CI, or open Status, Workflow Runner, Doctor expansion,
+provider/runtime integration, MCP, plugin, schema-v2, daemon, watcher, hosted
+memory, publish, push, tag, release, or PR work.
+
 ### Later Workflow Runner Lite
 
 Only after Context Pack Lite, Context Pack Check, One-command Resume,

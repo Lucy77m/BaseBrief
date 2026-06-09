@@ -1422,6 +1422,33 @@ Resume/Doctor/Export JSON contracts, start CI, or open Status, Workflow
 Runner, Doctor expansion, provider/runtime integration, MCP, plugin,
 schema-v2, daemon, watcher, hosted memory, push, tag, release, or PR work.
 
+## v2.6.28 Context Pack Test-File Split Second Candidate
+
+`v2.6.28` reviews the two-file baseline after `v2.6.27` and selects the next
+test-file split candidate without moving tests yet. The plan is recorded in
+[Context Pack Test-File Split Second Candidate v2.6.28](dogfooding/context-pack-test-file-split-second-candidate-v2.6.28.md).
+
+The selected second candidate is `tests/cache-ready-benchmark.test.js`, covering
+cache-ready generators, benchmark prompt variants, benchmark summaries, provider
+profiles, and relay usage audit assertions. Receiver, Project State, Sidecar,
+and docs/release-line assertion splits remain deferred.
+
+The public validation entry remains:
+
+```text
+node --test tests/basebrief.test.js tests/context-pack.test.js
+```
+
+Expected test count remains 175 tests. `npm run release-check` should continue
+to report `independent_test_files=2` and `provider_probe_status=skipped`.
+
+It does not add a CLI command, add a new test file, change package scripts,
+change release-check output shape, change Context Pack structure, change
+`check --input <dir> --json`, change Resume/Doctor/Export JSON contracts,
+start CI, or open Status, Workflow Runner, Doctor expansion, provider/runtime
+integration, MCP, plugin, schema-v2, daemon, watcher, hosted memory, push, tag,
+release, or PR work.
+
 ## v0.4.1 Stabilization Candidate
 
 `v0.4.1` is a stabilization-only cycle after the `v0.4.0` public release. It uses

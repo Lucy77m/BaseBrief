@@ -226,6 +226,7 @@ function checkRequiredFiles() {
     "docs/dogfooding/context-pack-output-ux-polish-v2.6.25.md",
     "docs/dogfooding/context-pack-test-file-split-plan-v2.6.26.md",
     "docs/dogfooding/context-pack-test-file-split-v2.6.27.md",
+    "docs/dogfooding/context-pack-test-file-split-second-candidate-v2.6.28.md",
     "docs/testing-v0.4.x-test-matrix.md",
     "docs/testing-v0.6.x-test-matrix.md",
     "docs/testing-v0.7.x-test-matrix.md",
@@ -555,6 +556,14 @@ function checkV2ContextPackDocs(context) {
   assertIncludesPhrase(testingDoc, "node --test tests/basebrief.test.js tests/context-pack.test.js", "Testing docs must document v2.6.27 npm test command");
   assert(testingDoc.includes("Expected test count remains 175 tests") && testingDoc.includes("independent_test_files=2"), "Testing docs must document v2.6.27 test count and independent file count");
   assertIncludesPhrase(testingDoc, "does not add a CLI command, change release-check output shape", "Testing docs must preserve v2.6.27 command and output boundaries");
+  assert(testingDoc.includes("v2.6.28 Context Pack Test-File Split Second Candidate"), "Testing docs must document v2.6.28 second split candidate");
+  assert(testingDoc.includes("dogfooding/context-pack-test-file-split-second-candidate-v2.6.28.md"), "Testing docs must link v2.6.28 second split candidate");
+  assert(testingDoc.includes("tests/cache-ready-benchmark.test.js"), "Testing docs must name v2.6.28 second candidate file");
+  assert(testingDoc.includes("cache-ready generators") && testingDoc.includes("benchmark summaries") && testingDoc.includes("relay usage audit"), "Testing docs must summarize v2.6.28 selected scope");
+  assert(testingDoc.includes("Receiver, Project State, Sidecar") && testingDoc.includes("docs/release-line assertion splits remain deferred"), "Testing docs must defer broader v2.6.28 clusters");
+  assertIncludesPhrase(testingDoc, "node --test tests/basebrief.test.js tests/context-pack.test.js", "Testing docs must keep v2.6.28 npm test command");
+  assert(testingDoc.includes("Expected test count remains 175 tests") && testingDoc.includes("independent_test_files=2"), "Testing docs must keep v2.6.28 test count and independent file count");
+  assertIncludesPhrase(testingDoc, "does not add a CLI command, add a new test file, change package scripts", "Testing docs must keep v2.6.28 planning-only boundaries");
   assert(testingDoc.includes("checker_error_propagation_status: pass"), "Testing docs must record checker-error propagation");
   assert(testingDoc.includes("context-pack --repo <target-repo>"), "Testing docs must document context-pack command");
   assert(testingDoc.includes("resume --input <context-pack-dir>"), "Testing docs must document resume command");
@@ -608,6 +617,7 @@ function checkV2ContextPackDocs(context) {
   assert(docsIndex.includes("dogfooding/context-pack-output-ux-polish-v2.6.25.md"), "Docs index must link v2.6.25 output UX polish");
   assert(docsIndex.includes("dogfooding/context-pack-test-file-split-plan-v2.6.26.md"), "Docs index must link v2.6.26 test-file split plan");
   assert(docsIndex.includes("dogfooding/context-pack-test-file-split-v2.6.27.md"), "Docs index must link v2.6.27 test-file split");
+  assert(docsIndex.includes("dogfooding/context-pack-test-file-split-second-candidate-v2.6.28.md"), "Docs index must link v2.6.28 second split candidate");
   assert(docsIndex.includes("specs/context-pack-lite.md"), "Docs index must link context pack lite spec");
   assert(docsIndex.includes("specs/context-pack-resume.md"), "Docs index must link context pack resume spec");
   assert(docsIndex.includes("specs/basebrief-format.md"), "Docs index must link basebrief format spec");
@@ -771,6 +781,13 @@ function checkV2ContextPackDocs(context) {
   assertIncludesPhrase(v2ContextPackRoadmapDoc, "node --test tests/basebrief.test.js tests/context-pack.test.js", "v2 roadmap must document v2.6.27 npm test command");
   assert(v2ContextPackRoadmapDoc.includes("expected test count still 175") && v2ContextPackRoadmapDoc.includes("independent_test_files=2"), "v2 roadmap must document v2.6.27 test count and independent files");
   assertIncludesPhrase(v2ContextPackRoadmapDoc, "does not add a CLI command, change release-check output shape", "v2 roadmap must preserve v2.6.27 command and output boundaries");
+  assert(v2ContextPackRoadmapDoc.includes("docs/dogfooding/context-pack-test-file-split-second-candidate-v2.6.28.md"), "v2 roadmap must link v2.6.28 second split candidate");
+  assert(v2ContextPackRoadmapDoc.includes("tests/cache-ready-benchmark.test.js"), "v2 roadmap must name v2.6.28 second candidate file");
+  assert(v2ContextPackRoadmapDoc.includes("cache-ready generators") && v2ContextPackRoadmapDoc.includes("benchmark summaries") && v2ContextPackRoadmapDoc.includes("relay usage audit"), "v2 roadmap must summarize v2.6.28 selected scope");
+  assert(v2ContextPackRoadmapDoc.includes("Receiver, Project State, Sidecar") && v2ContextPackRoadmapDoc.includes("docs/release-line assertion"), "v2 roadmap must defer broader v2.6.28 clusters");
+  assertIncludesPhrase(v2ContextPackRoadmapDoc, "node --test tests/basebrief.test.js tests/context-pack.test.js", "v2 roadmap must keep v2.6.28 npm test command");
+  assert(v2ContextPackRoadmapDoc.includes("expected test count still 175") && v2ContextPackRoadmapDoc.includes("independent_test_files=2"), "v2 roadmap must keep v2.6.28 test count and independent files");
+  assertIncludesPhrase(v2ContextPackRoadmapDoc, "does not add a CLI command, add a new test file, change package scripts", "v2 roadmap must keep v2.6.28 planning-only boundaries");
   assert(v2ContextPackRoadmapDoc.includes("exports/manifest.json"), "v2 roadmap must define export manifest");
   assert(v2ContextPackRoadmapDoc.includes("exports/context-pack.md"), "v2 roadmap must define readable export");
   assert(v2ContextPackRoadmapDoc.includes("exports/context.json"), "v2 roadmap must define machine-readable export");
@@ -816,6 +833,7 @@ function checkV26DogfoodingDocs(context) {
     contextPackOutputUxPolishV2625Doc,
     contextPackTestFileSplitPlanV2626Doc,
     contextPackTestFileSplitV2627Doc,
+    contextPackTestFileSplitSecondCandidateV2628Doc,
   } = context;
 
   assert(contextPackAdoptionNotesV261Doc.includes("Context Pack Adoption Notes v2.6.1"), "v2.6.1 adoption notes doc must have stable title");
@@ -1804,6 +1822,46 @@ function checkV26DogfoodingDocs(context) {
   assert(contextPackTestFileSplitV2627Doc.includes("mode_cases") && contextPackTestFileSplitV2627Doc.includes("checked_links") && contextPackTestFileSplitV2627Doc.includes("cli_lite_commands") && contextPackTestFileSplitV2627Doc.includes("independent_test_files"), "v2.6.27 test-file split doc must preserve release-check metric lines");
   assert(!/(^|[^A-Za-z])[A-Za-z]:[\\/]/.test(contextPackTestFileSplitV2627Doc), "v2.6.27 test-file split doc must not expose drive-letter absolute paths");
   assert(!/\\\\/.test(contextPackTestFileSplitV2627Doc), "v2.6.27 test-file split doc must not expose UNC paths");
+  assert(contextPackTestFileSplitSecondCandidateV2628Doc.includes("Context Pack Test-File Split Second Candidate v2.6.28"), "v2.6.28 second split candidate doc must have stable title");
+  assertIncludesPhrase(contextPackTestFileSplitSecondCandidateV2628Doc, "local test maintainability planning, not a test-runner or contract change", "v2.6.28 second split candidate doc must avoid test-runner and contract claims");
+  assert(contextPackTestFileSplitSecondCandidateV2628Doc.includes("plan_status: drafted"), "v2.6.28 second split candidate doc must record drafted plan status");
+  assert(contextPackTestFileSplitSecondCandidateV2628Doc.includes("implementation_status: not_started"), "v2.6.28 second split candidate doc must keep implementation not started");
+  assert(contextPackTestFileSplitSecondCandidateV2628Doc.includes("test_split_status: candidate_selected"), "v2.6.28 second split candidate doc must record selected candidate");
+  assert(contextPackTestFileSplitSecondCandidateV2628Doc.includes("package_script_status: unchanged"), "v2.6.28 second split candidate doc must keep package scripts unchanged");
+  assert(contextPackTestFileSplitSecondCandidateV2628Doc.includes("json_contract_change_status: not_started"), "v2.6.28 second split candidate doc must keep JSON contract changes not started");
+  assert(contextPackTestFileSplitSecondCandidateV2628Doc.includes("context_pack_structure_status: unchanged"), "v2.6.28 second split candidate doc must keep Context Pack structure unchanged");
+  assert(contextPackTestFileSplitSecondCandidateV2628Doc.includes("provider_probe_status=skipped"), "v2.6.28 second split candidate doc must preserve skipped provider gate");
+  assert(contextPackTestFileSplitSecondCandidateV2628Doc.includes("tests/cache-ready-benchmark.test.js"), "v2.6.28 second split candidate doc must name candidate test file");
+  assert(contextPackTestFileSplitSecondCandidateV2628Doc.includes("tests/basebrief.test.js") && contextPackTestFileSplitSecondCandidateV2628Doc.includes("tests/context-pack.test.js"), "v2.6.28 second split candidate doc must document current two-file baseline");
+  assertIncludesPhrase(contextPackTestFileSplitSecondCandidateV2628Doc, "node --test tests/basebrief.test.js tests/context-pack.test.js", "v2.6.28 second split candidate doc must document current npm test command");
+  assert(contextPackTestFileSplitSecondCandidateV2628Doc.includes("Expected test count remains 175 tests") && contextPackTestFileSplitSecondCandidateV2628Doc.includes("independent_test_files=2"), "v2.6.28 second split candidate doc must record test count and independent files");
+  assert(contextPackTestFileSplitSecondCandidateV2628Doc.includes("cache-ready generators") && contextPackTestFileSplitSecondCandidateV2628Doc.includes("benchmark summaries") && contextPackTestFileSplitSecondCandidateV2628Doc.includes("relay usage audit"), "v2.6.28 second split candidate doc must document selected scope");
+  assert(contextPackTestFileSplitSecondCandidateV2628Doc.includes("Receiver, Project State, Sidecar") && contextPackTestFileSplitSecondCandidateV2628Doc.includes("docs/release-line assertion") && contextPackTestFileSplitSecondCandidateV2628Doc.includes("splits remain") && contextPackTestFileSplitSecondCandidateV2628Doc.includes("deferred"), "v2.6.28 second split candidate doc must defer broader clusters");
+  assert(contextPackTestFileSplitSecondCandidateV2628Doc.includes("No new CLI command"), "v2.6.28 second split candidate doc must reject new commands");
+  assert(contextPackTestFileSplitSecondCandidateV2628Doc.includes("No new test file in this planning slice"), "v2.6.28 second split candidate doc must reject test-file creation");
+  assert(contextPackTestFileSplitSecondCandidateV2628Doc.includes("No package script change"), "v2.6.28 second split candidate doc must preserve package scripts");
+  assert(contextPackTestFileSplitSecondCandidateV2628Doc.includes("No release-check output shape change"), "v2.6.28 second split candidate doc must preserve release-check output shape");
+  assert(contextPackTestFileSplitSecondCandidateV2628Doc.includes("No Context Pack seven-file structure change"), "v2.6.28 second split candidate doc must preserve seven-file structure");
+  assert(contextPackTestFileSplitSecondCandidateV2628Doc.includes("No `check --input <dir> --json` top-level shape change"), "v2.6.28 second split candidate doc must preserve checker JSON shape");
+  assert(contextPackTestFileSplitSecondCandidateV2628Doc.includes("No Resume JSON contract change"), "v2.6.28 second split candidate doc must preserve resume JSON contract");
+  assert(contextPackTestFileSplitSecondCandidateV2628Doc.includes("No Doctor JSON contract change"), "v2.6.28 second split candidate doc must preserve doctor JSON contract");
+  assert(contextPackTestFileSplitSecondCandidateV2628Doc.includes("No Export JSON contract change"), "v2.6.28 second split candidate doc must preserve export JSON contract");
+  assert(contextPackTestFileSplitSecondCandidateV2628Doc.includes("No Status command"), "v2.6.28 second split candidate doc must reject status command");
+  assert(contextPackTestFileSplitSecondCandidateV2628Doc.includes("No Workflow Runner"), "v2.6.28 second split candidate doc must reject workflow runner");
+  assert(contextPackTestFileSplitSecondCandidateV2628Doc.includes("No Doctor expansion"), "v2.6.28 second split candidate doc must reject doctor expansion");
+  assert(contextPackTestFileSplitSecondCandidateV2628Doc.includes("No provider request"), "v2.6.28 second split candidate doc must reject provider requests");
+  assert(contextPackTestFileSplitSecondCandidateV2628Doc.includes("No runtime integration"), "v2.6.28 second split candidate doc must reject runtime integration");
+  assert(contextPackTestFileSplitSecondCandidateV2628Doc.includes("No MCP server"), "v2.6.28 second split candidate doc must reject MCP server");
+  assert(contextPackTestFileSplitSecondCandidateV2628Doc.includes("No MCP tools"), "v2.6.28 second split candidate doc must reject MCP tools");
+  assert(contextPackTestFileSplitSecondCandidateV2628Doc.includes("No plugin"), "v2.6.28 second split candidate doc must reject plugin scope");
+  assert(contextPackTestFileSplitSecondCandidateV2628Doc.includes("No schema-v2"), "v2.6.28 second split candidate doc must reject schema-v2");
+  assert(contextPackTestFileSplitSecondCandidateV2628Doc.includes("No daemon"), "v2.6.28 second split candidate doc must reject daemon scope");
+  assert(contextPackTestFileSplitSecondCandidateV2628Doc.includes("No watcher"), "v2.6.28 second split candidate doc must reject watcher scope");
+  assert(contextPackTestFileSplitSecondCandidateV2628Doc.includes("No hosted memory"), "v2.6.28 second split candidate doc must reject hosted memory");
+  assert(contextPackTestFileSplitSecondCandidateV2628Doc.includes("npm run release-check") && contextPackTestFileSplitSecondCandidateV2628Doc.includes("npm test") && contextPackTestFileSplitSecondCandidateV2628Doc.includes("git diff --check"), "v2.6.28 second split candidate doc must preserve validation gate");
+  assert(contextPackTestFileSplitSecondCandidateV2628Doc.includes("mode_cases") && contextPackTestFileSplitSecondCandidateV2628Doc.includes("checked_links") && contextPackTestFileSplitSecondCandidateV2628Doc.includes("cli_lite_commands") && contextPackTestFileSplitSecondCandidateV2628Doc.includes("independent_test_files"), "v2.6.28 second split candidate doc must preserve release-check metric lines");
+  assert(!/(^|[^A-Za-z])[A-Za-z]:[\\/]/.test(contextPackTestFileSplitSecondCandidateV2628Doc), "v2.6.28 second split candidate doc must not expose drive-letter absolute paths");
+  assert(!/\\\\/.test(contextPackTestFileSplitSecondCandidateV2628Doc), "v2.6.28 second split candidate doc must not expose UNC paths");
 }
 
 function checkContentContracts() {
@@ -1961,6 +2019,7 @@ function checkContentContracts() {
   const contextPackOutputUxPolishV2625Doc = readText("docs/dogfooding/context-pack-output-ux-polish-v2.6.25.md");
   const contextPackTestFileSplitPlanV2626Doc = readText("docs/dogfooding/context-pack-test-file-split-plan-v2.6.26.md");
   const contextPackTestFileSplitV2627Doc = readText("docs/dogfooding/context-pack-test-file-split-v2.6.27.md");
+  const contextPackTestFileSplitSecondCandidateV2628Doc = readText("docs/dogfooding/context-pack-test-file-split-second-candidate-v2.6.28.md");
   const postReleaseBaselineDoc = readText("docs/baselines/v0.4.0-post-release-baseline.md");
   const v060PostReleaseBaselineDoc = readText("docs/baselines/v0.6.0-post-release-baseline.md");
   const projectStateModelDoc = readText("docs/design/project-state-model.md");
@@ -3215,6 +3274,7 @@ function checkContentContracts() {
     contextPackOutputUxPolishV2625Doc,
     contextPackTestFileSplitPlanV2626Doc,
     contextPackTestFileSplitV2627Doc,
+    contextPackTestFileSplitSecondCandidateV2628Doc,
   });
   assert(contextPackDoctorDogfoodingDoc.includes("Context Pack Doctor Dogfooding v2.5.0"), "doctor dogfooding doc must have stable title");
   assert(contextPackDoctorDogfoodingDoc.includes("doctor_contract_version: basebrief-doctor-v1"), "doctor dogfooding must record contract version");
