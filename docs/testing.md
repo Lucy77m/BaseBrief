@@ -1157,6 +1157,25 @@ Expected release-check output without provider env remains:
 provider_probe_status=skipped
 ```
 
+## Context Pack First-Run / Handoff Validation
+
+The local first-run/handoff validation pass follows the documented
+`context-pack -> check -> resume -> doctor` path from README and quickstart. It
+records clean `check`, preserved `Continuation rules:`, no old v2.0 starter
+task wording, `basebrief-doctor-v1`, and `doctor.live-recheck-required`.
+
+The evidence is recorded in
+[Context Pack First-Run / Handoff Validation](dogfooding/context-pack-first-run-handoff-validation.md).
+The pass did not observe blocking or repeated confusing friction, so it does not
+trigger Continuation Harness Lite implementation, Status, Workflow Runner, or
+JSON contract changes.
+
+Expected release-check output without provider env remains:
+
+```text
+provider_probe_status=skipped
+```
+
 ## v0.4.1 Stabilization Candidate
 
 `v0.4.1` is a stabilization-only cycle after the `v0.4.0` public release. It uses

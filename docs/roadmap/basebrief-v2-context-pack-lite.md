@@ -500,6 +500,13 @@ It requires repeated real handoff friction before any implementation, and does
 not add a command, provider request, runtime integration, MCP server/tools,
 plugin, schema-v2, hosted memory, or release action.
 
+`docs/dogfooding/context-pack-first-run-handoff-validation.md` records a local
+README/quickstart validation pass through `context-pack -> check -> resume ->
+doctor`. It observed clean `check`, preserved `Continuation rules:`, confirmed
+`basebrief-doctor-v1` with `doctor.live-recheck-required`, and did not meet the
+feature trigger for Continuation Harness Lite, Status, Workflow Runner, or JSON
+contract changes.
+
 ### Later Workflow Runner Lite
 
 Only after Context Pack Lite, Context Pack Check, One-command Resume,

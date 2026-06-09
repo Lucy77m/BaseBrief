@@ -215,6 +215,7 @@ function checkRequiredFiles() {
     "docs/dogfooding/context-pack-continuation-harness-decision-spec-v2.6.16.md",
     "docs/dogfooding/context-pack-ahead14-bundle-review-v2.6.17.md",
     "docs/dogfooding/context-pack-minimal-feature-candidate-decision-v2.6.18.md",
+    "docs/dogfooding/context-pack-first-run-handoff-validation.md",
     "docs/testing-v0.4.x-test-matrix.md",
     "docs/testing-v0.6.x-test-matrix.md",
     "docs/testing-v0.7.x-test-matrix.md",
@@ -521,6 +522,7 @@ function checkContentContracts() {
   const contextPackContinuationHarnessDecisionSpecV2616Doc = readText("docs/dogfooding/context-pack-continuation-harness-decision-spec-v2.6.16.md");
   const contextPackAhead14BundleReviewV2617Doc = readText("docs/dogfooding/context-pack-ahead14-bundle-review-v2.6.17.md");
   const contextPackMinimalFeatureCandidateDecisionV2618Doc = readText("docs/dogfooding/context-pack-minimal-feature-candidate-decision-v2.6.18.md");
+  const contextPackFirstRunHandoffValidationDoc = readText("docs/dogfooding/context-pack-first-run-handoff-validation.md");
   const postReleaseBaselineDoc = readText("docs/baselines/v0.4.0-post-release-baseline.md");
   const v060PostReleaseBaselineDoc = readText("docs/baselines/v0.6.0-post-release-baseline.md");
   const projectStateModelDoc = readText("docs/design/project-state-model.md");
@@ -1083,6 +1085,12 @@ function checkContentContracts() {
   assert(testingDoc.includes("rejects Status") && testingDoc.includes("Workflow Runner") && testingDoc.includes("Doctor expansion") && testingDoc.includes("JSON contract changes for now"), "Testing docs must summarize v2.6.18 rejected candidates");
   assertIncludesPhrase(testingDoc, "real first-run/handoff validation", "Testing docs must point v2.6.18 to validation before implementation");
   assertIncludesPhrase(testingDoc, "push, tag, release, and PR actions out of scope", "Testing docs must keep v2.6.18 out of publish scope");
+  assert(testingDoc.includes("Context Pack First-Run / Handoff Validation"), "Testing docs must document first-run handoff validation");
+  assert(testingDoc.includes("dogfooding/context-pack-first-run-handoff-validation.md"), "Testing docs must link first-run handoff validation");
+  assertIncludesPhrase(testingDoc, "context-pack -> check -> resume -> doctor", "Testing docs must summarize first-run validation path");
+  assert(testingDoc.includes("clean `check`") && testingDoc.includes("Continuation rules:") && testingDoc.includes("basebrief-doctor-v1") && testingDoc.includes("doctor.live-recheck-required"), "Testing docs must summarize first-run validation results");
+  assertIncludesPhrase(testingDoc, "did not observe blocking or repeated confusing friction", "Testing docs must record no repeated friction");
+  assertIncludesPhrase(testingDoc, "does not trigger Continuation Harness Lite implementation, Status, Workflow Runner, or JSON contract changes", "Testing docs must keep validation out of feature implementation scope");
   assert(testingDoc.includes("checker_error_propagation_status: pass"), "Testing docs must record checker-error propagation");
   assert(testingDoc.includes("context-pack --repo <target-repo>"), "Testing docs must document context-pack command");
   assert(testingDoc.includes("resume --input <context-pack-dir>"), "Testing docs must document resume command");
@@ -1623,6 +1631,7 @@ function checkContentContracts() {
   assert(docsIndex.includes("dogfooding/context-pack-continuation-harness-decision-spec-v2.6.16.md"), "Docs index must link v2.6.16 harness decision spec");
   assert(docsIndex.includes("dogfooding/context-pack-ahead14-bundle-review-v2.6.17.md"), "Docs index must link v2.6.17 ahead-14 bundle review");
   assert(docsIndex.includes("dogfooding/context-pack-minimal-feature-candidate-decision-v2.6.18.md"), "Docs index must link v2.6.18 minimal feature candidate decision");
+  assert(docsIndex.includes("dogfooding/context-pack-first-run-handoff-validation.md"), "Docs index must link first-run handoff validation");
   assert(docsIndex.includes("specs/context-pack-lite.md"), "Docs index must link context pack lite spec");
   assert(docsIndex.includes("specs/context-pack-resume.md"), "Docs index must link context pack resume spec");
   assert(docsIndex.includes("specs/basebrief-format.md"), "Docs index must link basebrief format spec");
@@ -1723,6 +1732,10 @@ function checkContentContracts() {
   assert(v2ContextPackRoadmapDoc.includes("rejects") && v2ContextPackRoadmapDoc.includes("Status") && v2ContextPackRoadmapDoc.includes("Workflow Runner") && v2ContextPackRoadmapDoc.includes("Doctor expansion") && v2ContextPackRoadmapDoc.includes("JSON contract changes for now"), "v2 roadmap must summarize v2.6.18 rejected candidates");
   assertIncludesPhrase(v2ContextPackRoadmapDoc, "requires repeated real handoff friction before any implementation", "v2 roadmap must keep v2.6.18 evidence-gated");
   assertIncludesPhrase(v2ContextPackRoadmapDoc, "does not add a command, provider request, runtime integration", "v2 roadmap must keep v2.6.18 out of command and integration scope");
+  assert(v2ContextPackRoadmapDoc.includes("docs/dogfooding/context-pack-first-run-handoff-validation.md"), "v2 roadmap must link first-run handoff validation");
+  assertIncludesPhrase(v2ContextPackRoadmapDoc, "context-pack -> check -> resume -> doctor", "v2 roadmap must summarize first-run validation path");
+  assert(v2ContextPackRoadmapDoc.includes("clean `check`") && v2ContextPackRoadmapDoc.includes("Continuation rules:") && v2ContextPackRoadmapDoc.includes("basebrief-doctor-v1") && v2ContextPackRoadmapDoc.includes("doctor.live-recheck-required"), "v2 roadmap must summarize first-run validation results");
+  assertIncludesPhrase(v2ContextPackRoadmapDoc, "did not meet the feature trigger for Continuation Harness Lite, Status, Workflow Runner, or JSON contract changes", "v2 roadmap must keep first-run validation out of feature scope");
   assert(v2ContextPackRoadmapDoc.includes("exports/manifest.json"), "v2 roadmap must define export manifest");
   assert(v2ContextPackRoadmapDoc.includes("exports/context-pack.md"), "v2 roadmap must define readable export");
   assert(v2ContextPackRoadmapDoc.includes("exports/context.json"), "v2 roadmap must define machine-readable export");
@@ -2501,6 +2514,50 @@ function checkContentContracts() {
   assert(contextPackMinimalFeatureCandidateDecisionV2618Doc.includes("provider_probe_status=skipped"), "v2.6.18 minimal feature candidate decision must preserve skipped provider gate");
   assert(!/(^|[^A-Za-z])[A-Za-z]:[\\/]/.test(contextPackMinimalFeatureCandidateDecisionV2618Doc), "v2.6.18 minimal feature candidate decision must not expose drive-letter absolute paths");
   assert(!/\\\\/.test(contextPackMinimalFeatureCandidateDecisionV2618Doc), "v2.6.18 minimal feature candidate decision must not expose UNC paths");
+  assert(contextPackFirstRunHandoffValidationDoc.includes("Context Pack First-Run / Handoff Validation"), "first-run handoff validation doc must have stable title");
+  assertIncludesPhrase(contextPackFirstRunHandoffValidationDoc, "local validation evidence only, not a release closeout", "first-run handoff validation must avoid release closeout claims");
+  assert(contextPackFirstRunHandoffValidationDoc.includes("validation_status: passed"), "first-run handoff validation must record passed status");
+  assert(contextPackFirstRunHandoffValidationDoc.includes("blocking_friction_status: not_observed"), "first-run handoff validation must record no blocking friction");
+  assert(contextPackFirstRunHandoffValidationDoc.includes("confusing_friction_status: not_observed"), "first-run handoff validation must record no confusing friction");
+  assert(contextPackFirstRunHandoffValidationDoc.includes("feature_trigger_status: not_met"), "first-run handoff validation must keep feature trigger unmet");
+  assert(contextPackFirstRunHandoffValidationDoc.includes("implementation_status: not_started"), "first-run handoff validation must keep implementation not started");
+  assert(contextPackFirstRunHandoffValidationDoc.includes("release_closeout_status: not_started"), "first-run handoff validation must keep release closeout not started");
+  assert(contextPackFirstRunHandoffValidationDoc.includes("push_status: not_started"), "first-run handoff validation must keep push not started");
+  assert(contextPackFirstRunHandoffValidationDoc.includes("tag_status: not_started"), "first-run handoff validation must keep tag not started");
+  assert(contextPackFirstRunHandoffValidationDoc.includes("release_status: not_started"), "first-run handoff validation must keep release not started");
+  assert(contextPackFirstRunHandoffValidationDoc.includes("continuation_harness_lite_status: design_sketch_candidate_only"), "first-run handoff validation must keep harness as design sketch only");
+  assert(contextPackFirstRunHandoffValidationDoc.includes("status_command_status: not_started"), "first-run handoff validation must keep status command not started");
+  assert(contextPackFirstRunHandoffValidationDoc.includes("workflow_runner_status: not_started"), "first-run handoff validation must keep workflow runner not started");
+  assert(contextPackFirstRunHandoffValidationDoc.includes("json_contract_change_status: not_started"), "first-run handoff validation must keep JSON contract change not started");
+  assertIncludesPhrase(contextPackFirstRunHandoffValidationDoc, "context-pack -> check -> resume -> doctor", "first-run handoff validation must record validation path");
+  assert(contextPackFirstRunHandoffValidationDoc.includes("node scripts/basebrief.js context-pack --repo . --output-dir tests/outputs/private/context-pack-validation --json"), "first-run handoff validation must record context-pack command");
+  assert(contextPackFirstRunHandoffValidationDoc.includes("node scripts/basebrief.js check --input tests/outputs/private/context-pack-validation --json"), "first-run handoff validation must record check command");
+  assert(contextPackFirstRunHandoffValidationDoc.includes("node scripts/basebrief.js resume --input tests/outputs/private/context-pack-validation"), "first-run handoff validation must record resume command");
+  assert(contextPackFirstRunHandoffValidationDoc.includes("node scripts/basebrief.js doctor --repo . --context-pack tests/outputs/private/context-pack-validation --json"), "first-run handoff validation must record doctor command");
+  assert(contextPackFirstRunHandoffValidationDoc.includes("`check` returned `status=passed`, `errorCount=0`, `warningCount=0`"), "first-run handoff validation must record clean check result");
+  assert(contextPackFirstRunHandoffValidationDoc.includes("`resume` produced a copyable prompt and preserved `Continuation rules:`"), "first-run handoff validation must record resume starter result");
+  assert(contextPackFirstRunHandoffValidationDoc.includes("`v2.0 Context Pack Lite implementation slice`"), "first-run handoff validation must record old starter wording absence");
+  assert(contextPackFirstRunHandoffValidationDoc.includes("contractVersion=basebrief-doctor-v1") && contextPackFirstRunHandoffValidationDoc.includes("doctor.live-recheck-required"), "first-run handoff validation must record doctor result");
+  assertIncludesPhrase(contextPackFirstRunHandoffValidationDoc, "This pass does not meet the threshold for implementing Continuation Harness Lite", "first-run handoff validation must keep harness trigger closed");
+  assert(contextPackFirstRunHandoffValidationDoc.includes("No new CLI command"), "first-run handoff validation must reject new commands");
+  assert(contextPackFirstRunHandoffValidationDoc.includes("No Context Pack seven-file structure change"), "first-run handoff validation must preserve seven-file structure");
+  assert(contextPackFirstRunHandoffValidationDoc.includes("No `check --input <dir> --json` top-level shape change"), "first-run handoff validation must preserve checker JSON shape");
+  assert(contextPackFirstRunHandoffValidationDoc.includes("No Resume JSON contract change"), "first-run handoff validation must preserve resume JSON contract");
+  assert(contextPackFirstRunHandoffValidationDoc.includes("No Doctor JSON contract change"), "first-run handoff validation must preserve doctor JSON contract");
+  assert(contextPackFirstRunHandoffValidationDoc.includes("No Export JSON contract change"), "first-run handoff validation must preserve export JSON contract");
+  assert(contextPackFirstRunHandoffValidationDoc.includes("No Status command"), "first-run handoff validation must reject status command");
+  assert(contextPackFirstRunHandoffValidationDoc.includes("No Workflow Runner"), "first-run handoff validation must reject workflow runner");
+  assert(contextPackFirstRunHandoffValidationDoc.includes("No Continuation Harness Lite implementation"), "first-run handoff validation must reject harness implementation");
+  assert(contextPackFirstRunHandoffValidationDoc.includes("No provider request"), "first-run handoff validation must reject provider requests");
+  assert(contextPackFirstRunHandoffValidationDoc.includes("No runtime integration"), "first-run handoff validation must reject runtime integration");
+  assert(contextPackFirstRunHandoffValidationDoc.includes("No MCP server"), "first-run handoff validation must reject MCP server");
+  assert(contextPackFirstRunHandoffValidationDoc.includes("No MCP tools"), "first-run handoff validation must reject MCP tools");
+  assert(contextPackFirstRunHandoffValidationDoc.includes("No plugin"), "first-run handoff validation must reject plugin scope");
+  assert(contextPackFirstRunHandoffValidationDoc.includes("No schema-v2"), "first-run handoff validation must reject schema-v2");
+  assert(contextPackFirstRunHandoffValidationDoc.includes("No hosted memory"), "first-run handoff validation must reject hosted memory");
+  assert(contextPackFirstRunHandoffValidationDoc.includes("provider_probe_status=skipped"), "first-run handoff validation must preserve skipped provider gate");
+  assert(!/(^|[^A-Za-z])[A-Za-z]:[\\/]/.test(contextPackFirstRunHandoffValidationDoc), "first-run handoff validation must not expose drive-letter absolute paths");
+  assert(!/\\\\/.test(contextPackFirstRunHandoffValidationDoc), "first-run handoff validation must not expose UNC paths");
   assert(contextPackDoctorDogfoodingDoc.includes("Context Pack Doctor Dogfooding v2.5.0"), "doctor dogfooding doc must have stable title");
   assert(contextPackDoctorDogfoodingDoc.includes("doctor_contract_version: basebrief-doctor-v1"), "doctor dogfooding must record contract version");
   assert(contextPackDoctorDogfoodingDoc.includes("doctor_command_status: warning"), "doctor dogfooding must record warning status");
