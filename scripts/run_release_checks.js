@@ -214,6 +214,7 @@ function checkRequiredFiles() {
     "docs/dogfooding/context-pack-major-release-candidate-shape-v2.6.15.md",
     "docs/dogfooding/context-pack-continuation-harness-decision-spec-v2.6.16.md",
     "docs/dogfooding/context-pack-ahead14-bundle-review-v2.6.17.md",
+    "docs/dogfooding/context-pack-minimal-feature-candidate-decision-v2.6.18.md",
     "docs/testing-v0.4.x-test-matrix.md",
     "docs/testing-v0.6.x-test-matrix.md",
     "docs/testing-v0.7.x-test-matrix.md",
@@ -519,6 +520,7 @@ function checkContentContracts() {
   const contextPackMajorReleaseCandidateShapeV2615Doc = readText("docs/dogfooding/context-pack-major-release-candidate-shape-v2.6.15.md");
   const contextPackContinuationHarnessDecisionSpecV2616Doc = readText("docs/dogfooding/context-pack-continuation-harness-decision-spec-v2.6.16.md");
   const contextPackAhead14BundleReviewV2617Doc = readText("docs/dogfooding/context-pack-ahead14-bundle-review-v2.6.17.md");
+  const contextPackMinimalFeatureCandidateDecisionV2618Doc = readText("docs/dogfooding/context-pack-minimal-feature-candidate-decision-v2.6.18.md");
   const postReleaseBaselineDoc = readText("docs/baselines/v0.4.0-post-release-baseline.md");
   const v060PostReleaseBaselineDoc = readText("docs/baselines/v0.6.0-post-release-baseline.md");
   const projectStateModelDoc = readText("docs/design/project-state-model.md");
@@ -1075,6 +1077,12 @@ function checkContentContracts() {
   assertIncludesPhrase(testingDoc, "separates release-note candidates, dogfooding-only evidence, and future feature gates", "Testing docs must summarize v2.6.17 three-way split");
   assertIncludesPhrase(testingDoc, "without becoming frequent push/tag/release churn", "Testing docs must keep v2.6.17 out of publish churn");
   assert(testingDoc.includes("Continuation Harness Lite") && testingDoc.includes("Status") && testingDoc.includes("Workflow Runner") && testingDoc.includes("JSON contract changes out of scope"), "Testing docs must keep v2.6.17 out of behavior scope");
+  assert(testingDoc.includes("v2.6.18 Context Pack Minimal Feature Candidate Decision"), "Testing docs must document v2.6.18 minimal feature candidate decision");
+  assert(testingDoc.includes("dogfooding/context-pack-minimal-feature-candidate-decision-v2.6.18.md"), "Testing docs must link v2.6.18 minimal feature candidate decision");
+  assertIncludesPhrase(testingDoc, "Continuation Harness Lite as a design-sketch candidate only", "Testing docs must keep v2.6.18 harness as design sketch only");
+  assert(testingDoc.includes("rejects Status") && testingDoc.includes("Workflow Runner") && testingDoc.includes("Doctor expansion") && testingDoc.includes("JSON contract changes for now"), "Testing docs must summarize v2.6.18 rejected candidates");
+  assertIncludesPhrase(testingDoc, "real first-run/handoff validation", "Testing docs must point v2.6.18 to validation before implementation");
+  assertIncludesPhrase(testingDoc, "push, tag, release, and PR actions out of scope", "Testing docs must keep v2.6.18 out of publish scope");
   assert(testingDoc.includes("checker_error_propagation_status: pass"), "Testing docs must record checker-error propagation");
   assert(testingDoc.includes("context-pack --repo <target-repo>"), "Testing docs must document context-pack command");
   assert(testingDoc.includes("resume --input <context-pack-dir>"), "Testing docs must document resume command");
@@ -1614,6 +1622,7 @@ function checkContentContracts() {
   assert(docsIndex.includes("dogfooding/context-pack-major-release-candidate-shape-v2.6.15.md"), "Docs index must link v2.6.15 major-release candidate shape");
   assert(docsIndex.includes("dogfooding/context-pack-continuation-harness-decision-spec-v2.6.16.md"), "Docs index must link v2.6.16 harness decision spec");
   assert(docsIndex.includes("dogfooding/context-pack-ahead14-bundle-review-v2.6.17.md"), "Docs index must link v2.6.17 ahead-14 bundle review");
+  assert(docsIndex.includes("dogfooding/context-pack-minimal-feature-candidate-decision-v2.6.18.md"), "Docs index must link v2.6.18 minimal feature candidate decision");
   assert(docsIndex.includes("specs/context-pack-lite.md"), "Docs index must link context pack lite spec");
   assert(docsIndex.includes("specs/context-pack-resume.md"), "Docs index must link context pack resume spec");
   assert(docsIndex.includes("specs/basebrief-format.md"), "Docs index must link basebrief format spec");
@@ -1709,6 +1718,11 @@ function checkContentContracts() {
   assertIncludesPhrase(v2ContextPackRoadmapDoc, "release-note candidates, dogfooding-only evidence, and future feature gates", "v2 roadmap must summarize v2.6.17 three-way split");
   assertIncludesPhrase(v2ContextPackRoadmapDoc, "not a release closeout, push/tag/release action, feature implementation", "v2 roadmap must keep v2.6.17 out of release and feature scope");
   assertIncludesPhrase(v2ContextPackRoadmapDoc, "Continuation Harness implementation, Status command, Workflow Runner, or JSON contract change", "v2 roadmap must keep v2.6.17 out of behavior scope");
+  assert(v2ContextPackRoadmapDoc.includes("docs/dogfooding/context-pack-minimal-feature-candidate-decision-v2.6.18.md"), "v2 roadmap must link v2.6.18 minimal feature candidate decision");
+  assertIncludesPhrase(v2ContextPackRoadmapDoc, "Continuation Harness Lite as a design-sketch candidate only", "v2 roadmap must keep v2.6.18 harness as design sketch only");
+  assert(v2ContextPackRoadmapDoc.includes("rejects") && v2ContextPackRoadmapDoc.includes("Status") && v2ContextPackRoadmapDoc.includes("Workflow Runner") && v2ContextPackRoadmapDoc.includes("Doctor expansion") && v2ContextPackRoadmapDoc.includes("JSON contract changes for now"), "v2 roadmap must summarize v2.6.18 rejected candidates");
+  assertIncludesPhrase(v2ContextPackRoadmapDoc, "requires repeated real handoff friction before any implementation", "v2 roadmap must keep v2.6.18 evidence-gated");
+  assertIncludesPhrase(v2ContextPackRoadmapDoc, "does not add a command, provider request, runtime integration", "v2 roadmap must keep v2.6.18 out of command and integration scope");
   assert(v2ContextPackRoadmapDoc.includes("exports/manifest.json"), "v2 roadmap must define export manifest");
   assert(v2ContextPackRoadmapDoc.includes("exports/context-pack.md"), "v2 roadmap must define readable export");
   assert(v2ContextPackRoadmapDoc.includes("exports/context.json"), "v2 roadmap must define machine-readable export");
@@ -2445,6 +2459,48 @@ function checkContentContracts() {
   assert(contextPackAhead14BundleReviewV2617Doc.includes("provider_probe_status=skipped"), "v2.6.17 ahead-14 bundle review must preserve skipped provider gate");
   assert(!/(^|[^A-Za-z])[A-Za-z]:[\\/]/.test(contextPackAhead14BundleReviewV2617Doc), "v2.6.17 ahead-14 bundle review must not expose drive-letter absolute paths");
   assert(!/\\\\/.test(contextPackAhead14BundleReviewV2617Doc), "v2.6.17 ahead-14 bundle review must not expose UNC paths");
+  assert(contextPackMinimalFeatureCandidateDecisionV2618Doc.includes("Context Pack Minimal Feature Candidate Decision v2.6.18"), "v2.6.18 minimal feature candidate decision doc must have stable title");
+  assertIncludesPhrase(contextPackMinimalFeatureCandidateDecisionV2618Doc, "local feature-candidate decision only, not an implementation", "v2.6.18 minimal feature candidate decision must avoid implementation claims");
+  assert(contextPackMinimalFeatureCandidateDecisionV2618Doc.includes("feature_candidate_status: design_sketch_candidate"), "v2.6.18 minimal feature candidate decision must record design sketch candidate");
+  assert(contextPackMinimalFeatureCandidateDecisionV2618Doc.includes("implementation_status: not_started"), "v2.6.18 minimal feature candidate decision must keep implementation not started");
+  assert(contextPackMinimalFeatureCandidateDecisionV2618Doc.includes("release_closeout_status: not_started"), "v2.6.18 minimal feature candidate decision must keep release closeout not started");
+  assert(contextPackMinimalFeatureCandidateDecisionV2618Doc.includes("push_status: not_started"), "v2.6.18 minimal feature candidate decision must keep push not started");
+  assert(contextPackMinimalFeatureCandidateDecisionV2618Doc.includes("tag_status: not_started"), "v2.6.18 minimal feature candidate decision must keep tag not started");
+  assert(contextPackMinimalFeatureCandidateDecisionV2618Doc.includes("release_status: not_started"), "v2.6.18 minimal feature candidate decision must keep release not started");
+  assert(contextPackMinimalFeatureCandidateDecisionV2618Doc.includes("continuation_harness_lite_status: design_sketch_candidate"), "v2.6.18 minimal feature candidate decision must keep harness as design sketch candidate");
+  assert(contextPackMinimalFeatureCandidateDecisionV2618Doc.includes("status_command_status: not_started"), "v2.6.18 minimal feature candidate decision must keep status command not started");
+  assert(contextPackMinimalFeatureCandidateDecisionV2618Doc.includes("workflow_runner_status: not_started"), "v2.6.18 minimal feature candidate decision must keep workflow runner not started");
+  assert(contextPackMinimalFeatureCandidateDecisionV2618Doc.includes("json_contract_change_status: not_started"), "v2.6.18 minimal feature candidate decision must keep JSON contract change not started");
+  assert(contextPackMinimalFeatureCandidateDecisionV2618Doc.includes("## Candidate Ranking"), "v2.6.18 minimal feature candidate decision must include candidate ranking");
+  assert(contextPackMinimalFeatureCandidateDecisionV2618Doc.includes("Continuation Harness Lite design sketch: keep watching"), "v2.6.18 minimal feature candidate decision must keep harness watching");
+  assert(contextPackMinimalFeatureCandidateDecisionV2618Doc.includes("Status command: reject for now"), "v2.6.18 minimal feature candidate decision must reject status command");
+  assert(contextPackMinimalFeatureCandidateDecisionV2618Doc.includes("Workflow Runner Lite: reject for now"), "v2.6.18 minimal feature candidate decision must reject workflow runner");
+  assert(contextPackMinimalFeatureCandidateDecisionV2618Doc.includes("Doctor expansion: reject for now"), "v2.6.18 minimal feature candidate decision must reject doctor expansion");
+  assert(contextPackMinimalFeatureCandidateDecisionV2618Doc.includes("JSON contract change: reject for now"), "v2.6.18 minimal feature candidate decision must reject JSON contract change");
+  assertIncludesPhrase(contextPackMinimalFeatureCandidateDecisionV2618Doc, "inherited Context Pack material through `check`, `resume`, and live recheck", "v2.6.18 minimal feature candidate decision must define harness uncertainty");
+  assertIncludesPhrase(contextPackMinimalFeatureCandidateDecisionV2618Doc, "At least three public-safe real handoffs show the same blocking or high-frequency confusing friction", "v2.6.18 minimal feature candidate decision must define evidence count threshold");
+  assertIncludesPhrase(contextPackMinimalFeatureCandidateDecisionV2618Doc, "friction survives a docs/examples/release-check repair attempt", "v2.6.18 minimal feature candidate decision must require repair attempt before implementation");
+  assertIncludesPhrase(contextPackMinimalFeatureCandidateDecisionV2618Doc, "sequencing `context-pack -> check -> resume -> live recheck`", "v2.6.18 minimal feature candidate decision must require sequence-specific friction");
+  assertIncludesPhrase(contextPackMinimalFeatureCandidateDecisionV2618Doc, "real first-run/handoff validation pass", "v2.6.18 minimal feature candidate decision must point to validation pass");
+  assert(contextPackMinimalFeatureCandidateDecisionV2618Doc.includes("No new CLI command"), "v2.6.18 minimal feature candidate decision must reject new commands");
+  assert(contextPackMinimalFeatureCandidateDecisionV2618Doc.includes("No Context Pack seven-file structure change"), "v2.6.18 minimal feature candidate decision must preserve seven-file structure");
+  assert(contextPackMinimalFeatureCandidateDecisionV2618Doc.includes("No `check --input <dir> --json` top-level shape change"), "v2.6.18 minimal feature candidate decision must preserve checker JSON shape");
+  assert(contextPackMinimalFeatureCandidateDecisionV2618Doc.includes("No Resume JSON contract change"), "v2.6.18 minimal feature candidate decision must preserve resume JSON contract");
+  assert(contextPackMinimalFeatureCandidateDecisionV2618Doc.includes("No Doctor JSON contract change"), "v2.6.18 minimal feature candidate decision must preserve doctor JSON contract");
+  assert(contextPackMinimalFeatureCandidateDecisionV2618Doc.includes("No Export JSON contract change"), "v2.6.18 minimal feature candidate decision must preserve export JSON contract");
+  assert(contextPackMinimalFeatureCandidateDecisionV2618Doc.includes("No Status command"), "v2.6.18 minimal feature candidate decision must reject status command");
+  assert(contextPackMinimalFeatureCandidateDecisionV2618Doc.includes("No Workflow Runner"), "v2.6.18 minimal feature candidate decision must reject workflow runner");
+  assert(contextPackMinimalFeatureCandidateDecisionV2618Doc.includes("No Continuation Harness Lite implementation"), "v2.6.18 minimal feature candidate decision must reject harness implementation");
+  assert(contextPackMinimalFeatureCandidateDecisionV2618Doc.includes("No provider request"), "v2.6.18 minimal feature candidate decision must reject provider requests");
+  assert(contextPackMinimalFeatureCandidateDecisionV2618Doc.includes("No runtime integration"), "v2.6.18 minimal feature candidate decision must reject runtime integration");
+  assert(contextPackMinimalFeatureCandidateDecisionV2618Doc.includes("No MCP server"), "v2.6.18 minimal feature candidate decision must reject MCP server");
+  assert(contextPackMinimalFeatureCandidateDecisionV2618Doc.includes("No MCP tools"), "v2.6.18 minimal feature candidate decision must reject MCP tools");
+  assert(contextPackMinimalFeatureCandidateDecisionV2618Doc.includes("No plugin"), "v2.6.18 minimal feature candidate decision must reject plugin scope");
+  assert(contextPackMinimalFeatureCandidateDecisionV2618Doc.includes("No schema-v2"), "v2.6.18 minimal feature candidate decision must reject schema-v2");
+  assert(contextPackMinimalFeatureCandidateDecisionV2618Doc.includes("No hosted memory"), "v2.6.18 minimal feature candidate decision must reject hosted memory");
+  assert(contextPackMinimalFeatureCandidateDecisionV2618Doc.includes("provider_probe_status=skipped"), "v2.6.18 minimal feature candidate decision must preserve skipped provider gate");
+  assert(!/(^|[^A-Za-z])[A-Za-z]:[\\/]/.test(contextPackMinimalFeatureCandidateDecisionV2618Doc), "v2.6.18 minimal feature candidate decision must not expose drive-letter absolute paths");
+  assert(!/\\\\/.test(contextPackMinimalFeatureCandidateDecisionV2618Doc), "v2.6.18 minimal feature candidate decision must not expose UNC paths");
   assert(contextPackDoctorDogfoodingDoc.includes("Context Pack Doctor Dogfooding v2.5.0"), "doctor dogfooding doc must have stable title");
   assert(contextPackDoctorDogfoodingDoc.includes("doctor_contract_version: basebrief-doctor-v1"), "doctor dogfooding must record contract version");
   assert(contextPackDoctorDogfoodingDoc.includes("doctor_command_status: warning"), "doctor dogfooding must record warning status");

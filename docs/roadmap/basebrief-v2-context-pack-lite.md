@@ -493,6 +493,13 @@ dogfooding-only evidence, and future feature gates. It is not a release
 closeout, push/tag/release action, feature implementation, Continuation Harness
 implementation, Status command, Workflow Runner, or JSON contract change.
 
+`docs/dogfooding/context-pack-minimal-feature-candidate-decision-v2.6.18.md`
+keeps Continuation Harness Lite as a design-sketch candidate only and rejects
+Status, Workflow Runner, Doctor expansion, and JSON contract changes for now.
+It requires repeated real handoff friction before any implementation, and does
+not add a command, provider request, runtime integration, MCP server/tools,
+plugin, schema-v2, hosted memory, or release action.
+
 ### Later Workflow Runner Lite
 
 Only after Context Pack Lite, Context Pack Check, One-command Resume,

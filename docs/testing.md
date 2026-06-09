@@ -1138,6 +1138,25 @@ Expected release-check output without provider env remains:
 provider_probe_status=skipped
 ```
 
+## v2.6.18 Context Pack Minimal Feature Candidate Decision
+
+`v2.6.18` is a local feature-candidate decision, not an implementation. It keeps
+Continuation Harness Lite as a design-sketch candidate only, rejects Status,
+Workflow Runner, Doctor expansion, and JSON contract changes for now, and points
+the next acceleration move toward real first-run/handoff validation.
+
+The evidence is recorded in
+[Context Pack Minimal Feature Candidate Decision v2.6.18](dogfooding/context-pack-minimal-feature-candidate-decision-v2.6.18.md).
+It keeps provider request, runtime integration, MCP server/tools, plugin,
+schema-v2, hosted memory, daemon, watcher, push, tag, release, and PR actions
+out of scope.
+
+Expected release-check output without provider env remains:
+
+```text
+provider_probe_status=skipped
+```
+
 ## v0.4.1 Stabilization Candidate
 
 `v0.4.1` is a stabilization-only cycle after the `v0.4.0` public release. It uses
