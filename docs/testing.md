@@ -1449,6 +1449,34 @@ start CI, or open Status, Workflow Runner, Doctor expansion, provider/runtime
 integration, MCP, plugin, schema-v2, daemon, watcher, hosted memory, push, tag,
 release, or PR work.
 
+## v2.6.29 Context Pack Cache-Ready Benchmark Test Split
+
+`v2.6.29` implements the second split selected in `v2.6.28`. Cache-ready
+generators, benchmark prompt variants, benchmark summaries, provider profiles,
+and relay usage audit tests now live in `tests/cache-ready-benchmark.test.js`.
+The implementation is recorded in
+[Context Pack Cache-Ready Benchmark Test Split v2.6.29](dogfooding/context-pack-cache-ready-benchmark-test-split-v2.6.29.md).
+
+The public validation entry remains `npm test`, now backed by:
+
+```text
+node --test tests/basebrief.test.js tests/context-pack.test.js tests/cache-ready-benchmark.test.js
+```
+
+Expected test count remains 175 tests. `npm run release-check` should report
+`independent_test_files=3` while keeping `provider_probe_status=skipped`.
+
+`tests/basebrief.test.js` keeps release-line, quickstart, handoff, adapter,
+artifact checker, CLI Lite, Receiver, Project State, Sidecar, Delta, Seal/Diff,
+ContextOps, template, and receiver-ready coverage. `tests/context-pack.test.js`
+keeps Context Pack v2, File-only Export, Doctor, and Resume coverage.
+
+It does not add a CLI command, change release-check output shape, change
+Context Pack structure, change `check --input <dir> --json`, change
+Resume/Doctor/Export JSON contracts, start CI, or open Status, Workflow
+Runner, Doctor expansion, provider/runtime integration, MCP, plugin,
+schema-v2, daemon, watcher, hosted memory, push, tag, release, or PR work.
+
 ## v0.4.1 Stabilization Candidate
 
 `v0.4.1` is a stabilization-only cycle after the `v0.4.0` public release. It uses

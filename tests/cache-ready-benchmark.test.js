@@ -1,0 +1,1362 @@
+const assert = require("node:assert/strict");
+const { execFileSync } = require("node:child_process");
+const fs = require("node:fs");
+const path = require("node:path");
+const test = require("node:test");
+
+const { generateFromObject } = require("../scripts/generate_cache_ready_lite");
+const { generateCapsuleFromObject } = require("../scripts/generate_cache_ready_capsule");
+const { generateAnchorFromObject } = require("../scripts/generate_cache_ready_anchor");
+const { generateBb9HandoffFromObject, getProviderProfile } = require("../scripts/generate_bb9_handoff");
+const { buildSummary, getPromptForVariant, SCENARIOS, PROVIDER_PROFILES } = require("../scripts/provider_cache_benchmark");
+const { classifyRelayUsage } = require("../scripts/provider_relay_usage_audit");
+
+const repoRoot = path.resolve(__dirname, "..");
+
+function readText(relativePath) {
+  return fs.readFileSync(path.join(repoRoot, relativePath), "utf8");
+}
+
+function readJson(relativePath) {
+  return JSON.parse(readText(relativePath));
+}
+
+test("cache-ready generator keeps output stable for identical structured input", () => {
+  const input = readJson("tests/fixtures/cache-ready/cache-ready-a.json");
+  const first = generateFromObject(input);
+  const second = generateFromObject(input);
+
+  assert.equal(first, second);
+  assert.match(first, /MODE_FAMILY: BASEBRIEF_CACHE_READY/);
+  assert.match(first, /TAIL_REQUEST:/);
+});
+
+test("cache-ready generator uses fixed field order independent of object key order", () => {
+  const normal = generateFromObject(readJson("tests/fixtures/cache-ready/cache-ready-a.json"));
+  const shuffled = generateFromObject(readJson("tests/fixtures/cache-ready/cache-ready-shuffled.json"));
+
+  assert.equal(normal, shuffled);
+});
+
+test("cache-ready generator rejects missing required fields", () => {
+  const input = readJson("tests/fixtures/cache-ready/cache-ready-missing.json");
+
+  assert.throws(() => generateFromObject(input), /Missing required key: tail_request/);
+});
+
+test("cache-ready capsule v2 keeps compact deterministic field order", () => {
+  const input = readJson("tests/fixtures/cache-ready/cache-ready-a.json");
+  const first = generateCapsuleFromObject(input);
+  const second = generateCapsuleFromObject(input);
+
+  assert.equal(first, second);
+  assert.equal(first.split("\n").slice(0, 9).join("\n"), [
+    "BB2",
+    `P=${input.project_identity}`,
+    `G=${input.current_goal}`,
+    `F=${input.verified_facts.join(" ; ")}`,
+    `D=${input.confirmed_decisions.join(" ; ")}`,
+    `R=${input.risk_boundaries.join(" ; ")}`,
+    `X=${input.forbidden_scope.join(" ; ")}`,
+    `O=${input.expected_output}`,
+    "--",
+  ].join("\n"));
+  assert.match(first, /\nT=/);
+  assert.doesNotMatch(first, /NOTICE|SCHEMA_VERSION|COUNT|ASSUMPTION|OPEN_QUESTION|ALLOWED_SCOPE/);
+});
+
+test("cache-ready capsule v2 is stable across shuffled input and rejects missing fields", () => {
+  const normal = generateCapsuleFromObject(readJson("tests/fixtures/cache-ready/cache-ready-a.json"));
+  const shuffled = generateCapsuleFromObject(readJson("tests/fixtures/cache-ready/cache-ready-shuffled.json"));
+
+  assert.equal(normal, shuffled);
+  assert.throws(
+    () => generateCapsuleFromObject(readJson("tests/fixtures/cache-ready/cache-ready-missing.json")),
+    /Missing required key: tail_request/,
+  );
+});
+
+test("cache-ready capsule v2 is substantially shorter than v1 for the same input", () => {
+  const input = readJson("tests/fixtures/cache-ready/cache-ready-a.json");
+  const v1 = generateFromObject(input);
+  const v2 = generateCapsuleFromObject(input);
+  const reduction = (v1.length - v2.length) / v1.length;
+
+  assert(reduction >= 0.25, `Expected v2 to be at least 25% shorter; got ${reduction}`);
+});
+
+test("cache-ready anchor v3 pre-registers tail options and keeps only choice dynamic", () => {
+  const input = readJson("examples/cache-ready-anchor-input.json");
+  const first = generateAnchorFromObject(input);
+  const second = generateAnchorFromObject(input);
+
+  assert.equal(first, second);
+  assert.match(first, /^BB3\n/);
+  assert.match(first, /\nQAA=Restate the project state briefly/);
+  assert.match(first, /\nQAB=Generate a short next-chat opener/);
+  assert.match(first, /\n--\nQ=A\n$/);
+  assert.doesNotMatch(first.split("\n--\n")[1], /Restate|Generate|project state|next-chat/);
+});
+
+test("cache-ready anchor v3 validates tail options and choice", () => {
+  const input = readJson("examples/cache-ready-anchor-input.json");
+  const changedChoice = { ...input, tail_choice: "B" };
+
+  assert.match(generateAnchorFromObject(changedChoice), /\n--\nQ=B\n$/);
+  assert.throws(() => generateAnchorFromObject({ ...input, tail_options: ["only one"] }), /tail_options must contain at least two items/);
+  assert.throws(() => generateAnchorFromObject({ ...input, tail_choice: "Z" }), /tail_choice must be one of/);
+});
+
+test("cache-ready anchor pad v4 emits stable pad before dynamic choice", () => {
+  const input = readJson("examples/cache-ready-anchor-pad-input.json");
+  const output = generateAnchorFromObject(input);
+
+  assert.match(output, /\nPAD=p p p p p p p p\n--\nQ=A\n$/);
+  assert.doesNotMatch(output.split("\n--\n")[1], /PAD|Restate|Generate/);
+});
+
+test("cache-ready anchor pad v4 rejects missing or invalid pad values", () => {
+  const input = readJson("examples/cache-ready-anchor-pad-input.json");
+  const tooLongPad = Array.from({ length: 65 }, () => "p").join(" ");
+
+  assert.throws(() => {
+    const missing = { ...input };
+    delete missing.cache_pad;
+    generateAnchorFromObject(missing);
+  }, /Missing required key: cache_pad/);
+  assert.throws(() => generateAnchorFromObject({ ...input, cache_pad: "" }), /Empty required value: cache_pad/);
+  assert.throws(() => generateAnchorFromObject({ ...input, cache_pad: "p x p" }), /only lowercase p tokens/);
+  assert.throws(() => generateAnchorFromObject({ ...input, cache_pad: tooLongPad }), /no more than 64/);
+});
+
+test("benchmark anchor prompts stay aligned with standalone anchor generator", () => {
+  const snapshot = {
+    projectId: "projectA",
+    readmeExcerpt: "Public sample README.",
+    packages: [{ location: "package.json", name: "sample" }],
+    entryFiles: ["src/main.js"],
+    configFiles: ["vite.config.js"],
+    fileSample: ["src/main.js", "vite.config.js"],
+  };
+  const scenario = SCENARIOS[0];
+  const prompt = getPromptForVariant("anchorpad", snapshot, scenario, 0, "anchorPadV4");
+
+  assert.match(prompt, /^BB3\n/);
+  assert.match(prompt, /\nQAA=/);
+  assert.match(prompt, /\nQAB=/);
+  assert.match(prompt, /\nPAD=p p p p p p p p\n--\nQ=A\n$/);
+});
+
+test("readablePoc prompts keep stable markdown before hidden pad and dynamic tail", () => {
+  const snapshot = {
+    projectId: "projectA",
+    readmeExcerpt: "Public sample README.",
+    packages: [{ location: "package.json", name: "sample" }],
+    entryFiles: ["src/main.js"],
+    configFiles: ["vite.config.js"],
+    fileSample: ["src/main.js", "vite.config.js"],
+  };
+  const scenario = SCENARIOS[0];
+  const full = getPromptForVariant("readablePoc", snapshot, scenario, 0, "readableFullPad4");
+  const lite = getPromptForVariant("readablePoc", snapshot, scenario, 1, "readableLitePad4");
+
+  for (const prompt of [full, lite]) {
+    const padIndex = prompt.indexOf("<!-- BASEBRIEF_CACHE_PAD: p p p p -->");
+    const tailIndex = prompt.indexOf("Dynamic Tail Request");
+    assert(padIndex > 0, "readablePoc prompt should include hidden cache pad");
+    assert(tailIndex > padIndex, "dynamic tail must appear after hidden cache pad");
+    assert.match(prompt, /verified_facts/);
+    assert.match(prompt, /confirmed_decisions/);
+    assert.match(prompt, /risk_boundaries/);
+  }
+});
+
+test("sidecar prompts keep human-readable variants separate from compact BB5 sidecar", () => {
+  const snapshot = {
+    projectId: "projectA",
+    readmeExcerpt: "Public sample README.",
+    packages: [{ location: "package.json", name: "sample" }],
+    entryFiles: ["src/main.js"],
+    configFiles: ["vite.config.js"],
+    fileSample: ["src/main.js", "vite.config.js"],
+  };
+  const scenario = SCENARIOS[0];
+  const sidecar = getPromptForVariant("sidecar", snapshot, scenario, 0, "bb5SidecarFull");
+  const readable = getPromptForVariant("sidecar", snapshot, scenario, 0, "readableFull");
+
+  assert.match(readable, /^# BaseBrief Readable Full POC/);
+  assert.match(sidecar, /^BB5S\n/);
+  assert.match(sidecar, /\nS=full\n/);
+  assert.match(sidecar, /\nPAD=p p p p\n--\nQ=A$/);
+  assert.doesNotMatch(sidecar, /# BaseBrief Readable Full POC|Dynamic Tail Request/);
+});
+
+test("hybrid prompts keep natural context stable and only change final choice", () => {
+  const snapshot = {
+    projectId: "projectA",
+    readmeExcerpt: "Public sample README.",
+    packages: [{ location: "package.json", name: "sample" }],
+    entryFiles: ["src/main.js"],
+    configFiles: ["vite.config.js"],
+    fileSample: ["src/main.js", "vite.config.js"],
+  };
+  const scenario = SCENARIOS[0];
+  const fullA = getPromptForVariant("hybrid", snapshot, scenario, 0, "bb6HybridFull");
+  const fullB = getPromptForVariant("hybrid", snapshot, scenario, 1, "bb6HybridFull");
+  const splitA = fullA.split("\n--\n");
+  const splitB = fullB.split("\n--\n");
+
+  assert.match(fullA, /^# BaseBrief BB6 Hybrid Anchor/);
+  assert.match(fullA, /FORMAT: bb6-hybrid-full/);
+  assert.match(fullA, /## Stable Tail Options\nA=/);
+  assert.match(fullA, /<!-- BASEBRIEF_CACHE_PAD: p p p p -->\n--\nCHOICE=A$/);
+  assert.equal(splitA[0], splitB[0]);
+  assert.equal(splitB[1], "CHOICE=B");
+});
+
+test("blockpad prompts keep long stable pad before the final choice", () => {
+  const snapshot = {
+    projectId: "projectA",
+    readmeExcerpt: "Public sample README.",
+    packages: [{ location: "package.json", name: "sample" }],
+    entryFiles: ["src/main.js"],
+    configFiles: ["vite.config.js"],
+    fileSample: ["src/main.js", "vite.config.js"],
+  };
+  const scenario = SCENARIOS[0];
+  const promptA = getPromptForVariant("blockpad", snapshot, scenario, 0, "bb7BlockPadLite");
+  const promptB = getPromptForVariant("blockpad", snapshot, scenario, 1, "bb7BlockPadLite");
+  const [stableA, tailA] = promptA.split("\n--\n");
+  const [stableB, tailB] = promptB.split("\n--\n");
+
+  assert.match(promptA, /^# BaseBrief BB7 Block Pad Lite/);
+  assert.match(promptA, /BASEBRIEF_CACHE_BLOCK_PAD/);
+  assert(stableA.split(" p").length > 300, "blockpad prompt should include a long stable pad");
+  assert.equal(stableA, stableB);
+  assert.equal(tailA, "CHOICE=A");
+  assert.equal(tailB, "CHOICE=B");
+});
+
+test("blockalign prompts keep scenario-aligned pad stable across choices", () => {
+  const snapshot = {
+    projectId: "projectA",
+    readmeExcerpt: "Public sample README.",
+    packages: [{ location: "package.json", name: "sample" }],
+    entryFiles: ["src/main.js"],
+    configFiles: ["vite.config.js"],
+    fileSample: ["src/main.js", "vite.config.js"],
+  };
+  const scenario = SCENARIOS.find((item) => item.id === "risk-boundary");
+  const promptA = getPromptForVariant("blockalign", snapshot, scenario, 0, "bb8AlignedBlockPadLite");
+  const promptB = getPromptForVariant("blockalign", snapshot, scenario, 1, "bb8AlignedBlockPadLite");
+  const [stableA, tailA] = promptA.split("\n--\n");
+  const [stableB, tailB] = promptB.split("\n--\n");
+
+  assert.match(promptA, /^# BaseBrief BB8 Aligned Block Pad Lite/);
+  assert.match(promptA, /FORMAT: bb8-aligned-blockpad-lite/);
+  assert(stableA.split(" p").length > 330, "blockalign prompt should include a scenario-aligned stable pad");
+  assert.equal(stableA, stableB);
+  assert.equal(tailA, "CHOICE=A");
+  assert.equal(tailB, "CHOICE=B");
+});
+
+function bb9Fixture(overrides = {}) {
+  return {
+    mode: "full",
+    provider_profile: "mimo",
+    project_identity: "BaseBrief public sample project",
+    current_goal: "Prepare a complete handoff.",
+    verified_facts: [
+      "One public skill entry exists.",
+      "Full and Lite remain readable.",
+      "Cache-ready evidence is provider-specific.",
+    ],
+    confirmed_decisions: [
+      "Keep readable handoff first.",
+      "Attach sidecar only for supported provider profiles.",
+    ],
+    assumptions: ["The next agent can inspect files."],
+    open_questions: ["Whether sidecar should be merged later."],
+    risk_boundaries: [
+      "Do not expose secrets.",
+      "Do not claim cross-provider savings.",
+    ],
+    forbidden_scope: [".env", "API keys", "private paths"],
+    expected_output: "Readable handoff plus optional BB9 sidecar.",
+    tail_request: "Write the next-chat opener.",
+    ...overrides,
+  };
+}
+
+test("BB9 handoff generator emits readable full brief plus supported cache sidecar", () => {
+  const output = generateBb9HandoffFromObject(bb9Fixture(), { mode: "full", providerProfile: "mimo" });
+
+  assert.match(output.readableBrief, /^# BaseBrief Full Handoff/);
+  assert.match(output.readableBrief, /## verified_facts/);
+  assert.match(output.readableBrief, /## assumptions/);
+  assert.match(output.cacheSidecar, /^# BaseBrief BB9 Cache Sidecar/);
+  assert.match(output.cacheSidecar, /SELECTED_VARIANT: bb7BlockPadLite/);
+  assert.match(output.cacheSidecar, /BASEBRIEF_CACHE_BLOCK_PAD/);
+  assert.equal(output.selectedVariant, "bb7BlockPadLite");
+  assert.equal(output.recommendedPromptType, "cacheSidecar");
+  assert.equal(output.activeProviderPrompt, output.cacheSidecar);
+  assert.equal(output.promptUsePolicy.activeProviderPrompt, "cacheSidecar");
+  assert.match(output.promptUsePolicy.cacheSidecar, /Do not concatenate/);
+  assert.equal(output.providerProfile.profileId, "mimo");
+  assert.equal(output.fallbackReason, null);
+  assert(output.cacheSidecar.indexOf("TAIL_REQUEST=") > output.cacheSidecar.indexOf("BASEBRIEF_CACHE_BLOCK_PAD"));
+});
+
+test("BB9 handoff generator keeps lite readable brief separate from sidecar", () => {
+  const output = generateBb9HandoffFromObject(bb9Fixture({ mode: "lite" }), { mode: "lite", providerProfile: "deepseek" });
+
+  assert.match(output.readableBrief, /^# BaseBrief Lite Handoff/);
+  assert.doesNotMatch(output.readableBrief, /## assumptions/);
+  assert.match(output.readableBrief, /## open_questions/);
+  assert.match(output.cacheSidecar, /MODE: lite/);
+  assert.match(output.cacheSidecar, /TAIL_REQUEST=Write the next-chat opener/);
+  assert.notEqual(output.readableBrief, output.cacheSidecar);
+  assert.equal(output.providerProfile.pricingCnyPerMillionTokens.inputCacheHit, 0.02);
+});
+
+test("BB9 handoff generator is deterministic and independent of JSON key order", () => {
+  const normal = bb9Fixture();
+  const shuffled = {
+    tail_request: normal.tail_request,
+    expected_output: normal.expected_output,
+    forbidden_scope: normal.forbidden_scope,
+    risk_boundaries: normal.risk_boundaries,
+    open_questions: normal.open_questions,
+    assumptions: normal.assumptions,
+    confirmed_decisions: normal.confirmed_decisions,
+    verified_facts: normal.verified_facts,
+    current_goal: normal.current_goal,
+    project_identity: normal.project_identity,
+    provider_profile: normal.provider_profile,
+    mode: normal.mode,
+  };
+
+  assert.deepEqual(
+    generateBb9HandoffFromObject(normal, { mode: "full", providerProfile: "mimo" }),
+    generateBb9HandoffFromObject(shuffled, { mode: "full", providerProfile: "mimo" }),
+  );
+});
+
+test("BB9 handoff generator rejects missing core fields", () => {
+  const input = bb9Fixture();
+  delete input.tail_request;
+
+  assert.throws(
+    () => generateBb9HandoffFromObject(input, { mode: "full", providerProfile: "mimo" }),
+    /Missing required key: tail_request/,
+  );
+});
+
+test("BB9 handoff generator falls back when cache cost is not observable", () => {
+  const output = generateBb9HandoffFromObject(bb9Fixture(), {
+    mode: "lite",
+    providerProfile: "relay-openai-gpt55-codex-oauth",
+  });
+
+  assert.equal(output.cacheSidecar, null);
+  assert.equal(output.selectedVariant, "natural");
+  assert.equal(output.recommendedPromptType, "readableBrief");
+  assert.equal(output.activeProviderPrompt, output.readableBrief);
+  assert.equal(output.promptUsePolicy.activeProviderPrompt, "readableBrief");
+  assert.equal(output.fallbackReason, "cache_cost_not_observable");
+  assert.equal(output.providerProfile.cacheUsageObservable, false);
+  assert.match(output.readableBrief, /^# BaseBrief Lite Handoff/);
+});
+
+test("BB9 provider profiles separate direct provider evidence from relay observation", () => {
+  const mimo = getProviderProfile("mimo");
+  const deepseek = getProviderProfile("deepseek-v4-flash");
+  const relay = getProviderProfile("relay-openai-gpt55-codex-oauth");
+  const unknown = getProviderProfile("unknown-provider");
+
+  assert.equal(mimo.cacheUsageObservable, true);
+  assert.equal(mimo.defaultPromptStrategy, "bb9_sidecar");
+  assert.equal(mimo.activePromptStrategy, "cacheSidecar");
+  assert(mimo.experimentalCandidates.some((candidate) => (
+    candidate.candidateId === "bb12SizeBandGuard" &&
+    candidate.status === "mimo_specific_selector_candidate" &&
+    candidate.defaultEnabled === false
+  )));
+  assert.equal(deepseek.cacheUsageObservable, true);
+  assert.equal(deepseek.defaultPromptStrategy, "bb9_sidecar");
+  assert(deepseek.experimentalCandidates.every((candidate) => candidate.defaultEnabled === false));
+  assert(deepseek.experimentalCandidates.some((candidate) => (
+    candidate.candidateId === "bb12SizeBandGuard" &&
+    candidate.status === "deepseek_smoke_inconclusive"
+  )));
+  assert.equal(relay.cacheUsageObservable, false);
+  assert.equal(relay.recommendedVariant, "natural");
+  assert.equal(relay.defaultPromptStrategy, "readable_fallback");
+  assert.equal(relay.activePromptStrategy, "readableBrief");
+  assert.equal(unknown.cacheUsageObservable, false);
+  assert.equal(unknown.defaultPromptStrategy, "readable_fallback");
+  assert.equal(unknown.activePromptStrategy, "readableBrief");
+  assert.equal(unknown.fallbackReason, "provider_profile_not_supported");
+});
+
+test("BB10 active provider prompt preserves core handoff fields", () => {
+  const output = generateBb9HandoffFromObject(bb9Fixture(), { mode: "full", providerProfile: "mimo" });
+
+  for (const token of ["P=", "G=", "F=", "D=", "R=", "X=", "O=", "TAIL_REQUEST="]) {
+    assert.match(output.activeProviderPrompt, new RegExp(token.replace("=", "=")));
+  }
+  assert.match(output.activeProviderPrompt, /BASEBRIEF_CACHE_BLOCK_PAD/);
+});
+
+test("BB9 handoff CLI can print individual prompt artifacts", () => {
+  const inputPath = path.join(repoRoot, "examples/bb9-handoff-full-input.json");
+  const readable = execFileSync(process.execPath, [
+    "scripts/generate_bb9_handoff.js",
+    "--input",
+    inputPath,
+    "--mode",
+    "full",
+    "--provider-profile",
+    "mimo",
+    "--print",
+    "readableBrief",
+  ], { cwd: repoRoot, encoding: "utf8" });
+  const active = execFileSync(process.execPath, [
+    "scripts/generate_bb9_handoff.js",
+    "--input",
+    inputPath,
+    "--mode",
+    "full",
+    "--provider-profile",
+    "mimo",
+    "--print",
+    "activeProviderPrompt",
+  ], { cwd: repoRoot, encoding: "utf8" });
+
+  assert.match(readable, /^# BaseBrief Full Handoff/);
+  assert.doesNotMatch(readable, /BASEBRIEF_CACHE_BLOCK_PAD/);
+  assert.match(active, /^# BaseBrief BB9 Cache Sidecar/);
+  assert.match(active, /BASEBRIEF_CACHE_BLOCK_PAD/);
+});
+
+test("handoffPoc benchmark prompts compare readable brief with attached BB9 sidecar", () => {
+  const snapshot = {
+    projectId: "projectA",
+    readmeExcerpt: "Public sample README.",
+    packages: [{ location: "package.json", name: "sample" }],
+    entryFiles: ["src/main.js"],
+    configFiles: ["vite.config.js"],
+    fileSample: ["src/main.js", "vite.config.js"],
+  };
+  const scenario = SCENARIOS[0];
+  const readable = getPromptForVariant("handoffPoc", snapshot, scenario, 0, "readableFull", "mimo");
+  const sidecar = getPromptForVariant("handoffPoc", snapshot, scenario, 0, "readableFullSidecar", "mimo");
+  const fallbackSidecar = getPromptForVariant("handoffPoc", snapshot, scenario, 0, "readableLiteSidecar", "relay-openai-gpt55-codex-oauth");
+
+  assert.match(readable, /^# BaseBrief Full Handoff/);
+  assert.doesNotMatch(readable, /cache_sidecar/);
+  assert.match(sidecar, /^# BaseBrief Full Handoff/);
+  assert.match(sidecar, /## cache_sidecar/);
+  assert.match(sidecar, /# BaseBrief BB9 Cache Sidecar/);
+  assert(sidecar.indexOf("TAIL_REQUEST=") > sidecar.indexOf("BASEBRIEF_CACHE_BLOCK_PAD"));
+  assert.match(fallbackSidecar, /BB9 sidecar unavailable for this provider profile/);
+});
+
+test("activePromptPoc benchmark prompts use one active prompt without concatenation", () => {
+  const snapshot = {
+    projectId: "projectA",
+    readmeExcerpt: "Public sample README.",
+    packages: [{ location: "package.json", name: "sample" }],
+    entryFiles: ["src/main.js"],
+    configFiles: ["vite.config.js"],
+    fileSample: ["src/main.js", "vite.config.js"],
+  };
+  const scenario = SCENARIOS[0];
+  const readable = getPromptForVariant("activePromptPoc", snapshot, scenario, 0, "readableFull", "mimo");
+  const sidecarOnly = getPromptForVariant("activePromptPoc", snapshot, scenario, 0, "cacheSidecarFullOnly", "mimo");
+
+  assert.match(readable, /^# BaseBrief Full Handoff/);
+  assert.doesNotMatch(readable, /# BaseBrief BB9 Cache Sidecar/);
+  assert.match(sidecarOnly, /^# BaseBrief BB9 Cache Sidecar/);
+  assert.doesNotMatch(sidecarOnly, /^# BaseBrief Full Handoff/);
+  assert.match(sidecarOnly, /TAIL_REQUEST=/);
+  assert(sidecarOnly.indexOf("TAIL_REQUEST=") > sidecarOnly.indexOf("BASEBRIEF_CACHE_BLOCK_PAD"));
+});
+
+test("activePromptTrimPoc benchmark prompts emit compact BB11 lite sidecar and selector guard", () => {
+  const snapshot = {
+    projectId: "projectA",
+    readmeExcerpt: "Public sample README.",
+    packages: [{ location: "package.json", name: "sample" }],
+    entryFiles: ["src/main.js"],
+    configFiles: ["vite.config.js"],
+    fileSample: ["src/main.js", "vite.config.js"],
+  };
+  const scenario = SCENARIOS[0];
+  const readable = getPromptForVariant("activePromptTrimPoc", snapshot, scenario, 0, "readableLite", "mimo");
+  const bb10 = getPromptForVariant("activePromptTrimPoc", snapshot, scenario, 0, "cacheSidecarLiteOnly", "mimo");
+  const trim = getPromptForVariant("activePromptTrimPoc", snapshot, scenario, 0, "cacheSidecarLiteTrimOnly", "mimo");
+  const bb9 = getPromptForVariant("activePromptTrimPoc", snapshot, scenario, 0, "bb9Best", "mimo");
+  const guard = getPromptForVariant("activePromptTrimPoc", snapshot, scenario, 0, "bb11SelectorGuard", "mimo");
+
+  assert.match(readable, /^# BaseBrief Lite Handoff/);
+  assert.match(bb10, /^# BaseBrief BB9 Cache Sidecar/);
+  assert.match(trim, /^BB11L\n/);
+  for (const token of ["P=", "G=", "F=", "D=", "R=", "X=", "O=", "PAD=", "TAIL_REQUEST="]) {
+    assert.match(trim, new RegExp(token.replace("=", "=")));
+  }
+  assert.doesNotMatch(trim, /^# BaseBrief Lite Handoff/);
+  assert(trim.length < bb10.length, "BB11 trim sidecar should be shorter than BB10 lite sidecar");
+  assert(guard === trim || guard === bb9, "Selector guard should choose either trimmed sidecar or BB9 best fallback");
+});
+
+test("bb12GuardPoc prompt uses size-band guard before falling back to BB9", () => {
+  const smallSnapshot = {
+    projectId: "projectA",
+    readmeExcerpt: "Public sample README.",
+    packages: [{ location: "package.json", name: "sample" }],
+    entryFiles: ["src/main.js"],
+    configFiles: ["vite.config.js"],
+    fileSample: ["src/main.js", "vite.config.js"],
+  };
+  const largeSnapshot = {
+    ...smallSnapshot,
+    projectId: "projectC",
+    readmeExcerpt: "Large public sample README. ".repeat(80),
+    packages: [{ location: "package.json", name: "sample", dependencies: Array.from({ length: 30 }, (_, index) => `dep-${index}`) }],
+    fileSample: Array.from({ length: 80 }, (_, index) => `src/very-long-directory-name/file-${index}.js`),
+  };
+  const scenario = SCENARIOS[0];
+  const smallBb11Guard = getPromptForVariant("bb12GuardPoc", smallSnapshot, scenario, 0, "bb11SelectorGuard", "mimo");
+  const smallBb12 = getPromptForVariant("bb12GuardPoc", smallSnapshot, scenario, 0, "bb12SizeBandGuard", "mimo");
+  const largeBb9 = getPromptForVariant("bb12GuardPoc", largeSnapshot, scenario, 0, "bb9Best", "mimo");
+  const largeBb12 = getPromptForVariant("bb12GuardPoc", largeSnapshot, scenario, 0, "bb12SizeBandGuard", "mimo");
+
+  assert.equal(smallBb12, smallBb11Guard);
+  assert.equal(largeBb12, largeBb9);
+});
+
+test("handoffPoc benchmark summary classifies sidecar wins against readable baselines", () => {
+  const projectIds = ["projectA", "projectB", "projectC"];
+  const calls = [];
+  const variants = ["readableFull", "readableFullSidecar", "readableLite", "readableLiteSidecar", "bb9Best"];
+
+  for (const projectId of projectIds) {
+    for (const scenario of SCENARIOS) {
+      for (const variant of variants) {
+        for (let iteration = 0; iteration < 10; iteration += 1) {
+          const sidecar = variant === "readableFullSidecar" || variant === "readableLiteSidecar";
+          const estimatedTotalCostCny = sidecar ? 0.00008 : variant === "bb9Best" ? 0.00009 : 0.0002;
+          calls.push({
+            projectId,
+            scenarioId: scenario.id,
+            variant,
+            phase: iteration === 0 ? "warmup" : "repeat",
+            iteration,
+            status: "success",
+            promptTokens: sidecar ? 1500 : 1000,
+            completionTokens: 32,
+            cachedTokens: sidecar ? 1480 : 900,
+            cacheRatio: sidecar ? 1480 / 1500 : 900 / 1000,
+            cacheFieldVisible: true,
+            estimatedTotalCostCny,
+            totalLatencyMs: 1000 + iteration,
+          });
+        }
+      }
+    }
+  }
+
+  const summary = buildSummary({
+    status: "executed",
+    startedAt: "2026-06-02T00:00:00.000Z",
+    finishedAt: "2026-06-02T00:10:00.000Z",
+    providerName: "test-provider",
+    model: "test-model",
+    providerProfileId: "mimo",
+    mode: "handoffPoc",
+    repeats: 10,
+    projectIds,
+    calls,
+  });
+
+  assert.equal(summary.requestCount, 900);
+  assert.equal(summary.handoffStats.length, 2);
+  assert.equal(summary.handoffStats.find((item) => item.family === "full").estimatedCostWinsVsReadable, 18);
+  assert.equal(summary.handoffStats.find((item) => item.family === "lite").estimatedCostWinsVsReadable, 18);
+  assert.equal(summary.conclusionLevel, "bb9_handoff_poc_cost_evidence");
+});
+
+test("activePromptPoc benchmark summary classifies sidecar-only merge candidates", () => {
+  const projectIds = ["projectA", "projectB", "projectC"];
+  const calls = [];
+  const variants = ["readableFull", "readableLite", "cacheSidecarFullOnly", "cacheSidecarLiteOnly", "bb9Best"];
+
+  for (const projectId of projectIds) {
+    for (const scenario of SCENARIOS) {
+      for (const variant of variants) {
+        for (let iteration = 0; iteration < 10; iteration += 1) {
+          const sidecar = variant === "cacheSidecarFullOnly" || variant === "cacheSidecarLiteOnly";
+          const estimatedTotalCostCny = sidecar ? 0.00007 : variant === "bb9Best" ? 0.00008 : 0.0002;
+          calls.push({
+            projectId,
+            scenarioId: scenario.id,
+            variant,
+            phase: iteration === 0 ? "warmup" : "repeat",
+            iteration,
+            status: "success",
+            promptTokens: sidecar ? 1200 : 1000,
+            completionTokens: 32,
+            cachedTokens: sidecar ? 1180 : 900,
+            cacheRatio: sidecar ? 1180 / 1200 : 900 / 1000,
+            cacheFieldVisible: true,
+            estimatedTotalCostCny,
+            totalLatencyMs: 1000 + iteration,
+          });
+        }
+      }
+    }
+  }
+
+  const summary = buildSummary({
+    status: "executed",
+    startedAt: "2026-06-02T00:00:00.000Z",
+    finishedAt: "2026-06-02T00:10:00.000Z",
+    providerName: "test-provider",
+    model: "test-model",
+    providerProfileId: "mimo",
+    mode: "activePromptPoc",
+    repeats: 10,
+    projectIds,
+    calls,
+  });
+
+  assert.equal(summary.requestCount, 900);
+  assert.equal(summary.activePromptStats.length, 2);
+  assert.equal(summary.activePromptStats.find((item) => item.family === "full").estimatedCostWinsVsReadable, 18);
+  assert.equal(summary.activePromptStats.find((item) => item.family === "lite").estimatedCostNoWorseThanBb9Best, 18);
+  assert.equal(summary.conclusionLevel, "bb10_active_prompt_merge_candidate");
+});
+
+test("activePromptTrimPoc benchmark summary classifies BB11 trim and selector guard", () => {
+  const projectIds = ["projectA", "projectB", "projectC"];
+  const calls = [];
+  const variants = ["readableLite", "cacheSidecarLiteOnly", "cacheSidecarLiteTrimOnly", "bb9Best", "bb11SelectorGuard"];
+
+  for (const projectId of projectIds) {
+    for (const scenario of SCENARIOS) {
+      for (const variant of variants) {
+        for (let iteration = 0; iteration < 10; iteration += 1) {
+          const estimatedTotalCostCny =
+            variant === "cacheSidecarLiteTrimOnly" || variant === "bb11SelectorGuard"
+              ? 0.00007
+              : variant === "cacheSidecarLiteOnly"
+              ? 0.00008
+              : variant === "bb9Best"
+              ? 0.000075
+              : 0.0002;
+          calls.push({
+            projectId,
+            scenarioId: scenario.id,
+            variant,
+            phase: iteration === 0 ? "warmup" : "repeat",
+            iteration,
+            status: "success",
+            promptTokens: variant === "readableLite" ? 1000 : 1180,
+            completionTokens: 32,
+            cachedTokens: variant === "readableLite" ? 900 : 1152,
+            cacheRatio: variant === "readableLite" ? 900 / 1000 : 1152 / 1180,
+            cacheFieldVisible: true,
+            estimatedTotalCostCny,
+            totalLatencyMs: 1000 + iteration,
+          });
+        }
+      }
+    }
+  }
+
+  const summary = buildSummary({
+    status: "executed",
+    startedAt: "2026-06-02T00:00:00.000Z",
+    finishedAt: "2026-06-02T00:10:00.000Z",
+    providerName: "test-provider",
+    model: "test-model",
+    providerProfileId: "mimo",
+    mode: "activePromptTrimPoc",
+    repeats: 10,
+    projectIds,
+    calls,
+  });
+
+  assert.equal(summary.requestCount, 900);
+  assert.equal(summary.activePromptTrimStats.estimatedCostWinsVsReadable, 18);
+  assert.equal(summary.activePromptTrimStats.estimatedCostWinsVsBb10, 18);
+  assert.equal(summary.activePromptTrimStats.selectorGuardEstimatedCostNoWorseThanBb9Best, 18);
+  assert.equal(summary.conclusionLevel, "bb11_active_prompt_trim_selector_guard_candidate");
+});
+
+test("bb12GuardPoc benchmark summary classifies size-band guard selector candidates", () => {
+  const projectIds = ["projectA", "projectB", "projectC"];
+  const calls = [];
+  const variants = ["readableLite", "cacheSidecarLiteTrimOnly", "bb9Best", "bb11SelectorGuard", "bb12SizeBandGuard"];
+
+  for (const projectId of projectIds) {
+    for (const scenario of SCENARIOS) {
+      for (const variant of variants) {
+        for (let iteration = 0; iteration < 10; iteration += 1) {
+          const estimatedTotalCostCny =
+            variant === "bb12SizeBandGuard"
+              ? 0.00007
+              : variant === "bb9Best"
+              ? 0.000075
+              : variant === "bb11SelectorGuard"
+              ? 0.00008
+              : variant === "cacheSidecarLiteTrimOnly"
+              ? 0.00009
+              : 0.0002;
+          calls.push({
+            projectId,
+            scenarioId: scenario.id,
+            variant,
+            phase: iteration === 0 ? "warmup" : "repeat",
+            iteration,
+            status: "success",
+            promptTokens: variant === "readableLite" ? 1000 : 1250,
+            completionTokens: 32,
+            cachedTokens: variant === "readableLite" ? 900 : 1216,
+            cacheRatio: variant === "readableLite" ? 900 / 1000 : 1216 / 1250,
+            cacheFieldVisible: true,
+            estimatedTotalCostCny,
+            totalLatencyMs: 1000 + iteration,
+          });
+        }
+      }
+    }
+  }
+
+  const summary = buildSummary({
+    status: "executed",
+    startedAt: "2026-06-02T00:00:00.000Z",
+    finishedAt: "2026-06-02T00:10:00.000Z",
+    providerName: "test-provider",
+    model: "test-model",
+    providerProfileId: "mimo",
+    mode: "bb12GuardPoc",
+    repeats: 10,
+    projectIds,
+    calls,
+  });
+
+  assert.equal(summary.requestCount, 900);
+  assert.equal(summary.bb12GuardStats.estimatedCostWinsVsReadable, 18);
+  assert.equal(summary.bb12GuardStats.estimatedCostNoWorseThanBb9Best, 18);
+  assert.equal(summary.bb12GuardStats.estimatedCostNoWorseThanBb11Guard, 18);
+  assert.equal(summary.conclusionLevel, "bb12_size_band_guard_selector_candidate");
+});
+
+test("benchmark summary classifies large-sample evidence with anonymized project ids", () => {
+  const projectIds = ["projectA", "projectB", "projectC"];
+  const calls = [];
+
+  for (const projectId of projectIds) {
+    for (const scenario of SCENARIOS) {
+      for (const variant of ["natural", "cacheReady"]) {
+        for (let iteration = 0; iteration < 10; iteration += 1) {
+          const promptTokens = variant === "natural" ? 400 : 700;
+          const cachedTokens = variant === "natural" ? 300 : 600;
+          calls.push({
+            projectId,
+            scenarioId: scenario.id,
+            variant,
+            phase: iteration === 0 ? "warmup" : "repeat",
+            iteration,
+            status: "success",
+            promptTokens,
+            cachedTokens,
+            cacheRatio: cachedTokens / promptTokens,
+            cacheFieldVisible: true,
+            completionTokens: 32,
+            uncachedInputTokens: promptTokens - cachedTokens,
+            estimatedTotalCostCny: 0.0001,
+            totalLatencyMs: 1000 + iteration,
+          });
+        }
+      }
+    }
+  }
+
+  const summary = buildSummary({
+    status: "executed",
+    startedAt: "2026-06-02T00:00:00.000Z",
+    finishedAt: "2026-06-02T00:10:00.000Z",
+    providerName: "test-provider",
+    model: "test-model",
+    mode: "absolute",
+    repeats: 10,
+    projectIds,
+    calls,
+  });
+
+  assert.equal(summary.requestCount, 360);
+  assert.equal(summary.validRequestCount, 360);
+  assert.equal(summary.cacheReadyWins, 18);
+  assert.equal(summary.cacheReadyCacheRatioWins, 18);
+  assert.equal(summary.conclusionLevel, "large_sample_evidence");
+  assert.deepEqual(
+    [...new Set(summary.comparisons.map((item) => item.projectId))].sort(),
+    projectIds,
+  );
+});
+
+test("normalized benchmark summary reports ratio and cost wins only for length-normalized comparisons", () => {
+  const projectIds = ["projectA", "projectB", "projectC"];
+  const calls = [];
+
+  for (const projectId of projectIds) {
+    for (const scenario of SCENARIOS) {
+      for (const variant of ["natural", "cacheReady"]) {
+        for (let iteration = 0; iteration < 10; iteration += 1) {
+          const promptTokens = variant === "natural" ? 1000 : 1020;
+          const cachedTokens = variant === "natural" ? 900 : 960;
+          const estimatedTotalCostCny = variant === "natural" ? 0.0002 : 0.00017;
+          calls.push({
+            projectId,
+            scenarioId: scenario.id,
+            variant,
+            phase: iteration === 0 ? "warmup" : "repeat",
+            iteration,
+            status: "success",
+            promptTokens,
+            completionTokens: 32,
+            cachedTokens,
+            cacheRatio: cachedTokens / promptTokens,
+            cacheFieldVisible: true,
+            estimatedTotalCostCny,
+            totalLatencyMs: 1000 + iteration,
+          });
+        }
+      }
+    }
+  }
+
+  const summary = buildSummary({
+    status: "executed",
+    startedAt: "2026-06-02T00:00:00.000Z",
+    finishedAt: "2026-06-02T00:10:00.000Z",
+    providerName: "test-provider",
+    model: "test-model",
+    mode: "normalized",
+    repeats: 10,
+    projectIds,
+    calls,
+  });
+
+  assert.equal(summary.lengthNormalizedComparisons, 18);
+  assert.equal(summary.cacheReadyCacheRatioWins, 18);
+  assert.equal(summary.cacheReadyEstimatedCostWins, 18);
+  assert.equal(summary.ratioConclusionLevel, "ratio_large_sample_evidence");
+  assert.equal(summary.costConclusionLevel, "cost_large_sample_evidence");
+  assert.equal(summary.conclusionLevel, "normalized_large_sample_evidence");
+  assert(summary.overallCostDeltaPercent < -0.05);
+});
+
+test("capsule benchmark summary reports capsule v2 cost and ratio signals separately", () => {
+  const projectIds = ["projectA", "projectB", "projectC"];
+  const calls = [];
+
+  for (const projectId of projectIds) {
+    for (const scenario of SCENARIOS) {
+      for (const variant of ["natural", "cacheReady", "capsuleV2"]) {
+        for (let iteration = 0; iteration < 10; iteration += 1) {
+          const promptTokens = variant === "capsuleV2" ? 700 : 1000;
+          const cachedTokens = variant === "capsuleV2" ? 680 : 900;
+          const estimatedTotalCostCny = variant === "capsuleV2" ? 0.00012 : 0.0002;
+          calls.push({
+            projectId,
+            scenarioId: scenario.id,
+            variant,
+            phase: iteration === 0 ? "warmup" : "repeat",
+            iteration,
+            status: "success",
+            promptTokens,
+            completionTokens: 32,
+            cachedTokens,
+            cacheRatio: cachedTokens / promptTokens,
+            cacheFieldVisible: true,
+            estimatedTotalCostCny,
+            totalLatencyMs: 1000 + iteration,
+          });
+        }
+      }
+    }
+  }
+
+  const summary = buildSummary({
+    status: "executed",
+    startedAt: "2026-06-02T00:00:00.000Z",
+    finishedAt: "2026-06-02T00:10:00.000Z",
+    providerName: "test-provider",
+    model: "test-model",
+    mode: "capsule",
+    repeats: 10,
+    projectIds,
+    calls,
+  });
+
+  assert.equal(summary.requestCount, 540);
+  assert.equal(summary.largeSampleThreshold, 486);
+  assert.equal(summary.capsuleV2CacheRatioWins, 18);
+  assert.equal(summary.capsuleV2EstimatedCostWins, 18);
+  assert.equal(summary.capsuleV2ConclusionLevel, "capsule_cost_large_sample_evidence");
+  assert.equal(summary.conclusionLevel, "capsule_cost_large_sample_evidence");
+  assert(summary.capsuleV2OverallCostDeltaPercent < -0.05);
+});
+
+test("anchor benchmark summary reports anchor v3 cost and ratio signals separately", () => {
+  const projectIds = ["projectA", "projectB", "projectC"];
+  const calls = [];
+
+  for (const projectId of projectIds) {
+    for (const scenario of SCENARIOS) {
+      for (const variant of ["natural", "cacheReady", "capsuleV2", "anchorV3"]) {
+        for (let iteration = 0; iteration < 10; iteration += 1) {
+          const promptTokens = variant === "anchorV3" ? 1100 : 1000;
+          const cachedTokens = variant === "anchorV3" ? 1088 : 900;
+          const estimatedTotalCostCny = variant === "anchorV3" ? 0.00012 : 0.0002;
+          calls.push({
+            projectId,
+            scenarioId: scenario.id,
+            variant,
+            phase: iteration === 0 ? "warmup" : "repeat",
+            iteration,
+            status: "success",
+            promptTokens,
+            completionTokens: 32,
+            cachedTokens,
+            cacheRatio: cachedTokens / promptTokens,
+            cacheFieldVisible: true,
+            estimatedTotalCostCny,
+            totalLatencyMs: 1000 + iteration,
+          });
+        }
+      }
+    }
+  }
+
+  const summary = buildSummary({
+    status: "executed",
+    startedAt: "2026-06-02T00:00:00.000Z",
+    finishedAt: "2026-06-02T00:10:00.000Z",
+    providerName: "test-provider",
+    model: "test-model",
+    mode: "anchor",
+    repeats: 10,
+    projectIds,
+    calls,
+  });
+
+  assert.equal(summary.requestCount, 720);
+  assert.equal(summary.largeSampleThreshold, 648);
+  assert.equal(summary.anchorV3CacheRatioWins, 18);
+  assert.equal(summary.anchorV3EstimatedCostWins, 18);
+  assert.equal(summary.anchorV3ConclusionLevel, "anchor_cost_large_sample_evidence");
+  assert.equal(summary.conclusionLevel, "anchor_cost_large_sample_evidence");
+  assert(summary.anchorV3OverallCostDeltaPercent < -0.05);
+});
+
+test("anchorpad benchmark summary reports padded anchor v4 cost signals separately", () => {
+  const projectIds = ["projectA", "projectB", "projectC"];
+  const calls = [];
+
+  for (const projectId of projectIds) {
+    for (const scenario of SCENARIOS) {
+      for (const variant of ["natural", "cacheReady", "capsuleV2", "anchorV3", "anchorPadV4"]) {
+        for (let iteration = 0; iteration < 10; iteration += 1) {
+          const promptTokens = variant === "anchorPadV4" ? 1120 : 1000;
+          const cachedTokens = variant === "anchorPadV4" ? 1088 : 900;
+          const estimatedTotalCostCny = variant === "anchorPadV4" ? 0.00012 : 0.0002;
+          calls.push({
+            projectId,
+            scenarioId: scenario.id,
+            variant,
+            phase: iteration === 0 ? "warmup" : "repeat",
+            iteration,
+            status: "success",
+            promptTokens,
+            completionTokens: 32,
+            cachedTokens,
+            cacheRatio: cachedTokens / promptTokens,
+            cacheFieldVisible: true,
+            estimatedTotalCostCny,
+            totalLatencyMs: 1000 + iteration,
+          });
+        }
+      }
+    }
+  }
+
+  const summary = buildSummary({
+    status: "executed",
+    startedAt: "2026-06-02T00:00:00.000Z",
+    finishedAt: "2026-06-02T00:10:00.000Z",
+    providerName: "test-provider",
+    model: "test-model",
+    mode: "anchorpad",
+    repeats: 10,
+    projectIds,
+    calls,
+  });
+
+  assert.equal(summary.requestCount, 900);
+  assert.equal(summary.largeSampleThreshold, 810);
+  assert.equal(summary.anchorPadV4CacheRatioWins, 18);
+  assert.equal(summary.anchorPadV4EstimatedCostWins, 18);
+  assert.equal(summary.anchorPadV4ConclusionLevel, "anchorpad_cost_large_sample_evidence");
+  assert.equal(summary.conclusionLevel, "anchorpad_cost_large_sample_evidence");
+  assert(summary.anchorPadV4OverallCostDeltaPercent < -0.05);
+});
+
+test("padSweep benchmark summary marks stronger pad length as BB5 candidate", () => {
+  const projectIds = ["projectA", "projectB", "projectC"];
+  const calls = [];
+  const variants = ["anchorPad4", "anchorPad8", "anchorPad16", "anchorPad32", "anchorPad64"];
+
+  for (const projectId of projectIds) {
+    for (const scenario of SCENARIOS) {
+      for (const variant of variants) {
+        for (let iteration = 0; iteration < 10; iteration += 1) {
+          const estimatedTotalCostCny = variant === "anchorPad16" ? 0.00009 : variant === "anchorPad8" ? 0.00012 : 0.00013;
+          calls.push({
+            projectId,
+            scenarioId: scenario.id,
+            variant,
+            phase: iteration === 0 ? "warmup" : "repeat",
+            iteration,
+            status: "success",
+            promptTokens: 1100,
+            completionTokens: 32,
+            cachedTokens: variant === "anchorPad16" ? 1090 : 1080,
+            cacheRatio: variant === "anchorPad16" ? 1090 / 1100 : 1080 / 1100,
+            cacheFieldVisible: true,
+            estimatedTotalCostCny,
+            totalLatencyMs: 1000 + iteration,
+          });
+        }
+      }
+    }
+  }
+
+  const summary = buildSummary({
+    status: "executed",
+    startedAt: "2026-06-02T00:00:00.000Z",
+    finishedAt: "2026-06-02T00:10:00.000Z",
+    providerName: "test-provider",
+    model: "test-model",
+    providerProfileId: "custom-compatible",
+    mode: "padSweep",
+    repeats: 10,
+    projectIds,
+    calls,
+  });
+
+  assert.equal(summary.requestCount, 900);
+  assert.equal(summary.padSweepBaselineVariant, "anchorPad8");
+  assert.equal(summary.padSweepCandidate.variant, "anchorPad16");
+  assert.equal(summary.padSweepCandidate.costWinsVsPad8, 18);
+  assert.equal(summary.conclusionLevel, "pad_sweep_bb5_candidate");
+});
+
+test("readablePoc benchmark summary classifies Full and Lite padded markdown separately", () => {
+  const projectIds = ["projectA", "projectB", "projectC"];
+  const calls = [];
+  const variants = ["natural", "readableFull", "readableFullPad4", "readableLite", "readableLitePad4"];
+
+  for (const projectId of projectIds) {
+    for (const scenario of SCENARIOS) {
+      for (const variant of variants) {
+        for (let iteration = 0; iteration < 10; iteration += 1) {
+          const estimatedTotalCostCny =
+            variant === "readableFullPad4" || variant === "readableLitePad4" ? 0.00009 : 0.0002;
+          calls.push({
+            projectId,
+            scenarioId: scenario.id,
+            variant,
+            phase: iteration === 0 ? "warmup" : "repeat",
+            iteration,
+            status: "success",
+            promptTokens: 1200,
+            completionTokens: 32,
+            cachedTokens: variant.endsWith("Pad4") ? 1180 : 1000,
+            cacheRatio: variant.endsWith("Pad4") ? 1180 / 1200 : 1000 / 1200,
+            cacheFieldVisible: true,
+            estimatedTotalCostCny,
+            totalLatencyMs: 1000 + iteration,
+          });
+        }
+      }
+    }
+  }
+
+  const summary = buildSummary({
+    status: "executed",
+    startedAt: "2026-06-02T00:00:00.000Z",
+    finishedAt: "2026-06-02T00:10:00.000Z",
+    providerName: "test-provider",
+    model: "test-model",
+    providerProfileId: "custom-compatible",
+    mode: "readablePoc",
+    repeats: 10,
+    projectIds,
+    calls,
+  });
+
+  assert.equal(summary.requestCount, 900);
+  assert.equal(summary.readableStats.length, 2);
+  assert.equal(summary.readableStats.find((item) => item.family === "full").estimatedCostWins, 18);
+  assert.equal(summary.readableStats.find((item) => item.family === "lite").estimatedCostWins, 18);
+  assert.equal(summary.conclusionLevel, "readable_poc_large_sample_evidence");
+});
+
+test("sidecar benchmark summary requires sidecar evidence and compares against BB4", () => {
+  const projectIds = ["projectA", "projectB", "projectC"];
+  const calls = [];
+  const variants = ["natural", "readableFull", "readableLite", "bb4AnchorPad", "bb5SidecarFull", "bb5SidecarLite"];
+
+  for (const projectId of projectIds) {
+    for (const scenario of SCENARIOS) {
+      for (const variant of variants) {
+        for (let iteration = 0; iteration < 10; iteration += 1) {
+          const estimatedTotalCostCny =
+            variant === "bb5SidecarLite" ? 0.00008 : variant === "bb4AnchorPad" ? 0.00009 : 0.0002;
+          calls.push({
+            projectId,
+            scenarioId: scenario.id,
+            variant,
+            phase: iteration === 0 ? "warmup" : "repeat",
+            iteration,
+            status: "success",
+            promptTokens: variant === "bb5SidecarLite" ? 900 : 1200,
+            completionTokens: 32,
+            cachedTokens: variant === "bb5SidecarLite" ? 880 : 1000,
+            cacheRatio: variant === "bb5SidecarLite" ? 880 / 900 : 1000 / 1200,
+            cacheFieldVisible: true,
+            estimatedTotalCostCny,
+            totalLatencyMs: 1000 + iteration,
+          });
+        }
+      }
+    }
+  }
+
+  const summary = buildSummary({
+    status: "executed",
+    startedAt: "2026-06-02T00:00:00.000Z",
+    finishedAt: "2026-06-02T00:10:00.000Z",
+    providerName: "test-provider",
+    model: "test-model",
+    providerProfileId: "custom-compatible",
+    mode: "sidecar",
+    repeats: 10,
+    projectIds,
+    calls,
+  });
+
+  const lite = summary.sidecarStats.find((item) => item.family === "lite");
+  assert.equal(summary.requestCount, 1080);
+  assert.equal(lite.estimatedCostWinsVsNatural, 18);
+  assert.equal(lite.estimatedCostWinsVsBb4, 18);
+  assert.equal(lite.conclusionLevel, "bb5_sidecar_lite_best_evidence");
+  assert.equal(summary.conclusionLevel, "bb5_sidecar_best_evidence");
+});
+
+test("hybrid benchmark summary requires improvement over BB5 sidecar", () => {
+  const projectIds = ["projectA", "projectB", "projectC"];
+  const calls = [];
+  const variants = ["natural", "bb4AnchorPad", "bb5SidecarFull", "bb5SidecarLite", "bb6HybridFull", "bb6HybridLite"];
+
+  for (const projectId of projectIds) {
+    for (const scenario of SCENARIOS) {
+      for (const variant of variants) {
+        for (let iteration = 0; iteration < 10; iteration += 1) {
+          const estimatedTotalCostCny =
+            variant === "bb6HybridFull" ? 0.00007 : variant === "bb5SidecarFull" ? 0.00009 : 0.0002;
+          calls.push({
+            projectId,
+            scenarioId: scenario.id,
+            variant,
+            phase: iteration === 0 ? "warmup" : "repeat",
+            iteration,
+            status: "success",
+            promptTokens: variant === "bb6HybridFull" ? 1300 : 1000,
+            completionTokens: 32,
+            cachedTokens: variant === "bb6HybridFull" ? 1260 : 900,
+            cacheRatio: variant === "bb6HybridFull" ? 1260 / 1300 : 900 / 1000,
+            cacheFieldVisible: true,
+            estimatedTotalCostCny,
+            totalLatencyMs: 1000 + iteration,
+          });
+        }
+      }
+    }
+  }
+
+  const summary = buildSummary({
+    status: "executed",
+    startedAt: "2026-06-02T00:00:00.000Z",
+    finishedAt: "2026-06-02T00:10:00.000Z",
+    providerName: "test-provider",
+    model: "test-model",
+    providerProfileId: "custom-compatible",
+    mode: "hybrid",
+    repeats: 10,
+    projectIds,
+    calls,
+  });
+
+  const full = summary.hybridStats.find((item) => item.family === "full");
+  assert.equal(summary.requestCount, 1080);
+  assert.equal(full.estimatedCostWinsVsNatural, 18);
+  assert.equal(full.estimatedCostWinsVsBb5, 18);
+  assert.equal(full.conclusionLevel, "bb6_hybrid_full_best_evidence");
+  assert.equal(summary.conclusionLevel, "bb6_hybrid_best_evidence");
+});
+
+test("blockpad benchmark summary requires improvement over BB6 hybrid", () => {
+  const projectIds = ["projectA", "projectB", "projectC"];
+  const calls = [];
+  const variants = ["natural", "bb5SidecarLite", "bb6HybridLite", "bb7BlockPadLite"];
+
+  for (const projectId of projectIds) {
+    for (const scenario of SCENARIOS) {
+      for (const variant of variants) {
+        for (let iteration = 0; iteration < 10; iteration += 1) {
+          const estimatedTotalCostCny =
+            variant === "bb7BlockPadLite" ? 0.00006 : variant === "bb6HybridLite" ? 0.00009 : 0.0002;
+          calls.push({
+            projectId,
+            scenarioId: scenario.id,
+            variant,
+            phase: iteration === 0 ? "warmup" : "repeat",
+            iteration,
+            status: "success",
+            promptTokens: variant === "bb7BlockPadLite" ? 1288 : 960,
+            completionTokens: 32,
+            cachedTokens: variant === "bb7BlockPadLite" ? 1280 : 896,
+            cacheRatio: variant === "bb7BlockPadLite" ? 1280 / 1288 : 896 / 960,
+            cacheFieldVisible: true,
+            estimatedTotalCostCny,
+            totalLatencyMs: 1000 + iteration,
+          });
+        }
+      }
+    }
+  }
+
+  const summary = buildSummary({
+    status: "executed",
+    startedAt: "2026-06-02T00:00:00.000Z",
+    finishedAt: "2026-06-02T00:10:00.000Z",
+    providerName: "test-provider",
+    model: "test-model",
+    providerProfileId: "custom-compatible",
+    mode: "blockpad",
+    repeats: 10,
+    projectIds,
+    calls,
+  });
+
+  assert.equal(summary.requestCount, 720);
+  assert.equal(summary.blockPadStats.estimatedCostWinsVsNatural, 18);
+  assert.equal(summary.blockPadStats.estimatedCostWinsVsBb6, 18);
+  assert.equal(summary.blockPadStats.conclusionLevel, "bb7_blockpad_best_evidence");
+  assert.equal(summary.adaptiveSelectorStats.estimatedCostWinsVsNatural, 18);
+  assert.equal(summary.adaptiveSelectorStats.estimatedCostNoWorseVsNatural, 18);
+  assert.equal(summary.adaptiveSelectorStats.conclusionLevel, "bb9_adaptive_selector_best_evidence");
+  assert.equal(summary.conclusionLevel, "bb9_adaptive_selector_best_evidence");
+});
+
+test("blockalign benchmark summary requires improvement over BB7 blockpad", () => {
+  const projectIds = ["projectA", "projectB", "projectC"];
+  const calls = [];
+  const variants = ["natural", "bb7BlockPadLite", "bb8AlignedBlockPadLite"];
+
+  for (const projectId of projectIds) {
+    for (const scenario of SCENARIOS) {
+      for (const variant of variants) {
+        for (let iteration = 0; iteration < 10; iteration += 1) {
+          const estimatedTotalCostCny =
+            variant === "bb8AlignedBlockPadLite" ? 0.00005 : variant === "bb7BlockPadLite" ? 0.00008 : 0.0002;
+          calls.push({
+            projectId,
+            scenarioId: scenario.id,
+            variant,
+            phase: iteration === 0 ? "warmup" : "repeat",
+            iteration,
+            status: "success",
+            promptTokens: variant === "bb8AlignedBlockPadLite" ? 1282 : 1274,
+            completionTokens: 32,
+            cachedTokens: variant === "bb8AlignedBlockPadLite" ? 1280 : 1152,
+            cacheRatio: variant === "bb8AlignedBlockPadLite" ? 1280 / 1282 : 1152 / 1274,
+            cacheFieldVisible: true,
+            estimatedTotalCostCny,
+            totalLatencyMs: 1000 + iteration,
+          });
+        }
+      }
+    }
+  }
+
+  const summary = buildSummary({
+    status: "executed",
+    startedAt: "2026-06-02T00:00:00.000Z",
+    finishedAt: "2026-06-02T00:10:00.000Z",
+    providerName: "test-provider",
+    model: "test-model",
+    providerProfileId: "custom-compatible",
+    mode: "blockalign",
+    repeats: 10,
+    projectIds,
+    calls,
+  });
+
+  assert.equal(summary.requestCount, 540);
+  assert.equal(summary.alignedBlockPadStats.estimatedCostWinsVsNatural, 18);
+  assert.equal(summary.alignedBlockPadStats.estimatedCostWinsVsBb7, 18);
+  assert.equal(summary.alignedBlockPadStats.conclusionLevel, "bb8_blockalign_best_evidence");
+  assert.equal(summary.conclusionLevel, "bb8_blockalign_best_evidence");
+});
+
+test("benchmark provider profiles include MiMo and DeepSeek pricing", () => {
+  assert.equal(PROVIDER_PROFILES["mimo-v2.5"].pricingCnyPerMillionTokens.inputCacheHit, 0.02);
+  assert.equal(PROVIDER_PROFILES["deepseek-v4-flash"].pricingCnyPerMillionTokens.inputCacheMiss, 1);
+  assert.equal(PROVIDER_PROFILES["deepseek-v4-flash"].pricingCnyPerMillionTokens.output, 2);
+});
+
+test("relay provider profile is separated from official provider evidence", () => {
+  const relay = PROVIDER_PROFILES["relay-openai-gpt55-codex-oauth"];
+
+  assert.equal(relay.routeType, "third_party_relay");
+  assert.equal(relay.evidenceLevel, "relay_specific_observation");
+  assert.equal(relay.pricingBasis, "openai_official_reference_price");
+  assert.equal(relay.billingAudited, false);
+  assert.equal(relay.pricingCnyPerMillionTokens, null);
+});
+
+test("relay usage audit recommends benchmark only when cache cost is observable", () => {
+  const visibleCache = classifyRelayUsage([
+    { label: "identical", status: "success", promptTokens: 100, completionTokens: 2, cachedTokens: 0, usageVisible: true, cacheFieldVisible: true },
+    { label: "identical", status: "success", promptTokens: 100, completionTokens: 2, cachedTokens: 80, usageVisible: true, cacheFieldVisible: true },
+    { label: "varied", status: "success", promptTokens: 110, completionTokens: 2, cachedTokens: 80, usageVisible: true, cacheFieldVisible: true },
+  ]);
+  const tokenLengthOnly = classifyRelayUsage([
+    { label: "identical", status: "success", promptTokens: 100, completionTokens: 2, cachedTokens: null, usageVisible: true, cacheFieldVisible: false },
+    { label: "identical", status: "success", promptTokens: 100, completionTokens: 2, cachedTokens: null, usageVisible: true, cacheFieldVisible: false },
+    { label: "varied", status: "success", promptTokens: 110, completionTokens: 2, cachedTokens: null, usageVisible: true, cacheFieldVisible: false },
+  ]);
+
+  assert.equal(visibleCache.usageInterpretation, "cache_tokens_visible");
+  assert.equal(visibleCache.benchmarkRecommended, true);
+  assert.equal(tokenLengthOnly.usageInterpretation, "token_length_observation_only");
+  assert.equal(tokenLengthOnly.stopRecommended, true);
+  assert.equal(tokenLengthOnly.stopReason, "cache_cost_not_observable");
+});

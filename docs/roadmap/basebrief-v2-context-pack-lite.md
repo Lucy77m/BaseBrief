@@ -634,6 +634,23 @@ structure, start CI, or open Status, Workflow Runner, Doctor expansion,
 provider/runtime integration, MCP, plugin, schema-v2, daemon, watcher, hosted
 memory, publish, push, tag, release, or PR work.
 
+`docs/dogfooding/context-pack-cache-ready-benchmark-test-split-v2.6.29.md`
+implements the second test-file split from the v2.6.28 candidate decision.
+Cache-ready generators, benchmark prompt variants, benchmark summaries,
+provider profiles, and relay usage audit tests now live in
+`tests/cache-ready-benchmark.test.js`; broader release-line, quickstart,
+handoff, adapter, artifact checker, CLI Lite, Receiver, Project State, Sidecar,
+Delta, Seal/Diff, ContextOps, template, and receiver-ready coverage remains in
+`tests/basebrief.test.js`. Context Pack v2, File-only Export, Doctor, and Resume
+coverage remains in `tests/context-pack.test.js`. The public validation entry
+remains `npm test`, now running
+`node --test tests/basebrief.test.js tests/context-pack.test.js tests/cache-ready-benchmark.test.js`,
+with expected test count still 175 and `independent_test_files=3`. It does not
+add a CLI command, change release-check output shape, change JSON contracts,
+alter the Context Pack seven-file structure, start CI, or open Status, Workflow
+Runner, Doctor expansion, provider/runtime integration, MCP, plugin, schema-v2,
+daemon, watcher, hosted memory, publish, push, tag, release, or PR work.
+
 ### Later Workflow Runner Lite
 
 Only after Context Pack Lite, Context Pack Check, One-command Resume,
