@@ -463,6 +463,12 @@ The rehearsal passed with `check_status: passed`, `resume_status: ready`, and
 Continuation Harness Lite, Status, Workflow Runner, and JSON contract changes
 not started.
 
+`docs/dogfooding/context-pack-local-bundle-compression-v2.6.13.md` compresses
+the ahead-10 local adoption bundle into a future major-release candidate
+narrative. It is not a release closeout, feature implementation, new command,
+Status command, Workflow Runner, Continuation Harness implementation, or JSON
+contract change.
+
 ### Later Workflow Runner Lite
 
 Only after Context Pack Lite, Context Pack Check, One-command Resume,

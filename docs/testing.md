@@ -1044,6 +1044,26 @@ Expected release-check output without provider env remains:
 provider_probe_status=skipped
 ```
 
+## v2.6.13 Context Pack Local Bundle Compression
+
+`v2.6.13` is local adoption sedimentation, not a release closeout or feature
+implementation. It compresses the ahead-10 local adoption bundle into four
+groups: starter wording repair, adoption examples/evidence, external
+alignment/feature gates, and bundle audit + rehearsal verification.
+
+The evidence is recorded in
+[Context Pack Local Bundle Compression v2.6.13](dogfooding/context-pack-local-bundle-compression-v2.6.13.md).
+It drafts future major-release candidate wording while keeping Continuation
+Harness Lite, Status, Workflow Runner, provider request, runtime integration,
+MCP server/tools, schema-v2, daemon, watcher, hosted memory, and JSON contract
+changes out of scope.
+
+Expected release-check output without provider env remains:
+
+```text
+provider_probe_status=skipped
+```
+
 ## v0.4.1 Stabilization Candidate
 
 `v0.4.1` is a stabilization-only cycle after the `v0.4.0` public release. It uses

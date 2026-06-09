@@ -197,6 +197,7 @@ function checkRequiredFiles() {
     "docs/dogfooding/context-pack-pre-release-bundle-audit-v2.6.10.md",
     "docs/dogfooding/context-pack-feature-feasibility-spike-v2.6.11.md",
     "docs/dogfooding/context-pack-local-bundle-review-rehearsal-v2.6.12.md",
+    "docs/dogfooding/context-pack-local-bundle-compression-v2.6.13.md",
     "docs/testing-v0.4.x-test-matrix.md",
     "docs/testing-v0.6.x-test-matrix.md",
     "docs/testing-v0.7.x-test-matrix.md",
@@ -497,6 +498,7 @@ function checkContentContracts() {
   const contextPackPreReleaseBundleAuditV2610Doc = readText("docs/dogfooding/context-pack-pre-release-bundle-audit-v2.6.10.md");
   const contextPackFeatureFeasibilitySpikeV2611Doc = readText("docs/dogfooding/context-pack-feature-feasibility-spike-v2.6.11.md");
   const contextPackLocalBundleReviewRehearsalV2612Doc = readText("docs/dogfooding/context-pack-local-bundle-review-rehearsal-v2.6.12.md");
+  const contextPackLocalBundleCompressionV2613Doc = readText("docs/dogfooding/context-pack-local-bundle-compression-v2.6.13.md");
   const postReleaseBaselineDoc = readText("docs/baselines/v0.4.0-post-release-baseline.md");
   const v060PostReleaseBaselineDoc = readText("docs/baselines/v0.6.0-post-release-baseline.md");
   const projectStateModelDoc = readText("docs/design/project-state-model.md");
@@ -1029,6 +1031,10 @@ function checkContentContracts() {
   assert(testingDoc.includes("dogfooding/context-pack-local-bundle-review-rehearsal-v2.6.12.md"), "Testing docs must link v2.6.12 bundle review rehearsal");
   assert(testingDoc.includes("ahead-9 local adoption bundle") && testingDoc.includes("context_pack_status: generated"), "Testing docs must summarize v2.6.12 bundle and rehearsal");
   assert(testingDoc.includes("doctor_info_findings: doctor.live-recheck-required"), "Testing docs must record v2.6.12 doctor info finding");
+  assert(testingDoc.includes("v2.6.13 Context Pack Local Bundle Compression"), "Testing docs must document v2.6.13 bundle compression");
+  assert(testingDoc.includes("dogfooding/context-pack-local-bundle-compression-v2.6.13.md"), "Testing docs must link v2.6.13 bundle compression");
+  assert(testingDoc.includes("ahead-10 local adoption bundle") && testingDoc.includes("starter wording repair") && testingDoc.includes("adoption examples/evidence"), "Testing docs must summarize v2.6.13 compressed bundle");
+  assert(testingDoc.includes("future major-release candidate wording") && testingDoc.includes("JSON contract changes out of scope"), "Testing docs must keep v2.6.13 in compression scope");
   assert(testingDoc.includes("checker_error_propagation_status: pass"), "Testing docs must record checker-error propagation");
   assert(testingDoc.includes("context-pack --repo <target-repo>"), "Testing docs must document context-pack command");
   assert(testingDoc.includes("resume --input <context-pack-dir>"), "Testing docs must document resume command");
@@ -1563,6 +1569,7 @@ function checkContentContracts() {
   assert(docsIndex.includes("dogfooding/context-pack-pre-release-bundle-audit-v2.6.10.md"), "Docs index must link v2.6.10 bundle audit");
   assert(docsIndex.includes("dogfooding/context-pack-feature-feasibility-spike-v2.6.11.md"), "Docs index must link v2.6.11 feasibility spike");
   assert(docsIndex.includes("dogfooding/context-pack-local-bundle-review-rehearsal-v2.6.12.md"), "Docs index must link v2.6.12 bundle review rehearsal");
+  assert(docsIndex.includes("dogfooding/context-pack-local-bundle-compression-v2.6.13.md"), "Docs index must link v2.6.13 bundle compression");
   assert(docsIndex.includes("specs/context-pack-lite.md"), "Docs index must link context pack lite spec");
   assert(docsIndex.includes("specs/context-pack-resume.md"), "Docs index must link context pack resume spec");
   assert(docsIndex.includes("specs/basebrief-format.md"), "Docs index must link basebrief format spec");
@@ -1637,6 +1644,9 @@ function checkContentContracts() {
   assert(v2ContextPackRoadmapDoc.includes("docs/dogfooding/context-pack-local-bundle-review-rehearsal-v2.6.12.md"), "v2 roadmap must link v2.6.12 bundle review rehearsal");
   assert(v2ContextPackRoadmapDoc.includes("ahead-9 local adoption bundle") && v2ContextPackRoadmapDoc.includes("check_status: passed") && v2ContextPackRoadmapDoc.includes("resume_status: ready"), "v2 roadmap must summarize v2.6.12 rehearsal results");
   assert(v2ContextPackRoadmapDoc.includes("doctor_info_findings: doctor.live-recheck-required") && v2ContextPackRoadmapDoc.includes("Continuation Harness Lite, Status, Workflow Runner, and JSON contract changes"), "v2 roadmap must keep v2.6.12 feature gates closed");
+  assert(v2ContextPackRoadmapDoc.includes("docs/dogfooding/context-pack-local-bundle-compression-v2.6.13.md"), "v2 roadmap must link v2.6.13 bundle compression");
+  assert(v2ContextPackRoadmapDoc.includes("ahead-10 local adoption bundle") && v2ContextPackRoadmapDoc.includes("future major-release candidate"), "v2 roadmap must summarize v2.6.13 compression");
+  assert(v2ContextPackRoadmapDoc.includes("not a release closeout, feature implementation, new command") && v2ContextPackRoadmapDoc.includes("Continuation Harness implementation, or JSON"), "v2 roadmap must keep v2.6.13 out of feature scope");
   assert(v2ContextPackRoadmapDoc.includes("exports/manifest.json"), "v2 roadmap must define export manifest");
   assert(v2ContextPackRoadmapDoc.includes("exports/context-pack.md"), "v2 roadmap must define readable export");
   assert(v2ContextPackRoadmapDoc.includes("exports/context.json"), "v2 roadmap must define machine-readable export");
@@ -2187,6 +2197,52 @@ function checkContentContracts() {
   assert(contextPackLocalBundleReviewRehearsalV2612Doc.includes("provider_probe_status=skipped"), "v2.6.12 bundle review rehearsal must preserve skipped provider gate");
   assert(!/(^|[^A-Za-z])[A-Za-z]:[\\/]/.test(contextPackLocalBundleReviewRehearsalV2612Doc), "v2.6.12 bundle review rehearsal must not expose drive-letter absolute paths");
   assert(!/\\\\/.test(contextPackLocalBundleReviewRehearsalV2612Doc), "v2.6.12 bundle review rehearsal must not expose UNC paths");
+  assert(contextPackLocalBundleCompressionV2613Doc.includes("Context Pack Local Bundle Compression v2.6.13"), "v2.6.13 bundle compression doc must have stable title");
+  assert(contextPackLocalBundleCompressionV2613Doc.includes("local ahead-10 v2.6.x adoption bundle"), "v2.6.13 bundle compression must name ahead-10 bundle");
+  assert(contextPackLocalBundleCompressionV2613Doc.includes("local adoption sedimentation, not a frequent release line"), "v2.6.13 bundle compression must avoid frequent release framing");
+  assert(contextPackLocalBundleCompressionV2613Doc.includes("not a frequent release line, release closeout, push, tag"), "v2.6.13 bundle compression must reject release actions");
+  assert(contextPackLocalBundleCompressionV2613Doc.includes("bundle_status: local_adoption_sedimentation"), "v2.6.13 bundle compression must record sedimentation status");
+  assert(contextPackLocalBundleCompressionV2613Doc.includes("bundle_scope: ahead-10 docs/examples/release-check/adoption polish"), "v2.6.13 bundle compression must scope ahead-10 bundle");
+  assert(contextPackLocalBundleCompressionV2613Doc.includes("future_release_shape: larger version package, not frequent v2.6.x publishing"), "v2.6.13 bundle compression must prefer larger release package");
+  assert(contextPackLocalBundleCompressionV2613Doc.includes("release_closeout_status: not_started"), "v2.6.13 bundle compression must keep release closeout not started");
+  assert(contextPackLocalBundleCompressionV2613Doc.includes("push_status: not_started"), "v2.6.13 bundle compression must keep push not started");
+  assert(contextPackLocalBundleCompressionV2613Doc.includes("tag_status: not_started"), "v2.6.13 bundle compression must keep tag not started");
+  assert(contextPackLocalBundleCompressionV2613Doc.includes("release_status: not_started"), "v2.6.13 bundle compression must keep release not started");
+  assert(contextPackLocalBundleCompressionV2613Doc.includes("starter wording repair"), "v2.6.13 bundle compression must include starter wording repair group");
+  assert(contextPackLocalBundleCompressionV2613Doc.includes("adoption examples/evidence"), "v2.6.13 bundle compression must include adoption examples group");
+  assert(contextPackLocalBundleCompressionV2613Doc.includes("external alignment/feature gates"), "v2.6.13 bundle compression must include external alignment group");
+  assert(contextPackLocalBundleCompressionV2613Doc.includes("bundle audit + rehearsal verification"), "v2.6.13 bundle compression must include audit and rehearsal group");
+  assert(contextPackLocalBundleCompressionV2613Doc.includes("00a787e") && contextPackLocalBundleCompressionV2613Doc.includes("754e808"), "v2.6.13 bundle compression must cite local bundle endpoints");
+  assert(contextPackLocalBundleCompressionV2613Doc.includes("Future release notes may reuse this compressed summary"), "v2.6.13 bundle compression must provide reusable release-note summary");
+  assert(contextPackLocalBundleCompressionV2613Doc.includes("new runtime behavior") && contextPackLocalBundleCompressionV2613Doc.includes("Doctor interpretation"), "v2.6.13 bundle compression must summarize future release-note wording");
+  assert(contextPackLocalBundleCompressionV2613Doc.includes("does not support implementing Continuation Harness"), "v2.6.13 bundle compression must reject harness implementation");
+  assert(contextPackLocalBundleCompressionV2613Doc.includes("Status, Workflow Runner, or any JSON contract change"), "v2.6.13 bundle compression must reject status runner and JSON changes");
+  assert(contextPackLocalBundleCompressionV2613Doc.includes("continuation_harness_lite_status: not_started"), "v2.6.13 bundle compression must keep harness not started");
+  assert(contextPackLocalBundleCompressionV2613Doc.includes("status_command_status: not_started"), "v2.6.13 bundle compression must keep status command not started");
+  assert(contextPackLocalBundleCompressionV2613Doc.includes("workflow_runner_status: not_started"), "v2.6.13 bundle compression must keep workflow runner not started");
+  assert(contextPackLocalBundleCompressionV2613Doc.includes("json_contract_change_status: not_started"), "v2.6.13 bundle compression must keep JSON contract change not started");
+  assert(contextPackLocalBundleCompressionV2613Doc.includes("No new CLI command"), "v2.6.13 bundle compression must reject new commands");
+  assert(contextPackLocalBundleCompressionV2613Doc.includes("No Context Pack seven-file structure change"), "v2.6.13 bundle compression must preserve seven-file structure");
+  assert(contextPackLocalBundleCompressionV2613Doc.includes("No `check --input <dir> --json` top-level shape change"), "v2.6.13 bundle compression must preserve checker JSON shape");
+  assert(contextPackLocalBundleCompressionV2613Doc.includes("No Resume JSON contract change"), "v2.6.13 bundle compression must preserve resume JSON contract");
+  assert(contextPackLocalBundleCompressionV2613Doc.includes("No Doctor JSON contract change"), "v2.6.13 bundle compression must preserve doctor JSON contract");
+  assert(contextPackLocalBundleCompressionV2613Doc.includes("No Export JSON contract change"), "v2.6.13 bundle compression must preserve export JSON contract");
+  assert(contextPackLocalBundleCompressionV2613Doc.includes("No Status command"), "v2.6.13 bundle compression must reject status command");
+  assert(contextPackLocalBundleCompressionV2613Doc.includes("No Workflow Runner"), "v2.6.13 bundle compression must reject workflow runner");
+  assert(contextPackLocalBundleCompressionV2613Doc.includes("No Continuation Harness Lite implementation"), "v2.6.13 bundle compression must reject harness implementation");
+  assert(contextPackLocalBundleCompressionV2613Doc.includes("No provider request"), "v2.6.13 bundle compression must reject provider requests");
+  assert(contextPackLocalBundleCompressionV2613Doc.includes("No runtime integration"), "v2.6.13 bundle compression must reject runtime integration");
+  assert(contextPackLocalBundleCompressionV2613Doc.includes("No MCP server"), "v2.6.13 bundle compression must reject MCP server");
+  assert(contextPackLocalBundleCompressionV2613Doc.includes("No MCP tools"), "v2.6.13 bundle compression must reject MCP tools");
+  assert(contextPackLocalBundleCompressionV2613Doc.includes("No plugin"), "v2.6.13 bundle compression must reject plugin scope");
+  assert(contextPackLocalBundleCompressionV2613Doc.includes("No schema-v2"), "v2.6.13 bundle compression must reject schema-v2");
+  assert(contextPackLocalBundleCompressionV2613Doc.includes("No daemon"), "v2.6.13 bundle compression must reject daemon");
+  assert(contextPackLocalBundleCompressionV2613Doc.includes("No watcher"), "v2.6.13 bundle compression must reject watcher");
+  assert(contextPackLocalBundleCompressionV2613Doc.includes("No hosted memory"), "v2.6.13 bundle compression must reject hosted memory");
+  assert(contextPackLocalBundleCompressionV2613Doc.includes("No push, tag, release"), "v2.6.13 bundle compression must reject publication actions");
+  assert(contextPackLocalBundleCompressionV2613Doc.includes("provider_probe_status=skipped"), "v2.6.13 bundle compression must preserve skipped provider gate");
+  assert(!/(^|[^A-Za-z])[A-Za-z]:[\\/]/.test(contextPackLocalBundleCompressionV2613Doc), "v2.6.13 bundle compression must not expose drive-letter absolute paths");
+  assert(!/\\\\/.test(contextPackLocalBundleCompressionV2613Doc), "v2.6.13 bundle compression must not expose UNC paths");
   assert(contextPackDoctorDogfoodingDoc.includes("Context Pack Doctor Dogfooding v2.5.0"), "doctor dogfooding doc must have stable title");
   assert(contextPackDoctorDogfoodingDoc.includes("doctor_contract_version: basebrief-doctor-v1"), "doctor dogfooding must record contract version");
   assert(contextPackDoctorDogfoodingDoc.includes("doctor_command_status: warning"), "doctor dogfooding must record warning status");
