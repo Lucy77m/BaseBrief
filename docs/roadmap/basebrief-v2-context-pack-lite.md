@@ -487,6 +487,12 @@ a decision spec only with implementation_status: not_started; it does not add a
 command, Status command, Workflow Runner, provider request, runtime integration,
 MCP server/tools, plugin, schema-v2, hosted memory, or JSON contract change.
 
+`docs/dogfooding/context-pack-ahead14-bundle-review-v2.6.17.md` reviews the
+ahead-14 local adoption bundle and separates release-note candidates,
+dogfooding-only evidence, and future feature gates. It is not a release
+closeout, push/tag/release action, feature implementation, Continuation Harness
+implementation, Status command, Workflow Runner, or JSON contract change.
+
 ### Later Workflow Runner Lite
 
 Only after Context Pack Lite, Context Pack Check, One-command Resume,

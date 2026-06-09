@@ -213,6 +213,7 @@ function checkRequiredFiles() {
     "docs/dogfooding/context-pack-release-check-maintainability-v2.6.14.md",
     "docs/dogfooding/context-pack-major-release-candidate-shape-v2.6.15.md",
     "docs/dogfooding/context-pack-continuation-harness-decision-spec-v2.6.16.md",
+    "docs/dogfooding/context-pack-ahead14-bundle-review-v2.6.17.md",
     "docs/testing-v0.4.x-test-matrix.md",
     "docs/testing-v0.6.x-test-matrix.md",
     "docs/testing-v0.7.x-test-matrix.md",
@@ -517,6 +518,7 @@ function checkContentContracts() {
   const contextPackReleaseCheckMaintainabilityV2614Doc = readText("docs/dogfooding/context-pack-release-check-maintainability-v2.6.14.md");
   const contextPackMajorReleaseCandidateShapeV2615Doc = readText("docs/dogfooding/context-pack-major-release-candidate-shape-v2.6.15.md");
   const contextPackContinuationHarnessDecisionSpecV2616Doc = readText("docs/dogfooding/context-pack-continuation-harness-decision-spec-v2.6.16.md");
+  const contextPackAhead14BundleReviewV2617Doc = readText("docs/dogfooding/context-pack-ahead14-bundle-review-v2.6.17.md");
   const postReleaseBaselineDoc = readText("docs/baselines/v0.4.0-post-release-baseline.md");
   const v060PostReleaseBaselineDoc = readText("docs/baselines/v0.6.0-post-release-baseline.md");
   const projectStateModelDoc = readText("docs/design/project-state-model.md");
@@ -1068,6 +1070,11 @@ function checkContentContracts() {
   assertIncludesPhrase(testingDoc, "evidence thresholds that must be met before any future harness work begins", "Testing docs must summarize v2.6.16 evidence threshold");
   assertIncludesPhrase(testingDoc, "context-pack -> check -> resume -> live recheck", "Testing docs must summarize v2.6.16 handoff sequence");
   assert(testingDoc.includes("Status") && testingDoc.includes("Workflow Runner") && testingDoc.includes("JSON contract changes out of scope"), "Testing docs must keep v2.6.16 out of behavior scope");
+  assert(testingDoc.includes("v2.6.17 Context Pack Ahead-14 Bundle Review"), "Testing docs must document v2.6.17 ahead-14 bundle review");
+  assert(testingDoc.includes("dogfooding/context-pack-ahead14-bundle-review-v2.6.17.md"), "Testing docs must link v2.6.17 ahead-14 bundle review");
+  assertIncludesPhrase(testingDoc, "separates release-note candidates, dogfooding-only evidence, and future feature gates", "Testing docs must summarize v2.6.17 three-way split");
+  assertIncludesPhrase(testingDoc, "without becoming frequent push/tag/release churn", "Testing docs must keep v2.6.17 out of publish churn");
+  assert(testingDoc.includes("Continuation Harness Lite") && testingDoc.includes("Status") && testingDoc.includes("Workflow Runner") && testingDoc.includes("JSON contract changes out of scope"), "Testing docs must keep v2.6.17 out of behavior scope");
   assert(testingDoc.includes("checker_error_propagation_status: pass"), "Testing docs must record checker-error propagation");
   assert(testingDoc.includes("context-pack --repo <target-repo>"), "Testing docs must document context-pack command");
   assert(testingDoc.includes("resume --input <context-pack-dir>"), "Testing docs must document resume command");
@@ -1606,6 +1613,7 @@ function checkContentContracts() {
   assert(docsIndex.includes("dogfooding/context-pack-release-check-maintainability-v2.6.14.md"), "Docs index must link v2.6.14 release-check maintainability");
   assert(docsIndex.includes("dogfooding/context-pack-major-release-candidate-shape-v2.6.15.md"), "Docs index must link v2.6.15 major-release candidate shape");
   assert(docsIndex.includes("dogfooding/context-pack-continuation-harness-decision-spec-v2.6.16.md"), "Docs index must link v2.6.16 harness decision spec");
+  assert(docsIndex.includes("dogfooding/context-pack-ahead14-bundle-review-v2.6.17.md"), "Docs index must link v2.6.17 ahead-14 bundle review");
   assert(docsIndex.includes("specs/context-pack-lite.md"), "Docs index must link context pack lite spec");
   assert(docsIndex.includes("specs/context-pack-resume.md"), "Docs index must link context pack resume spec");
   assert(docsIndex.includes("specs/basebrief-format.md"), "Docs index must link basebrief format spec");
@@ -1696,6 +1704,11 @@ function checkContentContracts() {
   assert(v2ContextPackRoadmapDoc.includes("implementation_status: not_started"), "v2 roadmap must keep v2.6.16 implementation not started");
   assertIncludesPhrase(v2ContextPackRoadmapDoc, "does not add a command, Status command, Workflow Runner", "v2 roadmap must keep v2.6.16 out of command and runner scope");
   assertIncludesPhrase(v2ContextPackRoadmapDoc, "provider request, runtime integration, MCP server/tools, plugin, schema-v2, hosted memory, or JSON contract change", "v2 roadmap must keep v2.6.16 out of integration and JSON scope");
+  assert(v2ContextPackRoadmapDoc.includes("docs/dogfooding/context-pack-ahead14-bundle-review-v2.6.17.md"), "v2 roadmap must link v2.6.17 ahead-14 bundle review");
+  assertIncludesPhrase(v2ContextPackRoadmapDoc, "ahead-14 local adoption bundle", "v2 roadmap must summarize v2.6.17 ahead-14 bundle");
+  assertIncludesPhrase(v2ContextPackRoadmapDoc, "release-note candidates, dogfooding-only evidence, and future feature gates", "v2 roadmap must summarize v2.6.17 three-way split");
+  assertIncludesPhrase(v2ContextPackRoadmapDoc, "not a release closeout, push/tag/release action, feature implementation", "v2 roadmap must keep v2.6.17 out of release and feature scope");
+  assertIncludesPhrase(v2ContextPackRoadmapDoc, "Continuation Harness implementation, Status command, Workflow Runner, or JSON contract change", "v2 roadmap must keep v2.6.17 out of behavior scope");
   assert(v2ContextPackRoadmapDoc.includes("exports/manifest.json"), "v2 roadmap must define export manifest");
   assert(v2ContextPackRoadmapDoc.includes("exports/context-pack.md"), "v2 roadmap must define readable export");
   assert(v2ContextPackRoadmapDoc.includes("exports/context.json"), "v2 roadmap must define machine-readable export");
@@ -2394,6 +2407,44 @@ function checkContentContracts() {
   assert(contextPackContinuationHarnessDecisionSpecV2616Doc.includes("provider_probe_status=skipped"), "v2.6.16 harness decision spec must preserve skipped provider gate");
   assert(!/(^|[^A-Za-z])[A-Za-z]:[\\/]/.test(contextPackContinuationHarnessDecisionSpecV2616Doc), "v2.6.16 harness decision spec must not expose drive-letter absolute paths");
   assert(!/\\\\/.test(contextPackContinuationHarnessDecisionSpecV2616Doc), "v2.6.16 harness decision spec must not expose UNC paths");
+  assert(contextPackAhead14BundleReviewV2617Doc.includes("Context Pack Ahead-14 Bundle Review v2.6.17"), "v2.6.17 ahead-14 bundle review doc must have stable title");
+  assertIncludesPhrase(contextPackAhead14BundleReviewV2617Doc, "local bundle review only, not a release closeout", "v2.6.17 ahead-14 bundle review must avoid release closeout claims");
+  assert(contextPackAhead14BundleReviewV2617Doc.includes("bundle_review_status: draft_only"), "v2.6.17 ahead-14 bundle review must stay draft only");
+  assert(contextPackAhead14BundleReviewV2617Doc.includes("local_bundle_status: ahead-14 adoption sedimentation"), "v2.6.17 ahead-14 bundle review must record ahead-14 status");
+  assert(contextPackAhead14BundleReviewV2617Doc.includes("release_closeout_status: not_started"), "v2.6.17 ahead-14 bundle review must keep release closeout not started");
+  assert(contextPackAhead14BundleReviewV2617Doc.includes("push_status: not_started"), "v2.6.17 ahead-14 bundle review must keep push not started");
+  assert(contextPackAhead14BundleReviewV2617Doc.includes("tag_status: not_started"), "v2.6.17 ahead-14 bundle review must keep tag not started");
+  assert(contextPackAhead14BundleReviewV2617Doc.includes("release_status: not_started"), "v2.6.17 ahead-14 bundle review must keep release not started");
+  assert(contextPackAhead14BundleReviewV2617Doc.includes("implementation_status: not_started"), "v2.6.17 ahead-14 bundle review must keep implementation not started");
+  assert(contextPackAhead14BundleReviewV2617Doc.includes("continuation_harness_lite_status: not_started"), "v2.6.17 ahead-14 bundle review must keep harness not started");
+  assert(contextPackAhead14BundleReviewV2617Doc.includes("status_command_status: not_started"), "v2.6.17 ahead-14 bundle review must keep status command not started");
+  assert(contextPackAhead14BundleReviewV2617Doc.includes("workflow_runner_status: not_started"), "v2.6.17 ahead-14 bundle review must keep workflow runner not started");
+  assert(contextPackAhead14BundleReviewV2617Doc.includes("json_contract_change_status: not_started"), "v2.6.17 ahead-14 bundle review must keep JSON contract change not started");
+  assert(contextPackAhead14BundleReviewV2617Doc.includes("## Release-Note Candidates"), "v2.6.17 ahead-14 bundle review must include release-note candidates");
+  assert(contextPackAhead14BundleReviewV2617Doc.includes("## Dogfooding-Only Evidence"), "v2.6.17 ahead-14 bundle review must include dogfooding-only evidence");
+  assert(contextPackAhead14BundleReviewV2617Doc.includes("## Future Feature Gates"), "v2.6.17 ahead-14 bundle review must include future feature gates");
+  assert(contextPackAhead14BundleReviewV2617Doc.includes("First-run adoption polish") && contextPackAhead14BundleReviewV2617Doc.includes("Context Pack interpretation") && contextPackAhead14BundleReviewV2617Doc.includes("Diagnostics confidence") && contextPackAhead14BundleReviewV2617Doc.includes("Maintenance hardening"), "v2.6.17 ahead-14 bundle review must classify release-note candidates");
+  assert(contextPackAhead14BundleReviewV2617Doc.includes("Per-slice v2.6.x local chronology") && contextPackAhead14BundleReviewV2617Doc.includes("Private output paths") && contextPackAhead14BundleReviewV2617Doc.includes("Detailed release-check assertion wording"), "v2.6.17 ahead-14 bundle review must classify dogfooding-only evidence");
+  assertIncludesPhrase(contextPackAhead14BundleReviewV2617Doc, "Keep the ahead-14 bundle local", "v2.6.17 ahead-14 bundle review must keep bundle local");
+  assert(contextPackAhead14BundleReviewV2617Doc.includes("No new CLI command"), "v2.6.17 ahead-14 bundle review must reject new commands");
+  assert(contextPackAhead14BundleReviewV2617Doc.includes("No Context Pack seven-file structure change"), "v2.6.17 ahead-14 bundle review must preserve seven-file structure");
+  assert(contextPackAhead14BundleReviewV2617Doc.includes("No `check --input <dir> --json` top-level shape change"), "v2.6.17 ahead-14 bundle review must preserve checker JSON shape");
+  assert(contextPackAhead14BundleReviewV2617Doc.includes("No Resume JSON contract change"), "v2.6.17 ahead-14 bundle review must preserve resume JSON contract");
+  assert(contextPackAhead14BundleReviewV2617Doc.includes("No Doctor JSON contract change"), "v2.6.17 ahead-14 bundle review must preserve doctor JSON contract");
+  assert(contextPackAhead14BundleReviewV2617Doc.includes("No Export JSON contract change"), "v2.6.17 ahead-14 bundle review must preserve export JSON contract");
+  assert(contextPackAhead14BundleReviewV2617Doc.includes("No Status command"), "v2.6.17 ahead-14 bundle review must reject status command");
+  assert(contextPackAhead14BundleReviewV2617Doc.includes("No Workflow Runner"), "v2.6.17 ahead-14 bundle review must reject workflow runner");
+  assert(contextPackAhead14BundleReviewV2617Doc.includes("No Continuation Harness Lite implementation"), "v2.6.17 ahead-14 bundle review must reject harness implementation");
+  assert(contextPackAhead14BundleReviewV2617Doc.includes("No provider request"), "v2.6.17 ahead-14 bundle review must reject provider requests");
+  assert(contextPackAhead14BundleReviewV2617Doc.includes("No runtime integration"), "v2.6.17 ahead-14 bundle review must reject runtime integration");
+  assert(contextPackAhead14BundleReviewV2617Doc.includes("No MCP server"), "v2.6.17 ahead-14 bundle review must reject MCP server");
+  assert(contextPackAhead14BundleReviewV2617Doc.includes("No MCP tools"), "v2.6.17 ahead-14 bundle review must reject MCP tools");
+  assert(contextPackAhead14BundleReviewV2617Doc.includes("No plugin"), "v2.6.17 ahead-14 bundle review must reject plugin scope");
+  assert(contextPackAhead14BundleReviewV2617Doc.includes("No schema-v2"), "v2.6.17 ahead-14 bundle review must reject schema-v2");
+  assert(contextPackAhead14BundleReviewV2617Doc.includes("No hosted memory"), "v2.6.17 ahead-14 bundle review must reject hosted memory");
+  assert(contextPackAhead14BundleReviewV2617Doc.includes("provider_probe_status=skipped"), "v2.6.17 ahead-14 bundle review must preserve skipped provider gate");
+  assert(!/(^|[^A-Za-z])[A-Za-z]:[\\/]/.test(contextPackAhead14BundleReviewV2617Doc), "v2.6.17 ahead-14 bundle review must not expose drive-letter absolute paths");
+  assert(!/\\\\/.test(contextPackAhead14BundleReviewV2617Doc), "v2.6.17 ahead-14 bundle review must not expose UNC paths");
   assert(contextPackDoctorDogfoodingDoc.includes("Context Pack Doctor Dogfooding v2.5.0"), "doctor dogfooding doc must have stable title");
   assert(contextPackDoctorDogfoodingDoc.includes("doctor_contract_version: basebrief-doctor-v1"), "doctor dogfooding must record contract version");
   assert(contextPackDoctorDogfoodingDoc.includes("doctor_command_status: warning"), "doctor dogfooding must record warning status");

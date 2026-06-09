@@ -1119,6 +1119,25 @@ Expected release-check output without provider env remains:
 provider_probe_status=skipped
 ```
 
+## v2.6.17 Context Pack Ahead-14 Bundle Review
+
+`v2.6.17` is a local ahead-14 bundle review, not a release closeout or feature
+implementation. It separates release-note candidates, dogfooding-only evidence,
+and future feature gates so the local bundle can inform a larger future release
+without becoming frequent push/tag/release churn.
+
+The evidence is recorded in
+[Context Pack Ahead-14 Bundle Review v2.6.17](dogfooding/context-pack-ahead14-bundle-review-v2.6.17.md).
+It keeps Continuation Harness Lite, Status, Workflow Runner, provider request,
+runtime integration, MCP server/tools, plugin, schema-v2, hosted memory, and
+JSON contract changes out of scope.
+
+Expected release-check output without provider env remains:
+
+```text
+provider_probe_status=skipped
+```
+
 ## v0.4.1 Stabilization Candidate
 
 `v0.4.1` is a stabilization-only cycle after the `v0.4.0` public release. It uses
