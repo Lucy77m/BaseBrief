@@ -678,6 +678,17 @@ candidate only, while Status, Workflow Runner, Doctor expansion,
 provider/runtime integration, MCP, plugin, schema-v2, daemon, watcher, hosted
 memory, publish, push, tag, release, and PR work stay closed.
 
+`docs/dogfooding/context-pack-release-candidate-decision-v2.6.32.md` chooses
+the release-candidate decision path before v2.7 implementation. It compresses
+the ahead-28 local bundle into future release-note candidates, dogfooding-only
+evidence, release-check / contract protections, and deferred feature gates. It
+records `release_candidate_status: decision_ready_not_published`, keeps v2.7
+implementation deferred until the decision explains any remaining user-facing
+gap, and keeps new commands, package scripts, release-check output shape,
+Context Pack structure, JSON contracts, Status, Workflow Runner, Doctor
+expansion, provider/runtime integration, MCP, plugin, schema-v2, daemon,
+watcher, hosted memory, publish, push, tag, release, and PR work closed.
+
 ### Later Workflow Runner Lite
 
 Only after Context Pack Lite, Context Pack Check, One-command Resume,
