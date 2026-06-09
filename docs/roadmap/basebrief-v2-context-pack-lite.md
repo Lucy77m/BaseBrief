@@ -606,6 +606,19 @@ alter the Context Pack seven-file structure, start CI, or open Status, Workflow
 Runner, Doctor expansion, provider/runtime integration, MCP, plugin, schema-v2,
 daemon, watcher, hosted memory, publish, push, tag, release, or PR work.
 
+`docs/dogfooding/context-pack-test-file-split-v2.6.27.md` implements the first
+test-file split from the v2.6.26 plan. Context Pack v2, File-only Export,
+Doctor, and Resume tests now live in `tests/context-pack.test.js`; broader
+release-line, receiver, project state, sidecar, delta, Seal/Diff, ContextOps,
+cache-ready, benchmark, and relay audit coverage remains in
+`tests/basebrief.test.js`. The public validation entry remains `npm test`, now
+running `node --test tests/basebrief.test.js tests/context-pack.test.js`, with
+expected test count still 175 and `independent_test_files=2`. It does not add a
+CLI command, change release-check output shape, change JSON contracts, alter
+the Context Pack seven-file structure, start CI, or open Status, Workflow
+Runner, Doctor expansion, provider/runtime integration, MCP, plugin, schema-v2,
+daemon, watcher, hosted memory, publish, push, tag, release, or PR work.
+
 ### Later Workflow Runner Lite
 
 Only after Context Pack Lite, Context Pack Check, One-command Resume,

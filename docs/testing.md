@@ -1398,6 +1398,30 @@ Expected release-check output without provider env remains:
 provider_probe_status=skipped
 ```
 
+## v2.6.27 Context Pack Test-File Split
+
+`v2.6.27` implements the first test-file split planned in `v2.6.26`. Context
+Pack v2, File-only Export, Doctor, and Resume tests now live in
+`tests/context-pack.test.js`; the broader suite remains in
+`tests/basebrief.test.js`.
+
+The implementation is recorded in
+[Context Pack Test-File Split v2.6.27](dogfooding/context-pack-test-file-split-v2.6.27.md).
+The public validation entry remains `npm test`, now backed by:
+
+```text
+node --test tests/basebrief.test.js tests/context-pack.test.js
+```
+
+Expected test count remains 175 tests. `npm run release-check` should report
+`independent_test_files=2` while keeping `provider_probe_status=skipped`.
+
+It does not add a CLI command, change release-check output shape, change
+Context Pack structure, change `check --input <dir> --json`, change
+Resume/Doctor/Export JSON contracts, start CI, or open Status, Workflow
+Runner, Doctor expansion, provider/runtime integration, MCP, plugin,
+schema-v2, daemon, watcher, hosted memory, push, tag, release, or PR work.
+
 ## v0.4.1 Stabilization Candidate
 
 `v0.4.1` is a stabilization-only cycle after the `v0.4.0` public release. It uses
