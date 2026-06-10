@@ -222,7 +222,7 @@ test("README homepage stays simple and routes advanced commands away from first-
   assert.ok((readme.match(/\]\(/g) || []).length <= 12);
   assert.ok((englishReadme.match(/\]\(/g) || []).length <= 12);
 
-  assert.match(readme, /不再让 AI 项目换窗口就失忆。/);
+  assert.match(readme, /我会带着上下文，一万次回到那个项目现场。/);
   assert.match(englishReadme, /Stop losing context between AI coding sessions\./);
   assert.match(readme, /continue --repo \. --output-dir tests\/outputs\/private\/continue/);
   assert.match(englishReadme, /continue --repo \. --output-dir tests\/outputs\/private\/continue/);

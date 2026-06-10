@@ -1,6 +1,6 @@
 # BaseBrief
 
-> 不再让 AI 项目换窗口就失忆。
+> 我会带着上下文，一万次回到那个项目现场。
 
 BaseBrief 是一个 local-first 的 AI 项目接续工具。
 
@@ -11,7 +11,7 @@ English README: [README.en.md](README.en.md)
 ## 什么时候用
 
 - 你和 AI 做了一个项目，但窗口快爆了。
-- 你想从 ChatGPT 切到 Codex、Claude、Cursor 或另一个工具。
+- 你想从 OpenCode 切到 Codex、Claude、Cursor 或另一个工具。
 - 你不想每次手写项目背景、已完成内容和下一步。
 - 你希望下一个 AI 先理解现状、边界和风险，再继续动手。
 

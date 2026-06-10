@@ -2704,8 +2704,9 @@ function checkContentContracts() {
   assert(englishReadme.split(/\r?\n/).length <= 90, "README.en.md should stay a 2-minute public front door");
   assert((readme.match(/\]\(/g) || []).length <= 12, "README.md should keep a small curated link set");
   assert((englishReadme.match(/\]\(/g) || []).length <= 12, "README.en.md should keep a small curated link set");
-  assert(readme.includes("不再让 AI 项目换窗口就失忆。"), "README.md must keep the public-freeze homepage hook");
+  assert(readme.includes("我会带着上下文，一万次回到那个项目现场。"), "README.md must keep the approved homepage hook");
   assert(englishReadme.includes("Stop losing context between AI coding sessions."), "README.en.md must keep the public-freeze homepage hook");
+  assert(readme.includes("你想从 OpenCode 切到 Codex、Claude、Cursor 或另一个工具。"), "README.md must name OpenCode in the tool-switching example");
   assert(readme.includes("local-first"), "README.md must make the local-first positioning clear");
   assert(englishReadme.includes("local-first"), "README.en.md must make the local-first positioning clear");
   assert(readme.includes("README.en.md"), "README.md should link to README.en.md");
