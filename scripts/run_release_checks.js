@@ -265,6 +265,7 @@ function checkRequiredFiles() {
     "docs/releases/v2.9.0-plan.md",
     "docs/releases/v2.9.0.md",
     "docs/releases/v2.9.1.md",
+    "docs/releases/v3.0.0-plan.md",
     "docs/specs/context-pack-resume.md",
     "docs/specs/basebrief-format.md",
     "docs/specs/file-only-export.md",
@@ -496,6 +497,7 @@ function checkV2ContextPackDocs(context) {
     v290PlanDoc,
     v290ReleaseDoc,
     v291ReleaseDoc,
+    v300PlanDoc,
     continuationHarnessDogfoodingDoc,
     basebriefCliScript,
     basebriefContinuationHarnessScript,
@@ -1098,7 +1100,9 @@ function checkV2ContextPackDocs(context) {
   assert(docsIndex.includes("releases/v2.9.0-plan.md"), "Docs index must link v2.9 project profile plan");
   assert(docsIndex.includes("releases/v2.9.0.md"), "Docs index must link v2.9 project profile closeout");
   assert(docsIndex.includes("releases/v2.9.1.md"), "Docs index must link v2.9.1 project profile polish");
+  assert(docsIndex.includes("releases/v3.0.0-plan.md"), "Docs index must link v3.0 workflow runner plan");
   assert(docsIndex.includes("../examples/project-profile-lite/README.md"), "Docs index must link project profile example kit");
+  assert(testingDoc.includes("v3.0.0 Workflow Runner Lite Plan") && testingDoc.includes("research/spec"), "Testing docs must document v3.0 workflow runner research/spec plan");
   assert(v2ContextPackRoadmapDoc.includes("v2.8 Continuation Harness Lite"), "v2 roadmap must name v2.8 continuation harness");
   assert(v2ContextPackRoadmapDoc.includes("docs/dogfooding/continuation-harness-lite-v2.8.0.md"), "v2 roadmap must link v2.8 dogfooding");
   assert(v2ContextPackRoadmapDoc.includes("expected test count") && v2ContextPackRoadmapDoc.includes("independent_test_files=4"), "v2 roadmap must document v2.8 validation metrics");
@@ -1107,6 +1111,8 @@ function checkV2ContextPackDocs(context) {
   assert(v2ContextPackRoadmapDoc.includes("tests/project-profile.test.js") && v2ContextPackRoadmapDoc.includes("independent_test_files=5"), "v2 roadmap must document v2.9 validation metrics");
   assert(v2ContextPackRoadmapDoc.includes("docs/releases/v2.9.1.md"), "v2 roadmap must link v2.9.1 polish");
   assert(v2ContextPackRoadmapDoc.includes("current working directory") && v2ContextPackRoadmapDoc.includes("Expected test count is 186"), "v2 roadmap must document v2.9.1 cwd hint polish");
+  assert(v2ContextPackRoadmapDoc.includes("v3.0 Workflow Runner Lite Research"), "v2 roadmap must name v3.0 workflow runner research");
+  assert(v2ContextPackRoadmapDoc.includes("Project Profile -> Continue -> Context Pack -> Check -> Resume starter"), "v2 roadmap must preserve v3.0 proposed workflow chain");
 
   assert(v280PlanDoc.includes("v2.8.0 Continuation Harness Lite Plan"), "v2.8 plan must have stable title");
   assert(v280PlanDoc.includes("context-pack -> check -> resume"), "v2.8 plan must preserve command sequence");
@@ -1172,6 +1178,22 @@ function checkV2ContextPackDocs(context) {
   assert(v291ReleaseDoc.includes("current working directory") && v291ReleaseDoc.includes("repo_hint"), "v2.9.1 closeout must document cwd repo hint fallback");
   assert(v291ReleaseDoc.includes("profile-init --repo . --output <temp>/basebrief-profile.json") && v291ReleaseDoc.includes("continue --profile <temp>/basebrief-profile.json"), "v2.9.1 closeout must record dogfooding scenario");
   assert(v291ReleaseDoc.includes("No Workflow Runner") && v291ReleaseDoc.includes("No global config") && v291ReleaseDoc.includes("No secret store"), "v2.9.1 closeout must preserve profile boundaries");
+
+  assert(v300PlanDoc.includes("v3.0.0 Workflow Runner Lite Plan"), "v3.0 plan must have stable title");
+  assert(v300PlanDoc.includes("v3.0-A research/spec"), "v3.0 plan must record research/spec status");
+  assert(v300PlanDoc.includes("This plan is research/spec only"), "v3.0 plan must preserve planning-only scope");
+  assert(v300PlanDoc.includes("does not add a runner script, CLI command"), "v3.0 plan must reject implementation in this step");
+  assert(v300PlanDoc.includes("Project Profile -> Continue -> Context Pack -> Check -> Resume starter"), "v3.0 plan must preserve proposed workflow chain");
+  assert(v300PlanDoc.includes("node scripts/basebrief.js workflow --profile <profile.json> --output-dir <dir>"), "v3.0 plan must document future command shape");
+  assert(v300PlanDoc.includes("basebrief-workflow-lite-v1"), "v3.0 plan must define future workflow contract");
+  assert(v300PlanDoc.includes("must not include the full resume prompt body") && v300PlanDoc.includes("human-only `next_step`"), "v3.0 plan must keep prompt and human hints out of JSON");
+  assert(v300PlanDoc.includes("No provider request.") && v300PlanDoc.includes("No raw private output."), "v3.0 plan must preserve public-safe provider boundaries");
+  assert(v300PlanDoc.includes("No runtime integration.") && v300PlanDoc.includes("No plugin."), "v3.0 plan must reject runtime and plugin scope");
+  assert(v300PlanDoc.includes("No MCP server.") && v300PlanDoc.includes("No MCP tools."), "v3.0 plan must reject MCP scope");
+  assert(v300PlanDoc.includes("No schema-v2.") && v300PlanDoc.includes("No CI workflow."), "v3.0 plan must reject schema-v2 and CI scope");
+  assert(v300PlanDoc.includes("No daemon.") && v300PlanDoc.includes("No watcher."), "v3.0 plan must reject background automation");
+  assert(v300PlanDoc.includes("No automatic project task implementation."), "v3.0 plan must reject automatic project work");
+  assert(v300PlanDoc.includes("No automatic commit, push, tag, release"), "v3.0 plan must reject automatic release actions");
 
   assert(projectProfileExampleReadme.includes("Project Profile Lite Example Kit"), "Project Profile example kit must have stable title");
   assert(projectProfileExampleReadme.includes("basebrief-project-profile-v1"), "Project Profile example kit must name contract");
@@ -2497,6 +2519,7 @@ function checkContentContracts() {
   const v290PlanDoc = readText("docs/releases/v2.9.0-plan.md");
   const v290ReleaseDoc = readText("docs/releases/v2.9.0.md");
   const v291ReleaseDoc = readText("docs/releases/v2.9.1.md");
+  const v300PlanDoc = readText("docs/releases/v3.0.0-plan.md");
   const contextPackResumeSpecDoc = readText("docs/specs/context-pack-resume.md");
   const basebriefFormatSpecDoc = readText("docs/specs/basebrief-format.md");
   const fileOnlyExportSpecDoc = readText("docs/specs/file-only-export.md");
@@ -3070,6 +3093,7 @@ function checkContentContracts() {
     v290PlanDoc,
     v290ReleaseDoc,
     v291ReleaseDoc,
+    v300PlanDoc,
     continuationHarnessDogfoodingDoc,
     basebriefCliScript,
     basebriefContinuationHarnessScript,

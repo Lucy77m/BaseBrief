@@ -850,12 +850,27 @@ Context Pack Check, Resume, Export, Doctor, and plain `continue --repo` JSON
 contracts and keeps `provider_probe_status=skipped` as the no-provider
 release-check gate.
 
-### Later Workflow Runner Lite
+### v3.0 Workflow Runner Lite Research
 
-Only after Context Pack Lite, Context Pack Check, One-command Resume,
-BaseBrief Format, and File-only Export prove useful in local dogfooding,
-consider a narrow runner that chains state, delta, context pack generation,
-check, and starter output.
+`docs/releases/v3.0.0-plan.md` opens the Workflow Runner Lite research/spec
+line after Project Profile / Recipes Lite dogfooding. The proposed future shape
+is a narrow local BaseBrief pipeline runner:
+
+```text
+Project Profile -> Continue -> Context Pack -> Check -> Resume starter
+```
+
+The proposed future command shape is:
+
+```text
+node scripts/basebrief.js workflow --profile <profile.json> --output-dir <dir> [--repo <target-repo>] [--since <commit>] [--max-files <n>] [--json]
+```
+
+This first v3.0 step is planning only. It does not add a runner script, new CLI
+command, JSON contract implementation, schema-v2, provider/runtime integration,
+plugin/MCP surface, daemon, watcher, CI workflow, or automatic project-task,
+git, or release actions. It keeps `provider_probe_status=skipped` as the
+no-provider release-check gate.
 
 ## Acceptance Criteria
 

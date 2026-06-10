@@ -81,6 +81,29 @@ This remains profile polish only. It does not store private absolute paths,
 change the profile contract, add global config, call providers, or become a
 Workflow Runner.
 
+## v3.0.0 Workflow Runner Lite Plan
+
+`v3.0.0-plan` opens a research/spec line for Workflow Runner Lite. This is a
+local BaseBrief pipeline runner proposal, not a platform or project automation
+surface.
+
+The proposed future command shape is:
+
+```text
+node scripts/basebrief.js workflow --profile <profile.json> --output-dir <dir> [--repo <target-repo>] [--since <commit>] [--max-files <n>] [--json]
+```
+
+This planning step adds no runner script, no CLI command, no JSON contract
+implementation, no schema-v2, no provider request, no runtime integration, no
+plugin, no MCP server/tools, no daemon/watcher, no CI workflow, and no automatic
+project-task or git/release action.
+
+Expected release-check output without provider env remains:
+
+```text
+provider_probe_status=skipped
+```
+
 `v0.9.0` is a public hardening line for the integrated local handoff path:
 receiver-ready handoff -> Project State -> Sidecar bundle -> receiver first
 response. It adds no provider request, runtime integration, schema change, Auto
