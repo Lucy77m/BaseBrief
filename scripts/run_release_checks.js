@@ -152,6 +152,9 @@ function checkRequiredFiles() {
     "templates/zh-CN/CACHE_READY_ANCHOR_PAD_INPUT.json",
     "docs/usage.md",
     "docs/index.md",
+    "docs/why-basebrief.md",
+    "docs/concepts-simple.md",
+    "docs/advanced.md",
     "docs/quickstart-5min.md",
     "docs/known-limitations.md",
     "docs/receiver-usage-pack.md",
@@ -265,6 +268,7 @@ function checkRequiredFiles() {
     "docs/releases/v2.9.0-plan.md",
     "docs/releases/v2.9.0.md",
     "docs/releases/v2.9.1.md",
+    "docs/releases/v2.10.0.md",
     "docs/releases/v3.0.0-plan.md",
     "docs/specs/context-pack-resume.md",
     "docs/specs/basebrief-format.md",
@@ -479,6 +483,12 @@ function checkRequiredFiles() {
     "examples/minimal/input-project-notes.md",
     "examples/minimal/output-basebrief-lite.md",
     "examples/minimal/next-chat-prompt.md",
+    "examples/simple-continuation/README.md",
+    "examples/simple-continuation/input/PROJECT_STATE.md",
+    "examples/simple-continuation/input/NOTES.md",
+    "examples/simple-continuation/output/CONTINUATION_REPORT.md",
+    "examples/simple-continuation/output/CHECK_SUMMARY.md",
+    "examples/simple-continuation/output/NEXT_WINDOW_STARTER.md",
     "tests/continuation-harness.test.js",
     "tests/workflow-runner.test.js",
     ".github/ISSUE_TEMPLATE/usability_feedback.md",
@@ -2419,6 +2429,9 @@ function checkContentContracts() {
   const integrationsDoc = readText("docs/integrations.md");
   const docsIndex = readText("docs/index.md");
   const quickstartDoc = readText("docs/quickstart-5min.md");
+  const whyBaseBriefDoc = readText("docs/why-basebrief.md");
+  const conceptsSimpleDoc = readText("docs/concepts-simple.md");
+  const advancedDoc = readText("docs/advanced.md");
   const knownLimitationsDoc = readText("docs/known-limitations.md");
   const receiverDifferenceExampleReadme = readText("examples/receiver/difference-found/README.md");
   const receiverBlockedExampleReadme = readText("examples/receiver/blocked/README.md");
@@ -2531,6 +2544,7 @@ function checkContentContracts() {
   const v290PlanDoc = readText("docs/releases/v2.9.0-plan.md");
   const v290ReleaseDoc = readText("docs/releases/v2.9.0.md");
   const v291ReleaseDoc = readText("docs/releases/v2.9.1.md");
+  const v2100ReleaseDoc = readText("docs/releases/v2.10.0.md");
   const v300PlanDoc = readText("docs/releases/v3.0.0-plan.md");
   const contextPackResumeSpecDoc = readText("docs/specs/context-pack-resume.md");
   const basebriefFormatSpecDoc = readText("docs/specs/basebrief-format.md");
@@ -2637,6 +2651,10 @@ function checkContentContracts() {
   const fileOnlyExportExampleAdapterNotes = readText("examples/file-only-export/exports/adapter-notes.md");
   const contextPackDoctorExampleReadme = readText("examples/context-pack-doctor/README.md");
   const minimalExampleReadme = readText("examples/minimal/README.md");
+  const simpleContinuationReadme = readText("examples/simple-continuation/README.md");
+  const simpleContinuationReport = readText("examples/simple-continuation/output/CONTINUATION_REPORT.md");
+  const simpleContinuationCheckSummary = readText("examples/simple-continuation/output/CHECK_SUMMARY.md");
+  const simpleContinuationStarter = readText("examples/simple-continuation/output/NEXT_WINDOW_STARTER.md");
   const fileOnlyExportExpectedSourceFiles = [
     "MANIFEST.md",
     "REPO_MAP.md",
@@ -2686,30 +2704,42 @@ function checkContentContracts() {
   assert(englishReadme.split(/\r?\n/).length <= 90, "README.en.md should stay a 2-minute public front door");
   assert((readme.match(/\]\(/g) || []).length <= 12, "README.md should keep a small curated link set");
   assert((englishReadme.match(/\]\(/g) || []).length <= 12, "README.en.md should keep a small curated link set");
-  assert(readme.includes("我会带着上下文，一万次回到那个项目现场。"), "README.md must keep the approved homepage hook");
-  assert(englishReadme.includes("I’ll return to the project scene with context in hand, every time."), "README.en.md must keep the approved homepage hook");
+  assert(readme.includes("不再让 AI 项目换窗口就失忆。"), "README.md must keep the public-freeze homepage hook");
+  assert(englishReadme.includes("Stop losing context between AI coding sessions."), "README.en.md must keep the public-freeze homepage hook");
   assert(readme.includes("local-first"), "README.md must make the local-first positioning clear");
   assert(englishReadme.includes("local-first"), "README.en.md must make the local-first positioning clear");
-  assert(readme.includes("一个公开 Skill 入口"), "README.md must state that BaseBrief has one public skill entry");
   assert(readme.includes("README.en.md"), "README.md should link to README.en.md");
-  assert(readme.includes("docs/quickstart-5min.md"), "README.md should link to the quickstart");
-  assert(readme.includes("docs/index.md"), "README.md should link to the documentation index");
-  assert(readme.includes("docs/cli-lite.md"), "README.md should link to CLI Lite docs");
+  assert(readme.includes("node scripts/basebrief.js continue --repo . --output-dir tests/outputs/private/continue"), "README.md must lead with the simple continue command");
+  assert(englishReadme.includes("node scripts/basebrief.js continue --repo . --output-dir tests/outputs/private/continue"), "README.en.md must lead with the simple continue command");
+  ["NEXT_WINDOW_STARTER.md", "CHECK_SUMMARY.md", "CONTINUATION_REPORT.md", "context-pack/"].forEach((entry) => {
+    assert(readme.includes(entry), `README.md must explain first-run output: ${entry}`);
+    assert(englishReadme.includes(entry), `README.en.md must explain first-run output: ${entry}`);
+  });
+  [
+    "examples/simple-continuation/README.md",
+    "docs/why-basebrief.md",
+    "docs/concepts-simple.md",
+    "docs/quickstart-5min.md",
+    "docs/advanced.md",
+    "docs/index.md",
+  ].forEach((entry) => {
+    assert(readme.includes(entry), `README.md should route to ${entry}`);
+    assert(englishReadme.includes(entry), `README.en.md should route to ${entry}`);
+  });
   assert(readme.includes("普通项目接续默认只在 `full` 和 `lite` 之间选择"), "README.md must keep full/lite as the normal route");
   assert(readme.includes("`cache-ready` 只保留为显式 prompt-cache 实验路线"), "README.md must keep cache-ready experimental");
-  assert(readme.includes("零依赖 CLI Lite"), "README.md must describe the existing CLI Lite");
-  assert(readme.includes("context-pack --repo <target-repo> --output-dir <dir>"), "README.md should mention context-pack command");
-  assert(readme.includes("check --input <context-pack-dir>"), "README.md should mention check command");
-  assert(readme.includes("resume --input <context-pack-dir>"), "README.md should mention resume command");
-  assert(readme.includes("export --input <context-pack-dir> --output-dir <dir>"), "README.md should mention export command");
-  assert(readme.includes("doctor --repo <target-repo> --context-pack <context-pack-dir>"), "README.md should mention doctor command");
-  assert(readme.includes("MCP-friendly means future tool-consumable files"), "README.md must keep file-only MCP-friendly wording");
-  assert(readme.includes("No provider request"), "README.md should preserve no-provider boundary");
-  assert(readme.includes("No raw private output"), "README.md should preserve raw-output boundary");
-  assert(readme.includes("No runtime integration"), "README.md should preserve runtime boundary");
-  assert(readme.includes("No schema change"), "README.md should preserve schema boundary");
-  assert(readme.includes("No MCP server"), "README.md should preserve MCP server boundary");
-  assert(readme.includes("No Workflow Runner"), "README.md should preserve Workflow Runner boundary");
+  assert(englishReadme.includes("normal continuation path routes to `full` or `lite`"), "README.en.md must make full/lite the normal route");
+  assert(englishReadme.includes("`cache-ready` remains an explicit prompt-cache experiment route"), "README.en.md must keep cache-ready experimental");
+  [
+    "context-pack --repo <target-repo> --output-dir <dir>",
+    "export --input <context-pack-dir> --output-dir <dir>",
+    "doctor --repo <target-repo> --context-pack <context-pack-dir>",
+    "sidecar-build",
+    "basebrief-project-state-v1",
+  ].forEach((advancedPhrase) => {
+    assert(!readme.includes(advancedPhrase), `README.md should route advanced detail away from first-run: ${advancedPhrase}`);
+    assert(!englishReadme.includes(advancedPhrase), `README.en.md should route advanced detail away from first-run: ${advancedPhrase}`);
+  });
   assert(readme.includes("provider_probe_status=skipped"), "README.md should preserve skipped provider probe wording");
   assert(readme.includes("npm run check"), "README.md must document npm validation shortcut");
   assert(readme.includes("不是发布到 npm 的 package"), "README.md must keep npm scripts out of published-package scope");
@@ -2720,25 +2750,6 @@ function checkContentContracts() {
   assert(!readme.includes("BaseBrief 当前不是 CLI"), "README.md must not describe CLI Lite as nonexistent");
   assert(!readme.includes("暂无 CLI"), "README.md must not contain the obsolete no-CLI status");
   assert(!readme.includes("BB2 experiment notes"), "README.md must keep experiment-history links out of the public entry");
-  assert(englishReadme.includes("one public skill entry"), "README.en.md must explain the single public skill entry");
-  assert(englishReadme.includes("normal continuation path routes to `full` or `lite`"), "README.en.md must make full/lite the normal route");
-  assert(englishReadme.includes("`cache-ready` remains an explicit prompt-cache experiment route"), "README.en.md must keep cache-ready experimental");
-  assert(englishReadme.includes("docs/quickstart-5min.md"), "README.en.md should link to the quickstart");
-  assert(englishReadme.includes("docs/index.md"), "README.en.md should link to the documentation index");
-  assert(englishReadme.includes("docs/cli-lite.md"), "README.en.md should link to CLI Lite docs");
-  assert(englishReadme.includes("zero-dependency CLI Lite"), "README.en.md must describe the existing CLI Lite");
-  assert(englishReadme.includes("context-pack --repo <target-repo> --output-dir <dir>"), "README.en.md should mention context-pack command");
-  assert(englishReadme.includes("check --input <context-pack-dir>"), "README.en.md should mention check command");
-  assert(englishReadme.includes("resume --input <context-pack-dir>"), "README.en.md should mention resume command");
-  assert(englishReadme.includes("export --input <context-pack-dir> --output-dir <dir>"), "README.en.md should mention export command");
-  assert(englishReadme.includes("doctor --repo <target-repo> --context-pack <context-pack-dir>"), "README.en.md should mention doctor command");
-  assert(englishReadme.includes("MCP-friendly means future tool-consumable files"), "README.en.md must keep file-only MCP-friendly wording");
-  assert(englishReadme.includes("No provider request"), "README.en.md should preserve no-provider boundary");
-  assert(englishReadme.includes("No raw private output"), "README.en.md should preserve raw-output boundary");
-  assert(englishReadme.includes("No runtime integration"), "README.en.md should preserve runtime boundary");
-  assert(englishReadme.includes("No schema change"), "README.en.md should preserve schema boundary");
-  assert(englishReadme.includes("No MCP server"), "README.en.md should preserve MCP server boundary");
-  assert(englishReadme.includes("No Workflow Runner"), "README.en.md should preserve Workflow Runner boundary");
   assert(englishReadme.includes("provider_probe_status=skipped"), "README.en.md should preserve skipped provider probe wording");
   assert(englishReadme.includes("npm run check"), "README.en.md must document npm validation shortcut");
   assert(englishReadme.includes("not a published npm package"), "README.en.md must keep npm scripts out of published-package scope");
@@ -2749,7 +2760,42 @@ function checkContentContracts() {
   assert(!englishReadme.includes("not a CLI or plugin yet"), "README.en.md must not contain the obsolete no-CLI status");
   assert(!/two skills/i.test(englishReadme), "README.en.md must not imply two skills");
   [
+    "node scripts/basebrief.js context-pack --repo <target-repo> --output-dir <dir>",
+    "node scripts/basebrief.js check --input <context-pack-dir>",
+    "node scripts/basebrief.js resume --input <context-pack-dir>",
+    "node scripts/basebrief.js profile-init --repo <target-repo>",
+    "node scripts/basebrief.js continue --profile <profile.json> --output-dir <dir>",
+    "node scripts/basebrief.js workflow --profile <profile.json> --output-dir <dir>",
+    "node scripts/basebrief.js export --input <context-pack-dir> --output-dir <dir>",
+    "node scripts/basebrief.js doctor --repo <target-repo> --context-pack <context-pack-dir>",
+    "node scripts/basebrief.js sidecar-build --repo <target-repo>",
+  ].forEach((command) => {
+    assert(advancedDoc.includes(command), `Advanced docs must retain command: ${command}`);
+  });
+  assert(advancedDoc.includes("MCP-friendly means future tool-consumable files"), "Advanced docs must retain file-only MCP-friendly wording");
+  assert(advancedDoc.includes("does not call providers") && advancedDoc.includes("MCP server") && advancedDoc.includes("daemon"), "Advanced docs must preserve integration boundaries");
+  assert(whyBaseBriefDoc.includes("Why Not Just Paste Chat History?") && whyBaseBriefDoc.includes("NEXT_WINDOW_STARTER.md"), "Why BaseBrief docs must explain the handoff problem and starter file");
+  assert(conceptsSimpleDoc.includes("## Continue") && conceptsSimpleDoc.includes("## Next Window Starter") && conceptsSimpleDoc.includes("## Workflow Runner Lite"), "Simple concepts docs must define first-run and advanced concepts");
+  assert(conceptsSimpleDoc.includes("`cache-ready` is an explicit prompt-cache experiment route"), "Simple concepts docs must keep cache-ready experimental");
+  assert(simpleContinuationReadme.includes("small Todo app"), "Simple continuation example must use a concrete small Todo app scenario");
+  assert(simpleContinuationReadme.includes("node scripts/basebrief.js continue --repo . --output-dir tests/outputs/private/continue"), "Simple continuation example must use the first-run continue command");
+  assert(simpleContinuationReadme.includes("output/NEXT_WINDOW_STARTER.md") && simpleContinuationReadme.includes("## Boundaries"), "Simple continuation example must identify the copyable starter and boundaries");
+  assert(simpleContinuationReport.includes("small Todo app") && simpleContinuationReport.includes("Risk Boundaries"), "Simple continuation report must show a user-facing handoff report");
+  assert(simpleContinuationCheckSummary.includes("status: needs_review") && simpleContinuationCheckSummary.includes("NEXT_WINDOW_STARTER.md"), "Simple continuation check summary must show review-needed receiver handoff guidance");
+  assert(simpleContinuationStarter.includes("small Todo app") && simpleContinuationStarter.includes("Do not"), "Simple continuation starter must provide copyable next-window boundaries");
+  assert(v2100ReleaseDoc.includes("v2.10.0 Adoption Polish / Public Freeze"), "v2.10 closeout doc must have stable title");
+  assert(v2100ReleaseDoc.includes("one local command -> one continuation package -> copy NEXT_WINDOW_STARTER.md"), "v2.10 closeout doc must preserve the freeze story");
+  assert(v2100ReleaseDoc.includes("docs/advanced.md") && v2100ReleaseDoc.includes("examples/simple-continuation/"), "v2.10 closeout doc must list docs and example changes");
+  assert(v2100ReleaseDoc.includes("Do not add MCP") && v2100ReleaseDoc.includes("automatic commit/push/tag/release/PR"), "v2.10 closeout doc must preserve freeze boundaries");
+  assert(v2100ReleaseDoc.includes("provider_probe_status=skipped"), "v2.10 closeout doc must preserve skipped provider probe wording");
+  assert(testingDoc.includes("v2.10.0 Adoption Polish / Public Freeze"), "Testing docs must document v2.10 freeze polish");
+  assert(testingDoc.includes("docs/why-basebrief.md") && testingDoc.includes("examples/simple-continuation/"), "Testing docs must list v2.10 support docs and example");
+  assert(testingDoc.includes("Advanced commands remain available") && testingDoc.includes("Expected test count remains 192"), "Testing docs must preserve v2.10 validation expectations");
+  [
     "quickstart-5min.md",
+    "why-basebrief.md",
+    "concepts-simple.md",
+    "advanced.md",
     "cli-lite.md",
     "specs/context-pack-lite.md",
     "specs/context-pack-doctor.md",
@@ -2760,6 +2806,8 @@ function checkContentContracts() {
     "receiver-flow.md",
     "project-state.md",
     "seal-diff.md",
+    "releases/v2.10.0.md",
+    "../examples/simple-continuation/README.md",
     "../examples/context-pack-lite/README.md",
     "../examples/file-only-export/README.md",
     "../examples/context-pack-doctor/README.md",
@@ -2804,9 +2852,9 @@ function checkContentContracts() {
   assert(quickstartDoc.includes("state-advance -> sidecar-build -> sidecar-check"), "quickstart must document follow-up golden path");
   assert(quickstartDoc.includes("tests/outputs/private/quickstart/build"), "quickstart build must use the ignored private output directory");
   assert(quickstartDoc.includes("tests/outputs/private/quickstart/before.json"), "quickstart seal must use the ignored private output directory");
-  assert(readme.includes("first-run smoke path"), "README must expose the first-run smoke path");
-  assert(readme.includes("[5 分钟上手](docs/quickstart-5min.md)") && readme.includes("first-run smoke path"), "README must route first-run smoke path details to quickstart");
-  assert(readme.includes("Doctor") && readme.includes("File-only Export") && readme.includes("后续 recipe"), "README must keep follow-up recipes out of mandatory first-run scope");
+  assert(readme.includes("docs/quickstart-5min.md") && readme.includes("examples/simple-continuation/README.md"), "README must route first-run details to quickstart and simple example");
+  assert(readme.includes("docs/advanced.md") && readme.includes("它们不是第一次跑通的主路径"), "README must route advanced recipes out of the mandatory first-run scope");
+  assert(englishReadme.includes("docs/advanced.md") && englishReadme.includes("They are not the first-run path."), "README.en.md must route advanced recipes out of the mandatory first-run scope");
   assert(quickstartDoc.includes("## First-Run Smoke Path"), "quickstart must expose a canonical first-run smoke path section");
   assert(quickstartDoc.includes("README -> docs/index.md -> docs/quickstart-5min.md -> examples/minimal -> examples/context-pack-lite"), "quickstart must preserve the canonical first-run smoke path");
   assert(quickstartDoc.includes("Doctor、File-only") && quickstartDoc.includes("不是首次") && quickstartDoc.includes("必经步骤"), "quickstart must keep follow-up paths out of the mandatory first-run smoke path");
@@ -5370,6 +5418,12 @@ function checkExamples() {
     "examples/minimal/input-project-notes.md",
     "examples/minimal/output-basebrief-lite.md",
     "examples/minimal/next-chat-prompt.md",
+    "examples/simple-continuation/README.md",
+    "examples/simple-continuation/input/PROJECT_STATE.md",
+    "examples/simple-continuation/input/NOTES.md",
+    "examples/simple-continuation/output/CONTINUATION_REPORT.md",
+    "examples/simple-continuation/output/CHECK_SUMMARY.md",
+    "examples/simple-continuation/output/NEXT_WINDOW_STARTER.md",
   ];
   exampleFiles.forEach((relativePath) => {
     assert(fs.existsSync(path.join(repoRoot, relativePath)), `Missing example: ${relativePath}`);

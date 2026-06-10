@@ -1,55 +1,65 @@
 # BaseBrief
 
-> 我会带着上下文，一万次回到那个项目现场。
+> 不再让 AI 项目换窗口就失忆。
 
-BaseBrief 是一个中文优先、local-first 的 AI 项目交接工具。
+BaseBrief 是一个 local-first 的 AI 项目接续工具。
 
-它把 repo 当前状态、已确认事实、风险边界和下一步任务整理成一个可审阅的 Context Pack，让新窗口、新模型或新的 coding agent 能接着干，而不是从“这项目是啥”开始考古。English README: [README.en.md](README.en.md)
+当一个 AI 聊天窗口快结束、模型要切换、或者你要把项目交给另一个 AI 时，BaseBrief 可以把当前 repo 整理成一个可审阅、可检查、可复制给下一窗口的接续包。
+
+English README: [README.en.md](README.en.md)
 
 ## 什么时候用
 
-- 换 AI 窗口、换模型、换工具，项目还得继续。
-- 想把当前 repo 状态打包成下一个接手者能读懂的 Context Pack。
-- 想检查旧 Context Pack 是否已经跟 live repo 脱节。
-- 想把“不能碰什么”写清楚，而不是让接手者靠猜。
+- 你和 AI 做了一个项目，但窗口快爆了。
+- 你想从 ChatGPT 切到 Codex、Claude、Cursor 或另一个工具。
+- 你不想每次手写项目背景、已完成内容和下一步。
+- 你希望下一个 AI 先理解现状、边界和风险，再继续动手。
 
-BaseBrief 保持一个公开 Skill 入口和一个零依赖 CLI Lite。普通项目接续默认只在 `full` 和 `lite` 之间选择；`cache-ready` 只保留为显式 prompt-cache 实验路线。
-
-## 2 分钟开始
-
-让 AI 读取 BaseBrief Skill：
-
-```text
-请读取 skills/basebrief/SKILL.md。
-根据当前任务选择 full 或 lite，整理项目阶段基线。
-不要把推测写成事实；如果边界不清，先列 open_questions。
-```
-
-或者用 CLI Lite 生成接续包；需要手动拆步时再走 Context Pack 三步：
+## 先跑这一条
 
 ```text
 node scripts/basebrief.js continue --repo . --output-dir tests/outputs/private/continue
-node scripts/basebrief.js context-pack --repo . --output-dir tests/outputs/private/context-pack --json
-node scripts/basebrief.js check --input tests/outputs/private/context-pack --json
-node scripts/basebrief.js resume --input tests/outputs/private/context-pack
 ```
 
-`tests/outputs/private/` 是本仓库忽略的本地输出目录，适合放生成物。
+`tests/outputs/private/` 已被本仓库忽略，适合放本地生成物。
 
-## 常用命令
+## 你会得到什么
+
+- `NEXT_WINDOW_STARTER.md`：复制给下一个 AI 窗口的开场白。
+- `CHECK_SUMMARY.md`：这份接续包是否可用，有没有需要人工看的问题。
+- `CONTINUATION_REPORT.md`：本次 repo 状态、变更和风险摘要。
+- `context-pack/`：更完整的项目上下文资料包。
+
+第一次只想看懂流程，可以先读 [simple continuation 示例](examples/simple-continuation/README.md)。
+
+## BaseBrief 不做什么
+
+- 不调用模型或 provider。
+- 不自动写代码。
+- 不自动 commit、push、tag、release 或开 PR。
+- 不读取或保存密钥。
+- 不连接云服务、MCP server、runtime 或后台 daemon。
+- 不替代项目管理系统、Agent runtime 或完整 spec framework。
+
+## 普通路径和高级路径
+
+普通用户先记住一个命令：
 
 ```text
-node scripts/basebrief.js continue --repo <target-repo> --output-dir <dir> [--json]
-node scripts/basebrief.js profile-init --repo <target-repo> --output <profile.json> [--json]
-node scripts/basebrief.js continue --profile <profile.json> --output-dir <dir> [--json]
-node scripts/basebrief.js context-pack --repo <target-repo> --output-dir <dir> [--json]
-node scripts/basebrief.js check --input <context-pack-dir> [--json]
-node scripts/basebrief.js resume --input <context-pack-dir> [--json]
-node scripts/basebrief.js export --input <context-pack-dir> --output-dir <dir> [--json]
-node scripts/basebrief.js doctor --repo <target-repo> --context-pack <context-pack-dir> [--json]
+continue = 生成下一窗口接续包
 ```
 
-主线能力是 Continue / Project Profile / Context Pack / Check / Resume / Export / Doctor。`profile-init` 只保存公开安全的本地 recipe 默认值；`continue` 只准备可审阅的接续包，不自动执行项目任务。File-only Export 的 “MCP-friendly means future tool-consumable files”，不是 MCP server、runtime integration 或 provider integration。
+如果你用 `skills/basebrief/SKILL.md`，普通项目接续默认只在 `full` 和 `lite` 之间选择；`cache-ready` 只保留为显式 prompt-cache 实验路线。
+
+更细的 `context-pack`、`check`、`resume`、Project Profile、Workflow Runner Lite、Export、Doctor、Seal/Diff 和 Project State 都放在 [高级用法](docs/advanced.md)。它们不是第一次跑通的主路径。
+
+## 继续阅读
+
+- [为什么需要 BaseBrief](docs/why-basebrief.md)
+- [核心概念，用人话解释](docs/concepts-simple.md)
+- [5 分钟上手](docs/quickstart-5min.md)
+- [高级用法](docs/advanced.md)
+- [完整文档索引与历史档案](docs/index.md)
 
 ## 本地验证
 
@@ -59,26 +69,8 @@ npm run release-check
 npm run check
 ```
 
-这些 npm scripts 只是本地验证快捷入口；BaseBrief 不是发布到 npm 的 package、全局命令、聊天客户端、Agent runtime、托管平台、密钥管理器、项目管理系统或 provider gateway。
-
-## 安全边界
-
-- No provider request.
-- No raw private output.
-- No runtime integration.
-- No schema change / No schema-v2.
-- No MCP server.
-- No Workflow Runner; `continue` 是本地接续包准备器，不是 runner。
-- Project Profile 不是全局配置、secret store 或自动化系统。
-- 不把 `.env`、API key、token、secret、私人绝对路径或假设写成公开事实。
-
-未配置 provider 环境变量时，release check 应保持 `provider_probe_status=skipped`。
-
-## 继续阅读
-
-- [5 分钟上手](docs/quickstart-5min.md)：第一次只想跑通时，走这里的 first-run smoke path；Doctor 和 File-only Export 是后续 recipe。
-- [CLI Lite](docs/cli-lite.md)
-- [完整文档索引与历史档案](docs/index.md)
+这些 npm scripts 只是本地验证快捷入口；BaseBrief 不是发布到 npm 的 package 或全局命令。未配置 provider 环境变量时，release check 应保持 `provider_probe_status=skipped`。
 
 ## License
+
 MIT

@@ -107,6 +107,40 @@ release-check output without provider env remains:
 provider_probe_status=skipped
 ```
 
+## v2.10.0 Adoption Polish / Public Freeze
+
+`v2.10.0` closes the current expansion loop as adoption polish, not as a new
+feature line. The public first-run story is intentionally small:
+
+```text
+one local command -> one continuation package -> copy NEXT_WINDOW_STARTER.md
+```
+
+The README now leads with:
+
+```text
+node scripts/basebrief.js continue --repo . --output-dir tests/outputs/private/continue
+```
+
+The supporting docs are:
+
+- `docs/why-basebrief.md`
+- `docs/concepts-simple.md`
+- `docs/advanced.md`
+- `examples/simple-continuation/`
+
+Advanced commands remain available, including Context Pack, Check, Resume,
+Project Profile, Workflow Runner Lite, Export, Doctor, Seal/Diff, Delta,
+Project State, Receiver, and Sidecar tools. They are no longer first-run
+selling points.
+
+Expected test count remains 192 tests with `independent_test_files=6`. Expected
+release-check output without provider env remains:
+
+```text
+provider_probe_status=skipped
+```
+
 `v0.9.0` is a public hardening line for the integrated local handoff path:
 receiver-ready handoff -> Project State -> Sidecar bundle -> receiver first
 response. It adds no provider request, runtime integration, schema change, Auto

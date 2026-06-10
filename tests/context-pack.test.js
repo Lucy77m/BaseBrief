@@ -302,6 +302,7 @@ test("v2.3.0 BaseBrief Format stays docs-first and local-only", () => {
 test("v2.4.0 File-only Export stays docs-first and MCP-friendly only", () => {
   const readme = readText("README.md");
   const englishReadme = readText("README.en.md");
+  const advanced = readText("docs/advanced.md");
   const docsIndex = readText("docs/index.md");
   const cliLite = readText("docs/cli-lite.md");
   const testing = readText("docs/testing.md");
@@ -321,15 +322,15 @@ test("v2.4.0 File-only Export stays docs-first and MCP-friendly only", () => {
   assert.match(docsIndex, /specs\/file-only-export\.md/);
   assert.match(docsIndex, /dogfooding\/file-only-export-v2\.4\.0\.md/);
   assert.match(docsIndex, /\.\.\/examples\/file-only-export\/README\.md/);
-  assert.match(readme, /export --input <context-pack-dir> --output-dir <dir>/);
-  assert.match(readme, /MCP-friendly means future tool-consumable files/);
+  assert.match(advanced, /export --input <context-pack-dir> --output-dir <dir>/);
+  assert.match(advanced, /MCP-friendly means future tool-consumable files/);
   assert.match(docsIndex, /releases\/v2\.4\.0-plan\.md/);
   assert.match(docsIndex, /releases\/v2\.4\.0\.md/);
   assert.match(docsIndex, /specs\/file-only-export\.md/);
   assert.match(docsIndex, /dogfooding\/file-only-export-v2\.4\.0\.md/);
   assert.match(docsIndex, /\.\.\/examples\/file-only-export\/README\.md/);
-  assert.match(englishReadme, /export --input <context-pack-dir> --output-dir <dir>/);
-  assert.match(englishReadme, /MCP-friendly means future tool-consumable files/);
+  assert.match(advanced, /export --input <context-pack-dir> --output-dir <dir>/);
+  assert.match(advanced, /MCP-friendly means future tool-consumable files/);
   assert.match(docsIndex, /releases\/v2\.4\.0-plan\.md/);
   assert.match(docsIndex, /releases\/v2\.4\.0\.md/);
   assert.match(docsIndex, /specs\/file-only-export\.md/);
@@ -486,6 +487,7 @@ test("v2.4.0 File-only Export stays docs-first and MCP-friendly only", () => {
 test("v2.5.0 Context Pack Doctor stays read-only and local-only", () => {
   const readme = readText("README.md");
   const englishReadme = readText("README.en.md");
+  const advanced = readText("docs/advanced.md");
   const docsIndex = readText("docs/index.md");
   const cliLite = readText("docs/cli-lite.md");
   const testing = readText("docs/testing.md");
@@ -497,13 +499,13 @@ test("v2.5.0 Context Pack Doctor stays read-only and local-only", () => {
   const dogfooding251 = readText("docs/dogfooding/context-pack-doctor-v2.5.1.md");
   const exampleReadme = readText("examples/context-pack-doctor/README.md");
 
-  assert.match(readme, /doctor --repo <target-repo> --context-pack <context-pack-dir>/);
+  assert.match(advanced, /doctor --repo <target-repo> --context-pack <context-pack-dir>/);
   assert.match(docsIndex, /releases\/v2\.5\.0-plan\.md/);
   assert.match(docsIndex, /releases\/v2\.5\.0\.md/);
   assert.match(docsIndex, /specs\/context-pack-doctor\.md/);
   assert.match(docsIndex, /dogfooding\/context-pack-doctor-v2\.5\.0\.md/);
   assert.match(docsIndex, /\.\.\/examples\/context-pack-doctor\/README\.md/);
-  assert.match(englishReadme, /doctor --repo <target-repo> --context-pack <context-pack-dir>/);
+  assert.match(advanced, /doctor --repo <target-repo> --context-pack <context-pack-dir>/);
   assert.match(docsIndex, /releases\/v2\.5\.0-plan\.md/);
   assert.match(docsIndex, /releases\/v2\.5\.0\.md/);
   assert.match(docsIndex, /specs\/context-pack-doctor\.md/);

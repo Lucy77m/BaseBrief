@@ -194,24 +194,27 @@ test("mode router selects cache-ready only for stable-prefix experiments", () =>
 test("public docs keep cache-ready as explicit experiment route", () => {
   const readme = readText("README.md");
   const englishReadme = readText("README.en.md");
+  const concepts = readText("docs/concepts-simple.md");
   const skill = readText("skills/basebrief/SKILL.md");
   const modeSelection = readText("docs/mode-selection.md");
   const docsIndex = readText("docs/index.md");
 
   assert.match(readme, /普通项目接续默认只在 `full` 和 `lite` 之间选择/);
   assert.match(readme, /`cache-ready` 只保留为显式 prompt-cache 实验路线/);
-  assert.match(readme, /零依赖 CLI Lite/);
+  assert.match(readme, /local-first/);
   assert.doesNotMatch(readme, /BaseBrief 当前不是 CLI|暂无 CLI/);
   assert.match(englishReadme, /normal continuation path routes to `full` or `lite`/);
-  assert.match(englishReadme, /zero-dependency CLI Lite/);
+  assert.match(englishReadme, /local-first/);
+  assert.match(concepts, /`cache-ready` is an explicit prompt-cache experiment route|`cache-ready` 是一个显式 prompt-cache 实验路线/);
   assert.match(skill, /普通项目接续默认只在 `full` 和 `lite` 之间选择/);
   assert.match(modeSelection, /`cache-ready` 是显式实验路线/);
   assert.match(docsIndex, /experiments\/cache-ready-bb12-guard\.md/);
 });
 
-test("README 2-minute homepage stays concise and local-only", () => {
+test("README homepage stays simple and routes advanced commands away from first-run", () => {
   const readme = readText("README.md");
   const englishReadme = readText("README.en.md");
+  const advanced = readText("docs/advanced.md");
   const docsIndex = readText("docs/index.md");
 
   assert.ok(readme.split(/\r?\n/).length <= 85);
@@ -219,27 +222,36 @@ test("README 2-minute homepage stays concise and local-only", () => {
   assert.ok((readme.match(/\]\(/g) || []).length <= 12);
   assert.ok((englishReadme.match(/\]\(/g) || []).length <= 12);
 
-  assert.match(readme, /我会带着上下文，一万次回到那个项目现场。/);
-  assert.match(englishReadme, /I’ll return to the project scene with context in hand, every time\./);
-  assert.match(readme, /context-pack --repo <target-repo> --output-dir <dir>/);
-  assert.match(readme, /resume --input <context-pack-dir>/);
-  assert.match(readme, /export --input <context-pack-dir> --output-dir <dir>/);
-  assert.match(readme, /doctor --repo <target-repo> --context-pack <context-pack-dir>/);
-  assert.match(englishReadme, /context-pack --repo <target-repo> --output-dir <dir>/);
-  assert.match(englishReadme, /resume --input <context-pack-dir>/);
-  assert.match(englishReadme, /export --input <context-pack-dir> --output-dir <dir>/);
-  assert.match(englishReadme, /doctor --repo <target-repo> --context-pack <context-pack-dir>/);
+  assert.match(readme, /不再让 AI 项目换窗口就失忆。/);
+  assert.match(englishReadme, /Stop losing context between AI coding sessions\./);
+  assert.match(readme, /continue --repo \. --output-dir tests\/outputs\/private\/continue/);
+  assert.match(englishReadme, /continue --repo \. --output-dir tests\/outputs\/private\/continue/);
+  assert.match(readme, /NEXT_WINDOW_STARTER\.md/);
+  assert.match(englishReadme, /NEXT_WINDOW_STARTER\.md/);
+  assert.match(readme, /examples\/simple-continuation\/README\.md/);
+  assert.match(englishReadme, /examples\/simple-continuation\/README\.md/);
+  assert.match(readme, /docs\/advanced\.md/);
+  assert.match(englishReadme, /docs\/advanced\.md/);
+  assert.match(advanced, /context-pack --repo <target-repo> --output-dir <dir>/);
+  assert.match(advanced, /resume --input <context-pack-dir>/);
+  assert.match(advanced, /export --input <context-pack-dir> --output-dir <dir>/);
+  assert.match(advanced, /doctor --repo <target-repo> --context-pack <context-pack-dir>/);
 
   for (const doc of [readme, englishReadme]) {
-    assert.match(doc, /No provider request/);
-    assert.match(doc, /No runtime integration/);
-    assert.match(doc, /No MCP server/);
-    assert.match(doc, /No Workflow Runner/);
+    assert.match(doc, /not call|不调用/);
+    assert.match(doc, /MCP server/);
     assert.match(doc, /provider_probe_status=skipped/);
+    assert.doesNotMatch(doc, /context-pack --repo <target-repo> --output-dir <dir>/);
+    assert.doesNotMatch(doc, /export --input <context-pack-dir> --output-dir <dir>/);
+    assert.doesNotMatch(doc, /doctor --repo <target-repo> --context-pack <context-pack-dir>/);
     assert.doesNotMatch(doc, /sidecar-build/);
     assert.doesNotMatch(doc, /basebrief-project-state-v1/);
   }
 
+  assert.match(docsIndex, /why-basebrief\.md/);
+  assert.match(docsIndex, /concepts-simple\.md/);
+  assert.match(docsIndex, /advanced\.md/);
+  assert.match(docsIndex, /examples\/simple-continuation\/README\.md/);
   assert.match(docsIndex, /project-state\.md/);
   assert.match(docsIndex, /seal-diff\.md/);
   assert.match(docsIndex, /specs\/delta-handoff\.md/);
