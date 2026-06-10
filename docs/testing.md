@@ -56,6 +56,31 @@ This is not Workflow Runner Lite. It does not call providers, store secrets,
 write global config, change Project State schema, create a plugin or MCP
 server/tools, add schema-v2, or perform git/release actions.
 
+## v2.9.1 Project Profile CWD Hint Polish
+
+`v2.9.1` is a small dogfooding fix for Project Profile / Recipes Lite. It keeps
+the `basebrief-project-profile-v1` contract unchanged, but lets
+`continue --profile` resolve a public-safe `repo_hint` from the current working
+directory when the profile file lives outside the target repo.
+
+The regression case is:
+
+```text
+profile-init --repo . --output <temp>/basebrief-profile.json
+continue --profile <temp>/basebrief-profile.json --output-dir <temp>/continue-profile
+```
+
+Expected test count is 186 tests with `independent_test_files=5`. Expected
+release-check output without provider env remains:
+
+```text
+provider_probe_status=skipped
+```
+
+This remains profile polish only. It does not store private absolute paths,
+change the profile contract, add global config, call providers, or become a
+Workflow Runner.
+
 `v0.9.0` is a public hardening line for the integrated local handoff path:
 receiver-ready handoff -> Project State -> Sidecar bundle -> receiver first
 response. It adds no provider request, runtime integration, schema change, Auto

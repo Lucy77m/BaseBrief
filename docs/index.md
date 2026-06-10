@@ -97,6 +97,7 @@ npm run check
 - [Continuation Harness Lite example kit](../examples/context-pack-continuation/README.md)
 - [v2.9.0 Project Profile / Recipes Lite Plan](releases/v2.9.0-plan.md)
 - [v2.9.0 Project Profile / Recipes Lite Local Closeout](releases/v2.9.0.md)
+- [v2.9.1 Project Profile CWD Hint Polish](releases/v2.9.1.md)
 - [Project Profile Lite example kit](../examples/project-profile-lite/README.md)
 - [Context Pack Adoption Notes v2.6.1](dogfooding/context-pack-adoption-notes-v2.6.1.md)
 - [Context Engineering Reference Notes v2.6.4](dogfooding/context-engineering-reference-notes-v2.6.4.md)

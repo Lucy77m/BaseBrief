@@ -264,6 +264,7 @@ function checkRequiredFiles() {
     "docs/releases/v2.8.0.md",
     "docs/releases/v2.9.0-plan.md",
     "docs/releases/v2.9.0.md",
+    "docs/releases/v2.9.1.md",
     "docs/specs/context-pack-resume.md",
     "docs/specs/basebrief-format.md",
     "docs/specs/file-only-export.md",
@@ -494,6 +495,7 @@ function checkV2ContextPackDocs(context) {
     v280ReleaseDoc,
     v290PlanDoc,
     v290ReleaseDoc,
+    v291ReleaseDoc,
     continuationHarnessDogfoodingDoc,
     basebriefCliScript,
     basebriefContinuationHarnessScript,
@@ -1087,12 +1089,15 @@ function checkV2ContextPackDocs(context) {
   assert(testingDoc.includes("Expected test count is 180 tests") && testingDoc.includes("independent_test_files=4"), "Testing docs must document v2.8 test count and independent files");
   assert(testingDoc.includes("v2.9.0 Project Profile / Recipes Lite"), "Testing docs must document v2.9 project profile");
   assert(testingDoc.includes("Expected test count is 185 tests") && testingDoc.includes("independent_test_files=5"), "Testing docs must document v2.9 test count and independent files");
+  assert(testingDoc.includes("v2.9.1 Project Profile CWD Hint Polish"), "Testing docs must document v2.9.1 project profile polish");
+  assert(testingDoc.includes("Expected test count is 186 tests") && testingDoc.includes("independent_test_files=5"), "Testing docs must document v2.9.1 test count and independent files");
   assert(docsIndex.includes("releases/v2.8.0-plan.md"), "Docs index must link v2.8 continuation harness plan");
   assert(docsIndex.includes("releases/v2.8.0.md"), "Docs index must link v2.8 continuation harness closeout");
   assert(docsIndex.includes("dogfooding/continuation-harness-lite-v2.8.0.md"), "Docs index must link v2.8 dogfooding");
   assert(docsIndex.includes("../examples/context-pack-continuation/README.md"), "Docs index must link continuation harness example kit");
   assert(docsIndex.includes("releases/v2.9.0-plan.md"), "Docs index must link v2.9 project profile plan");
   assert(docsIndex.includes("releases/v2.9.0.md"), "Docs index must link v2.9 project profile closeout");
+  assert(docsIndex.includes("releases/v2.9.1.md"), "Docs index must link v2.9.1 project profile polish");
   assert(docsIndex.includes("../examples/project-profile-lite/README.md"), "Docs index must link project profile example kit");
   assert(v2ContextPackRoadmapDoc.includes("v2.8 Continuation Harness Lite"), "v2 roadmap must name v2.8 continuation harness");
   assert(v2ContextPackRoadmapDoc.includes("docs/dogfooding/continuation-harness-lite-v2.8.0.md"), "v2 roadmap must link v2.8 dogfooding");
@@ -1100,6 +1105,8 @@ function checkV2ContextPackDocs(context) {
   assert(v2ContextPackRoadmapDoc.includes("v2.9 Project Profile / Recipes Lite"), "v2 roadmap must name v2.9 project profile");
   assert(v2ContextPackRoadmapDoc.includes("docs/releases/v2.9.0-plan.md"), "v2 roadmap must link v2.9 plan");
   assert(v2ContextPackRoadmapDoc.includes("tests/project-profile.test.js") && v2ContextPackRoadmapDoc.includes("independent_test_files=5"), "v2 roadmap must document v2.9 validation metrics");
+  assert(v2ContextPackRoadmapDoc.includes("docs/releases/v2.9.1.md"), "v2 roadmap must link v2.9.1 polish");
+  assert(v2ContextPackRoadmapDoc.includes("current working directory") && v2ContextPackRoadmapDoc.includes("Expected test count is 186"), "v2 roadmap must document v2.9.1 cwd hint polish");
 
   assert(v280PlanDoc.includes("v2.8.0 Continuation Harness Lite Plan"), "v2.8 plan must have stable title");
   assert(v280PlanDoc.includes("context-pack -> check -> resume"), "v2.8 plan must preserve command sequence");
@@ -1160,6 +1167,12 @@ function checkV2ContextPackDocs(context) {
   assertIncludesPhrase(v290ReleaseDoc, "does not include the full resume prompt body and does not add human-only `next_step` fields", "v2.9 closeout must preserve JSON boundary");
   assert(v290ReleaseDoc.includes("No Workflow Runner") && v290ReleaseDoc.includes("No global config") && v290ReleaseDoc.includes("No secret store"), "v2.9 closeout must preserve profile boundaries");
 
+  assert(v291ReleaseDoc.includes("v2.9.1 Project Profile CWD Hint Polish"), "v2.9.1 closeout must have stable title");
+  assert(v291ReleaseDoc.includes("basebrief-project-profile-v1") && v291ReleaseDoc.includes("contract unchanged"), "v2.9.1 closeout must preserve profile contract");
+  assert(v291ReleaseDoc.includes("current working directory") && v291ReleaseDoc.includes("repo_hint"), "v2.9.1 closeout must document cwd repo hint fallback");
+  assert(v291ReleaseDoc.includes("profile-init --repo . --output <temp>/basebrief-profile.json") && v291ReleaseDoc.includes("continue --profile <temp>/basebrief-profile.json"), "v2.9.1 closeout must record dogfooding scenario");
+  assert(v291ReleaseDoc.includes("No Workflow Runner") && v291ReleaseDoc.includes("No global config") && v291ReleaseDoc.includes("No secret store"), "v2.9.1 closeout must preserve profile boundaries");
+
   assert(projectProfileExampleReadme.includes("Project Profile Lite Example Kit"), "Project Profile example kit must have stable title");
   assert(projectProfileExampleReadme.includes("basebrief-project-profile-v1"), "Project Profile example kit must name contract");
   assert(projectProfileExampleReadme.includes("continuation-default") && projectProfileExampleReadme.includes("small-delta") && projectProfileExampleReadme.includes("review-heavy"), "Project Profile example kit must define recipes");
@@ -1179,6 +1192,7 @@ function checkV2ContextPackDocs(context) {
   assert(basebriefProjectProfileScript.includes("basebrief-project-profile-v1"), "Project Profile script must define v1 contract");
   assert(basebriefProjectProfileScript.includes("continuation-default") && basebriefProjectProfileScript.includes("small-delta") && basebriefProjectProfileScript.includes("review-heavy"), "Project Profile script must define recipes");
   assert(basebriefProjectProfileScript.includes("SENSITIVE_KEY_PATTERN") && basebriefProjectProfileScript.includes("SECRET_VALUE_PATTERN"), "Project Profile script must scan sensitive fields and values");
+  assert(basebriefProjectProfileScript.includes("cwdCandidate") && basebriefProjectProfileScript.includes("path.basename(cwd) === repoHint"), "Project Profile script must resolve public repo hints from cwd");
 
   assert(v2ContextPackRoadmapDoc.includes("exports/manifest.json"), "v2 roadmap must define export manifest");
   assert(v2ContextPackRoadmapDoc.includes("exports/context-pack.md"), "v2 roadmap must define readable export");
@@ -2482,6 +2496,7 @@ function checkContentContracts() {
   const v280ReleaseDoc = readText("docs/releases/v2.8.0.md");
   const v290PlanDoc = readText("docs/releases/v2.9.0-plan.md");
   const v290ReleaseDoc = readText("docs/releases/v2.9.0.md");
+  const v291ReleaseDoc = readText("docs/releases/v2.9.1.md");
   const contextPackResumeSpecDoc = readText("docs/specs/context-pack-resume.md");
   const basebriefFormatSpecDoc = readText("docs/specs/basebrief-format.md");
   const fileOnlyExportSpecDoc = readText("docs/specs/file-only-export.md");
@@ -3054,6 +3069,7 @@ function checkContentContracts() {
     v280ReleaseDoc,
     v290PlanDoc,
     v290ReleaseDoc,
+    v291ReleaseDoc,
     continuationHarnessDogfoodingDoc,
     basebriefCliScript,
     basebriefContinuationHarnessScript,

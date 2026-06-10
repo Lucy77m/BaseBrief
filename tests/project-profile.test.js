@@ -148,6 +148,35 @@ test("continue --profile lets explicit CLI options override profile defaults", (
   });
 });
 
+test("continue --profile resolves public repo hints from the current working directory", () => {
+  const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), "basebrief-profile-cwd-"));
+  const profilePath = path.join(tempRoot, "profile.json");
+  const outputDir = path.join(tempRoot, "cwd-continue");
+  try {
+    runProfileInit({ repo: repoRoot, output: profilePath });
+    const profile = readJson(profilePath);
+    assert.equal(profile.repo_hint, path.basename(repoRoot));
+
+    const cli = spawnSync(process.execPath, [
+      "scripts/basebrief.js",
+      "continue",
+      "--profile",
+      profilePath,
+      "--output-dir",
+      outputDir,
+      "--json",
+    ], { cwd: repoRoot, encoding: "utf8" });
+
+    assert.equal(cli.status, 0, cli.stderr);
+    const parsed = JSON.parse(cli.stdout);
+    assert.equal(parsed.command, "continue");
+    assert.equal(parsed.profileDefaultsApplied.repo, true);
+    assert.equal(fs.existsSync(path.join(outputDir, "CONTINUATION_REPORT.md")), true);
+  } finally {
+    fs.rmSync(tempRoot, { recursive: true, force: true });
+  }
+});
+
 test("Project Profile Lite rejects sensitive fields, private paths, and unsafe outputs", () => {
   withFixtureRepo(({ tempRoot, repoDir }) => {
     assert.throws(

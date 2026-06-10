@@ -835,6 +835,12 @@ node scripts/basebrief.js continue --profile <profile.json> --output-dir <dir> [
 `examples/project-profile-lite/`. Expected test count is 185 and
 `independent_test_files=5`.
 
+`docs/releases/v2.9.1.md` records the first Project Profile dogfooding polish.
+It keeps the profile contract unchanged while letting `continue --profile`
+resolve a public-safe `repo_hint` from the current working directory when the
+profile file lives outside the target repo. Expected test count is 186 and
+`independent_test_files=5`.
+
 Project Profile is not global config, not Project State schema, not a secret
 store, and not Workflow Runner Lite. It does not call providers, run project
 tasks, expand Doctor or Export, create a plugin or MCP server/tools, add

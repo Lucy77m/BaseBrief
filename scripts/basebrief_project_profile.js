@@ -189,7 +189,22 @@ function resolveProfileRepo(profilePath, profile) {
   if (path.isAbsolute(repoHint)) {
     throw new Error("profile.repo_hint must not be an absolute path");
   }
-  return path.resolve(path.dirname(profilePath), repoHint);
+  const profileDirCandidate = path.resolve(path.dirname(profilePath), repoHint);
+  if (fs.existsSync(profileDirCandidate)) {
+    return profileDirCandidate;
+  }
+
+  const cwdCandidate = path.resolve(process.cwd(), repoHint);
+  if (fs.existsSync(cwdCandidate)) {
+    return cwdCandidate;
+  }
+
+  const cwd = process.cwd();
+  if (path.basename(cwd) === repoHint && fs.existsSync(cwd)) {
+    return cwd;
+  }
+
+  return profileDirCandidate;
 }
 
 function runProfileInit(options) {
