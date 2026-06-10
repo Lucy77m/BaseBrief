@@ -81,24 +81,27 @@ This remains profile polish only. It does not store private absolute paths,
 change the profile contract, add global config, call providers, or become a
 Workflow Runner.
 
-## v3.0.0 Workflow Runner Lite Plan
+## v3.0.0 Workflow Runner Lite
 
-`v3.0.0-plan` opens a research/spec line for Workflow Runner Lite. This is a
-local BaseBrief pipeline runner proposal, not a platform or project automation
+`v3.0.0-plan` opened a research/spec line for Workflow Runner Lite, then v3.0-B
+added the minimum local implementation. This is a thin wrapper around Project
+Profile and Continuation Harness Lite, not a platform or project automation
 surface.
 
-The proposed future command shape is:
+The command shape is:
 
 ```text
 node scripts/basebrief.js workflow --profile <profile.json> --output-dir <dir> [--repo <target-repo>] [--since <commit>] [--max-files <n>] [--json]
 ```
 
-This planning step adds no runner script, no CLI command, no JSON contract
-implementation, no schema-v2, no provider request, no runtime integration, no
-plugin, no MCP server/tools, no daemon/watcher, no CI workflow, and no automatic
-project-task or git/release action.
+The implementation adds `scripts/basebrief_workflow.js` and
+`tests/workflow-runner.test.js`. Workflow JSON uses
+`basebrief-workflow-lite-v1`, excludes the full resume prompt and human-only
+`next_step`, and reuses continuation output without changing
+`continuation.meta.json` or the Context Pack seven-file structure.
 
-Expected release-check output without provider env remains:
+Expected test count is 192 tests with `independent_test_files=6`. Expected
+release-check output without provider env remains:
 
 ```text
 provider_probe_status=skipped

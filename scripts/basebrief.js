@@ -28,6 +28,7 @@ const { EXPORT_FILES, runExport } = require("./basebrief_export");
 const { runDoctor } = require("./basebrief_doctor");
 const { runContinuationHarness } = require("./basebrief_continuation_harness");
 const { loadProjectProfile, optionsFromProfile, runProfileInit } = require("./basebrief_project_profile");
+const { runWorkflow } = require("./basebrief_workflow");
 
 const STARTER_FILE = "basebrief-handoff-input.json";
 const HELP_TEXT = [
@@ -58,6 +59,7 @@ const HELP_TEXT = [
   "  node scripts/basebrief.js export --input <context-pack-dir> --output-dir <dir> [--json]",
   "  node scripts/basebrief.js doctor --repo <target-repo> --context-pack <context-pack-dir> [--json]",
   "  node scripts/basebrief.js profile-init --repo <target-repo> --output <profile.json> [--recipe continuation-default|small-delta|review-heavy] [--json]",
+  "  node scripts/basebrief.js workflow --profile <profile.json> --output-dir <dir> [--repo <target-repo>] [--since <commit>] [--max-files <n>] [--json]",
   "  node scripts/basebrief.js continue --profile <profile.json> --output-dir <dir> [--repo <target-repo>] [--since <commit>] [--max-files <n>] [--json]",
   "  node scripts/basebrief.js continue --repo <target-repo> --output-dir <dir> [--since <commit>] [--max-files <n>] [--json]",
   "",
@@ -460,6 +462,16 @@ function commandContinue(options) {
   });
 }
 
+function commandWorkflow(options) {
+  return runWorkflow({
+    profile: options.profile,
+    "output-dir": options["output-dir"],
+    repo: options.repo || "",
+    since: options.since || "",
+    "max-files": options["max-files"] || "",
+  });
+}
+
 function run(argv) {
   const command = argv[2];
   if (!command || command === "--help" || command === "-h") return { command: "help" };
@@ -490,6 +502,7 @@ function run(argv) {
   if (command === "export") return commandExport(options);
   if (command === "doctor") return commandDoctor(options);
   if (command === "profile-init") return commandProfileInit(options);
+  if (command === "workflow") return commandWorkflow(options);
   if (command === "continue") return commandContinue(options);
   throw new Error(`Unknown command: ${command}`);
 }
@@ -665,6 +678,14 @@ function toPublicResult(result) {
       outputDir: publicPath(result.outputDir, cwd),
       outputFiles: toRelativeMap(result.outputFiles, cwd),
       profile: result.profile ? publicPath(result.profile, cwd) : undefined,
+    };
+  }
+  if (result.command === "workflow") {
+    return {
+      ...result,
+      outputDir: publicPath(result.outputDir, cwd),
+      outputFiles: toRelativeMap(result.outputFiles, cwd),
+      profile: publicPath(result.profile, cwd),
     };
   }
   return result;
@@ -892,6 +913,20 @@ function formatHuman(result) {
       "",
     ].join(os.EOL);
   }
+  if (result.command === "workflow") {
+    return [
+      `BaseBrief workflow runner ${result.status}`,
+      `output_dir=${result.outputDir}`,
+      `context_pack=${result.outputFiles.contextPack}`,
+      `profile=${result.profile}`,
+      `recipe=${result.recipe}`,
+      `report=${result.outputFiles.report}`,
+      `starter=${result.outputFiles.starter}`,
+      `check_summary=${result.outputFiles.checkSummary}`,
+      ...formatNextStepLines(result),
+      "",
+    ].join(os.EOL);
+  }
   return `${JSON.stringify(result, null, 2)}${os.EOL}`;
 }
 
@@ -958,6 +993,15 @@ function formatNextStepLines(result) {
     }
     return ["next_step=copy NEXT_WINDOW_STARTER.md into the receiver window after review"];
   }
+  if (result.command === "workflow") {
+    if (result.status === "blocked") {
+      return ["next_step=review CHECK_SUMMARY.md and rerun workflow after repair"];
+    }
+    if (result.status === "needs_review") {
+      return ["next_step=review CONTINUATION_REPORT.md before copying NEXT_WINDOW_STARTER.md"];
+    }
+    return ["next_step=copy NEXT_WINDOW_STARTER.md into the receiver window after review"];
+  }
   return [];
 }
 
@@ -998,6 +1042,9 @@ function cli() {
   if (result.command === "continue" && result.status === "blocked") {
     process.exitCode = 1;
   }
+  if (result.command === "workflow" && result.status === "blocked") {
+    process.exitCode = 1;
+  }
 }
 
 if (require.main === module) {
@@ -1034,6 +1081,7 @@ module.exports = {
   commandExport,
   commandDoctor,
   commandProfileInit,
+  commandWorkflow,
   commandContinue,
   formatFindingLines,
   formatHuman,

@@ -1,7 +1,7 @@
 {
   "private": true,
   "scripts": {
-    "test": "node --test tests/basebrief.test.js tests/context-pack.test.js tests/cache-ready-benchmark.test.js tests/continuation-harness.test.js tests/project-profile.test.js",
+    "test": "node --test tests/basebrief.test.js tests/context-pack.test.js tests/cache-ready-benchmark.test.js tests/continuation-harness.test.js tests/project-profile.test.js tests/workflow-runner.test.js",
     "release-check": "node scripts/run_release_checks.js",
     "check": "npm test && npm run release-check"
   }

@@ -365,6 +365,7 @@ function checkRequiredFiles() {
     "scripts/basebrief_resume.js",
     "scripts/basebrief_continuation_harness.js",
     "scripts/basebrief_project_profile.js",
+    "scripts/basebrief_workflow.js",
     "scripts/bb9_provider_profiles.json",
     "schemas/bb9-handoff.schema.json",
     "schemas/basebrief-receiver-check.schema.json",
@@ -479,6 +480,7 @@ function checkRequiredFiles() {
     "examples/minimal/output-basebrief-lite.md",
     "examples/minimal/next-chat-prompt.md",
     "tests/continuation-harness.test.js",
+    "tests/workflow-runner.test.js",
     ".github/ISSUE_TEMPLATE/usability_feedback.md",
   ];
   required.forEach((relativePath) => {
@@ -502,6 +504,7 @@ function checkV2ContextPackDocs(context) {
     basebriefCliScript,
     basebriefContinuationHarnessScript,
     basebriefProjectProfileScript,
+    basebriefWorkflowScript,
     continuationExampleReadme,
     projectProfileExampleReadme,
     projectProfileExample,
@@ -1102,7 +1105,7 @@ function checkV2ContextPackDocs(context) {
   assert(docsIndex.includes("releases/v2.9.1.md"), "Docs index must link v2.9.1 project profile polish");
   assert(docsIndex.includes("releases/v3.0.0-plan.md"), "Docs index must link v3.0 workflow runner plan");
   assert(docsIndex.includes("../examples/project-profile-lite/README.md"), "Docs index must link project profile example kit");
-  assert(testingDoc.includes("v3.0.0 Workflow Runner Lite Plan") && testingDoc.includes("research/spec"), "Testing docs must document v3.0 workflow runner research/spec plan");
+  assert(testingDoc.includes("v3.0.0 Workflow Runner Lite") && testingDoc.includes("research/spec") && testingDoc.includes("v3.0-B"), "Testing docs must document v3.0 workflow runner implementation");
   assert(v2ContextPackRoadmapDoc.includes("v2.8 Continuation Harness Lite"), "v2 roadmap must name v2.8 continuation harness");
   assert(v2ContextPackRoadmapDoc.includes("docs/dogfooding/continuation-harness-lite-v2.8.0.md"), "v2 roadmap must link v2.8 dogfooding");
   assert(v2ContextPackRoadmapDoc.includes("expected test count") && v2ContextPackRoadmapDoc.includes("independent_test_files=4"), "v2 roadmap must document v2.8 validation metrics");
@@ -1111,7 +1114,7 @@ function checkV2ContextPackDocs(context) {
   assert(v2ContextPackRoadmapDoc.includes("tests/project-profile.test.js") && v2ContextPackRoadmapDoc.includes("independent_test_files=5"), "v2 roadmap must document v2.9 validation metrics");
   assert(v2ContextPackRoadmapDoc.includes("docs/releases/v2.9.1.md"), "v2 roadmap must link v2.9.1 polish");
   assert(v2ContextPackRoadmapDoc.includes("current working directory") && v2ContextPackRoadmapDoc.includes("Expected test count is 186"), "v2 roadmap must document v2.9.1 cwd hint polish");
-  assert(v2ContextPackRoadmapDoc.includes("v3.0 Workflow Runner Lite Research"), "v2 roadmap must name v3.0 workflow runner research");
+  assert(v2ContextPackRoadmapDoc.includes("v3.0 Workflow Runner Lite Research") && v2ContextPackRoadmapDoc.includes("v3.0-B"), "v2 roadmap must name v3.0 workflow runner implementation");
   assert(v2ContextPackRoadmapDoc.includes("Project Profile -> Continue -> Context Pack -> Check -> Resume starter"), "v2 roadmap must preserve v3.0 proposed workflow chain");
 
   assert(v280PlanDoc.includes("v2.8.0 Continuation Harness Lite Plan"), "v2.8 plan must have stable title");
@@ -1180,9 +1183,9 @@ function checkV2ContextPackDocs(context) {
   assert(v291ReleaseDoc.includes("No Workflow Runner") && v291ReleaseDoc.includes("No global config") && v291ReleaseDoc.includes("No secret store"), "v2.9.1 closeout must preserve profile boundaries");
 
   assert(v300PlanDoc.includes("v3.0.0 Workflow Runner Lite Plan"), "v3.0 plan must have stable title");
-  assert(v300PlanDoc.includes("v3.0-A research/spec"), "v3.0 plan must record research/spec status");
-  assert(v300PlanDoc.includes("This plan is research/spec only"), "v3.0 plan must preserve planning-only scope");
-  assert(v300PlanDoc.includes("does not add a runner script, CLI command"), "v3.0 plan must reject implementation in this step");
+  assert(v300PlanDoc.includes("v3.0-A") && v300PlanDoc.includes("research/spec"), "v3.0 plan must record research/spec status");
+  assert(v300PlanDoc.includes("v3.0-B minimal implementation"), "v3.0 plan must record minimal implementation status");
+  assert(v300PlanDoc.includes("thin local wrapper") && v300PlanDoc.includes("scripts/basebrief_workflow.js"), "v3.0 plan must document the thin workflow implementation");
   assert(v300PlanDoc.includes("Project Profile -> Continue -> Context Pack -> Check -> Resume starter"), "v3.0 plan must preserve proposed workflow chain");
   assert(v300PlanDoc.includes("node scripts/basebrief.js workflow --profile <profile.json> --output-dir <dir>"), "v3.0 plan must document future command shape");
   assert(v300PlanDoc.includes("basebrief-workflow-lite-v1"), "v3.0 plan must define future workflow contract");
@@ -1194,6 +1197,7 @@ function checkV2ContextPackDocs(context) {
   assert(v300PlanDoc.includes("No daemon.") && v300PlanDoc.includes("No watcher."), "v3.0 plan must reject background automation");
   assert(v300PlanDoc.includes("No automatic project task implementation."), "v3.0 plan must reject automatic project work");
   assert(v300PlanDoc.includes("No automatic commit, push, tag, release"), "v3.0 plan must reject automatic release actions");
+  assert(v300PlanDoc.includes("Expected test count is 192 tests") && v300PlanDoc.includes("independent_test_files=6"), "v3.0 plan must record workflow validation metrics");
 
   assert(projectProfileExampleReadme.includes("Project Profile Lite Example Kit"), "Project Profile example kit must have stable title");
   assert(projectProfileExampleReadme.includes("basebrief-project-profile-v1"), "Project Profile example kit must name contract");
@@ -1209,12 +1213,20 @@ function checkV2ContextPackDocs(context) {
   assert(basebriefCliScript.includes("loadProjectProfile"), "CLI must load project profiles");
   assert(basebriefCliScript.includes("profile-init --repo <target-repo> --output <profile.json>"), "CLI must expose profile-init help");
   assert(basebriefCliScript.includes("continue --profile <profile.json> --output-dir <dir>"), "CLI must expose continue profile help");
+  assert(basebriefCliScript.includes("workflow --profile <profile.json> --output-dir <dir>"), "CLI must expose workflow profile help");
   assert(basebriefCliScript.includes('if (command === "profile-init") return commandProfileInit(options);'), "CLI must route profile-init command");
+  assert(basebriefCliScript.includes('if (command === "workflow") return commandWorkflow(options);'), "CLI must route workflow command");
+  assert(basebriefCliScript.includes('if (result.command === "workflow")') && basebriefCliScript.includes("BaseBrief workflow runner"), "CLI must format workflow output");
   assert(basebriefCliScript.includes("profileDefaultsApplied"), "CLI continue profile must report applied defaults");
   assert(basebriefProjectProfileScript.includes("basebrief-project-profile-v1"), "Project Profile script must define v1 contract");
   assert(basebriefProjectProfileScript.includes("continuation-default") && basebriefProjectProfileScript.includes("small-delta") && basebriefProjectProfileScript.includes("review-heavy"), "Project Profile script must define recipes");
   assert(basebriefProjectProfileScript.includes("SENSITIVE_KEY_PATTERN") && basebriefProjectProfileScript.includes("SECRET_VALUE_PATTERN"), "Project Profile script must scan sensitive fields and values");
   assert(basebriefProjectProfileScript.includes("cwdCandidate") && basebriefProjectProfileScript.includes("path.basename(cwd) === repoHint"), "Project Profile script must resolve public repo hints from cwd");
+  assert(basebriefWorkflowScript.includes("WORKFLOW_CONTRACT_VERSION") && basebriefWorkflowScript.includes("basebrief-workflow-lite-v1"), "Workflow script must define v1 contract");
+  assert(basebriefWorkflowScript.includes("runContinuationHarness") && basebriefWorkflowScript.includes("optionsFromProfile"), "Workflow script must wrap profile continuation");
+  assert(basebriefWorkflowScript.includes("No provider request.") && basebriefWorkflowScript.includes("No MCP server.") && basebriefWorkflowScript.includes("No schema-v2."), "Workflow script must preserve hard boundaries");
+  assert(basebriefWorkflowScript.includes("No automatic commit, push, tag, release"), "Workflow script must reject automatic release actions");
+  assert(!basebriefWorkflowScript.includes("runDoctor") && !basebriefWorkflowScript.includes("runExport") && !basebriefWorkflowScript.includes("runDelta"), "Workflow script must not call doctor, export, or delta");
 
   assert(v2ContextPackRoadmapDoc.includes("exports/manifest.json"), "v2 roadmap must define export manifest");
   assert(v2ContextPackRoadmapDoc.includes("exports/context-pack.md"), "v2 roadmap must define readable export");
@@ -2530,6 +2542,7 @@ function checkContentContracts() {
   const basebriefDoctorScript = readText("scripts/basebrief_doctor.js");
   const basebriefContinuationHarnessScript = readText("scripts/basebrief_continuation_harness.js");
   const basebriefProjectProfileScript = readText("scripts/basebrief_project_profile.js");
+  const basebriefWorkflowScript = readText("scripts/basebrief_workflow.js");
   const v2ContextPackRoadmapDoc = readText("docs/roadmap/basebrief-v2-context-pack-lite.md");
   const contextPackLiteDogfoodingDoc = readText("docs/dogfooding/context-pack-lite-fresh-receiver-v2.0.0.md");
   const contextPackCheckDogfoodingDoc = readText("docs/dogfooding/context-pack-check-acceptance-v2.1.0.md");
@@ -2659,7 +2672,7 @@ function checkContentContracts() {
     JSON.stringify(Object.keys(packageJson.scripts || {}).sort()) === JSON.stringify(["check", "release-check", "test"]),
     "package.json must only expose local validation scripts",
   );
-  assert(packageJson.scripts.test === "node --test tests/basebrief.test.js tests/context-pack.test.js tests/cache-ready-benchmark.test.js tests/continuation-harness.test.js tests/project-profile.test.js", "npm test must wrap the independent tests");
+  assert(packageJson.scripts.test === "node --test tests/basebrief.test.js tests/context-pack.test.js tests/cache-ready-benchmark.test.js tests/continuation-harness.test.js tests/project-profile.test.js tests/workflow-runner.test.js", "npm test must wrap the independent tests");
   assert(packageJson.scripts["release-check"] === "node scripts/run_release_checks.js", "npm run release-check must wrap release checks");
   assert(packageJson.scripts.check === "npm test && npm run release-check", "npm run check must run tests before release checks");
   ["dependencies", "devDependencies", "peerDependencies", "optionalDependencies", "bin", "publishConfig", "files"].forEach((key) => {
@@ -3098,6 +3111,7 @@ function checkContentContracts() {
     basebriefCliScript,
     basebriefContinuationHarnessScript,
     basebriefProjectProfileScript,
+    basebriefWorkflowScript,
     continuationExampleReadme,
     projectProfileExampleReadme,
     projectProfileExample,
@@ -5646,6 +5660,7 @@ function checkCliLite() {
     assert(helpStdout.includes("sidecar-check --input <sidecar-dir>"), "CLI help must expose Sidecar check");
     assert(helpStdout.includes("continue --repo <target-repo> --output-dir <dir>"), "CLI help must expose Continuation Harness Lite");
     assert(helpStdout.includes("profile-init --repo <target-repo> --output <profile.json>"), "CLI help must expose Project Profile init");
+    assert(helpStdout.includes("workflow --profile <profile.json> --output-dir <dir>"), "CLI help must expose Workflow Runner Lite");
     assert(helpStdout.includes("continue --profile <profile.json> --output-dir <dir>"), "CLI help must expose profile-backed continue");
     assert(helpStdout.includes("context-pack --repo <target-repo> --output-dir <dir>"), "CLI help must expose Context Pack Lite");
     assert(helpStdout.includes("resume --input <context-pack-dir>"), "CLI help must expose Context Pack Resume");
@@ -6125,6 +6140,34 @@ function checkCliLite() {
     assert(!("next_step" in profileContinueResult), "CLI continue --profile JSON must not include next_step");
     assert(fs.existsSync(path.join(profileContinueDir, "CONTINUATION_REPORT.md")), "CLI continue --profile must write continuation report");
 
+    const workflowDir = path.join(tempRoot, "workflow");
+    const workflowStdout = execFileSync(process.execPath, [
+      "scripts/basebrief.js",
+      "workflow",
+      "--profile",
+      profilePath,
+      "--output-dir",
+      workflowDir,
+      "--json",
+    ], {
+      cwd: repoRoot,
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "pipe"],
+      env: process.env,
+    });
+    const workflowResult = JSON.parse(workflowStdout);
+    assert(workflowResult.command === "workflow", "CLI workflow must return workflow metadata");
+    assert(workflowResult.workflowContractVersion === "basebrief-workflow-lite-v1", "CLI workflow must return workflow contract");
+    assert(workflowResult.recipe === "small-delta", "CLI workflow must report profile recipe");
+    assert(workflowResult.profileDefaultsApplied.repo === true, "CLI workflow must apply profile repo default");
+    assert(workflowResult.steps.continue === workflowResult.status, "CLI workflow must expose continuation status in steps");
+    assert(workflowResult.outputFiles.contextPack.endsWith("context-pack"), "CLI workflow must report context pack output");
+    assert(!("prompt" in workflowResult), "CLI workflow JSON must not include prompt");
+    assert(!("next_step" in workflowResult), "CLI workflow JSON must not include next_step");
+    assert(!/[A-Za-z]:[\\/]/.test(workflowStdout), "CLI workflow JSON must not expose drive-letter absolute paths");
+    assert(fs.existsSync(path.join(workflowDir, "CONTINUATION_REPORT.md")), "CLI workflow must write continuation report");
+    assert(fs.existsSync(path.join(workflowDir, "context-pack", "MANIFEST.md")), "CLI workflow must write context pack");
+
     const contextPackCheckStdout = execFileSync(process.execPath, [
       "scripts/basebrief.js",
       "check",
@@ -6335,7 +6378,7 @@ function checkCliLite() {
   } finally {
     fs.rmSync(tempRoot, { recursive: true, force: true });
   }
-  return 23;
+    return 24;
 }
 
 function checkFirstRunWorkflow() {
@@ -6576,7 +6619,7 @@ function checkBenchmarkSummaryIfPresent() {
 }
 
 function checkIndependentTests() {
-  const tests = ["tests/basebrief.test.js", "tests/context-pack.test.js", "tests/cache-ready-benchmark.test.js", "tests/continuation-harness.test.js", "tests/project-profile.test.js"];
+  const tests = ["tests/basebrief.test.js", "tests/context-pack.test.js", "tests/cache-ready-benchmark.test.js", "tests/continuation-harness.test.js", "tests/project-profile.test.js", "tests/workflow-runner.test.js"];
   tests.forEach((relativePath) => {
     assert(fs.existsSync(path.join(repoRoot, relativePath)), `Missing independent test: ${relativePath}`);
   });

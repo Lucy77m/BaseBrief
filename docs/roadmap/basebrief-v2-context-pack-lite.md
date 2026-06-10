@@ -853,23 +853,29 @@ release-check gate.
 ### v3.0 Workflow Runner Lite Research
 
 `docs/releases/v3.0.0-plan.md` opens the Workflow Runner Lite research/spec
-line after Project Profile / Recipes Lite dogfooding. The proposed future shape
-is a narrow local BaseBrief pipeline runner:
+line after Project Profile / Recipes Lite dogfooding, then v3.0-B adds the
+minimum local implementation. The shape is a narrow local BaseBrief pipeline
+runner:
 
 ```text
 Project Profile -> Continue -> Context Pack -> Check -> Resume starter
 ```
 
-The proposed future command shape is:
+The command shape is:
 
 ```text
 node scripts/basebrief.js workflow --profile <profile.json> --output-dir <dir> [--repo <target-repo>] [--since <commit>] [--max-files <n>] [--json]
 ```
 
-This first v3.0 step is planning only. It does not add a runner script, new CLI
-command, JSON contract implementation, schema-v2, provider/runtime integration,
-plugin/MCP surface, daemon, watcher, CI workflow, or automatic project-task,
-git, or release actions. It keeps `provider_probe_status=skipped` as the
+The implementation is a thin wrapper in `scripts/basebrief_workflow.js` with
+coverage in `tests/workflow-runner.test.js`. It reuses Continuation Harness Lite
+output and preserves `continuation.meta.json`, the Context Pack seven-file
+structure, and existing `continue/context-pack/check/resume` behavior.
+
+It does not add provider/runtime integration, plugin/MCP surface, schema-v2,
+daemon, watcher, CI workflow, Doctor/Export/Delta/Project State automation, or
+automatic project-task, git, or release actions. Expected test count is 192 with
+`independent_test_files=6`, and it keeps `provider_probe_status=skipped` as the
 no-provider release-check gate.
 
 ## Acceptance Criteria
