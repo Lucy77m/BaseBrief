@@ -34,6 +34,8 @@ node scripts/basebrief.js context-pack --repo . --output-dir tests/outputs/priva
 node scripts/basebrief.js resume --input examples/context-pack-lite --json
 node scripts/basebrief.js export --input examples/context-pack-lite --output-dir tests/outputs/private/file-export --json
 node scripts/basebrief.js doctor --repo . --context-pack examples/context-pack-lite --json
+node scripts/basebrief.js profile-init --repo . --output tests/outputs/private/basebrief-profile.json --json
+node scripts/basebrief.js continue --profile tests/outputs/private/basebrief-profile.json --output-dir tests/outputs/private/continue-profile --json
 ```
 
 The repository also includes minimal local npm scripts:
@@ -347,6 +349,7 @@ generated git and diff summaries. See [Delta Handoff Spec](specs/delta-handoff.m
 
 ```text
 node scripts/basebrief.js continue --repo <target-repo> --output-dir <dir> [--since <commit>] [--max-files <n>] [--json]
+node scripts/basebrief.js continue --profile <profile.json> --output-dir <dir> [--repo <target-repo>] [--since <commit>] [--max-files <n>] [--json]
 ```
 
 This command runs the existing `context-pack -> check -> resume` path and writes
@@ -370,9 +373,40 @@ Continuation Harness Lite is not a Workflow Runner. It does not call providers,
 does not expand Doctor or Export, does not create an MCP server or plugin, does
 not add schema-v2, and does not perform git or release actions.
 
+When `--profile` is supplied, `continue` reads public-safe defaults from a
+Project Profile and then lets explicit CLI flags override those defaults. The
+profile can provide the target repo hint, `since`, `max_files`, recipe name,
+starter language, risk boundaries, and review notes. It cannot store secrets,
+private absolute paths, provider credentials, runtime settings, global config,
+or automatic actions.
+
 See [v2.8.0 Continuation Harness Lite Plan](releases/v2.8.0-plan.md),
 [v2.8.0 Continuation Harness Lite Local Closeout](releases/v2.8.0.md), and
 [Continuation Harness Lite example kit](../examples/context-pack-continuation/README.md).
+
+### profile-init
+
+```text
+node scripts/basebrief.js profile-init --repo <target-repo> --output <profile.json> [--recipe continuation-default|small-delta|review-heavy] [--json]
+```
+
+This command writes a local Project Profile template with
+`schemaVersion: basebrief-project-profile-v1`.
+
+The first recipe set is intentionally small:
+
+- `continuation-default`: normal next-window continuation packages
+- `small-delta`: narrower recent-delta packages
+- `review-heavy`: wider public-safe file review packages
+
+Generated profiles are reviewable JSON files. They are not global config, not a
+secret store, not Project State, not schema-v2, and not a Workflow Runner. The
+command refuses `.env` and `.git` output paths and refuses to overwrite an
+existing profile.
+
+See [v2.9.0 Project Profile / Recipes Lite Plan](releases/v2.9.0-plan.md),
+[v2.9.0 Project Profile / Recipes Lite Local Closeout](releases/v2.9.0.md), and
+[Project Profile Lite example kit](../examples/project-profile-lite/README.md).
 
 ### context-pack
 

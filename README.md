@@ -40,6 +40,8 @@ node scripts/basebrief.js resume --input tests/outputs/private/context-pack
 
 ```text
 node scripts/basebrief.js continue --repo <target-repo> --output-dir <dir> [--json]
+node scripts/basebrief.js profile-init --repo <target-repo> --output <profile.json> [--json]
+node scripts/basebrief.js continue --profile <profile.json> --output-dir <dir> [--json]
 node scripts/basebrief.js context-pack --repo <target-repo> --output-dir <dir> [--json]
 node scripts/basebrief.js check --input <context-pack-dir> [--json]
 node scripts/basebrief.js resume --input <context-pack-dir> [--json]
@@ -47,7 +49,7 @@ node scripts/basebrief.js export --input <context-pack-dir> --output-dir <dir> [
 node scripts/basebrief.js doctor --repo <target-repo> --context-pack <context-pack-dir> [--json]
 ```
 
-主线能力是 Continue / Context Pack / Check / Resume / Export / Doctor。`continue` 只准备可审阅的接续包，不自动执行项目任务。File-only Export 的 “MCP-friendly means future tool-consumable files”，不是 MCP server、runtime integration 或 provider integration。
+主线能力是 Continue / Project Profile / Context Pack / Check / Resume / Export / Doctor。`profile-init` 只保存公开安全的本地 recipe 默认值；`continue` 只准备可审阅的接续包，不自动执行项目任务。File-only Export 的 “MCP-friendly means future tool-consumable files”，不是 MCP server、runtime integration 或 provider integration。
 
 ## 本地验证
 
@@ -67,9 +69,8 @@ npm run check
 - No schema change / No schema-v2.
 - No MCP server.
 - No Workflow Runner; `continue` 是本地接续包准备器，不是 runner。
-- 不把 `.env`、API key、token、secret 写入公开产物。
-- 不把私人绝对路径写入公开文档。
-- 不把假设写成已验证事实。
+- Project Profile 不是全局配置、secret store 或自动化系统。
+- 不把 `.env`、API key、token、secret、私人绝对路径或假设写成公开事实。
 
 未配置 provider 环境变量时，release check 应保持 `provider_probe_status=skipped`。
 
@@ -80,5 +81,4 @@ npm run check
 - [完整文档索引与历史档案](docs/index.md)
 
 ## License
-
 MIT

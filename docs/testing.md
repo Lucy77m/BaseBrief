@@ -26,6 +26,36 @@ npm run check
 
 ## v0.9.0 Integrated Handoff Readiness Candidate
 
+## v2.9.0 Project Profile / Recipes Lite
+
+`v2.9.0` adds a local Project Profile / Recipes Lite layer on top of
+Continuation Harness Lite. It exposes:
+
+```text
+node scripts/basebrief.js profile-init --repo <target-repo> --output <profile.json> [--recipe continuation-default|small-delta|review-heavy] [--json]
+node scripts/basebrief.js continue --profile <profile.json> --output-dir <dir> [--repo <target-repo>] [--since <commit>] [--max-files <n>] [--json]
+```
+
+The validation focus is:
+
+- profile-init writes public-safe `basebrief-project-profile-v1` JSON
+- `continue --profile` applies reviewed defaults
+- explicit CLI flags override profile defaults
+- sensitive fields, secret-like values, private absolute paths, and `.env` /
+  `.git` paths are rejected
+- plain `continue --repo` behavior remains unchanged
+
+Expected test count is 185 tests with `independent_test_files=5`. Expected
+release-check output without provider env remains:
+
+```text
+provider_probe_status=skipped
+```
+
+This is not Workflow Runner Lite. It does not call providers, store secrets,
+write global config, change Project State schema, create a plugin or MCP
+server/tools, add schema-v2, or perform git/release actions.
+
 `v0.9.0` is a public hardening line for the integrated local handoff path:
 receiver-ready handoff -> Project State -> Sidecar bundle -> receiver first
 response. It adds no provider request, runtime integration, schema change, Auto

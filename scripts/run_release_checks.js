@@ -262,6 +262,8 @@ function checkRequiredFiles() {
     "docs/releases/v2.7.0.md",
     "docs/releases/v2.8.0-plan.md",
     "docs/releases/v2.8.0.md",
+    "docs/releases/v2.9.0-plan.md",
+    "docs/releases/v2.9.0.md",
     "docs/specs/context-pack-resume.md",
     "docs/specs/basebrief-format.md",
     "docs/specs/file-only-export.md",
@@ -360,6 +362,7 @@ function checkRequiredFiles() {
     "scripts/basebrief_doctor.js",
     "scripts/basebrief_resume.js",
     "scripts/basebrief_continuation_harness.js",
+    "scripts/basebrief_project_profile.js",
     "scripts/bb9_provider_profiles.json",
     "schemas/bb9-handoff.schema.json",
     "schemas/basebrief-receiver-check.schema.json",
@@ -402,6 +405,8 @@ function checkRequiredFiles() {
     "examples/file-only-export/exports/context.json",
     "examples/file-only-export/exports/adapter-notes.md",
     "examples/context-pack-doctor/README.md",
+    "examples/project-profile-lite/README.md",
+    "examples/project-profile-lite/basebrief-profile.json",
     "examples/next-chat-example.md",
     "examples/receiver-check-config.json",
     "examples/receiver/difference-found/README.md",
@@ -437,6 +442,8 @@ function checkRequiredFiles() {
     "examples/context-pack-lite/RECEIVER_STATE.md",
     "examples/context-pack-lite/NEXT_WINDOW_STARTER.md",
     "examples/context-pack-continuation/README.md",
+    "examples/project-profile-lite/README.md",
+    "examples/project-profile-lite/basebrief-profile.json",
     "examples/receiver-flow/clean-repo/README.md",
     "examples/receiver-flow/clean-repo/flow-summary.json",
     "examples/receiver-flow/clean-repo/receiver-check.json",
@@ -485,10 +492,15 @@ function checkV2ContextPackDocs(context) {
     contextPackHumanNextStepHintsDogfoodingV271Doc,
     v280PlanDoc,
     v280ReleaseDoc,
+    v290PlanDoc,
+    v290ReleaseDoc,
     continuationHarnessDogfoodingDoc,
     basebriefCliScript,
     basebriefContinuationHarnessScript,
+    basebriefProjectProfileScript,
     continuationExampleReadme,
+    projectProfileExampleReadme,
+    projectProfileExample,
   } = context;
 
   assert(testingDoc.includes("v2.0.0 Context Pack Lite Local Closeout"), "Testing docs must document v2.0.0 context pack closeout");
@@ -1073,13 +1085,21 @@ function checkV2ContextPackDocs(context) {
   assert(testingDoc.includes("dogfooding/continuation-harness-lite-v2.8.0.md"), "Testing docs must link v2.8 dogfooding");
   assert(testingDoc.includes("tests/continuation-harness.test.js"), "Testing docs must name continuation harness tests");
   assert(testingDoc.includes("Expected test count is 180 tests") && testingDoc.includes("independent_test_files=4"), "Testing docs must document v2.8 test count and independent files");
+  assert(testingDoc.includes("v2.9.0 Project Profile / Recipes Lite"), "Testing docs must document v2.9 project profile");
+  assert(testingDoc.includes("Expected test count is 185 tests") && testingDoc.includes("independent_test_files=5"), "Testing docs must document v2.9 test count and independent files");
   assert(docsIndex.includes("releases/v2.8.0-plan.md"), "Docs index must link v2.8 continuation harness plan");
   assert(docsIndex.includes("releases/v2.8.0.md"), "Docs index must link v2.8 continuation harness closeout");
   assert(docsIndex.includes("dogfooding/continuation-harness-lite-v2.8.0.md"), "Docs index must link v2.8 dogfooding");
   assert(docsIndex.includes("../examples/context-pack-continuation/README.md"), "Docs index must link continuation harness example kit");
+  assert(docsIndex.includes("releases/v2.9.0-plan.md"), "Docs index must link v2.9 project profile plan");
+  assert(docsIndex.includes("releases/v2.9.0.md"), "Docs index must link v2.9 project profile closeout");
+  assert(docsIndex.includes("../examples/project-profile-lite/README.md"), "Docs index must link project profile example kit");
   assert(v2ContextPackRoadmapDoc.includes("v2.8 Continuation Harness Lite"), "v2 roadmap must name v2.8 continuation harness");
   assert(v2ContextPackRoadmapDoc.includes("docs/dogfooding/continuation-harness-lite-v2.8.0.md"), "v2 roadmap must link v2.8 dogfooding");
   assert(v2ContextPackRoadmapDoc.includes("expected test count") && v2ContextPackRoadmapDoc.includes("independent_test_files=4"), "v2 roadmap must document v2.8 validation metrics");
+  assert(v2ContextPackRoadmapDoc.includes("v2.9 Project Profile / Recipes Lite"), "v2 roadmap must name v2.9 project profile");
+  assert(v2ContextPackRoadmapDoc.includes("docs/releases/v2.9.0-plan.md"), "v2 roadmap must link v2.9 plan");
+  assert(v2ContextPackRoadmapDoc.includes("tests/project-profile.test.js") && v2ContextPackRoadmapDoc.includes("independent_test_files=5"), "v2 roadmap must document v2.9 validation metrics");
 
   assert(v280PlanDoc.includes("v2.8.0 Continuation Harness Lite Plan"), "v2.8 plan must have stable title");
   assert(v280PlanDoc.includes("context-pack -> check -> resume"), "v2.8 plan must preserve command sequence");
@@ -1124,6 +1144,41 @@ function checkV2ContextPackDocs(context) {
   assert(basebriefContinuationHarnessScript.includes("ready_for_receiver") && basebriefContinuationHarnessScript.includes("needs_review") && basebriefContinuationHarnessScript.includes("blocked"), "Harness script must implement status semantics");
   assert(basebriefContinuationHarnessScript.includes("safePromptForOutput"), "Harness script must normalize copied starter paths");
   assert(basebriefContinuationHarnessScript.includes("No provider request.") && basebriefContinuationHarnessScript.includes("No Workflow Runner."), "Harness script must preserve hard boundaries");
+
+  assert(v290PlanDoc.includes("v2.9.0 Project Profile / Recipes Lite Plan"), "v2.9 plan must have stable title");
+  assert(v290PlanDoc.includes("profile-init -> review profile -> continue --profile"), "v2.9 plan must preserve command sequence");
+  assert(v290PlanDoc.includes("basebrief-project-profile-v1"), "v2.9 plan must define profile contract");
+  assert(v290PlanDoc.includes("continuation-default") && v290PlanDoc.includes("small-delta") && v290PlanDoc.includes("review-heavy"), "v2.9 plan must define initial recipes");
+  assert(v290PlanDoc.includes("Explicit `continue` CLI flags override profile defaults"), "v2.9 plan must preserve override semantics");
+  assert(v290PlanDoc.includes("unsafe profile field -> rejected") && v290PlanDoc.includes("continue --repo -> unchanged from v2.8"), "v2.9 plan must preserve acceptance matrix");
+  assert(v290PlanDoc.includes("No Workflow Runner") && v290PlanDoc.includes("No global config") && v290PlanDoc.includes("No secret store"), "v2.9 plan must preserve profile boundaries");
+
+  assert(v290ReleaseDoc.includes("v2.9.0 Project Profile / Recipes Lite Local Closeout"), "v2.9 closeout must have stable title");
+  assert(v290ReleaseDoc.includes("scripts/basebrief_project_profile.js"), "v2.9 closeout must name project profile script");
+  assert(v290ReleaseDoc.includes("tests/project-profile.test.js"), "v2.9 closeout must name independent tests");
+  assert(v290ReleaseDoc.includes("examples/project-profile-lite/"), "v2.9 closeout must link example kit");
+  assertIncludesPhrase(v290ReleaseDoc, "does not include the full resume prompt body and does not add human-only `next_step` fields", "v2.9 closeout must preserve JSON boundary");
+  assert(v290ReleaseDoc.includes("No Workflow Runner") && v290ReleaseDoc.includes("No global config") && v290ReleaseDoc.includes("No secret store"), "v2.9 closeout must preserve profile boundaries");
+
+  assert(projectProfileExampleReadme.includes("Project Profile Lite Example Kit"), "Project Profile example kit must have stable title");
+  assert(projectProfileExampleReadme.includes("basebrief-project-profile-v1"), "Project Profile example kit must name contract");
+  assert(projectProfileExampleReadme.includes("continuation-default") && projectProfileExampleReadme.includes("small-delta") && projectProfileExampleReadme.includes("review-heavy"), "Project Profile example kit must define recipes");
+  assert(projectProfileExampleReadme.includes("inherited preference context, not proof"), "Project Profile example kit must preserve receiver recheck rule");
+  assert(projectProfileExampleReadme.includes("does not call providers") && projectProfileExampleReadme.includes("does not store secrets") && projectProfileExampleReadme.includes("does not write global config"), "Project Profile example kit must preserve non-goals");
+  assert(projectProfileExample.schemaVersion === "basebrief-project-profile-v1", "Project Profile example must use v1 contract");
+  assert(projectProfileExample.recipe === "continuation-default", "Project Profile example must use default recipe");
+  assert(projectProfileExample.defaults.max_files === 12, "Project Profile example must preserve default max files");
+  assert(!JSON.stringify(projectProfileExample).match(/[A-Z]:\\|\\\\|\/home\/|\b(?:sk|gho|ghp|github_pat|Bearer)\b/i), "Project Profile example must not contain private paths or secret-like values");
+
+  assert(basebriefCliScript.includes("runProfileInit"), "CLI must import project profile init");
+  assert(basebriefCliScript.includes("loadProjectProfile"), "CLI must load project profiles");
+  assert(basebriefCliScript.includes("profile-init --repo <target-repo> --output <profile.json>"), "CLI must expose profile-init help");
+  assert(basebriefCliScript.includes("continue --profile <profile.json> --output-dir <dir>"), "CLI must expose continue profile help");
+  assert(basebriefCliScript.includes('if (command === "profile-init") return commandProfileInit(options);'), "CLI must route profile-init command");
+  assert(basebriefCliScript.includes("profileDefaultsApplied"), "CLI continue profile must report applied defaults");
+  assert(basebriefProjectProfileScript.includes("basebrief-project-profile-v1"), "Project Profile script must define v1 contract");
+  assert(basebriefProjectProfileScript.includes("continuation-default") && basebriefProjectProfileScript.includes("small-delta") && basebriefProjectProfileScript.includes("review-heavy"), "Project Profile script must define recipes");
+  assert(basebriefProjectProfileScript.includes("SENSITIVE_KEY_PATTERN") && basebriefProjectProfileScript.includes("SECRET_VALUE_PATTERN"), "Project Profile script must scan sensitive fields and values");
 
   assert(v2ContextPackRoadmapDoc.includes("exports/manifest.json"), "v2 roadmap must define export manifest");
   assert(v2ContextPackRoadmapDoc.includes("exports/context-pack.md"), "v2 roadmap must define readable export");
@@ -2425,6 +2480,8 @@ function checkContentContracts() {
   const v270ReleaseDoc = readText("docs/releases/v2.7.0.md");
   const v280PlanDoc = readText("docs/releases/v2.8.0-plan.md");
   const v280ReleaseDoc = readText("docs/releases/v2.8.0.md");
+  const v290PlanDoc = readText("docs/releases/v2.9.0-plan.md");
+  const v290ReleaseDoc = readText("docs/releases/v2.9.0.md");
   const contextPackResumeSpecDoc = readText("docs/specs/context-pack-resume.md");
   const basebriefFormatSpecDoc = readText("docs/specs/basebrief-format.md");
   const fileOnlyExportSpecDoc = readText("docs/specs/file-only-export.md");
@@ -2434,6 +2491,7 @@ function checkContentContracts() {
   const basebriefExportScript = readText("scripts/basebrief_export.js");
   const basebriefDoctorScript = readText("scripts/basebrief_doctor.js");
   const basebriefContinuationHarnessScript = readText("scripts/basebrief_continuation_harness.js");
+  const basebriefProjectProfileScript = readText("scripts/basebrief_project_profile.js");
   const v2ContextPackRoadmapDoc = readText("docs/roadmap/basebrief-v2-context-pack-lite.md");
   const contextPackLiteDogfoodingDoc = readText("docs/dogfooding/context-pack-lite-fresh-receiver-v2.0.0.md");
   const contextPackCheckDogfoodingDoc = readText("docs/dogfooding/context-pack-check-acceptance-v2.1.0.md");
@@ -2519,6 +2577,8 @@ function checkContentContracts() {
   const contextPackLiteExampleReceiverState = readText("examples/context-pack-lite/RECEIVER_STATE.md");
   const contextPackLiteExampleStarter = readText("examples/context-pack-lite/NEXT_WINDOW_STARTER.md");
   const continuationExampleReadme = readText("examples/context-pack-continuation/README.md");
+  const projectProfileExampleReadme = readText("examples/project-profile-lite/README.md");
+  const projectProfileExample = readJson("examples/project-profile-lite/basebrief-profile.json");
   const fileOnlyExportExampleReadme = readText("examples/file-only-export/README.md");
   const fileOnlyExportExampleManifest = readJson("examples/file-only-export/exports/manifest.json");
   const fileOnlyExportExampleContext = readJson("examples/file-only-export/exports/context.json");
@@ -2561,7 +2621,7 @@ function checkContentContracts() {
     JSON.stringify(Object.keys(packageJson.scripts || {}).sort()) === JSON.stringify(["check", "release-check", "test"]),
     "package.json must only expose local validation scripts",
   );
-  assert(packageJson.scripts.test === "node --test tests/basebrief.test.js tests/context-pack.test.js tests/cache-ready-benchmark.test.js tests/continuation-harness.test.js", "npm test must wrap the independent tests");
+  assert(packageJson.scripts.test === "node --test tests/basebrief.test.js tests/context-pack.test.js tests/cache-ready-benchmark.test.js tests/continuation-harness.test.js tests/project-profile.test.js", "npm test must wrap the independent tests");
   assert(packageJson.scripts["release-check"] === "node scripts/run_release_checks.js", "npm run release-check must wrap release checks");
   assert(packageJson.scripts.check === "npm test && npm run release-check", "npm run check must run tests before release checks");
   ["dependencies", "devDependencies", "peerDependencies", "optionalDependencies", "bin", "publishConfig", "files"].forEach((key) => {
@@ -2992,10 +3052,15 @@ function checkContentContracts() {
     contextPackHumanNextStepHintsDogfoodingV271Doc,
     v280PlanDoc,
     v280ReleaseDoc,
+    v290PlanDoc,
+    v290ReleaseDoc,
     continuationHarnessDogfoodingDoc,
     basebriefCliScript,
     basebriefContinuationHarnessScript,
+    basebriefProjectProfileScript,
     continuationExampleReadme,
+    projectProfileExampleReadme,
+    projectProfileExample,
   });
   assert(testingDoc.includes("v1.5 Delta Receiver Lint Mini Plan"), "Testing docs must document the v1.5 lint mini plan");
   assert(testingDoc.includes("v1.5 Delta Receiver Lint Mini Local Closeout"), "Testing docs must document the v1.5 lint mini closeout");
@@ -5540,6 +5605,8 @@ function checkCliLite() {
     assert(helpStdout.includes("--starter-language auto|zh-CN|en|ja"), "CLI help must expose starter language option");
     assert(helpStdout.includes("sidecar-check --input <sidecar-dir>"), "CLI help must expose Sidecar check");
     assert(helpStdout.includes("continue --repo <target-repo> --output-dir <dir>"), "CLI help must expose Continuation Harness Lite");
+    assert(helpStdout.includes("profile-init --repo <target-repo> --output <profile.json>"), "CLI help must expose Project Profile init");
+    assert(helpStdout.includes("continue --profile <profile.json> --output-dir <dir>"), "CLI help must expose profile-backed continue");
     assert(helpStdout.includes("context-pack --repo <target-repo> --output-dir <dir>"), "CLI help must expose Context Pack Lite");
     assert(helpStdout.includes("resume --input <context-pack-dir>"), "CLI help must expose Context Pack Resume");
     assert(helpStdout.includes("doctor --repo <target-repo> --context-pack <context-pack-dir>"), "CLI help must expose Context Pack Doctor");
@@ -5971,6 +6038,52 @@ function checkCliLite() {
     assert(contextPackResult.limits.maxFiles === 4, "CLI context-pack must honor max-files");
     assert(fs.existsSync(path.join(contextPackDir, "MANIFEST.md")), "CLI context-pack must write MANIFEST.md");
     assert(fs.existsSync(path.join(contextPackDir, "NEXT_WINDOW_STARTER.md")), "CLI context-pack must write NEXT_WINDOW_STARTER.md");
+
+    const profilePath = path.join(tempRoot, "basebrief-profile.json");
+    const profileInitStdout = execFileSync(process.execPath, [
+      "scripts/basebrief.js",
+      "profile-init",
+      "--repo",
+      receiverRepo,
+      "--output",
+      profilePath,
+      "--recipe",
+      "small-delta",
+      "--json",
+    ], {
+      cwd: repoRoot,
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "pipe"],
+      env: process.env,
+    });
+    const profileInitResult = JSON.parse(profileInitStdout);
+    assert(profileInitResult.command === "profile-init", "CLI profile-init must return command metadata");
+    assert(profileInitResult.contractVersion === "basebrief-project-profile-v1", "CLI profile-init must return profile contract");
+    assert(profileInitResult.profile.recipe === "small-delta", "CLI profile-init must honor selected recipe");
+    assert(fs.existsSync(profilePath), "CLI profile-init must write profile output");
+
+    const profileContinueDir = path.join(tempRoot, "profile-continue");
+    const profileContinueStdout = execFileSync(process.execPath, [
+      "scripts/basebrief.js",
+      "continue",
+      "--profile",
+      profilePath,
+      "--output-dir",
+      profileContinueDir,
+      "--json",
+    ], {
+      cwd: repoRoot,
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "pipe"],
+      env: process.env,
+    });
+    const profileContinueResult = JSON.parse(profileContinueStdout);
+    assert(profileContinueResult.command === "continue", "CLI continue --profile must return continue metadata");
+    assert(profileContinueResult.recipe === "small-delta", "CLI continue --profile must report recipe");
+    assert(profileContinueResult.profileDefaultsApplied.repo === true, "CLI continue --profile must apply profile repo default");
+    assert(!("prompt" in profileContinueResult), "CLI continue --profile JSON must not include prompt");
+    assert(!("next_step" in profileContinueResult), "CLI continue --profile JSON must not include next_step");
+    assert(fs.existsSync(path.join(profileContinueDir, "CONTINUATION_REPORT.md")), "CLI continue --profile must write continuation report");
 
     const contextPackCheckStdout = execFileSync(process.execPath, [
       "scripts/basebrief.js",
@@ -6423,7 +6536,7 @@ function checkBenchmarkSummaryIfPresent() {
 }
 
 function checkIndependentTests() {
-  const tests = ["tests/basebrief.test.js", "tests/context-pack.test.js", "tests/cache-ready-benchmark.test.js", "tests/continuation-harness.test.js"];
+  const tests = ["tests/basebrief.test.js", "tests/context-pack.test.js", "tests/cache-ready-benchmark.test.js", "tests/continuation-harness.test.js", "tests/project-profile.test.js"];
   tests.forEach((relativePath) => {
     assert(fs.existsSync(path.join(repoRoot, relativePath)), `Missing independent test: ${relativePath}`);
   });

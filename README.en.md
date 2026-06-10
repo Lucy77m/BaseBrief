@@ -43,6 +43,8 @@ node scripts/basebrief.js resume --input tests/outputs/private/context-pack
 
 ```text
 node scripts/basebrief.js continue --repo <target-repo> --output-dir <dir> [--json]
+node scripts/basebrief.js profile-init --repo <target-repo> --output <profile.json> [--json]
+node scripts/basebrief.js continue --profile <profile.json> --output-dir <dir> [--json]
 node scripts/basebrief.js context-pack --repo <target-repo> --output-dir <dir> [--json]
 node scripts/basebrief.js check --input <context-pack-dir> [--json]
 node scripts/basebrief.js resume --input <context-pack-dir> [--json]
@@ -50,7 +52,7 @@ node scripts/basebrief.js export --input <context-pack-dir> --output-dir <dir> [
 node scripts/basebrief.js doctor --repo <target-repo> --context-pack <context-pack-dir> [--json]
 ```
 
-The main line is Continue / Context Pack / Check / Resume / Export / Doctor. `continue` prepares a reviewable continuation package; it does not execute project work automatically. For File-only Export, “MCP-friendly means future tool-consumable files”; it does not mean an MCP server, runtime integration, or provider integration.
+The main line is Continue / Project Profile / Context Pack / Check / Resume / Export / Doctor. `profile-init` only stores public-safe local recipe defaults; `continue` prepares a reviewable continuation package and does not execute project work automatically. For File-only Export, “MCP-friendly means future tool-consumable files”; it does not mean an MCP server, runtime integration, or provider integration.
 
 ## Local Validation
 
@@ -70,9 +72,8 @@ These npm scripts are local validation shortcuts only. BaseBrief is not a publis
 - No schema change / No schema-v2.
 - No MCP server.
 - No Workflow Runner; `continue` is a local continuation-package preparer, not a runner.
-- Do not publish `.env`, API keys, tokens, or secrets.
-- Do not write private absolute paths into public docs.
-- Do not record assumptions as verified facts.
+- Project Profile is not global config, a secret store, or an automation system.
+- Do not publish `.env`, keys, tokens, private absolute paths, or assumptions as verified facts.
 
 When provider environment variables are absent, release checks should keep reporting `provider_probe_status=skipped`.
 

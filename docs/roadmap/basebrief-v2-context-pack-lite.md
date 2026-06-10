@@ -816,6 +816,34 @@ release, pull request, npm publish, or global CLI install actions. It preserves
 Context Pack Check, Resume, Export, and Doctor JSON contracts and keeps
 `provider_probe_status=skipped` as the no-provider release-check gate.
 
+### v2.9 Project Profile / Recipes Lite
+
+`docs/releases/v2.9.0-plan.md` opens the Project Profile / Recipes Lite line
+after Continuation Harness Lite. v2.9 stores public-safe local defaults for
+repeated continuation runs so users do not have to remember the same repo hint,
+`since`, `max-files`, recipe, and review notes every time.
+
+The v2.9 command surface is:
+
+```text
+node scripts/basebrief.js profile-init --repo <target-repo> --output <profile.json> [--recipe continuation-default|small-delta|review-heavy] [--json]
+node scripts/basebrief.js continue --profile <profile.json> --output-dir <dir> [--repo <target-repo>] [--since <commit>] [--max-files <n>] [--json]
+```
+
+`docs/releases/v2.9.0.md` closes the minimal implementation. It adds
+`scripts/basebrief_project_profile.js`, `tests/project-profile.test.js`, and
+`examples/project-profile-lite/`. Expected test count is 185 and
+`independent_test_files=5`.
+
+Project Profile is not global config, not Project State schema, not a secret
+store, and not Workflow Runner Lite. It does not call providers, run project
+tasks, expand Doctor or Export, create a plugin or MCP server/tools, add
+schema-v2, start a daemon or watcher, or perform automatic commit, push, tag,
+release, pull request, npm publish, or global CLI install actions. It preserves
+Context Pack Check, Resume, Export, Doctor, and plain `continue --repo` JSON
+contracts and keeps `provider_probe_status=skipped` as the no-provider
+release-check gate.
+
 ### Later Workflow Runner Lite
 
 Only after Context Pack Lite, Context Pack Check, One-command Resume,

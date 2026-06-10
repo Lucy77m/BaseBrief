@@ -1,0 +1,27 @@
+{
+  "schemaVersion": "basebrief-project-profile-v1",
+  "recipe": "continuation-default",
+  "repo_hint": "../..",
+  "defaults": {
+    "since": "",
+    "max_files": 12
+  },
+  "starter_language": "auto",
+  "risk_boundaries": [
+    "No provider request.",
+    "No raw private output.",
+    "No runtime integration.",
+    "No automatic git, release, pull request, or project-task execution."
+  ],
+  "review_notes": [
+    "Use this for normal next-window continuation packages.",
+    "Review the generated continuation package before copying NEXT_WINDOW_STARTER.md."
+  ],
+  "non_goals": [
+    "No Workflow Runner.",
+    "No MCP server or MCP tools.",
+    "No plugin.",
+    "No schema-v2.",
+    "No global config or credential storage."
+  ]
+}

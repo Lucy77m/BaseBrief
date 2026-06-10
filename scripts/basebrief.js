@@ -27,6 +27,7 @@ const { runResume } = require("./basebrief_resume");
 const { EXPORT_FILES, runExport } = require("./basebrief_export");
 const { runDoctor } = require("./basebrief_doctor");
 const { runContinuationHarness } = require("./basebrief_continuation_harness");
+const { loadProjectProfile, optionsFromProfile, runProfileInit } = require("./basebrief_project_profile");
 
 const STARTER_FILE = "basebrief-handoff-input.json";
 const HELP_TEXT = [
@@ -56,6 +57,8 @@ const HELP_TEXT = [
   "  node scripts/basebrief.js resume --input <context-pack-dir> [--json]",
   "  node scripts/basebrief.js export --input <context-pack-dir> --output-dir <dir> [--json]",
   "  node scripts/basebrief.js doctor --repo <target-repo> --context-pack <context-pack-dir> [--json]",
+  "  node scripts/basebrief.js profile-init --repo <target-repo> --output <profile.json> [--recipe continuation-default|small-delta|review-heavy] [--json]",
+  "  node scripts/basebrief.js continue --profile <profile.json> --output-dir <dir> [--repo <target-repo>] [--since <commit>] [--max-files <n>] [--json]",
   "  node scripts/basebrief.js continue --repo <target-repo> --output-dir <dir> [--since <commit>] [--max-files <n>] [--json]",
   "",
   "Start here:",
@@ -418,7 +421,37 @@ function commandDoctor(options) {
   });
 }
 
+function commandProfileInit(options) {
+  return runProfileInit({
+    repo: options.repo,
+    output: options.output,
+    recipe: options.recipe || "",
+  });
+}
+
 function commandContinue(options) {
+  if (options.profile) {
+    const loaded = loadProjectProfile(options.profile);
+    const profileOptions = optionsFromProfile(loaded.path, loaded.profile, {
+      repo: options.repo || "",
+      since: options.since || "",
+      "max-files": options["max-files"] || "",
+    });
+    const result = runContinuationHarness({
+      ...profileOptions,
+      "output-dir": options["output-dir"],
+    });
+    return {
+      ...result,
+      profile: loaded.path,
+      recipe: loaded.profile.recipe,
+      profileDefaultsApplied: {
+        repo: !options.repo,
+        since: !options.since && Boolean(loaded.profile.defaults.since),
+        maxFiles: !options["max-files"],
+      },
+    };
+  }
   return runContinuationHarness({
     repo: options.repo,
     "output-dir": options["output-dir"],
@@ -456,6 +489,7 @@ function run(argv) {
   if (command === "resume") return commandResume(options);
   if (command === "export") return commandExport(options);
   if (command === "doctor") return commandDoctor(options);
+  if (command === "profile-init") return commandProfileInit(options);
   if (command === "continue") return commandContinue(options);
   throw new Error(`Unknown command: ${command}`);
 }
@@ -615,11 +649,22 @@ function toPublicResult(result) {
       contextPack: publicPath(result.contextPack, cwd).replace(/\\/g, "/"),
     };
   }
+  if (result.command === "profile-init") {
+    return {
+      ...result,
+      output: publicPath(result.output, cwd),
+      profile: {
+        ...result.profile,
+        repo_hint: result.profile.repo_hint,
+      },
+    };
+  }
   if (result.command === "continue") {
     return {
       ...result,
       outputDir: publicPath(result.outputDir, cwd),
       outputFiles: toRelativeMap(result.outputFiles, cwd),
+      profile: result.profile ? publicPath(result.profile, cwd) : undefined,
     };
   }
   return result;
@@ -822,11 +867,22 @@ function formatHuman(result) {
       "",
     ].join(os.EOL);
   }
+  if (result.command === "profile-init") {
+    return [
+      `BaseBrief project profile written to ${result.output}`,
+      `schemaVersion=${result.contractVersion}`,
+      `recipe=${result.profile.recipe}`,
+      `repo_hint=${result.profile.repo_hint}`,
+      "",
+    ].join(os.EOL);
+  }
   if (result.command === "continue") {
     return [
       `BaseBrief continuation harness ${result.status}`,
       `output_dir=${result.outputDir}`,
       `context_pack=${result.outputFiles.contextPackDir}`,
+      result.profile ? `profile=${result.profile}` : "",
+      result.recipe ? `recipe=${result.recipe}` : "",
       `report=${result.outputFiles.report}`,
       `starter=${result.outputFiles.starter}`,
       `check_status=${result.check.status}`,
@@ -977,6 +1033,7 @@ module.exports = {
   commandResume,
   commandExport,
   commandDoctor,
+  commandProfileInit,
   commandContinue,
   formatFindingLines,
   formatHuman,
