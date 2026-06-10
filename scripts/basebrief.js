@@ -26,6 +26,7 @@ const { CONTEXT_PACK_FILES, buildContextPack } = require("./basebrief_context_pa
 const { runResume } = require("./basebrief_resume");
 const { EXPORT_FILES, runExport } = require("./basebrief_export");
 const { runDoctor } = require("./basebrief_doctor");
+const { runContinuationHarness } = require("./basebrief_continuation_harness");
 
 const STARTER_FILE = "basebrief-handoff-input.json";
 const HELP_TEXT = [
@@ -55,6 +56,7 @@ const HELP_TEXT = [
   "  node scripts/basebrief.js resume --input <context-pack-dir> [--json]",
   "  node scripts/basebrief.js export --input <context-pack-dir> --output-dir <dir> [--json]",
   "  node scripts/basebrief.js doctor --repo <target-repo> --context-pack <context-pack-dir> [--json]",
+  "  node scripts/basebrief.js continue --repo <target-repo> --output-dir <dir> [--since <commit>] [--max-files <n>] [--json]",
   "",
   "Start here:",
   "  docs/quickstart-5min.md",
@@ -416,6 +418,15 @@ function commandDoctor(options) {
   });
 }
 
+function commandContinue(options) {
+  return runContinuationHarness({
+    repo: options.repo,
+    "output-dir": options["output-dir"],
+    since: options.since || "",
+    "max-files": options["max-files"] || "",
+  });
+}
+
 function run(argv) {
   const command = argv[2];
   if (!command || command === "--help" || command === "-h") return { command: "help" };
@@ -445,6 +456,7 @@ function run(argv) {
   if (command === "resume") return commandResume(options);
   if (command === "export") return commandExport(options);
   if (command === "doctor") return commandDoctor(options);
+  if (command === "continue") return commandContinue(options);
   throw new Error(`Unknown command: ${command}`);
 }
 
@@ -601,6 +613,13 @@ function toPublicResult(result) {
       ...result,
       repo: publicPath(result.repo, cwd).replace(/\\/g, "/"),
       contextPack: publicPath(result.contextPack, cwd).replace(/\\/g, "/"),
+    };
+  }
+  if (result.command === "continue") {
+    return {
+      ...result,
+      outputDir: publicPath(result.outputDir, cwd),
+      outputFiles: toRelativeMap(result.outputFiles, cwd),
     };
   }
   return result;
@@ -803,6 +822,20 @@ function formatHuman(result) {
       "",
     ].join(os.EOL);
   }
+  if (result.command === "continue") {
+    return [
+      `BaseBrief continuation harness ${result.status}`,
+      `output_dir=${result.outputDir}`,
+      `context_pack=${result.outputFiles.contextPackDir}`,
+      `report=${result.outputFiles.report}`,
+      `starter=${result.outputFiles.starter}`,
+      `check_status=${result.check.status}`,
+      `check_errors=${result.check.errorCount}`,
+      `check_warnings=${result.check.warningCount}`,
+      ...formatNextStepLines(result),
+      "",
+    ].join(os.EOL);
+  }
   return `${JSON.stringify(result, null, 2)}${os.EOL}`;
 }
 
@@ -860,6 +893,15 @@ function formatNextStepLines(result) {
     }
     return ["next_step=continue only after live repo facts are rechecked"];
   }
+  if (result.command === "continue") {
+    if (result.status === "blocked") {
+      return ["next_step=review CHECK_SUMMARY.md and rerun continue after repair"];
+    }
+    if (result.status === "needs_review") {
+      return ["next_step=review CONTINUATION_REPORT.md before copying NEXT_WINDOW_STARTER.md"];
+    }
+    return ["next_step=copy NEXT_WINDOW_STARTER.md into the receiver window after review"];
+  }
   return [];
 }
 
@@ -897,6 +939,9 @@ function cli() {
   if (result.command === "sidecar-check" && result.check_status !== "passed") {
     process.exitCode = 1;
   }
+  if (result.command === "continue" && result.status === "blocked") {
+    process.exitCode = 1;
+  }
 }
 
 if (require.main === module) {
@@ -932,6 +977,7 @@ module.exports = {
   commandResume,
   commandExport,
   commandDoctor,
+  commandContinue,
   formatFindingLines,
   formatHuman,
   parseOptions,

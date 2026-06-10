@@ -92,6 +92,25 @@ function assertDogfoodingDocSharedReleaseChecks(doc, label) {
   assertDogfoodingDocNoPrivatePaths(doc, label);
 }
 
+function assertContinuationHarnessLiteBoundaries(doc, label) {
+  [
+    ["No provider request", "reject provider requests"],
+    ["No raw private output", "reject raw private output"],
+    ["No runtime integration", "reject runtime integration"],
+    ["No plugin", "reject plugin scope"],
+    ["No MCP server", "reject MCP server"],
+    ["No MCP tools", "reject MCP tools"],
+    ["No schema-v2", "reject schema-v2"],
+    ["No Workflow Runner", "reject workflow runner"],
+    ["No Doctor expansion", "reject doctor expansion"],
+    ["No Export expansion", "reject export expansion"],
+    ["No automatic", "reject automatic side effects"],
+    ["No Context Pack seven-file structure change", "preserve seven-file structure"],
+  ].forEach(([phrase, intent]) => {
+    assert(doc.includes(phrase), `${label} must ${intent}`);
+  });
+}
+
 function git(cwd, args) {
   return execFileSync("git", args, { cwd, encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] }).trim();
 }
@@ -241,6 +260,8 @@ function checkRequiredFiles() {
     "docs/releases/v2.6.0.md",
     "docs/releases/v2.7.0-plan.md",
     "docs/releases/v2.7.0.md",
+    "docs/releases/v2.8.0-plan.md",
+    "docs/releases/v2.8.0.md",
     "docs/specs/context-pack-resume.md",
     "docs/specs/basebrief-format.md",
     "docs/specs/file-only-export.md",
@@ -252,6 +273,7 @@ function checkRequiredFiles() {
     "docs/dogfooding/file-only-export-v2.4.0.md",
     "docs/dogfooding/context-pack-doctor-v2.5.0.md",
     "docs/dogfooding/context-pack-human-next-step-hints-dogfooding-v2.7.1.md",
+    "docs/dogfooding/continuation-harness-lite-v2.8.0.md",
     "docs/dogfooding/context-pack-adoption-notes-v2.6.1.md",
     "docs/dogfooding/context-engineering-reference-notes-v2.6.4.md",
     "docs/dogfooding/context-pack-adoption-scenario-matrix-v2.6.5.md",
@@ -337,6 +359,7 @@ function checkRequiredFiles() {
     "scripts/basebrief_export.js",
     "scripts/basebrief_doctor.js",
     "scripts/basebrief_resume.js",
+    "scripts/basebrief_continuation_harness.js",
     "scripts/bb9_provider_profiles.json",
     "schemas/bb9-handoff.schema.json",
     "schemas/basebrief-receiver-check.schema.json",
@@ -413,6 +436,7 @@ function checkRequiredFiles() {
     "examples/context-pack-lite/RISK_BOUNDARIES.md",
     "examples/context-pack-lite/RECEIVER_STATE.md",
     "examples/context-pack-lite/NEXT_WINDOW_STARTER.md",
+    "examples/context-pack-continuation/README.md",
     "examples/receiver-flow/clean-repo/README.md",
     "examples/receiver-flow/clean-repo/flow-summary.json",
     "examples/receiver-flow/clean-repo/receiver-check.json",
@@ -445,6 +469,7 @@ function checkRequiredFiles() {
     "examples/minimal/input-project-notes.md",
     "examples/minimal/output-basebrief-lite.md",
     "examples/minimal/next-chat-prompt.md",
+    "tests/continuation-harness.test.js",
     ".github/ISSUE_TEMPLATE/usability_feedback.md",
   ];
   required.forEach((relativePath) => {
@@ -458,6 +483,12 @@ function checkV2ContextPackDocs(context) {
     testingDoc,
     v2ContextPackRoadmapDoc,
     contextPackHumanNextStepHintsDogfoodingV271Doc,
+    v280PlanDoc,
+    v280ReleaseDoc,
+    continuationHarnessDogfoodingDoc,
+    basebriefCliScript,
+    basebriefContinuationHarnessScript,
+    continuationExampleReadme,
   } = context;
 
   assert(testingDoc.includes("v2.0.0 Context Pack Lite Local Closeout"), "Testing docs must document v2.0.0 context pack closeout");
@@ -1037,6 +1068,62 @@ function checkV2ContextPackDocs(context) {
   assertIncludesPhrase(contextPackHumanNextStepHintsDogfoodingV271Doc, "The hidden input-kind helper is not serialized into `--json` output", "v2.7.1 dogfooding doc must keep input kind out of JSON");
   assertDogfoodingDocCommonBoundaries(contextPackHumanNextStepHintsDogfoodingV271Doc, "v2.7.1 human next-step hints dogfooding", { doctorExpansion: true });
   assertDogfoodingDocSharedReleaseChecks(contextPackHumanNextStepHintsDogfoodingV271Doc, "v2.7.1 human next-step hints dogfooding");
+
+  assert(testingDoc.includes("v2.8.0 Continuation Harness Lite"), "Testing docs must document v2.8 continuation harness");
+  assert(testingDoc.includes("dogfooding/continuation-harness-lite-v2.8.0.md"), "Testing docs must link v2.8 dogfooding");
+  assert(testingDoc.includes("tests/continuation-harness.test.js"), "Testing docs must name continuation harness tests");
+  assert(testingDoc.includes("Expected test count is 180 tests") && testingDoc.includes("independent_test_files=4"), "Testing docs must document v2.8 test count and independent files");
+  assert(docsIndex.includes("releases/v2.8.0-plan.md"), "Docs index must link v2.8 continuation harness plan");
+  assert(docsIndex.includes("releases/v2.8.0.md"), "Docs index must link v2.8 continuation harness closeout");
+  assert(docsIndex.includes("dogfooding/continuation-harness-lite-v2.8.0.md"), "Docs index must link v2.8 dogfooding");
+  assert(docsIndex.includes("../examples/context-pack-continuation/README.md"), "Docs index must link continuation harness example kit");
+  assert(v2ContextPackRoadmapDoc.includes("v2.8 Continuation Harness Lite"), "v2 roadmap must name v2.8 continuation harness");
+  assert(v2ContextPackRoadmapDoc.includes("docs/dogfooding/continuation-harness-lite-v2.8.0.md"), "v2 roadmap must link v2.8 dogfooding");
+  assert(v2ContextPackRoadmapDoc.includes("expected test count") && v2ContextPackRoadmapDoc.includes("independent_test_files=4"), "v2 roadmap must document v2.8 validation metrics");
+
+  assert(v280PlanDoc.includes("v2.8.0 Continuation Harness Lite Plan"), "v2.8 plan must have stable title");
+  assert(v280PlanDoc.includes("context-pack -> check -> resume"), "v2.8 plan must preserve command sequence");
+  assert(v280PlanDoc.includes("node scripts/basebrief.js continue --repo <target-repo> --output-dir <dir>"), "v2.8 plan must document command shape");
+  assert(v280PlanDoc.includes("CONTINUATION_REPORT.md") && v280PlanDoc.includes("continuation.meta.json") && v280PlanDoc.includes("context-pack/"), "v2.8 plan must define output shape");
+  assert(v280PlanDoc.includes("ready_for_receiver") && v280PlanDoc.includes("needs_review") && v280PlanDoc.includes("blocked"), "v2.8 plan must define status semantics");
+  assert(v280PlanDoc.includes("must not include the full resume") && v280PlanDoc.includes("next_step"), "v2.8 plan must keep prompt and human hints out of JSON");
+  assert(v280PlanDoc.includes("clean repo -> continue -> ready_for_receiver") && v280PlanDoc.includes("dirty repo -> continue -> needs_review"), "v2.8 plan must preserve acceptance matrix");
+  assertContinuationHarnessLiteBoundaries(v280PlanDoc, "v2.8 plan");
+
+  assert(v280ReleaseDoc.includes("v2.8.0 Continuation Harness Lite Local Closeout"), "v2.8 closeout must have stable title");
+  assert(v280ReleaseDoc.includes("scripts/basebrief_continuation_harness.js"), "v2.8 closeout must name harness script");
+  assert(v280ReleaseDoc.includes("tests/continuation-harness.test.js"), "v2.8 closeout must name independent tests");
+  assert(v280ReleaseDoc.includes("docs/dogfooding/continuation-harness-lite-v2.8.0.md"), "v2.8 closeout must link dogfooding evidence");
+  assertIncludesPhrase(v280ReleaseDoc, "does not include the full resume prompt body and does not add human-only `next_step` fields", "v2.8 closeout must preserve JSON boundary");
+  assertContinuationHarnessLiteBoundaries(v280ReleaseDoc, "v2.8 closeout");
+
+  assert(continuationHarnessDogfoodingDoc.includes("Continuation Harness Lite Dogfooding v2.8.0"), "v2.8 dogfooding doc must have stable title");
+  assert(continuationHarnessDogfoodingDoc.includes("continuation_status: needs_review"), "v2.8 dogfooding must record dirty-worktree needs_review");
+  assert(continuationHarnessDogfoodingDoc.includes("context_pack_step: generated") && continuationHarnessDogfoodingDoc.includes("check_step: passed") && continuationHarnessDogfoodingDoc.includes("resume_step: ready"), "v2.8 dogfooding must record harness step results");
+  assert(continuationHarnessDogfoodingDoc.includes("continuation_package_check_status: passed"), "v2.8 dogfooding must record package check pass");
+  assert(continuationHarnessDogfoodingDoc.includes("json_prompt_leak_status: absent") && continuationHarnessDogfoodingDoc.includes("json_next_step_leak_status: absent"), "v2.8 dogfooding must record JSON leak absence");
+  assert(continuationHarnessDogfoodingDoc.includes("copied_starter_private_path_status: absent") && continuationHarnessDogfoodingDoc.includes("report_private_path_status: absent") && continuationHarnessDogfoodingDoc.includes("metadata_private_path_status: absent"), "v2.8 dogfooding must record private path absence");
+  assert(continuationHarnessDogfoodingDoc.includes("independent_test_files=4") && continuationHarnessDogfoodingDoc.includes("provider_probe_status=skipped"), "v2.8 dogfooding must record expected release-check metrics");
+  assertContinuationHarnessLiteBoundaries(continuationHarnessDogfoodingDoc, "v2.8 dogfooding");
+  assertDogfoodingDocSharedReleaseChecks(continuationHarnessDogfoodingDoc, "v2.8 dogfooding");
+
+  assert(continuationExampleReadme.includes("Continuation Harness Lite Example Kit"), "Continuation example kit must have stable title");
+  assert(continuationExampleReadme.includes("CONTINUATION_REPORT.md") && continuationExampleReadme.includes("continuation.meta.json") && continuationExampleReadme.includes("context-pack/"), "Continuation example kit must define output shape");
+  assert(continuationExampleReadme.includes("ready_for_receiver") && continuationExampleReadme.includes("needs_review") && continuationExampleReadme.includes("blocked"), "Continuation example kit must define status semantics");
+  assert(continuationExampleReadme.includes("inherited context, not proof"), "Continuation example kit must preserve receiver recheck rule");
+  assert(continuationExampleReadme.includes("does not call providers") && continuationExampleReadme.includes("does not run a Workflow") && continuationExampleReadme.includes("does not create an MCP server"), "Continuation example kit must preserve non-goals");
+
+  assert(basebriefCliScript.includes("runContinuationHarness"), "CLI must import continuation harness");
+  assert(basebriefCliScript.includes("continue --repo <target-repo> --output-dir <dir>"), "CLI must expose continue help");
+  assert(basebriefCliScript.includes('if (command === "continue") return commandContinue(options);'), "CLI must route continue command");
+  assert(basebriefCliScript.includes("next_step=copy NEXT_WINDOW_STARTER.md"), "CLI human output must guide ready receiver copy");
+  assert(basebriefCliScript.includes("next_step=review CONTINUATION_REPORT.md"), "CLI human output must guide needs-review status");
+
+  assert(basebriefContinuationHarnessScript.includes("basebrief-continuation-harness-v1"), "Harness script must define v1 contract");
+  assert(basebriefContinuationHarnessScript.includes("CONTINUATION_REPORT.md") && basebriefContinuationHarnessScript.includes("CHECK_SUMMARY.md") && basebriefContinuationHarnessScript.includes("continuation.meta.json"), "Harness script must define v2.8 files");
+  assert(basebriefContinuationHarnessScript.includes("ready_for_receiver") && basebriefContinuationHarnessScript.includes("needs_review") && basebriefContinuationHarnessScript.includes("blocked"), "Harness script must implement status semantics");
+  assert(basebriefContinuationHarnessScript.includes("safePromptForOutput"), "Harness script must normalize copied starter paths");
+  assert(basebriefContinuationHarnessScript.includes("No provider request.") && basebriefContinuationHarnessScript.includes("No Workflow Runner."), "Harness script must preserve hard boundaries");
 
   assert(v2ContextPackRoadmapDoc.includes("exports/manifest.json"), "v2 roadmap must define export manifest");
   assert(v2ContextPackRoadmapDoc.includes("exports/context-pack.md"), "v2 roadmap must define readable export");
@@ -2336,6 +2423,8 @@ function checkContentContracts() {
   const v260ReleaseDoc = readText("docs/releases/v2.6.0.md");
   const v270PlanDoc = readText("docs/releases/v2.7.0-plan.md");
   const v270ReleaseDoc = readText("docs/releases/v2.7.0.md");
+  const v280PlanDoc = readText("docs/releases/v2.8.0-plan.md");
+  const v280ReleaseDoc = readText("docs/releases/v2.8.0.md");
   const contextPackResumeSpecDoc = readText("docs/specs/context-pack-resume.md");
   const basebriefFormatSpecDoc = readText("docs/specs/basebrief-format.md");
   const fileOnlyExportSpecDoc = readText("docs/specs/file-only-export.md");
@@ -2344,6 +2433,7 @@ function checkContentContracts() {
   const basebriefContextPackScript = readText("scripts/basebrief_context_pack.js");
   const basebriefExportScript = readText("scripts/basebrief_export.js");
   const basebriefDoctorScript = readText("scripts/basebrief_doctor.js");
+  const basebriefContinuationHarnessScript = readText("scripts/basebrief_continuation_harness.js");
   const v2ContextPackRoadmapDoc = readText("docs/roadmap/basebrief-v2-context-pack-lite.md");
   const contextPackLiteDogfoodingDoc = readText("docs/dogfooding/context-pack-lite-fresh-receiver-v2.0.0.md");
   const contextPackCheckDogfoodingDoc = readText("docs/dogfooding/context-pack-check-acceptance-v2.1.0.md");
@@ -2352,6 +2442,7 @@ function checkContentContracts() {
   const contextPackDoctorDogfoodingDoc = readText("docs/dogfooding/context-pack-doctor-v2.5.0.md");
   const contextPackDoctorDogfoodingV251Doc = readText("docs/dogfooding/context-pack-doctor-v2.5.1.md");
   const contextPackHumanNextStepHintsDogfoodingV271Doc = readText("docs/dogfooding/context-pack-human-next-step-hints-dogfooding-v2.7.1.md");
+  const continuationHarnessDogfoodingDoc = readText("docs/dogfooding/continuation-harness-lite-v2.8.0.md");
   const contextPackAdoptionNotesV261Doc = readText("docs/dogfooding/context-pack-adoption-notes-v2.6.1.md");
   const contextEngineeringReferenceNotesV264Doc = readText("docs/dogfooding/context-engineering-reference-notes-v2.6.4.md");
   const contextPackAdoptionScenarioMatrixV265Doc = readText("docs/dogfooding/context-pack-adoption-scenario-matrix-v2.6.5.md");
@@ -2427,6 +2518,7 @@ function checkContentContracts() {
   const contextPackLiteExampleManifest = readText("examples/context-pack-lite/MANIFEST.md");
   const contextPackLiteExampleReceiverState = readText("examples/context-pack-lite/RECEIVER_STATE.md");
   const contextPackLiteExampleStarter = readText("examples/context-pack-lite/NEXT_WINDOW_STARTER.md");
+  const continuationExampleReadme = readText("examples/context-pack-continuation/README.md");
   const fileOnlyExportExampleReadme = readText("examples/file-only-export/README.md");
   const fileOnlyExportExampleManifest = readJson("examples/file-only-export/exports/manifest.json");
   const fileOnlyExportExampleContext = readJson("examples/file-only-export/exports/context.json");
@@ -2469,7 +2561,7 @@ function checkContentContracts() {
     JSON.stringify(Object.keys(packageJson.scripts || {}).sort()) === JSON.stringify(["check", "release-check", "test"]),
     "package.json must only expose local validation scripts",
   );
-  assert(packageJson.scripts.test === "node --test tests/basebrief.test.js tests/context-pack.test.js tests/cache-ready-benchmark.test.js", "npm test must wrap the independent tests");
+  assert(packageJson.scripts.test === "node --test tests/basebrief.test.js tests/context-pack.test.js tests/cache-ready-benchmark.test.js tests/continuation-harness.test.js", "npm test must wrap the independent tests");
   assert(packageJson.scripts["release-check"] === "node scripts/run_release_checks.js", "npm run release-check must wrap release checks");
   assert(packageJson.scripts.check === "npm test && npm run release-check", "npm run check must run tests before release checks");
   ["dependencies", "devDependencies", "peerDependencies", "optionalDependencies", "bin", "publishConfig", "files"].forEach((key) => {
@@ -2898,6 +2990,12 @@ function checkContentContracts() {
     testingDoc,
     v2ContextPackRoadmapDoc,
     contextPackHumanNextStepHintsDogfoodingV271Doc,
+    v280PlanDoc,
+    v280ReleaseDoc,
+    continuationHarnessDogfoodingDoc,
+    basebriefCliScript,
+    basebriefContinuationHarnessScript,
+    continuationExampleReadme,
   });
   assert(testingDoc.includes("v1.5 Delta Receiver Lint Mini Plan"), "Testing docs must document the v1.5 lint mini plan");
   assert(testingDoc.includes("v1.5 Delta Receiver Lint Mini Local Closeout"), "Testing docs must document the v1.5 lint mini closeout");
@@ -5441,6 +5539,7 @@ function checkCliLite() {
     assert(helpStdout.includes("sidecar-build --repo <target-repo>"), "CLI help must expose Sidecar build");
     assert(helpStdout.includes("--starter-language auto|zh-CN|en|ja"), "CLI help must expose starter language option");
     assert(helpStdout.includes("sidecar-check --input <sidecar-dir>"), "CLI help must expose Sidecar check");
+    assert(helpStdout.includes("continue --repo <target-repo> --output-dir <dir>"), "CLI help must expose Continuation Harness Lite");
     assert(helpStdout.includes("context-pack --repo <target-repo> --output-dir <dir>"), "CLI help must expose Context Pack Lite");
     assert(helpStdout.includes("resume --input <context-pack-dir>"), "CLI help must expose Context Pack Resume");
     assert(helpStdout.includes("doctor --repo <target-repo> --context-pack <context-pack-dir>"), "CLI help must expose Context Pack Doctor");
@@ -6324,7 +6423,7 @@ function checkBenchmarkSummaryIfPresent() {
 }
 
 function checkIndependentTests() {
-  const tests = ["tests/basebrief.test.js", "tests/context-pack.test.js", "tests/cache-ready-benchmark.test.js"];
+  const tests = ["tests/basebrief.test.js", "tests/context-pack.test.js", "tests/cache-ready-benchmark.test.js", "tests/continuation-harness.test.js"];
   tests.forEach((relativePath) => {
     assert(fs.existsSync(path.join(repoRoot, relativePath)), `Missing independent test: ${relativePath}`);
   });

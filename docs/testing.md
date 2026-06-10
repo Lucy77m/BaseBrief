@@ -1841,6 +1841,48 @@ git diff --check
 Provider-free release checks must continue to print
 `provider_probe_status=skipped`.
 
+## v2.8.0 Continuation Harness Lite
+
+`v2.8.0` opens and closes the first Continuation Harness Lite implementation.
+The plan is recorded in
+[v2.8.0 Continuation Harness Lite Plan](releases/v2.8.0-plan.md), and the
+local closeout is recorded in
+[v2.8.0 Continuation Harness Lite Local Closeout](releases/v2.8.0.md).
+Self-dogfooding evidence is recorded in
+[Continuation Harness Lite Dogfooding v2.8.0](dogfooding/continuation-harness-lite-v2.8.0.md).
+
+The new local command is:
+
+```text
+node scripts/basebrief.js continue --repo <target-repo> --output-dir <dir> [--since <commit>] [--max-files <n>] [--json]
+```
+
+It runs the existing `context-pack -> check -> resume` path and writes a
+reviewable continuation package with `CONTINUATION_REPORT.md`,
+`CHECK_SUMMARY.md`, `NEXT_WINDOW_STARTER.md`, `continuation.meta.json`, and a
+seven-file `context-pack/` directory. The example shape is documented in
+[Continuation Harness Lite example kit](../examples/context-pack-continuation/README.md).
+
+Tests verify `ready_for_receiver` for clean repos, `needs_review` for dirty
+repos, unsafe and non-empty output rejection, public-safe `continue --json`
+metadata, and removal of private absolute Context Pack paths from the copied
+starter. The command does not change Context Pack Check, Resume, Export, or
+Doctor JSON contracts.
+
+Expected test count is 180 tests across `independent_test_files=4`.
+
+The local validation gate is:
+
+```text
+node --test tests/continuation-harness.test.js
+npm run release-check
+npm test
+git diff --check
+```
+
+Provider-free release checks must continue to print
+`provider_probe_status=skipped`.
+
 ## v0.4.1 Stabilization Candidate
 
 `v0.4.1` is a stabilization-only cycle after the `v0.4.0` public release. It uses

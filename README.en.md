@@ -27,9 +27,11 @@ Choose full or lite for the current task and produce a project-stage baseline.
 Do not turn assumptions into verified facts; list open_questions when boundaries are unclear.
 ```
 
-Or use CLI Lite to generate a Context Pack:
+Or use CLI Lite to prepare a continuation package; run the Context Pack steps
+manually only when you want the lower-level flow:
 
 ```text
+node scripts/basebrief.js continue --repo . --output-dir tests/outputs/private/continue
 node scripts/basebrief.js context-pack --repo . --output-dir tests/outputs/private/context-pack --json
 node scripts/basebrief.js check --input tests/outputs/private/context-pack --json
 node scripts/basebrief.js resume --input tests/outputs/private/context-pack
@@ -40,6 +42,7 @@ node scripts/basebrief.js resume --input tests/outputs/private/context-pack
 ## Common Commands
 
 ```text
+node scripts/basebrief.js continue --repo <target-repo> --output-dir <dir> [--json]
 node scripts/basebrief.js context-pack --repo <target-repo> --output-dir <dir> [--json]
 node scripts/basebrief.js check --input <context-pack-dir> [--json]
 node scripts/basebrief.js resume --input <context-pack-dir> [--json]
@@ -47,7 +50,7 @@ node scripts/basebrief.js export --input <context-pack-dir> --output-dir <dir> [
 node scripts/basebrief.js doctor --repo <target-repo> --context-pack <context-pack-dir> [--json]
 ```
 
-The main line is Context Pack / Check / Resume / Export / Doctor. For File-only Export, “MCP-friendly means future tool-consumable files”; it does not mean an MCP server, runtime integration, or provider integration.
+The main line is Continue / Context Pack / Check / Resume / Export / Doctor. `continue` prepares a reviewable continuation package; it does not execute project work automatically. For File-only Export, “MCP-friendly means future tool-consumable files”; it does not mean an MCP server, runtime integration, or provider integration.
 
 ## Local Validation
 
@@ -66,7 +69,7 @@ These npm scripts are local validation shortcuts only. BaseBrief is not a publis
 - No runtime integration.
 - No schema change / No schema-v2.
 - No MCP server.
-- No Workflow Runner.
+- No Workflow Runner; `continue` is a local continuation-package preparer, not a runner.
 - Do not publish `.env`, API keys, tokens, or secrets.
 - Do not write private absolute paths into public docs.
 - Do not record assumptions as verified facts.

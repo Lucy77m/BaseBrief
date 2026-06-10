@@ -788,6 +788,34 @@ narrows human `check` hints by input kind while keeping `--json` output free of
 structure, provider/runtime/MCP/plugin/schema-v2 boundaries, and release
 actions not_started.
 
+### v2.8 Continuation Harness Lite
+
+`docs/releases/v2.8.0-plan.md` opens the first new capability line after the
+v2.7.1 human-hint release. v2.8 should assemble the existing
+`context-pack -> check -> resume` path into a local reviewable continuation
+package instead of continuing as small hint/doc polish.
+
+The v2.8 command is:
+
+```text
+node scripts/basebrief.js continue --repo <target-repo> --output-dir <dir> [--since <commit>] [--max-files <n>] [--json]
+```
+
+`docs/releases/v2.8.0.md` closes the minimal implementation. It writes
+`CONTINUATION_REPORT.md`, `CHECK_SUMMARY.md`, `NEXT_WINDOW_STARTER.md`,
+`continuation.meta.json`, and `context-pack/`. It reports
+`ready_for_receiver`, `needs_review`, or `blocked`; `blocked` exits nonzero.
+Self-dogfooding is recorded in
+`docs/dogfooding/continuation-harness-lite-v2.8.0.md`, with expected test count
+180 and `independent_test_files=4`.
+
+This is not Workflow Runner Lite. It does not call providers, run project
+tasks, expand Doctor or Export, create a plugin or MCP server/tools, add
+schema-v2, start a daemon or watcher, or perform automatic commit, push, tag,
+release, pull request, npm publish, or global CLI install actions. It preserves
+Context Pack Check, Resume, Export, and Doctor JSON contracts and keeps
+`provider_probe_status=skipped` as the no-provider release-check gate.
+
 ### Later Workflow Runner Lite
 
 Only after Context Pack Lite, Context Pack Check, One-command Resume,

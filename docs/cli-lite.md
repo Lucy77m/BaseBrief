@@ -29,6 +29,7 @@ node scripts/basebrief.js sidecar-check --input tests/outputs/private/sidecar-ge
 node scripts/basebrief.js seal --input examples/seal-before-input.json --output tests/outputs/private/seal-before.json
 node scripts/basebrief.js diff --before examples/seal-before-input.json --after examples/seal-after-input.json --json
 node scripts/basebrief.js delta --repo . --output-dir tests/outputs/private/delta --json
+node scripts/basebrief.js continue --repo . --output-dir tests/outputs/private/continue --json
 node scripts/basebrief.js context-pack --repo . --output-dir tests/outputs/private/context-pack --json
 node scripts/basebrief.js resume --input examples/context-pack-lite --json
 node scripts/basebrief.js export --input examples/context-pack-lite --output-dir tests/outputs/private/file-export --json
@@ -341,6 +342,37 @@ baseline is delta-local and does not change `basebrief-project-state-v1`.
 
 The output separates `reviewed` project-state continuity from `needs-review`
 generated git and diff summaries. See [Delta Handoff Spec](specs/delta-handoff.md).
+
+### continue
+
+```text
+node scripts/basebrief.js continue --repo <target-repo> --output-dir <dir> [--since <commit>] [--max-files <n>] [--json]
+```
+
+This command runs the existing `context-pack -> check -> resume` path and writes
+a reviewable local continuation package:
+
+- `CONTINUATION_REPORT.md`
+- `NEXT_WINDOW_STARTER.md`
+- `CHECK_SUMMARY.md`
+- `continuation.meta.json`
+- `context-pack/`
+
+The command reports `ready_for_receiver`, `needs_review`, or `blocked`.
+`blocked` exits nonzero. `needs_review` exits zero but asks the user to review
+warnings or dirty-worktree facts before copying the starter.
+
+`continue --json` reports metadata, output file paths, step status, git summary,
+and check summary. It does not include the full resume prompt body and does not
+add human-only `next_step` fields.
+
+Continuation Harness Lite is not a Workflow Runner. It does not call providers,
+does not expand Doctor or Export, does not create an MCP server or plugin, does
+not add schema-v2, and does not perform git or release actions.
+
+See [v2.8.0 Continuation Harness Lite Plan](releases/v2.8.0-plan.md),
+[v2.8.0 Continuation Harness Lite Local Closeout](releases/v2.8.0.md), and
+[Continuation Harness Lite example kit](../examples/context-pack-continuation/README.md).
 
 ### context-pack
 

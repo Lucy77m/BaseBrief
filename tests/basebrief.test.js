@@ -276,7 +276,7 @@ test("v0.3.1 receiver stabilization documents examples, local npm scripts, and r
 
   assert.equal(packageJson.private, true);
   assert.deepEqual(Object.keys(packageJson.scripts).sort(), ["check", "release-check", "test"]);
-  assert.equal(packageJson.scripts.test, "node --test tests/basebrief.test.js tests/context-pack.test.js tests/cache-ready-benchmark.test.js");
+  assert.equal(packageJson.scripts.test, "node --test tests/basebrief.test.js tests/context-pack.test.js tests/cache-ready-benchmark.test.js tests/continuation-harness.test.js");
   assert.equal(packageJson.scripts["release-check"], "node scripts/run_release_checks.js");
   assert.equal(packageJson.scripts.check, "npm test && npm run release-check");
   ["dependencies", "devDependencies", "peerDependencies", "optionalDependencies", "bin", "publishConfig", "files"].forEach((key) => {
